@@ -14,14 +14,12 @@ function usage () {
     error "Usage: $0 [ OPTIONS... ]
  -bindir <dir>   Directory where the binaries will be installed
                  (default: /usr/local/bin)
- -libdir <dir>   Directory where the OCaml library PIC tools will be installed
-                 (default: /usr/local/lib/ocapic)
+ -libdir <dir>   Directory where the OCaml library will be installed
+                 (default: /usr/local/lib/omicrob)
  -mandir <dir>   Directory where the manual pages will be installed
                  (default: /usr/local/man)
- -prefix <dir>   Set bindir, libdir and mandir to <dir>/bin, <dir>/lib/ocapic
-                 and <dir>/man respectively
- -cc <cmd>       C compiler to use for building the system
- -pics <regexp>  Choose PIC to be managed by OCaPIC"
+ -prefix <dir>   Set bindir, libdir and mandir to <dir>/bin, <dir>/lib/omicrob
+                 and <dir>/man respectively"
 }
 
 function check_command () {
@@ -107,39 +105,38 @@ done
 ################################################################################
 
 echo -n "\
-OCAMLCLEAN = $OCAMLCLEAN
-BINDIR = $BINDIR
-LIBDIR = $LIBDIR
-MAN1DIR = $MANDIR/man1
-MAN3DIR = $MANDIR/man3
-OCAMLC = $OCAMLC -w A -warn-error A -safe-string -strict-formats -strict-sequence
-OCAMLOPT = $OCAMLOPT -w A -warn-error A -safe-string -strict-formats -strict-sequence
-OCAMLDOC = $OCAMLDOC
-OCAMLBUILD = $OCAMLBUILD -cflags -w,A,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -lflags -w,A,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -no-links -classic-display
-SRC = $ROOT/src
-BIN = $ROOT/bin
-LIB = $ROOT/lib
-ETC = $ROOT/etc
+VERSION    := $VERSION
+OCAMLCLEAN := $OCAMLCLEAN
+BINDIR     := $BINDIR
+LIBDIR     := $LIBDIR
+MAN1DIR    := $MANDIR/man1
+MAN3DIR    := $MANDIR/man3
+OCAMLC     := $OCAMLC -w A -warn-error A -safe-string -strict-formats -strict-sequence
+OCAMLOPT   := $OCAMLOPT -w A -warn-error A -safe-string -strict-formats -strict-sequence
+OCAMLDOC   := $OCAMLDOC
+OCAMLBUILD := $OCAMLBUILD -cflags -w,A,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -lflags -w,A,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -no-links -classic-display
+SRC        := $ROOT/src
+BIN        := $ROOT/bin
+LIB        := $ROOT/lib
+ETC        := $ROOT/etc
+
 define compile
-        @make --no-print-directory -q -C \$1 && \
-        make --no-print-directory -C \$1 || \
-        make -C \$1
+        @make --no-print-directory -q -C \$1 && make --no-print-directory -C \$1 || make -C \$1
 endef
+
 define clean
         @make --no-print-directory -C \$1 clean > /dev/null
 endef
-
 " > etc/Makefile.conf
 
 ################################################################################
 
 echo -n "\
-let libdir = \"$LIBDIR\"
-let ocaml = \"$OCAML\"
-let ocamlc = \"$OCAMLC\"
+let libdir     = \"$LIBDIR\"
+let ocaml      = \"$OCAML\"
+let ocamlc     = \"$OCAMLC\"
 let ocamlclean = \"$OCAMLCLEAN\"
-let version = \"$VERSION\"
-
+let version    = \"$VERSION\"
 " > etc/config.ml
 
 ################################################################################
