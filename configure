@@ -36,6 +36,12 @@ function check_absolute_path () {
     esac
 }
 
+function check_directory() {
+    if [ ! -d "$1" ]; then
+        error "-e" "Error: directory \"$1\" not found.\nPlease install $2."
+    fi
+}
+
 function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
@@ -60,6 +66,8 @@ check_command "rm"
 check_command "ar"
 check_command "cp"
 
+check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam install obytelib)"
+
 ################################################################################
 
 OCAML="$(wich ocaml.opt 2> /dev/null || which ocaml)"
@@ -68,7 +76,7 @@ OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
 OCAMLDOC="$(wich ocamldoc.opt 2> /dev/null || which ocamldoc)"
 OCAMLBUILD="$(which ocamlbuild)"
 OCAMLCLEAN="$(which ocamlclean)"
-CAMLWHERE="$(ocamlc -where)"
+OCAMLWHERE="$(ocamlc -where)"
 VERSION="$(cat VERSION)"
 ROOT="$(pwd)"
 
@@ -111,10 +119,11 @@ BINDIR     := $BINDIR
 LIBDIR     := $LIBDIR
 MAN1DIR    := $MANDIR/man1
 MAN3DIR    := $MANDIR/man3
-OCAMLC     := $OCAMLC -w A -warn-error A -safe-string -strict-formats -strict-sequence
-OCAMLOPT   := $OCAMLOPT -w A -warn-error A -safe-string -strict-formats -strict-sequence
+OCAMLC     := $OCAMLC -w A-58 -warn-error A -safe-string -strict-formats -strict-sequence
+OCAMLOPT   := $OCAMLOPT -w A-58 -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLDOC   := $OCAMLDOC
-OCAMLBUILD := $OCAMLBUILD -cflags -w,A,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -lflags -w,A,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -no-links -classic-display
+OCAMLBUILD := $OCAMLBUILD -cflags -w,A-58,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -lflags -w,A-58,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -no-links -classic-display -build-dir .build
+OCAMLWHERE := $OCAMLWHERE
 SRC        := $ROOT/src
 BIN        := $ROOT/bin
 LIB        := $ROOT/lib
@@ -140,3 +149,5 @@ let version    = \"$VERSION\"
 " > etc/config.ml
 
 ################################################################################
+
+echo "** OMicroB configuration completed successfully **"

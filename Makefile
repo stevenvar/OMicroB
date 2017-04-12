@@ -1,3 +1,5 @@
+include etc/Makefile.conf
+
 all: config
 	$(call compile, src/bc2c)
 	$(call compile, src/byterun)
