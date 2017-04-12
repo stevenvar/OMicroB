@@ -43,7 +43,7 @@ typedef int32_t  mlsize_t;
 
  */
 
-#define Is_int(x) ((x) & 1) != 0)
+#define Is_int(x) ((x & 1) != 0)
 #define Is_nan(x) ( (x >> 23) == 512)
 #define Is_ptr(x) ( ((x << 31) == 0) && ((x >> 23) == 256))
 
