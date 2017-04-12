@@ -31,6 +31,7 @@ pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoi
 typedef int32_t  val_t;
 typedef int32_t  header_t;
 typedef int32_t  tag_t;
+typedef int32_t  color_t;
 typedef int32_t  mlsize_t;
 
 
@@ -95,6 +96,20 @@ bits  31    10 9     8 7   0
 
 #define Wosize_val(val) (Wosize_hd (Hd_val (val)))
 #define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
+#define Wosize_bp(bp) (Wosize_val (bp))
+#define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
+#define Whsize_wosize(sz) ((sz) + 1)
+#define Wosize_whsize(sz) ((sz) - 1)
+#define Wosize_bhsize(sz) ((sz) / sizeof (value) - 1)
+#define Bsize_wsize(sz) ((sz) * sizeof (value))
+#define Wsize_bsize(sz) ((sz) / sizeof (value))
+#define Bhsize_wosize(sz) (Bsize_wsize (Whsize_wosize (sz)))
+#define Bhsize_bosize(sz) ((sz) + sizeof (header_t))
+#define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
+#define Bosize_op(op) (Bosize_val (Val_op (op)))
+#define Bosize_bp(bp) (Bosize_val (Val_bp (bp)))
+#define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
+#define Whsize_hp(hp) (Whsize_wosize (Wosize_hp (hp)))
 
 // supposition LITTLE ENDIAN
 #define Tag_val(val) (((unsigned char *) (val)) [-sizeof(val_t)])
