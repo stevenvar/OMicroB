@@ -1,5 +1,7 @@
 #include <stdint.h>
+#include <avr/pgmspace.h>
 #include "inst.h"
+#include "values.h"
 
 /* Registers for the abstract machine:
    pc          the code pointer
@@ -8,11 +10,7 @@
    env         heap-allocated environment
    caml_trapsp pointer to the current trap frame
    extra_args  number of extra arguments provided by the caller
-   sp is a local copy of the global variable caml_extern_sp. */
-
-typedef uint8_t opcode_t;
-typedef int32_t code_t;
-typedef int32_t val_t;
+*/
 
 static code_t pc;
 static val_t acc;
@@ -23,18 +21,18 @@ static val_t *global_data;
 static int extra_args;
 
 inline opcode_t read_inst (code_t pc){
-  return pgm_read_byte_far(pc);
+  return pgm_read_byte_near(pc);
 }
 
 inline val_t read_val (code_t pc){
-  return pgm_read_byte_far(pc);
+  return read_inst(pc);
 }
 
 inline int read_int (code_t pc){
   return Int_val(read_val(pc));
 }
 
-inline val_t peek (code_t n){
+inline val_t peek (int n){
   return sp[n];
 }
 
@@ -46,7 +44,7 @@ inline val_t pop (){
   return *(sp++);
 }
 
-inline val_t pop_n (code_t n){
+inline val_t pop_n (int n){
   sp += n;
   return *(sp);
 }
@@ -57,7 +55,8 @@ void interp(){
 
 void interp_inst (){
   opcode_t curr_inst = read_inst(pc++);
-
+  int n;
+  int ofs;
   switch(curr_inst){
   case ACC0 :
     acc = peek(0);
@@ -121,14 +120,16 @@ void interp_inst (){
     acc = peek(7);
     break;
   case PUSHACC :
+    n = read_int(pc++);
     push(acc);
-    acc = peek(pc++);
+    acc = peek(n+1);
     break;
   case POP :
     sp += read_val(pc++);
     break;
   case ASSIGN :
-    sp[pc++] = acc;
+    n = read_int(pc++);
+    sp[n] = acc;
     acc = Val_unit;
     break;
   case ENVACC1 :
@@ -167,9 +168,12 @@ void interp_inst (){
     acc = Field(env,read_val(pc++));
     break;
   case PUSH_RETADDR :
+    read_int(pc++);
     push(Val_int(extra_args));
-    push(env);
-    push(pc + read_val(pc++));
+    push((val_t)(env));
+    /* Something's not right here : an AVR pointer is 16bits
+     while a val_t can be 32 bits */
+    push(pc + ofs);
     break;
   case APPLY :
     extra_args = read_val(pc++) - 1;
@@ -582,9 +586,152 @@ void interp_inst (){
     env = pop();
     pop_n(n);
     break;
+  case PUSHCONST0 :
+    push(acc);
+    /* fallthrough */
   case CONST0 :
     acc = Val_int(0);
     break;
+  case PUSHCONST1 :
+    push(acc);
+    /* fallthrough */
+  case CONST1 :
+    acc = Val_int(1);
+    break;
+  case PUSHCONST2 :
+    push(acc);
+    /* fallthrough */
+  case CONST2 :
+    acc = Val_int(2);
+    break;
+  case PUSHCONST3 :
+    push(acc);
+    /* fallthrough */
+  case CONST3 :
+    acc = Val_int(3);
+    break;
+  case PUSHCONSTINT :
+    push(acc);
+    /* fallthrough */
+  case CONSTINT :
+    int n = read_int(pc++);
+    acc = Val_int(n);
+    break;
+  case NEGINT :
+    accu = NegInt(accu);
+    /* TODO MACRO */
+    break;
+  case ADDINT :
+    /* accu = AddInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) + Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case SUBINT :
+    /* accu = SubInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) - Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case MULINT :
+    /* accu = MulInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) * Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case DIVINT :
+    /* accu = DivInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) / Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case MODINT :
+    /* accu = ModInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) % Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case ANDINT :
+    /* accu = AndInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) & Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case ORINT :
+    /* accu = OrInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) | Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case XORINT :
+    /* accu = XorInt(accu,pop()); */
+    accu = Val_int((Int_val(accu) ^ Int_val(op())));
+    /* TODO MACRO */
+    break;
+  case LSLINT :
+    accu = LslInt(accu,pop());
+    /* TODO MACRO */
+    break;
+ case LSRINT :
+    accu = LsrInt(accu,pop());
+    /* TODO MACRO */
+    break;
+  case ASRINT :
+    accu = AsrInt(accu,pop());
+    /* TODO MACRO */
+    break;
+  case EQ :
+    accu = (accu == pop()) ? Val_int(1) : Val_int(0);
+    break;
+  case NEQ :
+    accu = (accu == pop()) ? Val_int(0) : Val_int(1);
+    break;
+  case LTINT :
+    break;
+  case LEINT :
+    break;
+  case GTINT :
+    break;
+  case GEINT :
+    break;
+  case OFFSETINT :
+    int ofs = read_int(pc++);
+    acc += Val_int(ofs);
+    break;
+  case OFFSETREF :
+    int ofs = read_int(pc++);
+    Field(addu,0) += Val_int(ofs);
+    accu = Val_unit;
+    break;
+  case ISINT :
+    accu = Is_int(accu) ? Val_int(1) : Val_int(0);
+    break;
+  case GETMETHOD :
+    val_t x = peek(0);
+    val_t y = Field(x,0);
+    accu = Field(y,Int_val(accu));
+    break;
+  case BEQ :
+    val_t val = read_val(pc++);
+    int_t ofs = read_int(pc);
+    if (val == accu){
+      pc += ofs - 1;
+    }
+    else {
+      pc++;
+    }
+    break;
+  case BNEQ :
+    val_t val = read_val(pc++);
+    int_t ofs = read_int(pc);
+    if (val != accu){
+      pc += ofs - 1;
+    }
+    else {
+      pc++;
+    }
+    break;
+  case BLTINT : break;
+  case BLEINT : break;
+  case BGTINT : break;
+  case BGEINT : break;
+  case ULTINT : break;
+  case UGEINT : break;
+  case BULTINT : break;
+  case BUGEINT : break;
   default : break;
 
   }

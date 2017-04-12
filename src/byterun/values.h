@@ -5,16 +5,16 @@
 
 #include <stdint.h>
 
-/* version 32 bits 
+/* version 32 bits
 
-   codage des valeurs par du Nan boxing 32 bits avec : 
+   codage des valeurs par du Nan boxing 32 bits avec :
 
           float : tels quels avec 1 seul Nan 1111 1111 1000 0000 0000 0000 0000 0000
            int  : 1 bit de marque à la fin ou au début
-       pointeur : 0111 1111 1xxx yyyy xxxx yyyy xxxx yyy0  (alignement) 
+       pointeur : 0111 1111 1xxx yyyy xxxx yyyy xxxx yyy0  (alignement)
 pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
-           word : 4 octets sur machines 32 bits 
+           word : 4 octets sur machines 32 bits
         int32_t : entiers sur 32 bits (stdint.h)
           val_t : la représentation uniforme d'une valeur ocaml
        header_t : la représentation de l'entête (là aussi 32 bits)
@@ -24,7 +24,7 @@ pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoi
 
 
 /* représentation uniforme
-   val_t : 32 bits 
+   val_t : 32 bits
 
  */
 
@@ -34,7 +34,7 @@ typedef int32_t  tag_t;
 typedef int32_t  mlsize_t;
 
 
-/* Représentation des valeurs : Entiers, vrai Nan et pointeur du tas 
+/* Représentation des valeurs : Entiers, vrai Nan et pointeur du tas
 
    Is_int ne différencie pas entiers et flottants mais cela ne doit pas être gênant dans les switch du filtrage
    Is_nan teste le seul nan
@@ -48,33 +48,33 @@ typedef int32_t  mlsize_t;
 #define Is_ptr(x) ( ((x << 31) == 0) && ((x >> 23) == 256))
 
 
-/* macros de conversion : to_from 
+/* macros de conversion : to_from
 
  */
 
 #define Val_int(x)  (((val_t)(x) << 1 ) + 1)
 #define Int_val(x) ((x) >> 1)
 
-/* Structure de l'entête : est-ce que la couleur est utile ? 
+/* Structure de l'entête : est-ce que la couleur est utile ?
 
      +--------+-------+-----+
      | wosize |       | tag |
      +--------+-------+-----+
 bits  31    10 9     8 7   0
 
-   on reprend la notation ocaml : 
+   on reprend la notation ocaml :
 
       wosize : taille (en mots) de la partie chamsp du bloc
           hd : l'entête
-         tag : la valeur du champ tag de l'entête 
-         
+         tag : la valeur du champ tag de l'entête
 
-  le pointeur sur un bloc démarre après l'entête, c'est-à-dire sur le premier élément du bloc, 
-  il faut donc décaler d'un mot pour atteindre l'entête 
 
-  on distingue alors 3 types de pointeurs : 
+  le pointeur sur un bloc démarre après l'entête, c'est-à-dire sur le premier élément du bloc,
+  il faut donc décaler d'un mot pour atteindre l'entête
+
+  on distingue alors 3 types de pointeurs :
     bp : pointeur sur le premier octet d'un bloc (un char * (pour les strings ?))
-    op : pointeur sur le premier champ du bloc (une val_t) 
+    op : pointeur sur le premier champ du bloc (une val_t)
     hp : pointeur sur l'entête d'un bloc (a char *)
 
 */
@@ -82,10 +82,10 @@ bits  31    10 9     8 7   0
 #define Tag_hd(hd) ((tag_t) ((hd) & 0xFF))
 #define Wosize_hd(hd) ((mlsize_t) ((hd) >> 10))
 
-#define Hd_val(val) (((header_t *) (val)) [-1]) 
-#define Hd_hp(hp) (* ((header_t *) (hp))) 
+#define Hd_val(val) (((header_t *) (val)) [-1])
+#define Hd_hp(hp) (* ((header_t *) (hp)))
 #define Hp_val(val) ((char *) (((header_t *) (val)) - 1))
-#define Val_hp(hp) ((value) (((header_t *) (hp)) + 1))
+#define Val_hp(hp) ((val_t) (((header_t *) (hp)) + 1))
 
 
 #define Num_tags (1 << 8)
@@ -97,7 +97,7 @@ bits  31    10 9     8 7   0
 #define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
 
 // supposition LITTLE ENDIAN
-#define Tag_val(val) (((unsigned char *) (val)) [-sizeof(value)])
+#define Tag_val(val) (((unsigned char *) (val)) [-sizeof(val_t)])
 #define Tag_hp(hp) (((unsigned char *) (hp)) [0])
 
 
@@ -106,9 +106,9 @@ bits  31    10 9     8 7   0
 /* 1- si  tag < No_scan_tag : un n-uplet de champs.  */
 
 /* pointeur sur le 1er champ */
-#define Op_val(x) ((value *) (x))
+#define Op_val(x) ((val_t *) (x))
 /* les champs sont numérotés à partir de 0 */
-#define Field(x, i) (((value *)(x)) [i])          
+#define Field(x, i) (((val_t *)(x)) [i])
 
 typedef int32_t opcode_t;
 typedef opcode_t * code_t;
@@ -119,7 +119,7 @@ typedef opcode_t * code_t;
 #define Forward_tag 250
 #define Forward_val(v) Field(v, 0)
 
-/* Infix_tag : là c'est plus compliqué 
+/* Infix_tag : là c'est plus compliqué
      apparait seulement dans les blocs Closure_tag pour les fonctions mutuelle ment récursives
      Infix_tag doit être impair pour être vu comme un entier
      et retourne 1 (modulo 4) : alignement ?
@@ -143,7 +143,7 @@ typedef opcode_t * code_t;
 
 /* Closure_tag */
 #define Closure_tag 247
-#define Code_val(val) (((code_t *) (val)) [0]) 
+#define Code_val(val) (((code_t *) (val)) [0])
 
 /* Lazy_tag : pour les lazy, à voir avec les Forward_tag */
 #define Lazy_tag 246
@@ -155,10 +155,10 @@ typedef opcode_t * code_t;
 
 /* Pointeur sur le premier octet */
 #define Bp_val(v) ((char *) (v))
-#define Val_bp(p) ((value) (p))
+#define Val_bp(p) ((val_t) (p))
 /* les octets sont numérotés à partir de 0. */
-#define Byte(x, i) (((char *) (x)) [i])    
-#define Byte_u(x, i) (((unsigned char *) (x)) [i]) 
+#define Byte(x, i) (((char *) (x)) [i])
+#define Byte_u(x, i) (((unsigned char *) (x)) [i])
 
 /* Abstract_tag : ne rien faire poru el GC */
 #define Abstract_tag 251
