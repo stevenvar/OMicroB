@@ -14,6 +14,12 @@
        pointeur : 0111 1111 1xxx yyyy xxxx yyyy xxxx yyy0  (alignement) 
 pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
+           word : 4 octets sur machines 32 bits 
+        int32_t : entiers sur 32 bits (stdint.h)
+          val_t : la représentation uniforme d'une valeur ocaml
+       header_t : la représentation de l'entête (là aussi 32 bits)
+          bloc  :  une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
+         champ  : une valeur (val_t)
   */
 
 
@@ -28,7 +34,8 @@ typedef int32_t  tag_t;
 typedef int32_t  mlsize_t;
 
 
-/* Entiers, vrai Nan et pointeur du tas 
+/* Représentation des valeurs : Entiers, vrai Nan et pointeur du tas 
+
    Is_int ne différencie pas entiers et flottants mais cela ne doit pas être gênant dans les switch du filtrage
    Is_nan teste le seul nan
    Is_ptr teste si c'est un pointeur à suivre dans le tas
@@ -82,11 +89,17 @@ bits  31    10 9     8 7   0
 
 
 #define Num_tags (1 << 8)
+/* pour 32 bits */
 #define Max_wosize ((1 << 22) - 1)
 
 
 #define Wosize_val(val) (Wosize_hd (Hd_val (val)))
 #define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
+
+// supposition LITTLE ENDIAN
+#define Tag_val(val) (((unsigned char *) (val)) [-sizeof(value)])
+#define Tag_hp(hp) (((unsigned char *) (hp)) [0])
+
 
 #define No_scan_tag 251
 
