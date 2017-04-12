@@ -53,7 +53,7 @@ typedef int32_t  mlsize_t;
  */
 
 #define Val_int(x)  (((val_t)(x) << 1 ) + 1)
-#define Int_val(x) (x) >> 1)
+#define Int_val(x) ((x) >> 1)
 
 /* Structure de l'entête : est-ce que la couleur est utile ? 
 
