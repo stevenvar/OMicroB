@@ -12,12 +12,15 @@
    extra_args  number of extra arguments provided by the caller
 */
 
+#define Trap_link(tp) (((val_t **)(tp))[1])
+#define Trap_pc(tp) (((code_t *)(tp))[0])
 
 static code_t pc;
 static val_t acc;
 extern val_t *stack_end;
-extern val_t *env;
+extern val_t env;
 static val_t *sp;
+static val_t *trapSp;
 static val_t *global_data;
 static int extra_args;
 
@@ -30,11 +33,11 @@ val_t read_val (code_t pc){
 }
 
 int read_int (code_t pc){
-  return Int_val(read_val(pc));
+  return (int)read_val(pc);
 }
 
 val_t peek (int n){
-  return sp[n];
+  return sp[(val_t) n];
 }
 
 val_t push (val_t x){
@@ -46,7 +49,7 @@ val_t pop (){
 }
 
 val_t pop_n (int n){
-  sp += n;
+  sp += (val_t) n;
   return *(sp);
 }
 
@@ -83,11 +86,11 @@ val_t interp_inst (){
     acc = peek(7);
     break;
   case ACC :
-    acc = read_val(pc++);
+    n = read_int(pc++);
+    acc = peek(n);
     break;
   case PUSH :
-    push(acc);
-    break;
+    /* fallthrough */
   case PUSHACC0 :
     push (acc);
     break;
@@ -170,10 +173,10 @@ val_t interp_inst (){
   case PUSH_RETADDR :
     read_int(pc++);
     push(Val_int(extra_args));
-    push((val_t)(env));
+    push(env);
     /* Something's not right here : an AVR pointer is 16bits
      while a val_t can be 32 bits */
-    push((val_t)(pc + ofs));
+    push(pc + ofs);
     break;
   case APPLY :
     extra_args = read_val(pc++) - 1;
@@ -518,13 +521,29 @@ val_t interp_inst (){
     acc = Val_not(acc);
     break;
   case PUSHTRAP :
-    /* TODO */
+    ofs = read_val(pc++);
+    push(Val_int(extra_args));
+    push((val_t)trapSp);
+    push((val_t)(pc+ofs));
+    trapSp = sp;
     break;
   case POPTRAP :
-    /* TODO */
+    pop();
+    trapSp = pop();
+    pop();
+    pop();
     break;
   case RAISE :
-    /* TODO */
+    /* : If no stack frame is defined,
+       stops the execution print- ing the exception. TODO */
+    if (*trapSp == Val_unit){
+      return Val_unit;
+    }
+    sp = trapSp;
+    pc = pop();
+    trapSp = pop();
+    env = pop();
+    extra_args = pop();
     break;
   case CHECK_SIGNALS :
     /* TODO */
@@ -672,12 +691,16 @@ val_t interp_inst (){
     acc = (acc == pop()) ? Val_int(0) : Val_int(1);
     break;
   case LTINT :
+    acc = (acc < pop()) ? Val_int(0) : Val_int(1);
     break;
   case LEINT :
+    acc = (acc <= pop()) ? Val_int(0) : Val_int(1);
     break;
   case GTINT :
+    acc = (acc > pop()) ? Val_int(0) : Val_int(1);
     break;
   case GEINT :
+    acc = (acc >= pop()) ? Val_int(0) : Val_int(1);
     break;
   case OFFSETINT :
     ofs = read_int(pc++);
@@ -716,23 +739,27 @@ val_t interp_inst (){
       pc++;
     }
     break;
-  case BLTINT : break;
-  case BLEINT : break;
-  case BGTINT : break;
-  case BGEINT : break;
-  case ULTINT : break;
-  case UGEINT : break;
-  case BULTINT : break;
-  case BUGEINT : break;
-  case GETPUBMET : break;
-  case GETDYNMET : break;
+  case BLTINT :
+    val = read_val(pc++);
+    ofs = read_int(pc);
+    if (val < acc){
+      pc += ofs -1;
+    }
+    break;
+  /* case BLEINT : break; */
+  /* case BGTINT : break; */
+  /* case BGEINT : break; */
+  /* case ULTINT : break; */
+  /* case UGEINT : break; */
+  /* case BULTINT : break; */
+  /* case BUGEINT : break; */
+  /* case GETPUBMET : break; */
+  /* case GETDYNMET : break; */
   case STOP :
     return acc;
     break;
-  case EVENT : break;
-  case BREAK : break;
-  case RERAISE : break;
-  case RAISE_NOTRACE : break;
+  /* case EVENT : break; */
+  /* case BREAK : break; */
   default : break;
   }
   return Val_unit;
@@ -741,6 +768,8 @@ val_t interp_inst (){
 
 void interp(){
   sp = stack_end;
+  *trapSp = Val_unit;
+  env = Val_unit;
   for(;;){
     interp_inst();
   }
