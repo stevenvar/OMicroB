@@ -7,7 +7,7 @@
 
 extern val_t acc;
 extern val_t *stack_end;
-extern val_t *env;
+extern val_t env;
 extern val_t *sp;
 extern val_t *global_data;
 
@@ -82,33 +82,40 @@ val_t alloc_small (mlsize_t wosize, tag_t tag) {
  *    c'est-à-dire effectue tous les déplacements attendus
  */
 
-void gc_one_val(val_t* r) {
-  val_t v = *r;
-  val_t* ptr;
+void gc_one_val(val_t* ptr, int update) {
+  val_t v = *ptr;
   header_t hd;
   tag_t tag;
   mlsize_t sz;
   
+  DEBUGassert(heap_ptr == new_heap); 
+
   if (Is_ptr(v)) { 
     // tester si c'est une globale ?
     hd = Hd_val(v);
     if (Is_black_hd(hd)) { // bloc déjà copié, mettre à jour la référence
       *ptr = Field(v, 0);  // on suppose qu'il y a toujours un champ (attention à [||]
     }
-    else {                 // ici il faut le copie
+    else {                 // ici il faut le copier
      tag = Tag_hd(hd);
      sz = Wosize_hd(hd);
-     if (tag >= No_scan_tag) {
+     if (tag <  No_scan_tag) { // le cas général 
        memcpy(new_heap, (void*)hd, sizeof (header_t));
        new_heap += sizeof (header_t);
+       val_t *  new_addr = new_heap;
        memcpy(new_heap,  (void*)v, sz * sizeof (val_t));
        Field(v, 0) = (val_t)new_heap;
        new_heap += sz * sizeof (val_t);
-       Hd_val(*ptr) = Blackhd_hd (hd); /* le bloc a été copié, mise à jour de l'entête */
+       Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
+       Field(ptr, 0) = (val_t)new_addr;
+       *ptr = new_addr ; // on le copie systematiquement (à voir pour les glob)
+       /* il faudra faire en tailrec et avec parcours en largeur si possible */
+       val_t * old_addr = new_addr ;
+       for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr, &old_addr); old_addr++;}
     }
-     else {
+//     else {
 
-     }
+//     }
    }
   }
 
@@ -118,7 +125,7 @@ void gc_one_val(val_t* r) {
 /* fonction principale pour récupérer de la mémoire
  * en effectuant le GC, et en mettant à jour les deux tas 
  * sp : le pointeur de pile courant dans interp.c
- * AFAIRE : 
+ * 
  */
 
 
@@ -131,15 +138,15 @@ void gc(int32_t size) {
   heap_ptr = new_heap;
  
   for (ptr = stack_end; ptr != sp; ptr--) {
-    gc_one_val(ptr);
+    gc_one_val(ptr, 1);
   }
 
   for (ptr = global_data; ptr < heap1_start; ptr++) {
-    gc_one_val(ptr);
+    gc_one_val(ptr, 1);  // c'est ici que l'on pourra avoir traiter les globales
   }
 
-  gc_one_val(&acc);
-  gc_one_value(&env);
+  gc_one_val(&acc,1);
+  gc_one_value(&env,1);
 
   // il n'y a pas eu assez de récupération
  if (heap_ptr + size > heap_end) {exit(200);} 
