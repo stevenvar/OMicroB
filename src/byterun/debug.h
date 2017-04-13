@@ -1,6 +1,6 @@
 
 
-// assertions en mode DEBUG
+/* assertions en mode DEBUG */
 extern int failed_assert (char *, char *, int);
 
 #ifdef DEBUG
@@ -11,8 +11,9 @@ extern int failed_assert (char *, char *, int);
 #define DEBUGassert(x) ((void) 0)
 #endif
 
-// à définir une valeur par défaut pour des champs non initialisés 
-// à voir s'il faut en réserver une ou cela peut aussi se recouvrir
+/* à définir une valeur par défaut pour des champs non initialisés 
+ * à voir s'il faut en réserver une ou cela peut aussi se recouvrir
+ */
 #ifdef DEBUG
 #define DEBUGclear(result, wosize) do{ \
   int32_t DEBUG_i; \

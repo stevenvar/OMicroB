@@ -34,26 +34,26 @@ extern val_t *global_data;
  * current_heap : 1 ou 2 selon le tas actif
  * les appels d'allocations mémoires ne savent pas dans quel tas seront placé les données.
  */
-char *heap1_start, *heap2_start;
-char *heap1_end, *heap2_end;
+val_t *heap1_start, *heap2_start;
+val_t *heap1_end, *heap2_end;
 int current_heap;
 
 /* heap_ptr : pointeur du premier emplacement libre du tas
  * heap_end : pointeur de fin du tas courant */
-char *heap_ptr, *heap_end;
+val_t *heap_ptr, *heap_end;
 
 /* des variables internes utiles pour le gc */
-char *new_heap, *old_heap;
-char* tab_heap_start[2];
-char* tab_heap_end[2];
+val_t *new_heap, *old_heap;
+val_t* tab_heap_start[2];
+val_t* tab_heap_end[2];
 
 /* Initialisation du GC
  * Cette fonction doit être appelée avant toute allocation du programme ;
  *   à voir dans startup.c
  * heap_size : la taille du tas utile. Au final 2 zones de cette taille seront allouées.
  */
-void init_gc(int heap_size) {
-  // il faudra probablement remplacer le malloc
+void init_gc(int32_t heap_size) {
+  /* il faudra probablement remplacer le malloc */
   heap1_start = malloc(heap_size * sizeof (val_t));
   heap1_end = heap1_start + heap_size * sizeof (val_t);
   tab_heap_start[0] = heap1_start;
@@ -70,12 +70,12 @@ void init_gc(int heap_size) {
   current_heap = 0;
 }
 
-//
-// val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
-//   val_t result;
-//   Alloc_small(result, wosize, tag);
-//  return result;
-// }
+
+ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
+   val_t result;
+   Alloc_small(result, wosize, tag);
+  return result;
+ }
 
 
 /* fonction qui traite complètement une racine 
@@ -93,46 +93,46 @@ void gc_one_val(val_t* ptr, int update) {
   DEBUGassert(heap_ptr == new_heap); 
 
   if (Is_ptr(v)) { 
-    // tester si c'est une globale ?
+    /* tester si c'est une globale ? */
     hd = (Hd_val(v));
-    if (Is_black_hd(hd)) { // bloc déjà copié, mettre à jour la référence
-      *ptr = Field(v, 0);  // on suppose qu'il y a toujours un champ (attention à [||]
+    if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
+      *ptr = Field(v, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
     }
-    else {                 // ici il faut le copier
+    else {                 /* ici il faut le copier*/
      tag = Tag_hd(hd);
      sz = Wosize_hd(hd);
-     if (tag >=  No_scan_tag) { // le cas où l'on copie sans ensuite parcourir les sous-blocs
-       memcpy(new_heap, (void*)hd, sizeof (header_t));
+     if (tag >=  No_scan_tag) { /* le cas où l'on copie sans ensuite parcourir les sous-blocs*/
+       memcpy((void*)new_heap, (void*)hd, sizeof (header_t));
        new_heap += sizeof (header_t);
        val_t *  new_addr = new_heap;
-       memcpy(new_heap,  (void*)v, sz * sizeof (val_t));
+       memcpy((void *)new_heap,  (void*)v, sz * sizeof (val_t));
        Field(v, 0) = (val_t)new_heap;
        new_heap += sz * sizeof (val_t);
        Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
        Field(ptr, 0) = (val_t)new_addr;
        if (update) 
-        *ptr = new_addr ; // on le copie systematiquement (à voir pour les glob)
+	 *ptr = new_addr ; /* on le copie systematiquement (à voir pour les glob)*/
     }
      else if (tag == Infix_tag) {
       val_t start = v - Infix_offset_hd(hd);
-      if (Is_black_val(start)) { // déjà déplacé
-          *ptr = Field(start, 0) + Infix_offset_hd(hd);
+      if (Is_black_val(start)) { /* déjà déplacé*/
+	*ptr = Field(Block_val(start), 0) + Infix_offset_hd(hd);
         } else {
  	  caml_gc_one_val(&start,1);
-          *ptr = Field(start, 0) + Infix_offset_hd(hd);
+          *ptr = Field(Block_val(start), 0) + Infix_offset_hd(hd);
         }
      }
-     else { // tag < No_scan_tag : tous les autres 
-       memcpy(new_heap, (void*)hd, sizeof (header_t));
+     else { /* tag < No_scan_tag : tous les autres */
+       memcpy((void *)new_heap, (void *)(Block_val(hd)), sizeof (header_t));
        new_heap += sizeof (header_t);
        val_t *  new_addr = new_heap;
-       memcpy(new_heap,  (void*)v, sz * sizeof (val_t));
-       Field(v, 0) = (val_t)new_heap;
+       memcpy((void *)new_heap,  (void *)(Block_val(v)), sz * sizeof (val_t));
+       Field(Block_val(v), 0) = (val_t)new_heap;
        new_heap += sz * sizeof (val_t);
        Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
        Field(ptr, 0) = (val_t)new_addr;
        if (update) 
-         *ptr = new_addr ; // on le copie systematiquement (à voir pour les glob)
+         *ptr = new_addr ; /* on le copie systematiquement (à voir pour les glob)*/
        /* il faudra faire en tailrec et avec parcours en largeur si possible */
        val_t * old_addr = new_addr ;
        for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr,1); old_addr++;}
@@ -163,13 +163,13 @@ void gc(int32_t size) {
   }  
 
   for (ptr = global_data; ptr < heap1_start; ptr++) {
-    gc_one_val(ptr, 1);  // c'est ici que l'on pourra avoir traiter les globales
+    gc_one_val(ptr, 1);  /* c'est ici que l'on pourra avoir traiter les globales*/
   }
 
   gc_one_val(&acc,1);
   gc_one_value(&env,1);
 
-  // il n'y a pas eu assez de récupération
+  /* il n y a pas eu assez de récupération */
  if (heap_ptr + size > heap_end) {exit(200);} 
 }
 
