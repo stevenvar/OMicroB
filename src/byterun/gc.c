@@ -70,12 +70,12 @@ void init_gc(int heap_size) {
   current_heap = 0;
 }
 
-
-val_t alloc_small (mlsize_t wosize, tag_t tag) {
-  val_t result;
-  Alloc_small(result, wosize, tag);
-  return result;
-}
+//
+// val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
+//   val_t result;
+//   Alloc_small(result, wosize, tag);
+//  return result;
+// }
 
 
 /* fonction qui traite complètement une racine 
@@ -83,23 +83,25 @@ val_t alloc_small (mlsize_t wosize, tag_t tag) {
  */
 
 void gc_one_val(val_t* ptr, int update) {
-  val_t v = *ptr;
+  val_t v ;
   header_t hd;
   tag_t tag;
   mlsize_t sz;
   
+  v = *ptr; 
+
   DEBUGassert(heap_ptr == new_heap); 
 
   if (Is_ptr(v)) { 
     // tester si c'est une globale ?
-    hd = Hd_val(v);
+    hd = (Hd_val(v));
     if (Is_black_hd(hd)) { // bloc déjà copié, mettre à jour la référence
       *ptr = Field(v, 0);  // on suppose qu'il y a toujours un champ (attention à [||]
     }
     else {                 // ici il faut le copier
      tag = Tag_hd(hd);
      sz = Wosize_hd(hd);
-     if (tag <  No_scan_tag) { // le cas général 
+     if (tag >=  No_scan_tag) { // le cas où l'on copie sans ensuite parcourir les sous-blocs
        memcpy(new_heap, (void*)hd, sizeof (header_t));
        new_heap += sizeof (header_t);
        val_t *  new_addr = new_heap;
@@ -108,14 +110,33 @@ void gc_one_val(val_t* ptr, int update) {
        new_heap += sz * sizeof (val_t);
        Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
        Field(ptr, 0) = (val_t)new_addr;
-       *ptr = new_addr ; // on le copie systematiquement (à voir pour les glob)
+       if (update) 
+        *ptr = new_addr ; // on le copie systematiquement (à voir pour les glob)
+    }
+     else if (tag == Infix_tag) {
+      val_t start = v - Infix_offset_hd(hd);
+      if (Is_black_val(start)) { // déjà déplacé
+          *ptr = Field(start, 0) + Infix_offset_hd(hd);
+        } else {
+ 	  caml_gc_one_val(&start,1);
+          *ptr = Field(start, 0) + Infix_offset_hd(hd);
+        }
+     }
+     else { // tag < No_scan_tag : tous les autres 
+       memcpy(new_heap, (void*)hd, sizeof (header_t));
+       new_heap += sizeof (header_t);
+       val_t *  new_addr = new_heap;
+       memcpy(new_heap,  (void*)v, sz * sizeof (val_t));
+       Field(v, 0) = (val_t)new_heap;
+       new_heap += sz * sizeof (val_t);
+       Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
+       Field(ptr, 0) = (val_t)new_addr;
+       if (update) 
+         *ptr = new_addr ; // on le copie systematiquement (à voir pour les glob)
        /* il faudra faire en tailrec et avec parcours en largeur si possible */
        val_t * old_addr = new_addr ;
-       for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr, &old_addr); old_addr++;}
-    }
-//     else {
-
-//     }
+       for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr,1); old_addr++;}
+     }
    }
   }
 
@@ -139,7 +160,7 @@ void gc(int32_t size) {
  
   for (ptr = stack_end; ptr != sp; ptr--) {
     gc_one_val(ptr, 1);
-  }
+  }  
 
   for (ptr = global_data; ptr < heap1_start; ptr++) {
     gc_one_val(ptr, 1);  // c'est ici que l'on pourra avoir traiter les globales
@@ -151,4 +172,8 @@ void gc(int32_t size) {
   // il n'y a pas eu assez de récupération
  if (heap_ptr + size > heap_end) {exit(200);} 
 }
+
+
+
+
 

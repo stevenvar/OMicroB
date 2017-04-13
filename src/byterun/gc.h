@@ -28,7 +28,7 @@
 #define Max_gc_wosize 256
 
 /* macro générale d'allocation d'un bloc */
-#define XAlloc_small(result, wosize, tag) do{    DEBUGassert ((wosize) >= 1);  \
+#define Alloc_small(result, wosize, tag) do{    DEBUGassert ((wosize) >= 1);  \
                                           DEBUGassert ((tag_t) (tag) < 256); \
                                  DEBUGassert ((wosize) <= Max_gc_wosize);     \
    heap_ptr += Bhsize_wosize (wosize);                                        \
