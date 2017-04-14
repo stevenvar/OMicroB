@@ -25,13 +25,13 @@ pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoi
 
 /* représentation uniforme
    val_t : 32 bits
-
  */
 
 typedef int32_t  val_t;
+typedef uint32_t  uval_t;
 typedef int32_t  header_t;
-typedef int32_t  tag_t;
-typedef int32_t  color_t;
+typedef uint8_t  tag_t;
+/* typedef int32_t  color_t; */
 typedef int32_t  mlsize_t;
 
 
@@ -50,11 +50,15 @@ typedef int32_t  mlsize_t;
 
 
 /* macros de conversion : to_from
-
+ * et de cast : to_from
  */
 
 #define Val_int(x)  (((val_t)(x) << 1 ) + 1)
 #define Int_val(x) ((x) >> 1)
+
+/* les pointeurs du tas ont 8 bits à 1 (poids forts décalés de 1)) */
+#define Val_block(x) (((val_t)(int16_t)(val_t *)x) | 0x7f800000)
+#define Block_val(x) ((val_t *)(int16_t)x)
 
 /* Structure de l'entête : est-ce que la couleur est utile ?
 
@@ -76,33 +80,33 @@ bits  31    10 9     8 7   0
   on distingue alors 3 types de pointeurs :
     bp : pointeur sur le premier octet d'un bloc (un char * (pour les strings ?))
     op : pointeur sur le premier champ du bloc (une val_t)
-    hp : pointeur sur l'entête d'un bloc (a char *)
+    hp : pointeur sur l'entête d'un bloc (header_t *)
 
 */
 
 #define Tag_hd(hd) ((tag_t) ((hd) & 0xFF))
 #define Wosize_hd(hd) ((mlsize_t) ((hd) >> 10))
 
-#define Hd_val(val) (((header_t *) (val)) [-1])
+#define Hd_val(val) ((((header_t *) (val)) [-1]))
 #define Hd_hp(hp) (* ((header_t *) (hp)))
-#define Hp_val(val) ((char *) (((header_t *) (val)) - 1))
-#define Val_hp(hp) ((val_t) (((header_t *) (hp)) + 1))
+#define Hp_val(val) ((header_t *) (((header_t *) (val)) - 1))
+#define Val_hp(hp) (((((header_t *) (hp)) + 1)))
 
 
 #define Num_tags (1 << 8)
 /* pour 32 bits */
 #define Max_wosize ((1 << 22) - 1)
 
-
+/* à nettoyer */
 #define Wosize_val(val) (Wosize_hd (Hd_val (val)))
 #define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
 #define Wosize_bp(bp) (Wosize_val (bp))
 #define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
 #define Whsize_wosize(sz) ((sz) + 1)
 #define Wosize_whsize(sz) ((sz) - 1)
-#define Wosize_bhsize(sz) ((sz) / sizeof (value) - 1)
-#define Bsize_wsize(sz) ((sz) * sizeof (value))
-#define Wsize_bsize(sz) ((sz) / sizeof (value))
+#define Wosize_bhsize(sz) ((sz) / sizeof (val_t) - 1)
+#define Bsize_wsize(sz) ((sz) * sizeof (val_t))
+#define Wsize_bsize(sz) ((sz) / sizeof (val_t))
 #define Bhsize_wosize(sz) (Bsize_wsize (Whsize_wosize (sz)))
 #define Bhsize_bosize(sz) ((sz) + sizeof (header_t))
 #define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
@@ -111,7 +115,7 @@ bits  31    10 9     8 7   0
 #define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
 #define Whsize_hp(hp) (Whsize_wosize (Wosize_hp (hp)))
 
-// supposition LITTLE ENDIAN
+/* supposition LITTLE ENDIAN */
 #define Tag_val(val) (((unsigned char *) (val)) [-sizeof(val_t)])
 #define Tag_hp(hp) (((unsigned char *) (hp)) [0])
 
@@ -125,8 +129,8 @@ bits  31    10 9     8 7   0
 /* les champs sont numérotés à partir de 0 */
 #define Field(x, i) (((val_t *)(x)) [i])
 
-typedef int32_t opcode_t;
-typedef opcode_t * code_t;
+typedef uint8_t opcode_t;
+typedef uint32_t code_t;
 
 /* de la doc ocaml : [Forward_tag] et [Infix_tag] doivent être sous No_scan_tag avec [Infix_tag] le plus petit */
 
@@ -164,7 +168,7 @@ typedef opcode_t * code_t;
 #define Lazy_tag 246
 
 /* Another special case: variants */
-//CAMLextern value caml_hash_variant(char const * tag);
+/*CAMLextern value caml_hash_variant(char const * tag); */
 
 /* 2- Si tag >= No_scan_tag : suite d'octets. */
 
@@ -181,7 +185,7 @@ typedef opcode_t * code_t;
 /* Strings. */
 #define String_tag 252
 #define String_val(x) ((char *) Bp_val(x))
-//CAMLextern mlsize_t caml_string_length (value);   /* taille en octets */
+/*CAMLextern mlsize_t caml_string_length (value);    taille en octets */
 
 /* nombres flottants : pour l'historique. */
 #define Double_tag 253
@@ -195,8 +199,9 @@ typedef opcode_t * code_t;
 
 /* 3- Atomes sont des 0-nuplet, alloués une seule fois (staituqement). */
 
-//CAMLextern header_t caml_atom_table[];
-//#define Atom(tag) (Val_hp (&(caml_atom_table [(tag)])))
+/*CAMLextern header_t caml_atom_table[];
+ *#define Atom(tag) (Val_hp (&(caml_atom_table [(tag)])))
+ */
 
 /* unit */
 #define Val_unit Val_int(0)
