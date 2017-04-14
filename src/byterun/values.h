@@ -1,8 +1,4 @@
 
-
-#ifndef CAML_MLVALUES_H
-#define CAML_MLVALUES_H
-
 #include <stdint.h>
 
 /* version 32 bits
@@ -10,7 +6,7 @@
    codage des valeurs par du Nan boxing 32 bits avec :
 
           float : tels quels avec 1 seul Nan 1111 1111 1000 0000 0000 0000 0000 0000
-           int  : 1 bit de marque à la fin ou au début
+           int  : 1 bit de marque à la fin 
        pointeur : 0111 1111 1xxx yyyy xxxx yyyy xxxx yyy0  (alignement)
 pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
@@ -46,7 +42,7 @@ typedef int32_t  mlsize_t;
 
 #define Is_int(x) ((x & 1) != 0)
 #define Is_nan(x) ( (x >> 23) == 512)
-#define Is_ptr(x) ( ((x << 31) == 0) && ((x >> 23) == 256))
+#define Is_ptr(x) ( ((x << 31) == 0) && ((x >> 23) == 255))
 
 
 /* macros de conversion : to_from
@@ -60,10 +56,10 @@ typedef int32_t  mlsize_t;
 #define Val_block(x) (((val_t)(int16_t)(val_t *)x) | 0x7f800000)
 #define Block_val(x) ((val_t *)(int16_t)x)
 
-/* Structure de l'entête : est-ce que la couleur est utile ?
+/* Structure de l'entête : est-ce que la couleur est utile (oui sur 1 bit)
 
      +--------+-------+-----+
-     | wosize |       | tag |
+     | wosize |couleur| tag |
      +--------+-------+-----+
 bits  31    10 9     8 7   0
 
@@ -79,13 +75,14 @@ bits  31    10 9     8 7   0
 
   on distingue alors 3 types de pointeurs :
     bp : pointeur sur le premier octet d'un bloc (un char * (pour les strings ?))
-    op : pointeur sur le premier champ du bloc (une val_t)
+    op : pointeur sur le premier champ du bloc (une val_t *)
     hp : pointeur sur l'entête d'un bloc (header_t *)
 
 */
 
 #define Tag_hd(hd) ((tag_t) ((hd) & 0xFF))
 #define Wosize_hd(hd) ((mlsize_t) ((hd) >> 10))
+#define Color_hd(hd) (((hd) >> 8) & 1)
 
 #define Hd_val(val) ((((header_t *) (val)) [-1]))
 #define Hd_hp(hp) (* ((header_t *) (hp)))
@@ -99,11 +96,14 @@ bits  31    10 9     8 7   0
 
 /* à nettoyer */
 #define Wosize_val(val) (Wosize_hd (Hd_val (val)))
+
+/*
 #define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
 #define Wosize_bp(bp) (Wosize_val (bp))
 #define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
 #define Whsize_wosize(sz) ((sz) + 1)
 #define Wosize_whsize(sz) ((sz) - 1)
+
 #define Wosize_bhsize(sz) ((sz) / sizeof (val_t) - 1)
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
 #define Wsize_bsize(sz) ((sz) / sizeof (val_t))
@@ -114,11 +114,17 @@ bits  31    10 9     8 7   0
 #define Bosize_bp(bp) (Bosize_val (Val_bp (bp)))
 #define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
 #define Whsize_hp(hp) (Whsize_wosize (Wosize_hp (hp)))
+*/
 
-/* supposition LITTLE ENDIAN */
+
+
+#define Tag_val(val) (Tag_hd(Hd_val(val)))
+#define Tag_hp(hp) (Tag_hd(*hp))
+
+/* supposition LITTLE ENDIAN  : voir plus haut
 #define Tag_val(val) (((unsigned char *) (val)) [-sizeof(val_t)])
 #define Tag_hp(hp) (((unsigned char *) (hp)) [0])
-
+*/
 
 #define No_scan_tag 251
 
@@ -143,6 +149,8 @@ typedef uint32_t code_t;
      Infix_tag doit être impair pour être vu comme un entier
      et retourne 1 (modulo 4) : alignement ?
 */
+
+/* attention des Bosize sont comenté plus haut */
 #define Infix_tag 249
 #define Infix_offset_hd(hd) (Bosize_hd(hd))
 #define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
@@ -179,7 +187,7 @@ typedef uint32_t code_t;
 #define Byte(x, i) (((char *) (x)) [i])
 #define Byte_u(x, i) (((unsigned char *) (x)) [i])
 
-/* Abstract_tag : ne rien faire poru el GC */
+/* Abstract_tag : ne rien faire pour el GC */
 #define Abstract_tag 251
 
 /* Strings. */
@@ -209,4 +217,4 @@ typedef uint32_t code_t;
 /* la liste vide  */
 #define Val_emptylist Val_int(0)
 
-#endif /* CAML_MLVALUES_H */
+
