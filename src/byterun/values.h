@@ -56,6 +56,7 @@ typedef int32_t  mlsize_t;
 #define Val_int(x)  (((val_t)(x) << 1 ) + 1)
 #define Int_val(x) ((x) >> 1)
 
+/* les pointeurs du tas ont 8 bits à 1 (poids forts décalés de 1)) */
 #define Val_block(x) (((val_t)(int16_t)(val_t *)x) | 0x7f800000)
 #define Block_val(x) ((val_t *)(int16_t)x)
 
