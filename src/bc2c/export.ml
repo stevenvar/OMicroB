@@ -1,5 +1,7 @@
 open OByteLib.Instr
 
+let verbose = false
+
 (******************************************************************************)
 (******************************************************************************)
 (******************************************************************************)
@@ -234,9 +236,9 @@ let export_code_from_addrs code addrs =
     | OFFSETCLOSURE2 ->
       export_uint8 Opcode.offsetclosure2;
     | OFFSETCLOSURE n ->
-      check_bounds "CLOSUREREC" n (-128) 127;
+      check_bounds "CLOSUREREC" n (-0x80) 0x7F;
       export_uint8 Opcode.offsetclosure;
-      export_uint8 n;
+      export_int8 n;
     | PUSHOFFSETCLOSUREM2 ->
       export_uint8 Opcode.pushoffsetclosurem2;
     | PUSHOFFSETCLOSURE0 ->
@@ -244,9 +246,9 @@ let export_code_from_addrs code addrs =
     | PUSHOFFSETCLOSURE2 ->
       export_uint8 Opcode.pushoffsetclosure2;
     | PUSHOFFSETCLOSURE n ->
-      check_bounds "PUSHOFFSETCLOSURE" n (-128) 127;
+      check_bounds "PUSHOFFSETCLOSURE" n (-0x80) 0x7F;
       export_uint8 Opcode.pushoffsetclosure;
-      export_uint8 n;
+      export_int8 n;
     | GETGLOBAL n ->
       check_bounds "GETGLOBAL" n 0 0x10000;
       if n < 0x100 then (
@@ -307,11 +309,17 @@ let export_code_from_addrs code addrs =
     | PUSHATOM _ ->
       Tools.fail "PUSHATOM with non-zero tag is not supported";
     | MAKEBLOCK (tag, size) ->
-      check_bounds "MAKEBLOCK tag:" tag 0 255;
-      check_bounds "MAKEBLOCK size:" size 0 255;
-      export_uint8 Opcode.makeblock;
-      export_uint8 tag;
-      export_uint8 size;
+      check_bounds "MAKEBLOCK tag:" tag 0 0xFF;
+      check_bounds "MAKEBLOCK size:" size 0 0xFFFF;
+      if size < 0x100 then (
+        export_uint8 (fst Opcode.makeblock);
+        export_uint8 tag;
+        export_uint8 size;
+      ) else (
+        export_uint8 (snd Opcode.makeblock);
+        export_uint8 tag;
+        export_uint16 size;
+      )
     | MAKEBLOCK1 tag ->
       check_bounds "MAKEBLOCK1" tag 0 255;
       export_uint8 Opcode.makeblock1;
@@ -534,7 +542,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.beq in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | BNEQ (n, ptr) ->
       check_bounds "BNEQ" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
@@ -543,7 +551,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.bneq in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | BLTINT (n, ptr) ->
       check_bounds "BLTINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
@@ -552,7 +560,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.bltint in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | BLEINT (n, ptr) ->
       check_bounds "BLEINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
@@ -561,7 +569,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.bleint in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | BGTINT (n, ptr) ->
       check_bounds "BGTINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
@@ -570,7 +578,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.bgtint in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | BGEINT (n, ptr) ->
       check_bounds "BGEINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
@@ -579,7 +587,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.bgeint in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | ULTINT ->
       export_uint8 Opcode.ultint;
     | UGEINT ->
@@ -592,7 +600,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.bultint in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | BUGEINT (n, ptr) ->
       check_bounds "BUGEINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
@@ -601,7 +609,7 @@ let export_code_from_addrs code addrs =
       let opcode = opcode_of_kind kind Opcode.bugeint in
       export_uint8 opcode;
       export n;
-      export ptr;
+      export ofs;
     | GETPUBMET (htag, _cache) ->
       export_uint8 Opcode.getpubmet;
       export_uint32 htag;
@@ -622,10 +630,14 @@ let export_code code =
   let addrs = Array.map (fun _ -> -1) code in
   let bytecode = ref [] in
   let continue = ref true in
+  let pass = ref 1 in
   while !continue do
+    if verbose then Printf.eprintf "Pass %d...%!" !pass;
+    incr pass;
     let new_bytecode = export_code_from_addrs code addrs in
     if new_bytecode = !bytecode then continue := false
     else bytecode := new_bytecode;
+    if verbose then Printf.eprintf " DONE\n%!";
   done;
   !bytecode
 
