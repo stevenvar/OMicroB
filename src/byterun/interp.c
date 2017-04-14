@@ -12,8 +12,6 @@
    extra_args  number of extra arguments provided by the caller
 */
 
-
-#define Alloc_small(a,b,c) (a)
 val_t atom0_header;
 val_t atom0;
 static code_t pc;
@@ -26,13 +24,13 @@ static val_t *global_data;
 static int extra_args;
 static int cpt;
 
-void print_stack(){
-  val_t i;
-  printf("STACK = [%d; %d] \n", stack_end, sp);
-  for (i = 0; i <= (stack_end-sp) ; i++ ){
-    printf(">[%d] = %d \n",i, Int_val(sp[i]));
-  }
-}
+/* void print_stack(){ */
+/*   val_t i; */
+/*   printf("STACK = [%d; %d] \n", stack_end, sp); */
+/*   for (i = 0; i <= (stack_end-sp) ; i++ ){ */
+/*     printf(">[%d] = %d \n",i, Int_val(sp[i])); */
+/*   } */
+/* } */
 
 opcode_t read_inst (code_t pc){
   return pgm_read_byte_near(pc);
@@ -87,7 +85,6 @@ void pop_n (int n){
 
 val_t interp_inst (){
   opcode_t curr_inst = read_inst(pc++);
-  printf("%d\n",curr_inst);
   switch(curr_inst){
   case ACC0 :
     acc = peek(0);
