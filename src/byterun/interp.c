@@ -675,24 +675,16 @@ val_t interp_inst (){
     acc = Val_int(read_val(pc++));
     break;
   case NEGINT :
-    /* acc = NegInt(acc); */
     acc = Val_int (-Int_val (acc));
-    /* TODO MACRO */
     break;
   case ADDINT :
-    /* acc = AddInt(acc,pop()); */
     acc = Val_int((Int_val(acc) + Int_val(pop())));
-    /* TODO MACRO */
     break;
   case SUBINT :
-    /* acc = SubInt(acc,pop()); */
     acc = Val_int((Int_val(acc) - Int_val(pop())));
-    /* TODO MACRO */
     break;
   case MULINT :
-    /* acc = MulInt(acc,pop()); */
     acc = Val_int((Int_val(acc) * Int_val(pop())));
-    /* TODO MACRO */
     break;
   case DIVINT : {
     int32_t divisor = Int_val(pop());
@@ -712,34 +704,22 @@ val_t interp_inst (){
     break;
   }
   case ANDINT :
-    /* acc = AndInt(acc,pop()); */
     acc = Val_int((Int_val(acc) & Int_val(pop())));
-    /* TODO MACRO */
     break;
   case ORINT :
-    /* acc = OrInt(acc,pop()); */
     acc = Val_int((Int_val(acc) | Int_val(pop())));
-    /* TODO MACRO */
     break;
   case XORINT :
-    /* acc = XorInt(acc,pop()); */
     acc = Val_int(Int_val(acc) ^ Int_val(pop()));
-    /* TODO MACRO */
     break;
   case LSLINT :
     acc = Val_int(Int_val(acc) << Int_val(pop()));
-    /* acc = LslInt(acc,pop()); */
-    /* TODO MACRO */
     break;
   case LSRINT :
     acc = Val_int((uval_t)(Int_val(acc)) >> Int_val(pop()));
-    /* acc = LsrInt(acc,pop()); */
-    /* TODO MACRO */
     break;
   case ASRINT :
     acc = Val_int(Int_val(acc) >> Int_val(pop()));
-    /* acc = AsrInt(acc,pop()); */
-    /* TODO MACRO */
     break;
   case EQ :
     acc = (acc == pop()) ? Val_int(1) : Val_int(0);
@@ -897,10 +877,10 @@ val_t interp_inst (){
   case BREAK : break;
   default : break;
   }
+
   return Val_unit;
 }
-
-void interp(){
+void interp_init(){
   atom0_header = Make_header(0,0);
   atom0 = Val_block(&atom0_header+1);
   sp = stack_end;
@@ -909,10 +889,10 @@ void interp(){
   extra_args = 0;
   cpt = 0;
   pc = 0;
-  for(int i = 0; i < 10; i++){
-    /* print_stack(); */
+}
+void interp(){
+  for(;;)
     interp_inst();
-  }
 }
 
 int main(int argc, char** argv){
