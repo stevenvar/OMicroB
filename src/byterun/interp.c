@@ -14,28 +14,17 @@
 
 
 #define Alloc_small(a,b,c) (a)
-
 val_t atom0_header;
 val_t atom0;
-
-
 static code_t pc;
 static val_t acc;
-/* extern val_t *stack_end; */
-/* extern val_t env; */
-val_t* stack_end;
-val_t env;
+extern val_t *stack_end;
+extern val_t env;
 static val_t *sp;
 static val_t *trapSp;
 static val_t *global_data;
 static int extra_args;
-
 static int cpt;
-
-/* static inst myArray[8] = { CONSTINT, 0x00, 0x00, 0x00, 0x03, PUSH, CONST2, STOP}; */
-static inst myArray[100] = { CONST1, PUSH, CONST2, PUSH, CONST3, PUSH, STOP};
-
-static val_t fakeStack[1000];
 
 void print_stack(){
   val_t i;
@@ -67,7 +56,7 @@ code_t read_ptr (code_t pc){
 }
 
 uint16_t read_global_index(code_t pc){
- val_t v = 0;
+  val_t v = 0;
   int i;
   for (i = 0; i < 2; i++){
     v = (v << 8) | read_inst(pc++);
@@ -78,8 +67,6 @@ uint16_t read_global_index(code_t pc){
 int32_t read_int (code_t pc){
   return read_val(pc);
 }
-
-
 
 val_t peek (int n){
   return sp[(val_t) n+1];
@@ -97,7 +84,6 @@ val_t pop (){
 void pop_n (int n){
   sp += n;
 }
-
 
 val_t interp_inst (){
   opcode_t curr_inst = read_inst(pc++);
@@ -750,8 +736,8 @@ val_t interp_inst (){
     /* acc = LslInt(acc,pop()); */
     /* TODO MACRO */
     break;
- case LSRINT :
-   acc = Val_int((uval_t)(Int_val(acc)) >> Int_val(pop()));
+  case LSRINT :
+    acc = Val_int((uval_t)(Int_val(acc)) >> Int_val(pop()));
     /* acc = LsrInt(acc,pop()); */
     /* TODO MACRO */
     break;
@@ -837,17 +823,17 @@ val_t interp_inst (){
     }
     break;
   }
-    case BLEINT : {
-      val_t val = read_val(pc++);
-      code_t ofs = read_ptr(pc);
-      if (val <= acc){
-	pc += ofs -1;
-      }
-      else{
-	pc++;
-      }
-      break;
+  case BLEINT : {
+    val_t val = read_val(pc++);
+    code_t ofs = read_ptr(pc);
+    if (val <= acc){
+      pc += ofs -1;
     }
+    else{
+      pc++;
+    }
+    break;
+  }
   case BGTINT : {
     val_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
@@ -870,7 +856,6 @@ val_t interp_inst (){
     }
     break;
   }
-
   case BULTINT : {
     uval_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
@@ -920,11 +905,9 @@ val_t interp_inst (){
   return Val_unit;
 }
 
-
 void interp(){
   atom0_header = Make_header(0,0);
   atom0 = Val_block(&atom0_header+1);
-  stack_end = fakeStack + sizeof(val_t) * 1000;
   sp = stack_end;
   trapSp = Val_unit;
   env = Val_unit;
