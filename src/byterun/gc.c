@@ -110,7 +110,7 @@ void gc_one_val(val_t* ptr, int update) {
        new_heap += sz * sizeof (val_t);
        Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
        Field(ptr, 0) = (val_t)new_addr;
-       if (update) 
+       /*       if (update) */
 	 *ptr = new_addr ; /* on le copie systematiquement (à voir pour les glob)*/
     }
      else if (tag == Infix_tag) {
@@ -131,7 +131,7 @@ void gc_one_val(val_t* ptr, int update) {
        new_heap += sz * sizeof (val_t);
        Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
        Field(ptr, 0) = (val_t)new_addr;
-       if (update) 
+       /*       if (update) */
          *ptr = new_addr ; /* on le copie systematiquement (à voir pour les glob)*/
        /* il faudra faire en tailrec et avec parcours en largeur si possible */
        val_t * old_addr = new_addr ;
