@@ -102,10 +102,6 @@ void pop_n (int n){
 val_t interp_inst (){
   opcode_t curr_inst = read_inst(pc++);
   printf("%d\n",curr_inst);
-  int n, nargs, slotsize,i,f,v,o,p;
-  int ofs;
-  val_t arg, arg1,arg2,arg3, *new_sp, r, block, val, *tab,x,y;
-  tag_t t;
   switch(curr_inst){
   case ACC0 :
     acc = peek(0);
@@ -272,7 +268,7 @@ val_t interp_inst (){
     uint8_t nargs = read_byte(pc++);
     uint8_t slotsize = read_byte(pc++);
     val_t * newsp = sp + slotsize - nargs;
-    for (i = nargs ; i > 0; i--) {
+    for (int i = nargs ; i > 0; i--) {
       newsp[i] = sp[i];
     }
     sp = newsp;
@@ -372,6 +368,7 @@ val_t interp_inst (){
     uint8_t f = read_byte(pc++);
     uint8_t v = read_byte(pc++);
     code_t ofs = read_ptr(pc++);
+    int i;
     if (v > 0){
       push(acc);
     }
@@ -409,10 +406,11 @@ val_t interp_inst (){
   case PUSHOFFSETCLOSURE :
     push(acc);
     /* fallthrough */
-  case OFFSETCLOSURE :
-    n = read_byte(pc++);
+  case OFFSETCLOSURE : {
+    int n = read_byte(pc++);
     acc = env + n * sizeof(val_t);
     break;
+  }
   case PUSHGETGLOBAL :
     push(acc);
     /* fallthrough */
@@ -426,7 +424,7 @@ val_t interp_inst (){
     /* fallthrough */
   case GETGLOBALFIELD : {
     uint16_t n = read_global_index(pc++);
-    p = read_byte(pc++);
+    uint8_t p = read_byte(pc++);
     acc = Field(global_data[n],p);
     break;
   }
@@ -445,14 +443,16 @@ val_t interp_inst (){
   case MAKEBLOCK : {
     uint8_t n = read_byte(pc++);
     tag_t t = read_byte(pc++);
+    val_t block;
     Alloc_small(block, n, t);
     Field(block,0) = acc;
-    for (i = 1; i < n; i++) Field(block, i) = pop();
+    for (int i = 1; i < n; i++) Field(block, i) = pop();
     acc = block;
     break;
   }
   case MAKEBLOCK1 : {
     tag_t t = read_byte(pc++);
+    val_t block;
     Alloc_small(block, 1, t);
     Field(block,0) = acc;
     acc = block;
@@ -460,6 +460,7 @@ val_t interp_inst (){
   }
   case MAKEBLOCK2 : {
     tag_t t = read_byte(pc++);
+    val_t block;
     Alloc_small(block, 2, t);
     Field(block,0) = acc;
     Field(block,1) = pop();
@@ -468,6 +469,7 @@ val_t interp_inst (){
   }
   case MAKEBLOCK3 : {
     tag_t t = read_byte(pc++);
+    val_t block;
     Alloc_small(block, 3, t);
     Field(block,0) = acc;
     Field(block,1) = pop();
@@ -537,7 +539,7 @@ val_t interp_inst (){
   case SETSTRINGCHAR : {
     val_t n = pop();
     val_t val = pop();
-    Byte_u(acc,Int_val(n)) = v;
+    Byte_u(acc,Int_val(n)) = val;
     acc = Val_unit;
     break;
   }
@@ -564,7 +566,7 @@ val_t interp_inst (){
   case SWITCH : {
     uint8_t n = read_byte(pc++);
     uint8_t t = read_byte(pc++);
-    /* tab = pc; */
+    /* what is t ?  */
     /* (sizeTag << 16) + sizeInt */
     if (Is_int(acc)){
       code_t idx = Int_val(acc);
@@ -572,7 +574,8 @@ val_t interp_inst (){
     }
     else {
       tag_t idx = Tag_val(acc);
-      pc += tab[(n & 0xFFFF) + idx];
+      /* pc += t[(n & 0xFFFF) + idx]; */
+      /* TODO; */
     }
     break;
   }
@@ -652,9 +655,8 @@ val_t interp_inst (){
     break;
   }
   case C_CALLN : {
-    n = read_int(pc++);
+    uint32_t n = read_int(pc++);
     uint8_t p = read_byte(pc++);
-    i;
     push(env);
     acc = Primitive(p)(sp+1, n);
     env = pop();
@@ -687,7 +689,6 @@ val_t interp_inst (){
     break;
   case PUSHCONSTINT :
     push(acc);
-    goto CONSTINT;
     /* fallthrough */
   case CONSTINT :
     acc = Val_int(read_val(pc++));
@@ -903,12 +904,8 @@ val_t interp_inst (){
     int li = 3, hi = Field(meths,0), mi;
     while (li < hi){
       mi = ((li+hi) >> 1) | 1;
-      if (acc < Field (meths,mi)){
-	hi = mi-2;
-      }
-      else {
-	li = mi;
-      }
+      if (acc < Field (meths,mi)) hi = mi-2;
+      else li = mi;
     }
     acc = Field(meths,li-1);
   }
