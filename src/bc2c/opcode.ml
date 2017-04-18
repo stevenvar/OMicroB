@@ -1,318 +1,405 @@
-(******************************************************************************)
+type t =
+| ACC0
+| ACC1
+| ACC2
+| ACC3
+| ACC4
+| ACC5
+| ACC6
+| ACC7
+| ACC
+| PUSH
+| PUSHACC1
+| PUSHACC2
+| PUSHACC3
+| PUSHACC4
+| PUSHACC5
+| PUSHACC6
+| PUSHACC7
+| PUSHACC
+| POP
+| ASSIGN
+| ENVACC1
+| ENVACC2
+| ENVACC3
+| ENVACC4
+| ENVACC
+| PUSHENVACC1
+| PUSHENVACC2
+| PUSHENVACC3
+| PUSHENVACC4
+| PUSHENVACC
+| PUSH_RETADDR_1B
+| PUSH_RETADDR_2B
+| PUSH_RETADDR_4B
+| APPLY
+| APPLY1
+| APPLY2
+| APPLY3
+| APPTERM
+| APPTERM1
+| APPTERM2
+| APPTERM3
+| RETURN
+| RESTART
+| GRAB
+| CLOSURE_1B
+| CLOSURE_2B
+| CLOSURE_4B
+| CLOSUREREC_1B
+| CLOSUREREC_2B
+| CLOSUREREC_4B
+| OFFSETCLOSUREM2
+| OFFSETCLOSURE0
+| OFFSETCLOSURE2
+| OFFSETCLOSURE
+| PUSHOFFSETCLOSUREM2
+| PUSHOFFSETCLOSURE0
+| PUSHOFFSETCLOSURE2
+| PUSHOFFSETCLOSURE
+| GETGLOBAL_1B
+| GETGLOBAL_2B
+| PUSHGETGLOBAL_1B
+| PUSHGETGLOBAL_2B
+| GETGLOBALFIELD_1B
+| GETGLOBALFIELD_2B
+| PUSHGETGLOBALFIELD_1B
+| PUSHGETGLOBALFIELD_2B
+| SETGLOBAL_1B
+| SETGLOBAL_2B
+| ATOM0
+| PUSHATOM0
+| MAKEBLOCK_1B
+| MAKEBLOCK_2B
+| MAKEBLOCK1
+| MAKEBLOCK2
+| MAKEBLOCK3
+| MAKEFLOATBLOCK
+| GETFIELD0
+| GETFIELD1
+| GETFIELD2
+| GETFIELD3
+| GETFIELD
+| GETFLOATFIELD
+| SETFIELD0
+| SETFIELD1
+| SETFIELD2
+| SETFIELD3
+| SETFIELD
+| SETFLOATFIELD
+| VECTLENGTH
+| GETVECTITEM
+| SETVECTITEM
+| GETSTRINGCHAR
+| SETSTRINGCHAR
+| BRANCH_1B
+| BRANCH_2B
+| BRANCH_4B
+| BRANCHIF_1B
+| BRANCHIF_2B
+| BRANCHIF_4B
+| BRANCHIFNOT_1B
+| BRANCHIFNOT_2B
+| BRANCHIFNOT_4B
+| SWITCH_1B
+| SWITCH_2B
+| SWITCH_4B
+| BOOLNOT
+| PUSHTRAP_1B
+| PUSHTRAP_2B
+| PUSHTRAP_4B
+| POPTRAP
+| RAISE
+| CHECK_SIGNALS
+| C_CALL1
+| C_CALL2
+| C_CALL3
+| C_CALL4
+| C_CALL5
+| C_CALLN
+| CONST0
+| CONST1
+| CONST2
+| CONST3
+| CONSTINT_1B
+| CONSTINT_2B
+| CONSTINT_4B
+| PUSHCONST0
+| PUSHCONST1
+| PUSHCONST2
+| PUSHCONST3
+| PUSHCONSTINT_1B
+| PUSHCONSTINT_2B
+| PUSHCONSTINT_4B
+| NEGINT
+| ADDINT
+| SUBINT
+| MULINT
+| DIVINT
+| MODINT
+| ANDINT
+| ORINT
+| XORINT
+| LSLINT
+| LSRINT
+| ASRINT
+| EQ
+| NEQ
+| LTINT
+| LEINT
+| GTINT
+| GEINT
+| OFFSETINT_1B
+| OFFSETINT_2B
+| OFFSETINT_4B
+| OFFSETREF_1B
+| OFFSETREF_2B
+| OFFSETREF_4B
+| ISINT
+| GETMETHOD
+| BEQ_1B
+| BEQ_2B
+| BEQ_4B
+| BNEQ_1B
+| BNEQ_2B
+| BNEQ_4B
+| BLTINT_1B
+| BLTINT_2B
+| BLTINT_4B
+| BLEINT_1B
+| BLEINT_2B
+| BLEINT_4B
+| BGTINT_1B
+| BGTINT_2B
+| BGTINT_4B
+| BGEINT_1B
+| BGEINT_2B
+| BGEINT_4B
+| ULTINT
+| UGEINT
+| BULTINT_1B
+| BULTINT_2B
+| BULTINT_4B
+| BUGEINT_1B
+| BUGEINT_2B
+| BUGEINT_4B
+| GETPUBMET
+| GETDYNMET
+| STOP
 
-let new_opcode =
-  let cnt = ref (-1) in
-  fun () -> incr cnt; assert (!cnt < 256); !cnt
+let to_string opcode =
+  match opcode with
+  | ACC0                  -> "ACC0"
+  | ACC1                  -> "ACC1"
+  | ACC2                  -> "ACC2"
+  | ACC3                  -> "ACC3"
+  | ACC4                  -> "ACC4"
+  | ACC5                  -> "ACC5"
+  | ACC6                  -> "ACC6"
+  | ACC7                  -> "ACC7"
+  | ACC                   -> "ACC"
+  | PUSH                  -> "PUSH"
+  | PUSHACC1              -> "PUSHACC1"
+  | PUSHACC2              -> "PUSHACC2"
+  | PUSHACC3              -> "PUSHACC3"
+  | PUSHACC4              -> "PUSHACC4"
+  | PUSHACC5              -> "PUSHACC5"
+  | PUSHACC6              -> "PUSHACC6"
+  | PUSHACC7              -> "PUSHACC7"
+  | PUSHACC               -> "PUSHACC"
+  | POP                   -> "POP"
+  | ASSIGN                -> "ASSIGN"
+  | ENVACC1               -> "ENVACC1"
+  | ENVACC2               -> "ENVACC2"
+  | ENVACC3               -> "ENVACC3"
+  | ENVACC4               -> "ENVACC4"
+  | ENVACC                -> "ENVACC"
+  | PUSHENVACC1           -> "PUSHENVACC1"
+  | PUSHENVACC2           -> "PUSHENVACC2"
+  | PUSHENVACC3           -> "PUSHENVACC3"
+  | PUSHENVACC4           -> "PUSHENVACC4"
+  | PUSHENVACC            -> "PUSHENVACC"
+  | PUSH_RETADDR_1B       -> "PUSH_RETADDR_1B"
+  | PUSH_RETADDR_2B       -> "PUSH_RETADDR_2B"
+  | PUSH_RETADDR_4B       -> "PUSH_RETADDR_4B"
+  | APPLY                 -> "APPLY"
+  | APPLY1                -> "APPLY1"
+  | APPLY2                -> "APPLY2"
+  | APPLY3                -> "APPLY3"
+  | APPTERM               -> "APPTERM"
+  | APPTERM1              -> "APPTERM1"
+  | APPTERM2              -> "APPTERM2"
+  | APPTERM3              -> "APPTERM3"
+  | RETURN                -> "RETURN"
+  | RESTART               -> "RESTART"
+  | GRAB                  -> "GRAB"
+  | CLOSURE_1B            -> "CLOSURE_1B"
+  | CLOSURE_2B            -> "CLOSURE_2B"
+  | CLOSURE_4B            -> "CLOSURE_4B"
+  | CLOSUREREC_1B         -> "CLOSUREREC_1B"
+  | CLOSUREREC_2B         -> "CLOSUREREC_2B"
+  | CLOSUREREC_4B         -> "CLOSUREREC_4B"
+  | OFFSETCLOSUREM2       -> "OFFSETCLOSUREM2"
+  | OFFSETCLOSURE0        -> "OFFSETCLOSURE0"
+  | OFFSETCLOSURE2        -> "OFFSETCLOSURE2"
+  | OFFSETCLOSURE         -> "OFFSETCLOSURE"
+  | PUSHOFFSETCLOSUREM2   -> "PUSHOFFSETCLOSUREM2"
+  | PUSHOFFSETCLOSURE0    -> "PUSHOFFSETCLOSURE0"
+  | PUSHOFFSETCLOSURE2    -> "PUSHOFFSETCLOSURE2"
+  | PUSHOFFSETCLOSURE     -> "PUSHOFFSETCLOSURE"
+  | GETGLOBAL_1B          -> "GETGLOBAL_1B"
+  | GETGLOBAL_2B          -> "GETGLOBAL_2B"
+  | PUSHGETGLOBAL_1B      -> "PUSHGETGLOBAL_1B"
+  | PUSHGETGLOBAL_2B      -> "PUSHGETGLOBAL_2B"
+  | GETGLOBALFIELD_1B     -> "GETGLOBALFIELD_1B"
+  | GETGLOBALFIELD_2B     -> "GETGLOBALFIELD_2B"
+  | PUSHGETGLOBALFIELD_1B -> "PUSHGETGLOBALFIELD_1B"
+  | PUSHGETGLOBALFIELD_2B -> "PUSHGETGLOBALFIELD_2B"
+  | SETGLOBAL_1B          -> "SETGLOBAL_1B"
+  | SETGLOBAL_2B          -> "SETGLOBAL_2B"
+  | ATOM0                 -> "ATOM0"
+  | PUSHATOM0             -> "PUSHATOM0"
+  | MAKEBLOCK_1B          -> "MAKEBLOCK_1B"
+  | MAKEBLOCK_2B          -> "MAKEBLOCK_2B"
+  | MAKEBLOCK1            -> "MAKEBLOCK1"
+  | MAKEBLOCK2            -> "MAKEBLOCK2"
+  | MAKEBLOCK3            -> "MAKEBLOCK3"
+  | MAKEFLOATBLOCK        -> "MAKEFLOATBLOCK"
+  | GETFIELD0             -> "GETFIELD0"
+  | GETFIELD1             -> "GETFIELD1"
+  | GETFIELD2             -> "GETFIELD2"
+  | GETFIELD3             -> "GETFIELD3"
+  | GETFIELD              -> "GETFIELD"
+  | GETFLOATFIELD         -> "GETFLOATFIELD"
+  | SETFIELD0             -> "SETFIELD0"
+  | SETFIELD1             -> "SETFIELD1"
+  | SETFIELD2             -> "SETFIELD2"
+  | SETFIELD3             -> "SETFIELD3"
+  | SETFIELD              -> "SETFIELD"
+  | SETFLOATFIELD         -> "SETFLOATFIELD"
+  | VECTLENGTH            -> "VECTLENGTH"
+  | GETVECTITEM           -> "GETVECTITEM"
+  | SETVECTITEM           -> "SETVECTITEM"
+  | GETSTRINGCHAR         -> "GETSTRINGCHAR"
+  | SETSTRINGCHAR         -> "SETSTRINGCHAR"
+  | BRANCH_1B             -> "BRANCH_1B"
+  | BRANCH_2B             -> "BRANCH_2B"
+  | BRANCH_4B             -> "BRANCH_4B"
+  | BRANCHIF_1B           -> "BRANCHIF_1B"
+  | BRANCHIF_2B           -> "BRANCHIF_2B"
+  | BRANCHIF_4B           -> "BRANCHIF_4B"
+  | BRANCHIFNOT_1B        -> "BRANCHIFNOT_1B"
+  | BRANCHIFNOT_2B        -> "BRANCHIFNOT_2B"
+  | BRANCHIFNOT_4B        -> "BRANCHIFNOT_4B"
+  | SWITCH_1B             -> "SWITCH_1B"
+  | SWITCH_2B             -> "SWITCH_2B"
+  | SWITCH_4B             -> "SWITCH_4B"
+  | BOOLNOT               -> "BOOLNOT"
+  | PUSHTRAP_1B           -> "PUSHTRAP_1B"
+  | PUSHTRAP_2B           -> "PUSHTRAP_2B"
+  | PUSHTRAP_4B           -> "PUSHTRAP_4B"
+  | POPTRAP               -> "POPTRAP"
+  | RAISE                 -> "RAISE"
+  | CHECK_SIGNALS         -> "CHECK_SIGNALS"
+  | C_CALL1               -> "C_CALL1"
+  | C_CALL2               -> "C_CALL2"
+  | C_CALL3               -> "C_CALL3"
+  | C_CALL4               -> "C_CALL4"
+  | C_CALL5               -> "C_CALL5"
+  | C_CALLN               -> "C_CALLN"
+  | CONST0                -> "CONST0"
+  | CONST1                -> "CONST1"
+  | CONST2                -> "CONST2"
+  | CONST3                -> "CONST3"
+  | CONSTINT_1B           -> "CONSTINT_1B"
+  | CONSTINT_2B           -> "CONSTINT_2B"
+  | CONSTINT_4B           -> "CONSTINT_4B"
+  | PUSHCONST0            -> "PUSHCONST0"
+  | PUSHCONST1            -> "PUSHCONST1"
+  | PUSHCONST2            -> "PUSHCONST2"
+  | PUSHCONST3            -> "PUSHCONST3"
+  | PUSHCONSTINT_1B       -> "PUSHCONSTINT_1B"
+  | PUSHCONSTINT_2B       -> "PUSHCONSTINT_2B"
+  | PUSHCONSTINT_4B       -> "PUSHCONSTINT_4B"
+  | NEGINT                -> "NEGINT"
+  | ADDINT                -> "ADDINT"
+  | SUBINT                -> "SUBINT"
+  | MULINT                -> "MULINT"
+  | DIVINT                -> "DIVINT"
+  | MODINT                -> "MODINT"
+  | ANDINT                -> "ANDINT"
+  | ORINT                 -> "ORINT"
+  | XORINT                -> "XORINT"
+  | LSLINT                -> "LSLINT"
+  | LSRINT                -> "LSRINT"
+  | ASRINT                -> "ASRINT"
+  | EQ                    -> "EQ"
+  | NEQ                   -> "NEQ"
+  | LTINT                 -> "LTINT"
+  | LEINT                 -> "LEINT"
+  | GTINT                 -> "GTINT"
+  | GEINT                 -> "GEINT"
+  | OFFSETINT_1B          -> "OFFSETINT_1B"
+  | OFFSETINT_2B          -> "OFFSETINT_2B"
+  | OFFSETINT_4B          -> "OFFSETINT_4B"
+  | OFFSETREF_1B          -> "OFFSETREF_1B"
+  | OFFSETREF_2B          -> "OFFSETREF_2B"
+  | OFFSETREF_4B          -> "OFFSETREF_4B"
+  | ISINT                 -> "ISINT"
+  | GETMETHOD             -> "GETMETHOD"
+  | BEQ_1B                -> "BEQ_1B"
+  | BEQ_2B                -> "BEQ_2B"
+  | BEQ_4B                -> "BEQ_4B"
+  | BNEQ_1B               -> "BNEQ_1B"
+  | BNEQ_2B               -> "BNEQ_2B"
+  | BNEQ_4B               -> "BNEQ_4B"
+  | BLTINT_1B             -> "BLTINT_1B"
+  | BLTINT_2B             -> "BLTINT_2B"
+  | BLTINT_4B             -> "BLTINT_4B"
+  | BLEINT_1B             -> "BLEINT_1B"
+  | BLEINT_2B             -> "BLEINT_2B"
+  | BLEINT_4B             -> "BLEINT_4B"
+  | BGTINT_1B             -> "BGTINT_1B"
+  | BGTINT_2B             -> "BGTINT_2B"
+  | BGTINT_4B             -> "BGTINT_4B"
+  | BGEINT_1B             -> "BGEINT_1B"
+  | BGEINT_2B             -> "BGEINT_2B"
+  | BGEINT_4B             -> "BGEINT_4B"
+  | ULTINT                -> "ULTINT"
+  | UGEINT                -> "UGEINT"
+  | BULTINT_1B            -> "BULTINT_1B"
+  | BULTINT_2B            -> "BULTINT_2B"
+  | BULTINT_4B            -> "BULTINT_4B"
+  | BUGEINT_1B            -> "BUGEINT_1B"
+  | BUGEINT_2B            -> "BUGEINT_2B"
+  | BUGEINT_4B            -> "BUGEINT_4B"
+  | GETPUBMET             -> "GETPUBMET"
+  | GETDYNMET             -> "GETDYNMET"
+  | STOP                  -> "STOP"
 
-let new_opcode_12 () =
-  let op_1B = new_opcode () in
-  let op_2B = new_opcode () in
-  (op_1B, op_2B)
-
-let new_opcode_124 () =
-  let op_1B = new_opcode () in
-  let op_2B = new_opcode () in
-  let op_4B = new_opcode () in
-  (op_1B, op_2B, op_4B)
-    
-(******************************************************************************)
-
-let acc0                  = new_opcode ()
-let acc1                  = new_opcode ()
-let acc2                  = new_opcode ()
-let acc3                  = new_opcode ()
-let acc4                  = new_opcode ()
-let acc5                  = new_opcode ()
-let acc6                  = new_opcode ()
-let acc7                  = new_opcode ()
-let acc                   = new_opcode ()
-let push                  = new_opcode ()
-let pushacc1              = new_opcode ()
-let pushacc2              = new_opcode ()
-let pushacc3              = new_opcode ()
-let pushacc4              = new_opcode ()
-let pushacc5              = new_opcode ()
-let pushacc6              = new_opcode ()
-let pushacc7              = new_opcode ()
-let pushacc               = new_opcode ()
-let pop                   = new_opcode ()
-let assign                = new_opcode ()
-let envacc1               = new_opcode ()
-let envacc2               = new_opcode ()
-let envacc3               = new_opcode ()
-let envacc4               = new_opcode ()
-let envacc                = new_opcode ()
-let pushenvacc1           = new_opcode ()
-let pushenvacc2           = new_opcode ()
-let pushenvacc3           = new_opcode ()
-let pushenvacc4           = new_opcode ()
-let pushenvacc            = new_opcode ()
-let push_retaddr          = new_opcode_124 ()
-let apply                 = new_opcode ()
-let apply1                = new_opcode ()
-let apply2                = new_opcode ()
-let apply3                = new_opcode ()
-let appterm               = new_opcode ()
-let appterm1              = new_opcode ()
-let appterm2              = new_opcode ()
-let appterm3              = new_opcode ()
-let return                = new_opcode ()
-let restart               = new_opcode ()
-let grab                  = new_opcode ()
-let closure               = new_opcode_124 ()
-let closurerec            = new_opcode_124 ()
-let offsetclosurem2       = new_opcode ()
-let offsetclosure0        = new_opcode ()
-let offsetclosure2        = new_opcode ()
-let offsetclosure         = new_opcode ()
-let pushoffsetclosurem2   = new_opcode ()
-let pushoffsetclosure0    = new_opcode ()
-let pushoffsetclosure2    = new_opcode ()
-let pushoffsetclosure     = new_opcode ()
-let getglobal             = new_opcode_12 ()
-let pushgetglobal         = new_opcode_12 ()
-let getglobalfield        = new_opcode_12 ()
-let pushgetglobalfield    = new_opcode_12 ()
-let setglobal             = new_opcode_12 ()
-let atom0                 = new_opcode ()
-let pushatom0             = new_opcode ()
-let makeblock             = new_opcode_12 ()
-let makeblock1            = new_opcode ()
-let makeblock2            = new_opcode ()
-let makeblock3            = new_opcode ()
-let makefloatblock        = new_opcode ()
-let getfield0             = new_opcode ()
-let getfield1             = new_opcode ()
-let getfield2             = new_opcode ()
-let getfield3             = new_opcode ()
-let getfield              = new_opcode ()
-let getfloatfield         = new_opcode ()
-let setfield0             = new_opcode ()
-let setfield1             = new_opcode ()
-let setfield2             = new_opcode ()
-let setfield3             = new_opcode ()
-let setfield              = new_opcode ()
-let setfloatfield         = new_opcode ()
-let vectlength            = new_opcode ()
-let getvectitem           = new_opcode ()
-let setvectitem           = new_opcode ()
-let getstringchar         = new_opcode ()
-let setstringchar         = new_opcode ()
-let branch                = new_opcode_124 ()
-let branchif              = new_opcode_124 ()
-let branchifnot           = new_opcode_124 ()
-let switch                = new_opcode_124 ()
-let boolnot               = new_opcode ()
-let pushtrap              = new_opcode_124 ()
-let poptrap               = new_opcode ()
-let raise                 = new_opcode ()
-let check_signals         = new_opcode ()
-let c_call1               = new_opcode ()
-let c_call2               = new_opcode ()
-let c_call3               = new_opcode ()
-let c_call4               = new_opcode ()
-let c_call5               = new_opcode ()
-let c_calln               = new_opcode ()
-let const0                = new_opcode ()
-let const1                = new_opcode ()
-let const2                = new_opcode ()
-let const3                = new_opcode ()
-let constint              = new_opcode_124 ()
-let pushconst0            = new_opcode ()
-let pushconst1            = new_opcode ()
-let pushconst2            = new_opcode ()
-let pushconst3            = new_opcode ()
-let pushconstint          = new_opcode_124 ()
-let negint                = new_opcode ()
-let addint                = new_opcode ()
-let subint                = new_opcode ()
-let mulint                = new_opcode ()
-let divint                = new_opcode ()
-let modint                = new_opcode ()
-let andint                = new_opcode ()
-let orint                 = new_opcode ()
-let xorint                = new_opcode ()
-let lslint                = new_opcode ()
-let lsrint                = new_opcode ()
-let asrint                = new_opcode ()
-let eq                    = new_opcode ()
-let neq                   = new_opcode ()
-let ltint                 = new_opcode ()
-let leint                 = new_opcode ()
-let gtint                 = new_opcode ()
-let geint                 = new_opcode ()
-let offsetint             = new_opcode_124 ()
-let offsetref             = new_opcode_124 ()
-let isint                 = new_opcode ()
-let getmethod             = new_opcode ()
-let beq                   = new_opcode_124 ()
-let bneq                  = new_opcode_124 ()
-let bltint                = new_opcode_124 ()
-let bleint                = new_opcode_124 ()
-let bgtint                = new_opcode_124 ()
-let bgeint                = new_opcode_124 ()
-let ultint                = new_opcode ()
-let ugeint                = new_opcode ()
-let bultint               = new_opcode_124 ()
-let bugeint               = new_opcode_124 ()
-let getpubmet             = new_opcode ()
-let getdynmet             = new_opcode ()
-let stop                  = new_opcode ()
-
-(******************************************************************************)
-
-let opcodes = [
-  ("ACC0", `SIMPLE acc0);
-  ("ACC1", `SIMPLE acc1);
-  ("ACC2", `SIMPLE acc2);
-  ("ACC3", `SIMPLE acc3);
-  ("ACC4", `SIMPLE acc4);
-  ("ACC5", `SIMPLE acc5);
-  ("ACC6", `SIMPLE acc6);
-  ("ACC7", `SIMPLE acc7);
-  ("ACC", `SIMPLE acc);
-  ("PUSH", `SIMPLE push);
-  ("PUSHACC1", `SIMPLE pushacc1);
-  ("PUSHACC2", `SIMPLE pushacc2);
-  ("PUSHACC3", `SIMPLE pushacc3);
-  ("PUSHACC4", `SIMPLE pushacc4);
-  ("PUSHACC5", `SIMPLE pushacc5);
-  ("PUSHACC6", `SIMPLE pushacc6);
-  ("PUSHACC7", `SIMPLE pushacc7);
-  ("PUSHACC", `SIMPLE pushacc);
-  ("POP", `SIMPLE pop);
-  ("ASSIGN", `SIMPLE assign);
-  ("ENVACC1", `SIMPLE envacc1);
-  ("ENVACC2", `SIMPLE envacc2);
-  ("ENVACC3", `SIMPLE envacc3);
-  ("ENVACC4", `SIMPLE envacc4);
-  ("ENVACC", `SIMPLE envacc);
-  ("PUSHENVACC1", `SIMPLE pushenvacc1);
-  ("PUSHENVACC2", `SIMPLE pushenvacc2);
-  ("PUSHENVACC3", `SIMPLE pushenvacc3);
-  ("PUSHENVACC4", `SIMPLE pushenvacc4);
-  ("PUSHENVACC", `SIMPLE pushenvacc);
-  ("PUSH_RETADDR", `TRIPLE push_retaddr);
-  ("APPLY", `SIMPLE apply);
-  ("APPLY1", `SIMPLE apply1);
-  ("APPLY2", `SIMPLE apply2);
-  ("APPLY3", `SIMPLE apply3);
-  ("APPTERM", `SIMPLE appterm);
-  ("APPTERM1", `SIMPLE appterm1);
-  ("APPTERM2", `SIMPLE appterm2);
-  ("APPTERM3", `SIMPLE appterm3);
-  ("RETURN", `SIMPLE return);
-  ("RESTART", `SIMPLE restart);
-  ("GRAB", `SIMPLE grab);
-  ("CLOSURE", `TRIPLE closure);
-  ("CLOSUREREC", `TRIPLE closurerec);
-  ("OFFSETCLOSUREM2", `SIMPLE offsetclosurem2);
-  ("OFFSETCLOSURE0", `SIMPLE offsetclosure0);
-  ("OFFSETCLOSURE2", `SIMPLE offsetclosure2);
-  ("OFFSETCLOSURE", `SIMPLE offsetclosure);
-  ("PUSHOFFSETCLOSUREM2", `SIMPLE pushoffsetclosurem2);
-  ("PUSHOFFSETCLOSURE0", `SIMPLE pushoffsetclosure0);
-  ("PUSHOFFSETCLOSURE2", `SIMPLE pushoffsetclosure2);
-  ("PUSHOFFSETCLOSURE", `SIMPLE pushoffsetclosure);
-  ("GETGLOBAL", `DOUBLE getglobal);
-  ("PUSHGETGLOBAL", `DOUBLE pushgetglobal);
-  ("GETGLOBALFIELD", `DOUBLE getglobalfield);
-  ("PUSHGETGLOBALFIELD", `DOUBLE pushgetglobalfield);
-  ("SETGLOBAL", `DOUBLE setglobal);
-  ("ATOM0", `SIMPLE atom0);
-  ("PUSHATOM0", `SIMPLE pushatom0);
-  ("MAKEBLOCK", `DOUBLE makeblock);
-  ("MAKEBLOCK1", `SIMPLE makeblock1);
-  ("MAKEBLOCK2", `SIMPLE makeblock2);
-  ("MAKEBLOCK3", `SIMPLE makeblock3);
-  ("MAKEFLOATBLOCK", `SIMPLE makefloatblock);
-  ("GETFIELD0", `SIMPLE getfield0);
-  ("GETFIELD1", `SIMPLE getfield1);
-  ("GETFIELD2", `SIMPLE getfield2);
-  ("GETFIELD3", `SIMPLE getfield3);
-  ("GETFIELD", `SIMPLE getfield);
-  ("GETFLOATFIELD", `SIMPLE getfloatfield);
-  ("SETFIELD0", `SIMPLE setfield0);
-  ("SETFIELD1", `SIMPLE setfield1);
-  ("SETFIELD2", `SIMPLE setfield2);
-  ("SETFIELD3", `SIMPLE setfield3);
-  ("SETFIELD", `SIMPLE setfield);
-  ("SETFLOATFIELD", `SIMPLE setfloatfield);
-  ("VECTLENGTH", `SIMPLE vectlength);
-  ("GETVECTITEM", `SIMPLE getvectitem);
-  ("SETVECTITEM", `SIMPLE setvectitem);
-  ("GETSTRINGCHAR", `SIMPLE getstringchar);
-  ("SETSTRINGCHAR", `SIMPLE setstringchar);
-  ("BRANCH", `TRIPLE branch);
-  ("BRANCHIF", `TRIPLE branchif);
-  ("BRANCHIFNOT", `TRIPLE branchifnot);
-  ("SWITCH", `TRIPLE switch);
-  ("BOOLNOT", `SIMPLE boolnot);
-  ("PUSHTRAP", `TRIPLE pushtrap);
-  ("POPTRAP", `SIMPLE poptrap);
-  ("RAISE", `SIMPLE raise);
-  ("CHECK_SIGNALS", `SIMPLE check_signals);
-  ("C_CALL1", `SIMPLE c_call1);
-  ("C_CALL2", `SIMPLE c_call2);
-  ("C_CALL3", `SIMPLE c_call3);
-  ("C_CALL4", `SIMPLE c_call4);
-  ("C_CALL5", `SIMPLE c_call5);
-  ("C_CALLN", `SIMPLE c_calln);
-  ("CONST0", `SIMPLE const0);
-  ("CONST1", `SIMPLE const1);
-  ("CONST2", `SIMPLE const2);
-  ("CONST3", `SIMPLE const3);
-  ("CONSTINT", `TRIPLE constint);
-  ("PUSHCONST0", `SIMPLE pushconst0);
-  ("PUSHCONST1", `SIMPLE pushconst1);
-  ("PUSHCONST2", `SIMPLE pushconst2);
-  ("PUSHCONST3", `SIMPLE pushconst3);
-  ("PUSHCONSTINT", `TRIPLE pushconstint);
-  ("NEGINT", `SIMPLE negint);
-  ("ADDINT", `SIMPLE addint);
-  ("SUBINT", `SIMPLE subint);
-  ("MULINT", `SIMPLE mulint);
-  ("DIVINT", `SIMPLE divint);
-  ("MODINT", `SIMPLE modint);
-  ("ANDINT", `SIMPLE andint);
-  ("ORINT", `SIMPLE orint);
-  ("XORINT", `SIMPLE xorint);
-  ("LSLINT", `SIMPLE lslint);
-  ("LSRINT", `SIMPLE lsrint);
-  ("ASRINT", `SIMPLE asrint);
-  ("EQ", `SIMPLE eq);
-  ("NEQ", `SIMPLE neq);
-  ("LTINT", `SIMPLE ltint);
-  ("LEINT", `SIMPLE leint);
-  ("GTINT", `SIMPLE gtint);
-  ("GEINT", `SIMPLE geint);
-  ("OFFSETINT", `TRIPLE offsetint);
-  ("OFFSETREF", `TRIPLE offsetref);
-  ("ISINT", `SIMPLE isint);
-  ("GETMETHOD", `SIMPLE getmethod);
-  ("BEQ", `TRIPLE beq);
-  ("BNEQ", `TRIPLE bneq);
-  ("BLTINT", `TRIPLE bltint);
-  ("BLEINT", `TRIPLE bleint);
-  ("BGTINT", `TRIPLE bgtint);
-  ("BGEINT", `TRIPLE bgeint);
-  ("ULTINT", `SIMPLE ultint);
-  ("UGEINT", `SIMPLE ugeint);
-  ("BULTINT", `TRIPLE bultint);
-  ("BUGEINT", `TRIPLE bugeint);
-  ("GETPUBMET", `SIMPLE getpubmet);
-  ("GETDYNMET", `SIMPLE getdynmet);
-  ("STOP", `SIMPLE stop);
-]
-
-(******************************************************************************)
-
-let export_opcodes oc =
-  List.iter (fun (name, ops) ->
-    match ops with
-    | `SIMPLE op -> Printf.fprintf oc "  %s = %d,\n" name op
-    | `DOUBLE (op1, op2) -> Printf.fprintf oc "  %s_1B = %d,\n  %s_2B = %d,\n" name op1 name op2
-    | `TRIPLE (op1, op2, op3) -> Printf.fprintf oc "  %s_1B = %d,\n  %s_2B = %d,\n  %s_3B = %d,\n" name op1 name op2 name op3
-  ) opcodes
-
-(******************************************************************************)
+let push_retaddr       = (PUSH_RETADDR_1B, PUSH_RETADDR_2B, PUSH_RETADDR_4B)
+let closure            = (CLOSURE_1B, CLOSURE_2B, CLOSURE_4B)
+let closurerec         = (CLOSUREREC_1B, CLOSUREREC_2B, CLOSUREREC_4B)
+let getglobal          = (GETGLOBAL_1B, GETGLOBAL_2B)
+let pushgetglobal      = (PUSHGETGLOBAL_1B, PUSHGETGLOBAL_2B)
+let getglobalfield     = (GETGLOBALFIELD_1B, GETGLOBALFIELD_2B)
+let pushgetglobalfield = (PUSHGETGLOBALFIELD_1B, PUSHGETGLOBALFIELD_2B)
+let setglobal          = (SETGLOBAL_1B, SETGLOBAL_2B)
+let makeblock          = (MAKEBLOCK_1B, MAKEBLOCK_2B)
+let branch             = (BRANCH_1B, BRANCH_2B, BRANCH_4B)
+let branchif           = (BRANCHIF_1B, BRANCHIF_2B, BRANCHIF_4B)
+let branchifnot        = (BRANCHIFNOT_1B, BRANCHIFNOT_2B, BRANCHIFNOT_4B)
+let switch             = (SWITCH_1B, SWITCH_2B, SWITCH_4B)
+let pushtrap           = (PUSHTRAP_1B, PUSHTRAP_2B, PUSHTRAP_4B)
+let constint           = (CONSTINT_1B, CONSTINT_2B, CONSTINT_4B)
+let pushconstint       = (PUSHCONSTINT_1B, PUSHCONSTINT_2B, PUSHCONSTINT_4B)
+let offsetint          = (OFFSETINT_1B, OFFSETINT_2B, OFFSETINT_4B)
+let offsetref          = (OFFSETREF_1B, OFFSETREF_2B, OFFSETREF_4B)
+let beq                = (BEQ_1B, BEQ_2B, BEQ_4B)
+let bneq               = (BNEQ_1B, BNEQ_2B, BNEQ_4B)
+let bltint             = (BLTINT_1B, BLTINT_2B, BLTINT_4B)
+let bleint             = (BLEINT_1B, BLEINT_2B, BLEINT_4B)
+let bgtint             = (BGTINT_1B, BGTINT_2B, BGTINT_4B)
+let bgeint             = (BGEINT_1B, BGEINT_2B, BGEINT_4B)
+let bultint            = (BULTINT_1B, BULTINT_2B, BULTINT_4B)
+let bugeint            = (BUGEINT_1B, BUGEINT_2B, BUGEINT_4B)
