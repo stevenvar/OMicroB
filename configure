@@ -141,6 +141,7 @@ endef
 ################################################################################
 
 echo -n "\
+let builddir   = \"$ROOT\"
 let libdir     = \"$LIBDIR\"
 let ocaml      = \"$OCAML\"
 let ocamlc     = \"$OCAMLC\"
