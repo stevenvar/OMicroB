@@ -1,5 +1,9 @@
+#define DEBUG
+
 #include <stdint.h>
+#ifndef DEBUG
 #include <avr/pgmspace.h>
+#endif
 #include "inst.h"
 #include "values.h"
 
@@ -11,6 +15,11 @@
    trapSp      pointer to the current trap frame
    extra_args  number of extra arguments provided by the caller
 */
+#ifdef DEBUG
+#define TODO printf("TODO")
+#elif
+#define TODO break
+#endif
 
 val_t atom0_header;
 val_t atom0;
@@ -24,6 +33,9 @@ static val_t *trapSp;
 static val_t *global_data;
 static int extra_args;
 static int cpt;
+typedef val_t (*c_primitive)();
+extern c_primitive ocaml_primitives[];
+#define Primitive(n) (ocaml_primitives[n])
 
 /* void print_stack(){ */
 /*   val_t i; */
@@ -48,6 +60,10 @@ val_t read_val (code_t pc){
     v = (v << 8) | read_inst(pc++);
   }
   return v;
+}
+
+code_t read_ptr_1b (code_t pc){
+  return read_byte(pc);
 }
 
 code_t read_ptr (code_t pc){
@@ -197,7 +213,13 @@ val_t interp_inst (){
     push(acc);
     acc = Field(env,read_byte(pc++));
     break;
-  case PUSH_RETADDR : {
+  case PUSH_RETADDR_1B :
+    TODO;
+    break;
+  case PUSH_RETADDR_2B :
+    TODO;
+    break;
+  case PUSH_RETADDR_4B : {
     code_t ofs = read_ptr(pc++);
     push(Val_int(extra_args));
     push(env);
@@ -334,7 +356,13 @@ val_t interp_inst (){
     }
     break;
   }
-  case CLOSURE : {
+  case CLOSURE_1B :
+    TODO;
+    break;
+  case CLOSURE_2B :
+    TODO;
+    break;
+  case CLOSURE_4B : {
     uint8_t n = read_byte(pc++);
     uint8_t ofs = read_byte(pc++);
     uint8_t i;
@@ -348,7 +376,13 @@ val_t interp_inst (){
     }
     break;
   }
-  case CLOSUREREC : {
+  case CLOSUREREC_1B :
+    TODO;
+    break;
+  case CLOSUREREC_2B :
+    TODO;
+    break;
+  case CLOSUREREC_4B : {
     uint8_t f = read_byte(pc++);
     uint8_t v = read_byte(pc++);
     code_t ofs = read_ptr(pc++);
@@ -395,7 +429,10 @@ val_t interp_inst (){
     acc = env + n * sizeof(val_t);
     break;
   }
-  case PUSHGETGLOBAL :
+  case PUSHGETGLOBAL_1B :
+    TODO;
+    break;
+  case PUSHGETGLOBAL_2B :
     push(acc);
     /* fallthrough */
   case GETGLOBAL : {
@@ -403,16 +440,25 @@ val_t interp_inst (){
     acc = global_data[n];
     break;
   }
-  case PUSHGETGLOBALFIELD :
+  case PUSHGETGLOBALFIELD_1B :
+    TODO;
+    /* fallthrough */
+  case GETGLOBALFIELD_1B :
+    TODO;
+    break;
+  case PUSHGETGLOBALFIELD_2B :
     push(acc);
     /* fallthrough */
-  case GETGLOBALFIELD : {
+  case GETGLOBALFIELD_2B : {
     uint16_t n = read_global_index(pc++);
     uint8_t p = read_byte(pc++);
     acc = Field(global_data[n],p);
     break;
   }
-  case SETGLOBAL : {
+  case SETGLOBAL_1B :
+    TODO;
+    break;
+  case SETGLOBAL_2B : {
     uint16_t n = read_global_index(pc++);
     global_data[n] = acc;
     acc = Val_unit;
@@ -424,7 +470,10 @@ val_t interp_inst (){
   case ATOM0 :
     acc = atom0;
     break;
-  case MAKEBLOCK : {
+  case MAKEBLOCK_1B :
+    TODO;
+    break;
+  case MAKEBLOCK_2B : {
     uint8_t n = read_byte(pc++);
     tag_t t = read_byte(pc++);
     val_t block;
@@ -527,12 +576,24 @@ val_t interp_inst (){
     acc = Val_unit;
     break;
   }
-  case BRANCH : {
+  case BRANCH_1B :
+    TODO;
+    break;
+  case BRANCH_2B:
+    TODO;
+    break;
+  case BRANCH_4B : {
     code_t ofs = read_ptr(pc);
     pc+=ofs;
     break;
   }
-  case BRANCHIF : {
+  case BRANCHIF_1B :
+    TODO;
+    break;
+  case BRANCHIF_2B :
+    TODO;
+    break;
+  case BRANCHIF_4B : {
     code_t ofs = read_ptr(pc++);
     if (acc != Val_false){
       /* -1 because pc++ has been done */
@@ -540,14 +601,22 @@ val_t interp_inst (){
     }
     break;
   }
-  case BRANCHIFNOT : {
+  case BRANCHIFNOT_1B :
+    TODO; break;
+  case BRANCHIFNOT_2B :
+    TODO; break;
+  case BRANCHIFNOT_4B : {
     code_t ofs = read_ptr(pc++);
     if (acc == Val_false){
       pc+= (ofs-1);
     }
     break;
   }
-  case SWITCH : {
+  case SWITCH_1B :
+    TODO; break;
+  case SWITCH_2B :
+    TODO; break;
+  case SWITCH_4B : {
     uint8_t n = read_byte(pc++);
     uint8_t t = read_byte(pc++);
     if (Is_int(acc)){
@@ -563,7 +632,11 @@ val_t interp_inst (){
   case BOOLNOT :
     acc = Val_not(acc);
     break;
-  case PUSHTRAP : {
+  case PUSHTRAP_1B :
+    TODO; break;
+  case PUSHTRAP_2B :
+    TODO; break;
+  case PUSHTRAP_4B : {
     code_t ofs = read_ptr(pc++);
     push(Val_int(extra_args));
     push(trapSp);
@@ -588,11 +661,12 @@ val_t interp_inst (){
     extra_args = pop();
     break;
   case CHECK_SIGNALS :
-    /* TODO */
+    TODO;
     break;
   case C_CALL1 : {
     uint8_t p = read_byte(pc++);
     push(env);
+    acc = Primitive(p)(acc);
     acc = Primitive(p)(acc);
     env = pop();
     break;
@@ -668,10 +742,18 @@ val_t interp_inst (){
   case CONST3 :
     acc = Val_int(3);
     break;
-  case PUSHCONSTINT :
+  case PUSHCONSTINT_1B :
+    TODO; break;
+  case CONSTINT_1B :
+    TODO; break;
+  case PUSHCONSTINT_2B :
+    TODO; break;
+  case CONSTINT_2B :
+    TODO; break;
+  case PUSHCONSTINT_4B :
     push(acc);
     /* fallthrough */
-  case CONSTINT :
+  case CONSTINT_4B :
     acc = Val_int(read_val(pc++));
     break;
   case NEGINT :
@@ -700,7 +782,6 @@ val_t interp_inst (){
       caml_raise_zero_divide();
     }
     acc = Val_int(Int_val(acc) % divisor);
-    /* TODO MACRO */
     break;
   }
   case ANDINT :
@@ -739,18 +820,20 @@ val_t interp_inst (){
   case GEINT :
     acc = (acc >= pop()) ? Val_int(0) : Val_int(1);
     break;
-  case ULTINT :
-    acc = ((uval_t)acc < (uval_t)pop()) ? Val_int(0) : Val_int(1);
-    break;
-  case UGEINT :
-    acc = ((uval_t)acc >= (uval_t)pop()) ? Val_int(0) : Val_int(1);
-    break;
-  case OFFSETINT : {
+  case OFFSETINT_1B :
+    TODO; break;
+  case OFFSETINT_2B :
+    TODO; break;
+  case OFFSETINT_4B : {
     int32_t ofs = read_int(pc++);
     acc = Val_int(Int_val(acc) + ofs);
     break;
   }
-  case OFFSETREF : {
+  case OFFSETREF_1B :
+    TODO; break;
+  case OFFSETREF_2B :
+    TODO; break;
+  case OFFSETREF_4B : {
     int32_t ofs = read_int(pc++);
     Field(acc,0) = Val_int (Int_val(Field(acc,0)) + ofs);
     acc = Val_unit;
@@ -765,7 +848,11 @@ val_t interp_inst (){
     acc = Field(y,Int_val(acc));
     break;
   }
-  case BEQ : {
+  case BEQ_1B :
+    TODO; break;
+  case BEQ_2B :
+    TODO; break;
+  case BEQ_4B : {
     val_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val == acc){
@@ -776,7 +863,11 @@ val_t interp_inst (){
     }
     break;
   }
-  case BNEQ : {
+  case BNEQ_1B :
+    TODO; break;
+  case BNEQ_2B :
+    TODO; break;
+  case BNEQ_4B : {
     val_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val != acc){
@@ -787,7 +878,11 @@ val_t interp_inst (){
     }
     break;
   }
-  case BLTINT : {
+  case BLTINT_1B :
+    TODO; break;
+  case BLTINT_2B :
+    TODO; break;
+  case BLTINT_4B : {
     val_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val < acc){
@@ -798,7 +893,11 @@ val_t interp_inst (){
     }
     break;
   }
-  case BLEINT : {
+  case BLEINT_1B :
+    TODO; break;
+  case BLEINT_2B :
+    TODO; break;
+  case BLEINT_4B : {
     val_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val <= acc){
@@ -809,7 +908,11 @@ val_t interp_inst (){
     }
     break;
   }
-  case BGTINT : {
+  case BGTINT_1B :
+    TODO; break;
+  case BGTINT_2B :
+    TODO; break;
+  case BGTINT_4B : {
     val_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val > acc){
@@ -820,7 +923,11 @@ val_t interp_inst (){
     }
     break;
   }
-  case BGEINT : {
+  case BGEINT_1B :
+    TODO; break;
+  case BGEINT_2B :
+    TODO; break;
+  case BGEINT_4B : {
     val_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val >= acc){
@@ -831,7 +938,17 @@ val_t interp_inst (){
     }
     break;
   }
-  case BULTINT : {
+  case ULTINT :
+    acc = ((uval_t)acc < (uval_t)pop()) ? Val_int(0) : Val_int(1);
+    break;
+  case UGEINT :
+    acc = ((uval_t)acc >= (uval_t)pop()) ? Val_int(0) : Val_int(1);
+    break;
+  case BULTINT_1B :
+    TODO; break;
+  case BULTINT_2B :
+    TODO; break;
+  case BULTINT_4B : {
     uval_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val < (uval_t)acc){
@@ -842,7 +959,11 @@ val_t interp_inst (){
     }
     break;
   }
-  case BUGEINT : {
+  case BUGEINT_1B :
+    TODO; break;
+  case BUGEINT_2B :
+    TODO; break;
+  case BUGEINT_4B : {
     uval_t val = read_val(pc++);
     code_t ofs = read_ptr(pc);
     if (val >= (uval_t)acc){
@@ -873,8 +994,8 @@ val_t interp_inst (){
   case STOP :
     return acc;
     break;
-  case EVENT : break;
-  case BREAK : break;
+  /* case EVENT : break; */
+  /* case BREAK : break; */
   default : break;
   }
 
