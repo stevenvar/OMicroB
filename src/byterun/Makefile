@@ -4,7 +4,7 @@ TARGETS := $(LIB)/libcamlrun.a
 
 byterun: $(TARGETS)
 
-$(LIB)/libcamlrun.a: runtime.o
+$(LIB)/libcamlrun.a: prims.o
 	@rm -f $@
 	cp $(OCAMLWHERE)/libcamlrun.a $@
 	ar rs $@ $^

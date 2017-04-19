@@ -4,7 +4,7 @@ open OByteLib
 
 let stack_size = ref 128
 let heap_size = ref 1024
-let arch = ref Arch.A16
+let arch = ref Arch.A32
 let output_path = ref None
 let local = ref false
 let debug = ref false
@@ -113,10 +113,7 @@ let byterun_dir =
   if local then [ Config.builddir; "src"; "byterun" ] else [ Config.libdir ]
     
 let values_h  = List.fold_right Filename.concat byterun_dir "values.h"
-let interp_c  = List.fold_right Filename.concat byterun_dir "interp.c"
 let runtime_c = List.fold_right Filename.concat byterun_dir "runtime.c"
-let debug_c   = List.fold_right Filename.concat byterun_dir "debug.c"
-let gc_c      = List.fold_right Filename.concat byterun_dir "gc.c"
 
 (******************************************************************************)
 
@@ -131,32 +128,37 @@ let () =
   try
     Tools.with_oc output_path (fun oc ->
       let bytefile = Bytefile.read bytecode_path in
-      let (bytecode, opgen) = Codegen.export bytefile.Bytefile.code in
-      let (_globdata, globnb) = Datagen.export bytefile.Bytefile.data in
-      Printf.fprintf oc "#define OCAML_STACK_WOSIZE     %8d\n" stack_size;
-      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE      %8d\n" heap_size;
-      Printf.fprintf oc "#define OCAML_GLOBDATA_WOSIZE  %8d\n" globnb; 
-      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE   %8d\n" (List.length bytecode);
-      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER %8d\n" (Array.length bytefile.Bytefile.prim);
-      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH     %8s\n" (Arch.to_string arch);
+      let (bytecode, opcodes) = Codegen.export bytefile.Bytefile.code in
+      let (globdata, heapdata) = Datagen.export arch bytefile.Bytefile.data in
+      if List.length heapdata > heap_size then (
+        error (Printf.sprintf "too huge global data (%d words) for the defined heap size (%d words), out of memory before start" (List.length heapdata) heap_size);
+      );
+      Printf.fprintf oc "#define OCAML_STACK_WOSIZE       %6d\n" stack_size;
+      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE        %6d\n" heap_size;
+      Printf.fprintf oc "#define OCAML_HEAP_INITIAL_USAGE %6d\n" (List.length heapdata);
+      Printf.fprintf oc "#define OCAML_GLOBDATA_NUMBER    %6d\n" (List.length globdata);
+      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE     %6d\n" (List.length bytecode);
+      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER   %6d\n" (Array.length bytefile.Bytefile.prim);
+      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH       %6s\n" (Arch.to_string arch);
       if debug then Printf.fprintf oc "#define OCAML_DEBUG_MODE\n";
-      Printf.fprintf oc "\n";
-      Printer.print_opgen oc opgen;
       Printf.fprintf oc "\n";
       Printf.fprintf oc "#include <%s>\n" values_h;
       Printf.fprintf oc "\n";
+      Printer.print_opcodes oc opcodes;
+      Printf.fprintf oc "\n";
       Printf.fprintf oc "val_t ocaml_stack[OCAML_STACK_WOSIZE];\n";
-      Printf.fprintf oc "val_t ocaml_heap[OCAML_HEAP_WOSIZE];\n";
-      Printf.fprintf oc "val_t ocaml_globdata[OCAML_GLOBDATA_WOSIZE];\n";
+      Printf.fprintf oc "\n";
+      Printer.print_datagen_word_array oc "val_t" "ocaml_heap1" "OCAML_HEAP_WOSIZE" heapdata;
+      Printf.fprintf oc "\n";
+      Printf.fprintf oc "val_t ocaml_heap2[OCAML_HEAP_WOSIZE];\n";
+      Printf.fprintf oc "\n";
+      Printer.print_datagen_word_array oc "val_t" "ocaml_globdata" "OCAML_GLOBDATA_WOSIZE" globdata;
+      Printf.fprintf oc "\n";
+      Printer.print_codegen_word_array oc "PROGMEM opcode_t" "ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
+      Printf.fprintf oc "\n";
+      Printf.fprintf oc "#include <%s>\n" runtime_c;
       Printf.fprintf oc "\n";
       Printer.print_prim oc bytefile.Bytefile.prim;
-      Printf.fprintf oc "\n";
-      Printer.print_c_array oc "PROGMEM opcode_t" "ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
-      Printf.fprintf oc "\n";
-      Printf.fprintf oc "#include <%s>\n" interp_c;
-      Printf.fprintf oc "#include <%s>\n" runtime_c;
-      Printf.fprintf oc "#include <%s>\n" debug_c;
-      Printf.fprintf oc "#include <%s>\n" gc_c;
     )
   with
   | Failure msg | Sys_error msg -> error msg
