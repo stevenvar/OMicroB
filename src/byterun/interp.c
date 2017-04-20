@@ -21,7 +21,7 @@
 */
 #ifdef DEBUG
 #define TODO printf("TODO")
-#elif
+#else
 #define TODO break
 #endif
 
