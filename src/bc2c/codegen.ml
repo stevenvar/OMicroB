@@ -310,7 +310,7 @@ let export_code_from_addrs code addrs =
       Tools.fail "PUSHATOM with non-zero tag is not supported";
     | MAKEBLOCK (tag, size) ->
       check_bounds "MAKEBLOCK tag:" tag 0 0xFF;
-      check_bounds "MAKEBLOCK size:" size 0 0xFFFF;
+      check_bounds "MAKEBLOCK size:" size 1 0xFFFF;
       if size < 0x100 then (
         export_opcode Opcode.MAKEBLOCK_1B;
         export_uint8 tag;
@@ -332,41 +332,49 @@ let export_code_from_addrs code addrs =
       check_bounds "MAKEBLOCK3" tag 0 255;
       export_opcode Opcode.MAKEBLOCK3;
       export_uint8 tag;
+    | MAKEFLOATBLOCK 1 ->
+      export_opcode Opcode.MAKEBLOCK1;
+      export_uint8 0;
+    | MAKEFLOATBLOCK 2 ->
+      export_opcode Opcode.MAKEBLOCK2;
+      export_uint8 0;
+    | MAKEFLOATBLOCK 3 ->
+      export_opcode Opcode.MAKEBLOCK3;
+      export_uint8 0;
     | MAKEFLOATBLOCK size ->
-      check_bounds "MAKEFLOATBLOCK" size 0 255;
-      export_opcode Opcode.MAKEFLOATBLOCK;
-      export_uint8 size;
-    | GETFIELD0 ->
+      check_bounds "MAKEFLOATBLOCK" size 4 0xFFFF;
+      if size < 0x100 then (
+        export_opcode Opcode.MAKEBLOCK_1B;
+        export_uint8 0;
+        export_uint8 size;
+      ) else (
+        export_opcode Opcode.MAKEBLOCK_2B;
+        export_uint8 0;
+        export_uint16 size;
+      )
+    | GETFIELD0 | GETFLOATFIELD 0 ->
       export_opcode Opcode.GETFIELD0;
-    | GETFIELD1 ->
+    | GETFIELD1 | GETFLOATFIELD 1 ->
       export_opcode Opcode.GETFIELD1;
-    | GETFIELD2 ->
+    | GETFIELD2 | GETFLOATFIELD 2 ->
       export_opcode Opcode.GETFIELD2;
-    | GETFIELD3 ->
+    | GETFIELD3 | GETFLOATFIELD 3 ->
       export_opcode Opcode.GETFIELD3;
-    | GETFIELD n ->
+    | GETFIELD n | GETFLOATFIELD n ->
       check_bounds "GETFIELD" n 4 255;
       export_opcode Opcode.GETFIELD;
       export_uint8 n;
-    | GETFLOATFIELD n ->
-      check_bounds "GETFLOATFIELD" n 0 255;
-      export_opcode Opcode.GETFLOATFIELD;
-      export_uint8 n;
-    | SETFIELD0 ->
+    | SETFIELD0 | SETFLOATFIELD 0 ->
       export_opcode Opcode.SETFIELD0;
-    | SETFIELD1 ->
+    | SETFIELD1 | SETFLOATFIELD 1 ->
       export_opcode Opcode.SETFIELD1;
-    | SETFIELD2 ->
+    | SETFIELD2 | SETFLOATFIELD 2 ->
       export_opcode Opcode.SETFIELD2;
-    | SETFIELD3 ->
+    | SETFIELD3 | SETFLOATFIELD 3 ->
       export_opcode Opcode.SETFIELD3;
-    | SETFIELD n ->
+    | SETFIELD n | SETFLOATFIELD n ->
       check_bounds "SETFIELD" n 0 255;
       export_opcode Opcode.SETFIELD;
-      export_uint8 n;
-    | SETFLOATFIELD n ->
-      check_bounds "SETFLOATFIELD" n 0 255;
-      export_opcode Opcode.SETFLOATFIELD;
       export_uint8 n;
     | VECTLENGTH ->
       export_opcode Opcode.VECTLENGTH;
@@ -432,18 +440,23 @@ let export_code_from_addrs code addrs =
     | C_CALL1 idx ->
       check_bounds "C_CALL1" idx 0 255;
       export_opcode Opcode.C_CALL1;
+      export_uint8 idx;
     | C_CALL2 idx ->
-      check_bounds "C_CALL1" idx 0 255;
+      check_bounds "C_CALL2" idx 0 255;
       export_opcode Opcode.C_CALL2;
+      export_uint8 idx;
     | C_CALL3 idx ->
-      check_bounds "C_CALL1" idx 0 255;
+      check_bounds "C_CALL3" idx 0 255;
       export_opcode Opcode.C_CALL3;
+      export_uint8 idx;
     | C_CALL4 idx ->
-      check_bounds "C_CALL1" idx 0 255;
+      check_bounds "C_CALL4" idx 0 255;
       export_opcode Opcode.C_CALL4;
+      export_uint8 idx;
     | C_CALL5 idx ->
-      check_bounds "C_CALL1" idx 0 255;
+      check_bounds "C_CALL5" idx 0 255;
       export_opcode Opcode.C_CALL5;
+      export_uint8 idx;
     | C_CALLN (narg, idx) ->
       check_bounds "C_CALLN narg:" narg 0 255;
       check_bounds "C_CALLN idx:" idx 0 255;

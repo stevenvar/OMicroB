@@ -1,6 +1,6 @@
 type word =
 | INT     of int
-| FLOAT   of float
+| FLOAT   of int list
 | CHARS   of char list
 | BYTES   of int list
 | CUSTOM  of string

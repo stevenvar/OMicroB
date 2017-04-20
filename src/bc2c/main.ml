@@ -152,7 +152,9 @@ let () =
       Printf.fprintf oc "\n";
       Printf.fprintf oc "val_t ocaml_heap2[OCAML_HEAP_WOSIZE];\n";
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "val_t" "ocaml_globdata" "OCAML_GLOBDATA_WOSIZE" globdata;
+      Printf.fprintf oc "val_t *ocaml_heap = ocaml_heap1;\n";
+      Printf.fprintf oc "\n";
+      Printer.print_datagen_word_array oc "val_t" "ocaml_global_data" "OCAML_GLOBDATA_NUMBER" globdata;
       Printf.fprintf oc "\n";
       Printer.print_codegen_word_array oc "PROGMEM opcode_t" "ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
       Printf.fprintf oc "\n";

@@ -33,9 +33,10 @@ let print_codegen_word_array oc ty name size data =
 let print_datagen_word_array oc ty name size data =
   let bprint_char buf c =
     match c with
-    | '\x00' .. '\x09' -> Printf.bprintf buf "'\\%d'" (int_of_char c)
-    | '\x20' .. '\x5B' | '\x5D' .. '\x7E' -> Printf.bprintf buf "'%c'" c
     | '\\' -> Printf.bprintf buf "'\\\\'"
+    | '\'' -> Printf.bprintf buf "'\\''"
+    | '\x00' .. '\x07' -> Printf.bprintf buf "'\\%d'" (int_of_char c)
+    | '\x20' .. '\x7E' -> Printf.bprintf buf "'%c'" c
     | _ -> Printf.bprintf buf "0x%02X" (int_of_char c) in
   let print_chars chars =
     let buf = Buffer.create 16 in
@@ -46,9 +47,9 @@ let print_datagen_word_array oc ty name size data =
     ) chars;
     Printf.bprintf buf ")";
     Buffer.contents buf in
-  let print_bytes bytes =
+  let print_bytes constr bytes =
     let buf = Buffer.create 16 in
-    Printf.bprintf buf "Make_custom_data(";
+    Printf.bprintf buf "%s(" constr;
     List.iteri (fun i c ->
       if i > 0 then Printf.bprintf buf ", ";
       Printf.bprintf buf "0x%02X" c;
@@ -70,12 +71,12 @@ let print_datagen_word_array oc ty name size data =
   let pp word =
     match word with
     | Datagen.INT n              -> Printf.sprintf "Val_int(%d)" n
-    | Datagen.FLOAT x            -> Printf.sprintf "Val_float(%F)" x
+    | Datagen.FLOAT bytes        -> print_bytes "Make_float" bytes
     | Datagen.CHARS chars        -> print_chars chars
-    | Datagen.BYTES bytes        -> print_bytes bytes
-    | Datagen.CUSTOM name        -> Printf.sprintf "&%s_custom_operations" name
+    | Datagen.BYTES bytes        -> print_bytes "Make_custom_data" bytes
+    | Datagen.CUSTOM name        -> Printf.sprintf "(val_t) &%s_custom_operations" name
     | Datagen.HEADER (tag, size) -> Printf.sprintf "Make_header(%s, %d)" (print_tag tag) size
-    | Datagen.POINTER ind        -> Printf.sprintf "&ocaml_heap1[%d]" ind
+    | Datagen.POINTER ind        -> Printf.sprintf "Val_block(%d)" ind
   in
   print_c_array oc ty name size data pp
 

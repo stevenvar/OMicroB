@@ -6,3 +6,4 @@
 **/*.cmxa
 **/*.byte
 **/*.native
+**/*.elf

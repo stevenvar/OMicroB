@@ -12,3 +12,9 @@ let to_string arch =
   | A16 -> "16"
   | A32 -> "32"
   | A64 -> "64"
+
+let byte_count arch =
+  match arch with
+  | A16 -> 2
+  | A32 -> 4
+  | A64 -> 8

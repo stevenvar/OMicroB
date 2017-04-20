@@ -1,220 +1,244 @@
-
 #include <stdint.h>
 
-/* version 32 bits
+#ifndef PROGMEM
+#define PROGMEM
+#endif
 
-   codage des valeurs par du Nan boxing 32 bits avec :
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-          float : tels quels avec 1 seul Nan 1111 1111 1000 0000 0000 0000 0000 0000
-           int  : 1 bit de marque à la fin 
-       pointeur : 0111 1111 1xxx yyyy xxxx yyyy xxxx yyy0  (alignement)
-pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoir que des 1 dans la zone Nan
-
-           word : 4 octets sur machines 32 bits
-        int32_t : entiers sur 32 bits (stdint.h)
-          val_t : la représentation uniforme d'une valeur ocaml
-       header_t : la représentation de l'entête (là aussi 32 bits)
-          bloc  :  une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
-         champ  : une valeur (val_t)
-  */
-
-
-/* représentation uniforme
-   val_t : 32 bits
- */
-
-typedef int32_t  val_t;
-typedef uint32_t  uval_t;
-typedef int32_t  header_t;
-typedef uint8_t  tag_t;
-/* typedef int32_t  color_t; */
-typedef int32_t  mlsize_t;
-
-
-/* Représentation des valeurs : Entiers, vrai Nan et pointeur du tas
-
-   Is_int ne différencie pas entiers et flottants mais cela ne doit pas être gênant dans les switch du filtrage
-   Is_nan teste le seul nan
-   Is_ptr teste si c'est un pointeur à suivre dans le tas
-   et on ne s'intéresse pas au cas d'un pointeur dans la flash (pointeur de fonction)
-
- */
-
-#define Is_int(x) ((x & 1) != 0)
-#define Is_nan(x) ( (x >> 23) == 512)
-#define Is_ptr(x) ( ((x << 31) == 0) && ((x >> 23) == 255))
-
-
-/* macros de conversion : to_from
- * et de cast : to_from
- */
-
-#define Val_int(x)  (((val_t)(x) << 1 ) + 1)
-#define Int_val(x) ((x) >> 1)
-
-/* les pointeurs du tas ont 8 bits à 1 (poids forts décalés de 1)) */
-#define Val_block(x) (((val_t)(int16_t)(val_t *)x) | 0x7f800000)
-#define Block_val(x) ((val_t *)(int16_t)x)
-
-/* Structure de l'entête : est-ce que la couleur est utile (oui sur 1 bit)
-
-     +--------+-------+-----+
-     | wosize |couleur| tag |
-     +--------+-------+-----+
-bits  31    10 9     8 7   0
-
-   on reprend la notation ocaml :
-
-      wosize : taille (en mots) de la partie chamsp du bloc
-          hd : l'entête
-         tag : la valeur du champ tag de l'entête
-
-
-  le pointeur sur un bloc démarre après l'entête, c'est-à-dire sur le premier élément du bloc,
-  il faut donc décaler d'un mot pour atteindre l'entête
-
-  on distingue alors 3 types de pointeurs :
-    bp : pointeur sur le premier octet d'un bloc (un char * (pour les strings ?))
-    op : pointeur sur le premier champ du bloc (une val_t *)
-    hp : pointeur sur l'entête d'un bloc (header_t *)
-
-*/
-
-#define Tag_hd(hd) ((tag_t) ((hd) & 0xFF))
-#define Wosize_hd(hd) ((mlsize_t) ((hd) >> 10))
-#define Color_hd(hd) (((hd) >> 8) & 1)
-
-#define Hd_val(val) ((((header_t *) (val)) [-1]))
-#define Hd_hp(hp) (* ((header_t *) (hp)))
-#define Hp_val(val) ((header_t *) (((header_t *) (val)) - 1))
-#define Val_hp(hp) (((((header_t *) (hp)) + 1)))
-
-
-#define Num_tags (1 << 8)
-/* pour 32 bits */
-#define Max_wosize ((1 << 22) - 1)
-
-/* à nettoyer */
-#define Wosize_val(val) (Wosize_hd (Hd_val (val)))
+#if OCAML_VIRTUAL_ARCH == 16
 
 /*
-#define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
-#define Wosize_bp(bp) (Wosize_val (bp))
-#define Wosize_hp(hp) (Wosize_hd (Hd_hp (hp)))
-#define Whsize_wosize(sz) ((sz) + 1)
-#define Wosize_whsize(sz) ((sz) - 1)
-
-#define Wosize_bhsize(sz) ((sz) / sizeof (val_t) - 1)
-#define Bsize_wsize(sz) ((sz) * sizeof (val_t))
-#define Wsize_bsize(sz) ((sz) / sizeof (val_t))
-#define Bhsize_wosize(sz) (Bsize_wsize (Whsize_wosize (sz)))
-#define Bhsize_bosize(sz) ((sz) + sizeof (header_t))
-#define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
-#define Bosize_op(op) (Bosize_val (Val_op (op)))
-#define Bosize_bp(bp) (Bosize_val (Val_bp (bp)))
-#define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
-#define Whsize_hp(hp) (Whsize_wosize (Wosize_hp (hp)))
+  Version 16 bits
 */
 
 
+/******************************************************************************/
 
-#define Tag_val(val) (Tag_hd(Hd_val(val)))
-#define Tag_hp(hp) (Tag_hd(*hp))
 
-/* supposition LITTLE ENDIAN  : voir plus haut
-#define Tag_val(val) (((unsigned char *) (val)) [-sizeof(val_t)])
-#define Tag_hp(hp) (((unsigned char *) (hp)) [0])
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+#elif OCAML_VIRTUAL_ARCH == 32
+
+/*
+  Version 32 bits
+
+  Codage des valeurs par du Nan boxing 32 bits avec :
+
+          float : tels quels avec 1 seul Nan 0111 1111 1100 0000 0000 0000 0000 0000
+           int  : 1 bit de marque à la fin 
+       pointeur : 1111 1111 11xx xxxx xxxx xxxx xxxx xx00  (alignement)
+pointeurs flash : tels quels mais limités à 2^31-2^22 en évitant ainsi d'avoir que des 1 dans la zone Nan
+
+        int32_t : entiers sur 32 bits (stdint.h)
+          val_t : la représentation uniforme d'une valeur ocaml
+           bloc : une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
+          champ : une valeur (val_t)
 */
 
-#define No_scan_tag 251
+/******************************************************************************/
+/* Types */
 
-/* 1- si  tag < No_scan_tag : un n-uplet de champs.  */
-
-/* pointeur sur le 1er champ */
-#define Op_val(x) ((val_t *) (x))
-/* les champs sont numérotés à partir de 0 */
-#define Field(x, i) (((val_t *)(x)) [i])
-
+typedef int32_t val_t;
+typedef uint32_t uval_t;
+typedef uint32_t mlsize_t;
+typedef uint8_t tag_t;
 typedef uint8_t opcode_t;
 typedef uint32_t code_t;
 
-/* de la doc ocaml : [Forward_tag] et [Infix_tag] doivent être sous No_scan_tag avec [Infix_tag] le plus petit */
+/******************************************************************************/
+/* Value classification */
 
-/* Forward_tag : pointeur */
-#define Forward_tag 250
-#define Forward_val(v) Field(v, 0)
+#define Is_int(x) (((x) & 1) != 0)
+#define Is_ptr(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 22) == 0x3FF)
 
-/* Infix_tag : là c'est plus compliqué
-     apparait seulement dans les blocs Closure_tag pour les fonctions mutuelle ment récursives
-     Infix_tag doit être impair pour être vu comme un entier
-     et retourne 1 (modulo 4) : alignement ?
-*/
+/******************************************************************************/
+/* Conversions */
 
-/* attention des Bosize sont comenté plus haut */
-#define Infix_tag 249
-#define Infix_offset_hd(hd) (Bosize_hd(hd))
-#define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
+#define Val_int(x) (((val_t) (x) << 1) + 1)
+#define Int_val(x) ((val_t) (x) >> 1)
 
-/* les booléens sont 0 et 1 */
+#define Val_block(x) ((val_t) (x) | ((val_t) 0x3FF << 22))
+#define Block_val(x) ((val_t) (x) ^ ((val_t) 0x3FF << 22))
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
+
+#define Val_float(x) ((float) x != (float) x ? Val_nan : ((union { float x; val_t n; }) (float) (x)).n)
+#define Float_val(v) (((union { float x; val_t n; }) (val_t) (v)).x)
+
+/******************************************************************************/
+/* Constants */
+
 #define Val_false Val_int(0)
-#define Val_true Val_int(1)
-#define Val_not(x) (Val_false + Val_true - (x))
+#define Val_true  Val_int(1)
+#define Val_unit  Val_int(0)
+#define Val_nan   0x7FC00000
 
-/* Object_tag */
-#define Object_tag 248
-#define Class_val(val) Field((val), 0)
-#define Oid_val(val) Int_val(Field((val), 1))
+/******************************************************************************/
+/* Blocks */
 
-/* Closure_tag */
-#define Closure_tag 247
-#define Code_val(val) (((code_t *) (val)) [0])
+#define Field(val, i) (ocaml_heap[(Block_val(val) >> 2) + i])
+#define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
 
-/* Lazy_tag : pour les lazy, à voir avec les Forward_tag */
-#define Lazy_tag 246
+#define Header(val) Field(val, -1)
+#define Code_val(val) Field(val, 0)
 
-/* Another special case: variants */
-/*CAMLextern value caml_hash_variant(char const * tag); */
+#define Make_string_data(c3, c2, c1, c0) \
+  (((val_t) (c3) << 24) | ((val_t) (c2) << 16) | ((val_t) (c1) << 8) | ((val_t) (c0)))
 
-/* 2- Si tag >= No_scan_tag : suite d'octets. */
+#define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
-/* Pointeur sur le premier octet */
-#define Bp_val(v) ((char *) (v))
-#define Val_bp(p) ((val_t) (p))
-/* les octets sont numérotés à partir de 0. */
-#define Byte(x, i) (((char *) (x)) [i])
-#define Byte_u(x, i) (((unsigned char *) (x)) [i])
+#define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
-/* Abstract_tag : ne rien faire pour el GC */
+#define Make_header(wosize, tag) (((val_t) (wosize) << 9) | tag)
+#define Wosize_val(val) (Header(val) >> 9)
+#define Color_val(val) ((Header(val) >> 9) & 1)
+#define Tag_val(val) (Header(val) & 0xFF)
+
+#define Color_white 0
+#define Color_black 1
+
+/******************************************************************************/
+/* Tags */
+
+#define Lazy_tag     246
+#define Closure_tag  247
+#define Object_tag   248
+#define Infix_tag    249
+#define Forward_tag  250
 #define Abstract_tag 251
+#define String_tag   252
+#define Custom_tag   255
 
-/* Strings. */
-#define String_tag 252
-#define String_val(x) ((char *) Bp_val(x))
-/*CAMLextern mlsize_t caml_string_length (value);    taille en octets */
+/******************************************************************************/
+/* Custom operations */
 
-/* nombres flottants : pour l'historique. */
-#define Double_tag 253
+extern void *int32_custom_operations;
+extern void *int64_custom_operations;
+extern void *nativeint_custom_operations;
 
-/* tableaux de flottants, là aussi c'est historique. */
-#define Double_array_tag 254
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-/* Custom */
-#define Custom_tag 255
-#define Data_custom_val(v) ((void *) &Field((v), 1))
+#elif OCAML_VIRTUAL_ARCH == 64
 
-/* 3- Atomes sont des 0-nuplet, alloués une seule fois (staituqement). */
+/*
+  Version 64 bits
 
-/*CAMLextern header_t caml_atom_table[];
- *#define Atom(tag) (Val_hp (&(caml_atom_table [(tag)])))
- */
+  Codage des valeurs par du Nan boxing 64 bits avec :
 
-/* unit */
-#define Val_unit Val_int(0)
+          float : tels quels avec 1 seul Nan 0111 1111 1111 1000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+           int  : 1 bit de marque à la fin
+       pointeur : 1111 1111 1111 1xxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx x000  (alignement)
+pointeurs flash : tels quels mais limités à 2^63-2^51 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
-/* la liste vide  */
-#define Val_emptylist Val_int(0)
+        int64_t : entiers sur 64 bits (stdint.h)
+          val_t : la représentation uniforme d'une valeur ocaml
+           bloc : une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
+          champ : une valeur (val_t)
+*/
 
+/******************************************************************************/
+/* Types */
 
+typedef int64_t val_t;
+typedef uint64_t uval_t;
+typedef uint64_t mlsize_t;
+typedef uint8_t tag_t;
+typedef uint8_t opcode_t;
+typedef uint64_t code_t;
+
+/******************************************************************************/
+/* Value classification */
+
+#define Is_int(x) (((x) & 1) != 0)
+#define Is_ptr(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 51) == 0x1FFF)
+
+/******************************************************************************/
+/* Conversions */
+
+#define Val_int(x) (((val_t) (x) << 1) | 1)
+#define Int_val(x) ((val_t) (x) >> 1)
+
+#define Val_block(x) ((val_t) (x) | ((val_t) 0x1FFF << 51))
+#define Block_val(x) ((val_t) (x) ^ ((val_t) 0x1FFF << 51))
+
+#define Val_bool(x) Val_int((x) != 0)
+#define Bool_val(x) Int_val(x)
+
+#define Val_float(x) ((double) x != (double) x ? Val_nan : ((union { double d; val_t n; }) (double) (x)).n)
+#define Float_val(v) (((union { double d; val_t n; }) (val_t) (v)).d)
+
+/******************************************************************************/
+/* Constants */
+
+#define Val_false Val_int(0)
+#define Val_true  Val_int(1)
+#define Val_unit  Val_int(0)
+#define Val_nan   0x7FF8000000000000
+
+/******************************************************************************/
+/* Blocks */
+
+#define Field(val, i) (ocaml_heap[(Block_val(val) >> 3) + i])
+#define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
+
+#define Header(val) Field(val, -1)
+#define Code_val(val) Field(val, 0)
+
+#define Make_string_data(c7, c6, c5, c4, c3, c2, c1, c0)                                       \
+  (((val_t) (c7) << 56) | ((val_t) (c6) << 48) | ((val_t) (c5) << 40) | ((val_t) (c4) << 32) | \
+   ((val_t) (c3) << 24) | ((val_t) (c2) << 16) | ((val_t) (c1) <<  8) | ((val_t) (c0)))
+
+#define Make_custom_data(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
+
+#define Make_float(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
+
+#define Make_header(wosize, tag) (((mlsize_t) (wosize) << 9) | tag)
+#define Wosize_val(val) ((mlsize_t) (Header(val) >> 9))
+#define Color_val(val) ((Header(val) >> 9) & 1)
+#define Tag_val(val) (Header(val) & 0xFF)
+
+#define Color_white 0
+#define Color_black 1
+
+/******************************************************************************/
+/* Tags */
+
+#define Lazy_tag     246
+#define Closure_tag  247
+#define Object_tag   248
+#define Infix_tag    249
+#define Forward_tag  250
+#define Abstract_tag 251
+#define String_tag   252
+#define Custom_tag   255
+
+/******************************************************************************/
+/* Custom operations */
+
+extern void *int32_custom_operations;
+extern void *int64_custom_operations;
+extern void *nativeint_custom_operations;
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+#else
+#ifdef OCAML_VIRTUAL_ARCH
+#error "Invalid virtual architecture, please define OCAML_VIRTUAL_ARCH"
+#else
+#error "Unknown virtual architecture, please define OCAML_VIRTUAL_ARCH to 16, 32 or 64"
+#endif
+#endif
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
