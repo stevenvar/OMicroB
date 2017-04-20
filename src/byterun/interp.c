@@ -1,3 +1,5 @@
+#define DEBUG
+
 #include <stdint.h>
 #include <assert.h>
 #include "values.h"
@@ -17,6 +19,11 @@
    trapSp      pointer to the current trap frame
    extra_args  number of extra arguments provided by the caller
 */
+#ifdef DEBUG
+#define TODO printf("TODO")
+#elif
+#define TODO break
+#endif
 
 val_t atom0_header;
 val_t atom0;
