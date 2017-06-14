@@ -8,3 +8,4 @@
 **/*.native
 **/*.elf
 **/*.avr
+**/*.hex
