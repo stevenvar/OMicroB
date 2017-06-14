@@ -14,7 +14,7 @@ extern val_t *global_data;
  * 
  * avec les fonctions principales suivantes : 
  * 
- *   init_gc 
+ *   gc_init 
  *   alloc_small
  *   gc
  * 
@@ -50,7 +50,7 @@ val_t* tab_heap_end[2];
  *   à voir dans startup.c
  * heap_size : la taille du tas utile. Au final 2 zones de cette taille seront allouées.
  */
-void init_gc(int32_t heap_size) {
+void gc_init(int32_t heap_size) {
   /* il faudra probablement remplacer le malloc */
   heap1_start = malloc(heap_size * sizeof (val_t));
   heap1_end = heap1_start + heap_size * sizeof (val_t);

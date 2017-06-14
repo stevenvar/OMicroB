@@ -7,3 +7,4 @@
 **/*.byte
 **/*.native
 **/*.elf
+**/*.avr

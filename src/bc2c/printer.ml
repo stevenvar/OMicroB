@@ -88,7 +88,7 @@ let print_opcodes oc opcodes =
 let print_prim oc prim =
   let prim_nb = Array.length prim in
   let prim_ind = ref 0 in
-  Printf.fprintf oc "PROGMEM void *ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {\n";
+  Printf.fprintf oc "PROGMEM void * const ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {\n";
   Array.iter (fun prim_name ->
     Printf.fprintf oc "  (void *) &%s" prim_name;
     incr prim_ind;

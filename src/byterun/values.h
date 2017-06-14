@@ -1,6 +1,8 @@
 #include <stdint.h>
 
-#ifndef PROGMEM
+#ifdef __AVR__
+#include <avr/pgmspace.h>
+#else
 #define PROGMEM
 #endif
 
@@ -126,7 +128,7 @@ extern void *nativeint_custom_operations;
 /******************************************************************************/
 /******************************************************************************/
 
-#elif OCAML_VIRTUAL_ARCH == 64
+#elif OCAML_VIRTUAL_ARCH == 64 || !defined(OCAML_VIRTUAL_ARCH)
 
 /*
   Version 64 bits
@@ -232,11 +234,7 @@ extern void *nativeint_custom_operations;
 /******************************************************************************/
 
 #else
-#ifdef OCAML_VIRTUAL_ARCH
 #error "Invalid virtual architecture, please define OCAML_VIRTUAL_ARCH"
-#else
-#error "Unknown virtual architecture, please define OCAML_VIRTUAL_ARCH to 16, 32 or 64"
-#endif
 #endif
 
 /******************************************************************************/

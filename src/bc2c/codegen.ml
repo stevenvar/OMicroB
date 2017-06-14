@@ -397,7 +397,7 @@ let export_code_from_addrs code addrs =
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in
       let export_ofs = export_of_kind kind in
-      let opcode = opcode_of_kind kind Opcode.branch in
+      let opcode = opcode_of_kind kind Opcode.branchif in
       export_opcode opcode;
       export_ofs ofs;
     | BRANCHIFNOT ptr ->

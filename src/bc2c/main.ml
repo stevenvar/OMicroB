@@ -156,7 +156,7 @@ let () =
       Printf.fprintf oc "\n";
       Printer.print_datagen_word_array oc "val_t" "ocaml_global_data" "OCAML_GLOBDATA_NUMBER" globdata;
       Printf.fprintf oc "\n";
-      Printer.print_codegen_word_array oc "PROGMEM opcode_t" "ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
+      Printer.print_codegen_word_array oc "PROGMEM opcode_t" "const ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
       Printf.fprintf oc "\n";
       Printf.fprintf oc "#include <%s>\n" runtime_c;
       Printf.fprintf oc "\n";

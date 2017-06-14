@@ -1,12 +1,12 @@
 #include <stdint.h>
-#include <assert.h>
+#include "debug.h"
 #include "values.h"
 
 extern val_t heap_ptr;
 extern val_t heap_end;
 
 extern void gc(mlsize_t wosize);
-extern void init_gc(void);
+extern void gc_init(void);
 
 #define DEBUGassert(test) assert(test)
 #define DEBUGclear(val, sz) do { for (int i = 0; i < sz; i ++) Field(val, i) = Val_unit; } while(0)
