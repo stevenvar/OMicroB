@@ -133,6 +133,11 @@ let float_of_value v =
   | Float x -> x
   | _ -> assert false
 
+let object_of_value v =
+  match v with
+  | Object o -> o
+  | _ -> assert false
+
 (******************************************************************************)
 (* Env tools. *)
 
@@ -210,17 +215,6 @@ let get_size blk =
   | _ -> assert false
 
 (******************************************************************************)
-(* C Primitive Call. *)
-
-let get_prim prims idx =
-  assert (idx >= 0 && idx < Array.length prims);
-  prims.(idx)
-
-let ccall prim args =
-  match prim, args with
-  | _ -> raise Exit
-
-(******************************************************************************)
 (* Physical comparison. *)
 
 let eq v1 v2 =
@@ -240,14 +234,113 @@ let find_object_method obj meth =
       if meth < meth' then bin_search tbl meth li (mi - 2)
       else bin_search tbl meth mi hi
   in
-  match obj with
-  | Object values ->
-    assert (Array.length values > 0);
-    let tbl = match values.(0) with Block (0, tbl) -> tbl | _ -> assert false in
-    let hi = match tbl.(0) with Int hi -> (hi lsl 1) lor 1 | _ -> assert false in
-    bin_search tbl meth 3 hi
-  | _ ->
-    assert false
+  assert (Array.length obj > 0);
+  let tbl = match obj.(0) with Block (0, tbl) -> tbl | _ -> assert false in
+  let hi = match tbl.(0) with Int hi -> (hi lsl 1) lor 1 | _ -> assert false in
+  bin_search tbl meth 3 hi
+
+(******************************************************************************)
+(* C Primitive Call. *)
+
+let get_prim prims idx =
+  assert (idx >= 0 && idx < Array.length prims);
+  prims.(idx)
+
+let caml_array_concat lst =
+  let rec to_list acc lst =
+    match lst with
+    | Int 0 -> acc
+    | Block (0, [| Block (0, v); rest |]) -> to_list (v :: acc) rest
+    | _ -> assert false in
+  let l = List.rev (to_list [] lst) in
+  let tbl = Array.concat l in
+  Block (0, tbl)
+
+let caml_hash i j seed v =
+  ignore (i, j, seed, v);
+  raise Exit (* TODO *)
+
+external format_float : bytes -> float -> bytes = "caml_format_float"
+external format_int : bytes -> int -> bytes = "caml_format_int"
+
+let ccall prim args =
+  match prim, args with
+  | "caml_abs_float", [ Float x ] -> Float (abs_float x)
+  | "caml_acos_float", [ Float x ] -> Float (acos x)
+  | "caml_add_float", [ Float x; Float y ] -> Float (x +. y)
+  | "caml_array_append", [ Block (0, v0); Block (0, v1) ] -> Block (0, Array.append v0 v1)
+  | "caml_array_blit", [ Block (0, v0); Int s0; Block (0, v1); Int s1; Int len ] -> Array.blit v0 s0 v1 s1 len; Int 0
+  | "caml_array_concat", [ lst ] -> caml_array_concat lst
+  | "caml_array_sub", [ Block (0, v); Int ofs; Int len ] -> Block (0, Array.sub v ofs len)
+  | "caml_asin_float", [ Float x ] -> Float (asin x)
+  | "caml_atan2_float", [ Float x; Float y ] -> Float (atan2 x y)
+  | "caml_atan_float", [ Float x ] -> Float (atan x)
+  | ("caml_blit_bytes" | "caml_blit_string"), [ Bytes b0; Int s0; Bytes b1; Int s1; Int len ] -> Bytes.blit b0 s0 b1 s1 len; Int 0
+  | "caml_bytes_equal", [ Bytes b0; Bytes b1 ] -> if Bytes.equal b0 b1 then Int 1 else Int 0
+  | "caml_ceil_float", [ Float x ] -> Float (ceil x)
+  | "caml_classify_float", [ Float x ] -> (match classify_float x with FP_normal -> Int 0 | FP_subnormal -> Int 1 | FP_zero -> Int 2 | FP_infinite -> Int 3 | FP_nan -> Int 4)
+  | "caml_copysign_float", [ Float x; Float y ] -> Float (copysign x y)
+  | "caml_cos_float", [ Float x ] -> Float (cos x)
+  | "caml_cosh_float", [ Float x ] -> Float (cosh x)
+  | ("caml_create_bytes" | "caml_create_string"), [ Int size ] -> Bytes (Bytes.create size)
+  | "caml_exp_float", [ Float x ] -> Float (exp x)
+  | "caml_expm1_float", [ Float x ] -> Float (expm1 x)
+  | ("caml_fill_bytes" | "caml_fill_string"), [ Bytes b; Int ofs; Int len; Int c ] -> Bytes.fill b ofs len (char_of_int c); Int 0
+  | "caml_float_of_string", [ Bytes b ] -> Float (float_of_string (Bytes.unsafe_to_string b))
+  | "caml_floor_float", [ Float x ] -> Float (floor x)
+  | "caml_fmod_float", [ Float x; Float y ] -> Float (mod_float x y)
+  | "caml_format_float", [ Bytes b; Float x ] -> Bytes (format_float b x)
+  | "format_int", [ Bytes b; Int i ] -> Bytes (format_int b i)
+  | "caml_frexp_float", [ Float x ] -> let y, i = frexp x in Block (0, [| Float y; Int i |])
+  | "caml_gc_compaction", [ Int 0 ] -> Gc.compact (); Int 0
+  | "caml_gc_counters", [ Int 0 ] -> let x, y, z = Gc.counters () in Block (0, [| Float x; Float y; Float z |])
+  | "caml_gc_full_major", [ Int 0 ] -> Gc.full_major (); Int 0
+  | "caml_gc_huge_fallback_count", [ Int 0 ] -> Int (Gc.huge_fallback_count ())
+  | "caml_gc_major", [ Int 0 ] -> Gc.major (); Int 0
+  | "caml_gc_major_slice", [ Int i ] -> Int (Gc.major_slice i)
+  | "caml_gc_minor", [ Int 0 ] -> Gc.minor (); Int 0
+  | "caml_gc_minor_words", [ Int 0 ] -> Float (Gc.minor_words ())
+  | "caml_get_major_bucket", [ Int i ] -> Int (Gc.get_bucket i)
+  | "caml_get_major_credit", [ Int 0 ] -> Int (Gc.get_credit ())
+  | "caml_get_minor_free", [ Int 0 ] -> Int (Gc.get_minor_free ())
+  | "caml_get_public_method", [ Object obj; Int tag ] -> find_object_method obj tag
+  | "caml_hash", [ Int i; Int j; Int k; v ] -> caml_hash i j k v
+  | "caml_hash_univ_param", [ Int i; Int j; v ] -> caml_hash i j 0 v
+  | "caml_hypot_float", [ Float x; Float y ] -> Float (hypot x y)
+  | "caml_int32_bits_of_float", [ Float x ] -> Int32 (Int32.bits_of_float x)
+  | "caml_int32_float_of_bits", [ Int32 i ] -> Float (Int32.float_of_bits i)
+  | "caml_int32_format", [ Bytes b; Int32 i ] -> Bytes (Bytes.unsafe_of_string (Int32.format (Bytes.unsafe_to_string b) i))
+  | "caml_int32_of_float", [ Float x ] -> Int32 (Int32.of_float x)
+  | "caml_int32_of_string", [ Bytes b ] -> Int32 (Int32.of_string (Bytes.unsafe_to_string b))
+  | "caml_int32_to_float", [ Int32 i ] -> Float (Int32.to_float i)
+  | "caml_int64_bits_of_float", [ Float x ] -> Int64 (Int64.bits_of_float x)
+  | "caml_int64_float_of_bits", [ Int64 i ] -> Float (Int64.float_of_bits i)
+  | "caml_int64_format", [ Bytes b; Int64 i ] -> Bytes (Bytes.unsafe_of_string (Int64.format (Bytes.unsafe_to_string b) i))
+  | "caml_int64_of_float", [ Float x ] -> Int64 (Int64.of_float x)
+  | "caml_int64_of_string", [ Bytes b ] -> Int64 (Int64.of_string (Bytes.unsafe_to_string b))
+  | "caml_int64_to_float", [ Int64 i ] -> Float (Int64.to_float i)
+  | "caml_int_of_string", [ Bytes b ] -> Int (int_of_string (Bytes.unsafe_to_string b))
+  | "caml_ldexp_float", [ Float x; Int i ] -> Float (ldexp x i)
+  | "caml_log10_float", [ Float x ] -> Float (log10 x)
+  | "caml_log1p_float", [ Float x ] -> Float (log1p x)
+  | "caml_log_float", [ Float x ] -> Float (log x)
+  | "caml_make_float_vect", [ Int i ] -> Float_array (Array.create_float i)
+  | "caml_make_vect", [ Int 0; _ ] -> Block (0, [||])
+  | "caml_make_vect", [ Int i; Float x ] -> Float_array (Array.make i x)
+  | "caml_make_vect", [ Int i; v ] -> Block (0, Array.make i v)
+  | "caml_modf_float", [ Float x ] -> let y, z = modf x in Block (0, [| Float y; Float z |])
+  | "caml_nativeint_format", [ Bytes b; Nativeint i ] -> Bytes (Bytes.unsafe_of_string (Nativeint.format (Bytes.unsafe_to_string b) i))
+  | "caml_nativeint_of_float", [ Float x ] -> Nativeint (Nativeint.of_float x)
+  | "caml_nativeint_of_string", [ Bytes b ] -> Nativeint (Nativeint.of_string (Bytes.unsafe_to_string b))
+  | "caml_nativeint_to_float", [ Nativeint i ] -> Float (Nativeint.to_float i)
+  | "caml_power_float", [ Float x; Float y ] -> Float (x ** y)
+  | "caml_sin_float", [ Float x ] -> Float (sin x)
+  | "caml_sinh_float", [ Float x ] -> Float (sinh x)
+  | "caml_sqrt_float", [ Float x ] -> Float (sqrt x)
+  | "caml_string_equal", [ Bytes b1; Bytes b2 ] -> if Bytes.equal b1 b2 then Int 1 else Int 0
+  | "caml_tan_float", [ Float x ] -> Float (tan x)
+  | "caml_tanh_float", [ Float x ] -> Float (tanh x)
+  | _ -> raise Exit
 
 (******************************************************************************)
 
@@ -868,10 +961,10 @@ let run prims globals code =
 
       | GETPUBMET (tag, _cache) ->
         push stack !accu;
-        accu := find_object_method !accu tag;
+        accu := find_object_method (object_of_value !accu) tag;
         incr pc;
       | GETDYNMET ->
-        accu := find_object_method (acc stack 0) (int_of_value !accu);
+        accu := find_object_method (object_of_value (acc stack 0)) (int_of_value !accu);
         incr pc;
 
       | STOP -> raise Exit
