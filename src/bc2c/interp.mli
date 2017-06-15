@@ -19,5 +19,10 @@ and closure = {
 
 and pc = int
 and stack = value list
+and globals = value array
 
-val run : OByteLib.Prim.t -> OByteLib.Data.t -> OByteLib.Code.t -> pc * stack
+val run :
+  OByteLib.Prim.t ->
+  OByteLib.Data.t ->
+  OByteLib.Code.t ->
+  pc * stack * globals

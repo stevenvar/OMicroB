@@ -24,6 +24,7 @@ and closure = {
 
 and pc = int
 and stack = value list
+and globals = value array
 
 (******************************************************************************)
 (* Value pretty printer. *)
@@ -57,7 +58,7 @@ let rec import_value v =
   | Value.Int64 n -> Int64 n
   | Value.Nativeint n -> Nativeint n
   | Value.Float x -> Float x
-  | Value.Float_array xs -> Float_array xs
+  | Value.Float_array xs -> Float_array (Array.copy xs)
   | Value.String s -> Bytes (Bytes.of_string s)
   | Value.Object vs -> Object (Array.map import_value vs)
   | Value.Block (tag, vs) -> Block (tag, Array.map import_value vs)
@@ -344,7 +345,7 @@ let ccall prim args =
 
 (******************************************************************************)
 
-let run prims globals code =
+let exec prims globals code cycle_limit =
   let globals = Array.map import_value globals in
   let code_size = Array.length code in
 
@@ -356,9 +357,17 @@ let run prims globals code =
   let trap_sp = ref (-1) in
   let stack = ref [] in
 
+  let cycle_count = ref 0 in
+  let last_valid_cycle = ref 0 in
+
   try
     while true do
+      if !cycle_count = cycle_limit then raise Exit;
+      if !env = unit then last_valid_cycle := !cycle_count;
+      incr cycle_count;
+
       assert (!pc >= 0 && !pc < code_size);
+
       match code.(!pc) with
       | ACC0 ->
         accu := acc stack 0;
@@ -974,9 +983,16 @@ let run prims globals code =
     done;
     assert false (* Unreachable code *)
   with
-  | Exit -> !pc, !stack
+  | Exit -> !pc, !stack, globals, !last_valid_cycle
   | Stack_overflow   -> failwith "Evaluation failed: stack overflow"
   | Out_of_memory    -> failwith "Evaluation failed: out of memory"
   | Division_by_zero -> failwith "Evaluation failed: division by zero"
+
+(******************************************************************************)
+
+let run prims globals code =
+  let _, _, _, cycle_limit = exec prims globals code max_int in
+  let pc, stack, globals, _ = exec prims globals code cycle_limit in
+  pc, stack, globals
 
 (******************************************************************************)
