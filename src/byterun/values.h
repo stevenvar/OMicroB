@@ -73,6 +73,9 @@ typedef uint32_t code_t;
 #define Val_float(x) ((float) x != (float) x ? Val_nan : ((union { float x; val_t n; }) (float) (x)).n)
 #define Float_val(v) (((union { float x; val_t n; }) (val_t) (v)).x)
 
+#define Val_codeptr(x) Val_int(x)
+#define Codeptr_val(x) Int_val(x)
+
 /******************************************************************************/
 /* Constants */
 

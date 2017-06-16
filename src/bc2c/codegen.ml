@@ -1,10 +1,9 @@
 open OByteLib.Instr
-
-type word = SBYTE of int | UBYTE of int | OPCODE of Opcode.t
+open T
 
 (******************************************************************************)
 
-let export_code_from_addrs code addrs =
+let export_code_from_codemap code codemap =
   let bytecode = ref [] in
   let pc = ref 0 in
 
@@ -51,7 +50,7 @@ let export_code_from_addrs code addrs =
   (***)
 
   let ofs_of_ptr ptr =
-    let addr = addrs.(ptr) in
+    let addr = codemap.(ptr) in
     if addr = -1 then 0
     else addr - !pc in
 
@@ -89,7 +88,7 @@ let export_code_from_addrs code addrs =
   (***)
 
   Array.iteri (fun instr_ind instr ->
-    addrs.(instr_ind) <- !pc;
+    codemap.(instr_ind) <- !pc;
     match instr with
     | ACC0 ->
       export_opcode Opcode.ACC0;
@@ -652,14 +651,14 @@ let opcodes_of_bytecode bytecode =
 (******************************************************************************)
 
 let export code =
-  let addrs = Array.map (fun _ -> -1) code in
+  let codemap = Array.map (fun _ -> -1) code in
   let bytecode = ref [] in
   let continue = ref true in
   while !continue do
-    let new_bytecode = export_code_from_addrs code addrs in
+    let new_bytecode = export_code_from_codemap code codemap in
     if new_bytecode = !bytecode then continue := false
     else bytecode := new_bytecode;
   done;
-  (!bytecode, opcodes_of_bytecode !bytecode)
+  (!bytecode, opcodes_of_bytecode !bytecode, codemap)
 
 (******************************************************************************)

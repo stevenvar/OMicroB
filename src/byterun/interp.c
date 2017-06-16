@@ -22,7 +22,6 @@ val_t atom0_header = Make_header(0, 0);
 PROGMEM extern void * const ocaml_primitives[];
 
 static code_t pc;
-static val_t acc;
 static val_t env;
 static val_t *sp;
 static val_t trapSp;
@@ -127,7 +126,7 @@ void caml_raise_division_by_zero(void) {
 /******************************************************************************/
 
 void interp_init(void) {
-  sp = ocaml_stack + OCAML_STACK_WOSIZE - 1;
+  sp = ocaml_stack + OCAML_STACK_WOSIZE - 1 - OCAML_STACK_INITIAL_USAGE;
   trapSp = Val_int(0);
   env = Val_unit;
   extra_args = 0;
@@ -145,7 +144,7 @@ val_t interp(void) {
 #endif
 
     opcode_t opcode = read_opcode();
-    
+
     switch(opcode){
       
 #ifdef OCAML_ACC0
@@ -402,7 +401,7 @@ val_t interp(void) {
 #ifdef OCAML_APPLY
     case OCAML_APPLY : {
       extra_args = read_uint8() - 1;
-      pc = Code_val(acc);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       break;
     }
@@ -413,9 +412,9 @@ val_t interp(void) {
       val_t arg1 = pop();
       push(Val_int(extra_args));
       push(env);
-      push(pc);
+      push(Val_codeptr(pc));
       push(arg1);
-      pc = Code_val(acc);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       extra_args = 0;
       break;
@@ -428,10 +427,10 @@ val_t interp(void) {
       val_t arg2 = pop();
       push(Val_int(extra_args));
       push(env);
-      push(pc);
-      push(arg1);
+      push(Val_codeptr(pc));
       push(arg2);
-      pc = Code_val(acc);
+      push(arg1);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       extra_args = 1;
       break;
@@ -445,11 +444,11 @@ val_t interp(void) {
       val_t arg3 = pop();
       push(Val_int(extra_args));
       push(env);
-      push(pc);
-      push(arg1);
-      push(arg2);
+      push(Val_codeptr(pc));
       push(arg3);
-      pc = Code_val(acc);
+      push(arg2);
+      push(arg1);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       extra_args = 2;
       break;
@@ -465,7 +464,7 @@ val_t interp(void) {
         newsp[i] = sp[i];
       }
       sp = newsp;
-      pc = Code_val(acc);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       extra_args += nargs - 1;
       break;
@@ -477,7 +476,7 @@ val_t interp(void) {
       val_t arg = peek(0);
       pop_n(read_uint8() - 1);
       push(arg);
-      pc = Code_val(acc);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       break;
     }
@@ -488,9 +487,9 @@ val_t interp(void) {
       val_t arg1 = peek(0);
       val_t arg2 = peek(1);
       pop_n(read_uint8() - 2);
-      push(arg1);
       push(arg2);
-      pc = Code_val(acc);
+      push(arg1);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       extra_args ++;
       break;
@@ -503,10 +502,10 @@ val_t interp(void) {
       val_t arg2 = peek(1);
       val_t arg3 = peek(2);
       pop_n(read_uint8() - 3);
-      push(arg1);
-      push(arg2);
       push(arg3);
-      pc = Code_val(acc);
+      push(arg2);
+      push(arg1);
+      pc = Codeptr_val(Code_val(acc));
       env = acc;
       extra_args += 2;
       break;
@@ -518,10 +517,10 @@ val_t interp(void) {
       pop_n(read_uint8());
       if (extra_args > 0){
         extra_args --;
-        pc = Code_val(acc);
+        pc = Codeptr_val(Code_val(acc));
         env = acc;
       } else {
-        pc = pop();
+        pc = Codeptr_val(pop());
         env = pop();
         extra_args = Int_val(pop());
       }
@@ -549,12 +548,12 @@ val_t interp(void) {
         extra_args -= n;
       } else {
         Alloc_small(acc, extra_args + 3, Closure_tag);
-        Code_val(acc) = pc - 3;
+        Code_val(acc) = Val_codeptr(pc - 3);
         Field(acc, 1) = env;
         for (i = 0 ; i < n; i ++) {
           Field(env, i + 1) = pop();
         }
-        pc = pop();
+        pc = Codeptr_val(pop());
         env = pop();
         extra_args = pop();
       }
@@ -571,7 +570,7 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
-      Code_val(acc) = ptr;
+      Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
       }
@@ -588,7 +587,7 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
-      Code_val(acc) = ptr;
+      Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
       }
@@ -605,7 +604,7 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
-      Code_val(acc) = ptr;
+      Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
       }
@@ -1233,7 +1232,7 @@ val_t interp(void) {
         return Val_unit;
       } else {
         sp = ocaml_stack + Int_val(trapSp);
-        pc = pop();
+        pc = Codeptr_val(pop());
         trapSp = pop();
         env = pop();
         extra_args = Int_val(pop());
@@ -1636,7 +1635,7 @@ val_t interp(void) {
       if (Val_int(read_int16()) == acc) {
         pc = read_ptr_2B() - 2;
       } else {
-       pc += 2;
+        pc += 2;
       }
       break;
     }

@@ -1,4 +1,5 @@
 open OByteLib.Instr
+open T
 
 let nexts code pc =
   assert (pc >= 0 && pc < Array.length code);
@@ -67,14 +68,14 @@ let rec mark_living code living_code read_globals written_globals pc =
 let code_ptrs_of_value v =
   let rec loop acc v =
     match v with
-    | Interp.Int _ | Interp.Int32 _ | Interp.Int64 _ | Interp.Nativeint _
-    | Interp.Float _ | Interp.Float_array _ | Interp.Bytes _ ->
+    | Int _ | Int32 _ | Int64 _ | Nativeint _
+    | Float _ | Float_array _ | Bytes _ ->
       acc
-    | Interp.Object vs | Interp.Block (_, vs) ->
+    | Object vs | Block (_, vs) ->
       Array.fold_left loop acc vs
-    | Interp.Closure { Interp.ofs = _; ptrs; env } ->
+    | Closure { ofs = _; ptrs; env } ->
       Array.fold_left loop (Array.to_list ptrs @ acc) env
-    | Interp.CodePtr pc ->
+    | CodePtr pc ->
       pc :: acc in
   loop [] v
     
@@ -158,29 +159,30 @@ let remap_instr code_mapper globals_mapper instr =
 
 let rec remap_value code_mapper v =
   match v with
-  | Interp.Int _ | Interp.Int32 _ | Interp.Int64 _ | Interp.Nativeint _
-  | Interp.Float _ | Interp.Float_array _ | Interp.Bytes _ ->
+  | Int _ | Int32 _ | Int64 _ | Nativeint _
+  | Float _ | Float_array _ | Bytes _ ->
     v
-  | Interp.Object vs ->
-    Interp.Object (Array.map (remap_value code_mapper) vs)
-  | Interp.Block (tag, vs) ->
-    Interp.Block (tag, Array.map (remap_value code_mapper) vs)
-  | Interp.Closure { Interp.ofs; ptrs; env } ->
-    Interp.Closure {
-      Interp.ofs;
-      Interp.ptrs = Array.map (fun ptr -> code_mapper.(ptr)) ptrs;
-      Interp.env = Array.map (remap_value code_mapper) env;
+  | Object vs ->
+    Object (Array.map (remap_value code_mapper) vs)
+  | Block (tag, vs) ->
+    Block (tag, Array.map (remap_value code_mapper) vs)
+  | Closure { ofs; ptrs; env } ->
+    Closure {
+      ofs;
+      ptrs = Array.map (fun ptr -> code_mapper.(ptr)) ptrs;
+      env = Array.map (remap_value code_mapper) env;
     }
-  | Interp.CodePtr ptr ->
-    Interp.CodePtr code_mapper.(ptr)
+  | CodePtr ptr ->
+    CodePtr code_mapper.(ptr)
 
 let clean prims globals code =
-  let pc, stack, globals = Interp.run prims globals code in
+  let pc, accu, stack, globals = Interp.run prims globals code in
 
   let living_code = Array.map (fun _ -> false) code in
   let read_globals = Array.map (fun _ -> false) globals in
   let written_globals = Array.map (fun _ -> false) globals in
   let mark = mark_living code living_code read_globals written_globals in
+  List.iter mark (code_ptrs_of_value accu);
   List.iter (fun v -> List.iter mark (code_ptrs_of_value v)) stack;
   Array.iter (fun v -> List.iter mark (code_ptrs_of_value v)) globals;
   mark pc;
@@ -204,4 +206,4 @@ let clean prims globals code =
   let globals = Array.map (remap_value code_mapper) globals in
   let stack = List.map (remap_value code_mapper) stack in
 
-  stack, globals, code
+  accu, stack, globals, code

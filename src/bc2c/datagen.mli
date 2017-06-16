@@ -1,10 +1,2 @@
-type word =
-| INT     of int
-| FLOAT   of int list
-| CHARS   of char list
-| BYTES   of int list
-| CUSTOM  of string
-| HEADER  of int * int
-| POINTER of int
-
-val export : Arch.t -> OByteLib.Data.t -> word list * word list
+val export : Arch.t -> T.code_ptr array -> T.value -> T.stack -> T.globals -> T.dword * T.dword list * T.dword list * T.dword list
+val reverse_stack : int -> T.dword list -> T.dword list

@@ -1,3 +1,5 @@
+open T
+
 let print_c_array oc ty name size data pp =
   let len = List.length data in
   let padding =
@@ -19,18 +21,18 @@ let print_c_array oc ty name size data pp =
 let print_codegen_word_array oc ty name size data =
   let pp word =
     match word with
-    | Codegen.SBYTE byte ->
+    | SBYTE byte ->
       assert (byte >= -0x80 && byte < 0x80);
       string_of_int byte;
-    | Codegen.UBYTE byte ->
+    | UBYTE byte ->
       assert (byte >= 0 && byte < 0x100);
       string_of_int byte;
-    | Codegen.OPCODE opcode ->
+    | OPCODE opcode ->
       "OCAML_" ^ Opcode.to_string opcode
   in
   print_c_array oc ty name size data pp
 
-let print_datagen_word_array oc ty name size data =
+let string_of_dword arch dword =
   let bprint_char buf c =
     match c with
     | '\\' -> Printf.bprintf buf "'\\\\'"
@@ -68,17 +70,18 @@ let print_datagen_word_array oc ty name size data =
     else if tag = Obj.double_array_tag then "Double_array_tag"
     else if tag = Obj.custom_tag then "Custom_tag"
     else string_of_int tag in
-  let pp word =
-    match word with
-    | Datagen.INT n              -> Printf.sprintf "Val_int(%d)" n
-    | Datagen.FLOAT bytes        -> print_bytes "Make_float" bytes
-    | Datagen.CHARS chars        -> print_chars chars
-    | Datagen.BYTES bytes        -> print_bytes "Make_custom_data" bytes
-    | Datagen.CUSTOM name        -> Printf.sprintf "(val_t) &%s_custom_operations" name
-    | Datagen.HEADER (tag, size) -> Printf.sprintf "Make_header(%s, %d)" (print_tag tag) size
-    | Datagen.POINTER ind        -> Printf.sprintf "Val_block(%d)" ind
-  in
-  print_c_array oc ty name size data pp
+  match dword with
+  | INT n              -> Printf.sprintf "Val_int(%d)" n
+  | FLOAT bytes        -> print_bytes "Make_float" bytes
+  | CHARS chars        -> print_chars chars
+  | BYTES bytes        -> print_bytes "Make_custom_data" bytes
+  | CUSTOM name        -> Printf.sprintf "(val_t) &%s_custom_operations" name
+  | HEADER (tag, size) -> Printf.sprintf "Make_header(%s, %d)" (print_tag tag) size
+  | POINTER ind        -> Printf.sprintf "Val_block(%d * %d)" (Arch.byte_count arch) ind
+  | CODEPTR ptr        -> Printf.sprintf "Val_codeptr(%d)" ptr
+
+let print_datagen_word_array oc arch ty name size data =
+  print_c_array oc ty name size data (string_of_dword arch)
 
 let print_opcodes oc opcodes =
   List.iteri (fun i opcode ->

@@ -1,30 +1,5 @@
-open OByteLib
-open Instr
-
-(******************************************************************************)
-
-type value =
-| Int         of int
-| Int32       of Int32.t
-| Int64       of Int64.t
-| Nativeint   of Nativeint.t
-| Float       of float
-| Float_array of float array
-| Bytes       of bytes
-| Object      of value array
-| Block       of int * value array
-| Closure     of closure
-| CodePtr     of pc
-
-and closure = {
-  ofs  : int;
-  ptrs : pc array;
-  env  : value array;
-}
-
-and pc = int
-and stack = value list
-and globals = value array
+open OByteLib.Instr
+open T
 
 (******************************************************************************)
 (* Value pretty printer. *)
@@ -41,7 +16,7 @@ let rec bprint_value buf v =
   | Object       vs -> Printf.bprintf buf "<"; Array.iter (Printf.bprintf buf " %a;" bprint_value) vs; Printf.bprintf buf " >"
   | Block (tag, vs) -> Printf.bprintf buf "[%d|" tag; Array.iter (Printf.bprintf buf " %a;" bprint_value) vs; Printf.bprintf buf " ]"
   | Closure       _ -> Printf.bprintf buf "<fun>"
-  | CodePtr      pc -> Printf.bprintf buf "#%d" pc
+  | CodePtr      cp -> Printf.bprintf buf "#%d" cp
 
 let pprint_value v =
   let buf = Buffer.create 16 in
@@ -53,15 +28,15 @@ let pprint_value v =
 
 let rec import_value v =
   match v with
-  | Value.Int n -> Int n
-  | Value.Int32 n -> Int32 n
-  | Value.Int64 n -> Int64 n
-  | Value.Nativeint n -> Nativeint n
-  | Value.Float x -> Float x
-  | Value.Float_array xs -> Float_array (Array.copy xs)
-  | Value.String s -> Bytes (Bytes.of_string s)
-  | Value.Object vs -> Object (Array.map import_value vs)
-  | Value.Block (tag, vs) -> Block (tag, Array.map import_value vs)
+  | OByteLib.Value.Int n -> Int n
+  | OByteLib.Value.Int32 n -> Int32 n
+  | OByteLib.Value.Int64 n -> Int64 n
+  | OByteLib.Value.Nativeint n -> Nativeint n
+  | OByteLib.Value.Float x -> Float x
+  | OByteLib.Value.Float_array xs -> Float_array (Array.copy xs)
+  | OByteLib.Value.String s -> Bytes (Bytes.of_string s)
+  | OByteLib.Value.Object vs -> Object (Array.map import_value vs)
+  | OByteLib.Value.Block (tag, vs) -> Block (tag, Array.map import_value vs)
 
 (******************************************************************************)
 (* Stack tools. *)
@@ -363,7 +338,7 @@ let exec prims globals code cycle_limit =
   try
     while true do
       if !cycle_count = cycle_limit then raise Exit;
-      if !env = unit then last_valid_cycle := !cycle_count;
+      if !env = unit && !trap_sp = -1 then last_valid_cycle := !cycle_count;
       incr cycle_count;
 
       assert (!pc >= 0 && !pc < code_size);
@@ -983,7 +958,7 @@ let exec prims globals code cycle_limit =
     done;
     assert false (* Unreachable code *)
   with
-  | Exit -> !pc, !stack, globals, !last_valid_cycle
+  | Exit -> !pc, !accu, !stack, globals, !last_valid_cycle
   | Stack_overflow   -> failwith "Evaluation failed: stack overflow"
   | Out_of_memory    -> failwith "Evaluation failed: out of memory"
   | Division_by_zero -> failwith "Evaluation failed: division by zero"
@@ -991,8 +966,8 @@ let exec prims globals code cycle_limit =
 (******************************************************************************)
 
 let run prims globals code =
-  let _, _, _, cycle_limit = exec prims globals code max_int in
-  let pc, stack, globals, _ = exec prims globals code cycle_limit in
-  pc, stack, globals
+  let _, _, _, _, cycle_limit = exec prims globals code max_int in
+  let pc, accu, stack, globals, _ = exec prims globals code cycle_limit in
+  pc, accu, stack, globals
 
 (******************************************************************************)

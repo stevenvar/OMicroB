@@ -1,13 +1,28 @@
-open OByteLib
+open T
 
-type word =
-| INT     of int
-| FLOAT   of int list
-| CHARS   of char list
-| BYTES   of int list
-| CUSTOM  of string
-| HEADER  of int * int
-| POINTER of int
+(******************************************************************************)
+
+module QHTBL : sig
+  type ('k, 'v) t
+  val create : unit -> ('k, 'v) t
+  val put  : ('k, 'v) t -> 'k -> 'v -> unit
+  val find : ('k, 'v) t -> 'k -> 'v
+end = struct
+  type ('k, 'v) t = ('k, ('k * 'v) list ref) Hashtbl.t
+
+  let create () = Hashtbl.create 16
+
+  let put qhtbl k v =
+    try
+      let rl = Hashtbl.find qhtbl k in
+      assert (not (List.mem_assq k !rl));
+      rl := (k, v) :: !rl;
+    with Not_found ->
+      Hashtbl.add qhtbl k (ref [ (k, v) ])
+
+  let find qhtbl k =
+    List.assq k !(Hashtbl.find qhtbl k)
+end
 
 (******************************************************************************)
 
@@ -42,23 +57,34 @@ let nativeint_bytes n =
 
 (******************************************************************************)
 
-let export arch data =
+let export arch codemap accu stack data =
+  let int32_cache = Hashtbl.create 16 in
+  let int64_cache = Hashtbl.create 16 in
+  let nativeint_cache = Hashtbl.create 16 in
+  let float_array_cache = QHTBL.create () in
+  let bytes_cache = QHTBL.create () in
+  let block_cache = QHTBL.create () in
+  let closure_cache = Hashtbl.create 16 in
+
   let heap = ref [] in
   let heap_ind = ref 0 in
-  let push w = heap := w :: !heap; incr heap_ind in
-  let pointer () = POINTER (!heap_ind * Arch.byte_count arch) in
+  let push w = heap := ref w :: !heap; incr heap_ind in
+  let push_ref () = let r = ref (INT 0) in heap := r :: !heap; incr heap_ind; r in
+  let pointer () = POINTER !heap_ind in
 
   let rec export_value d =
     match d with
-    | Value.Int n -> export_int n
-    | Value.Int32 n -> export_int32 n
-    | Value.Int64 n -> export_int64 n
-    | Value.Nativeint n -> export_nativeint n
-    | Value.Float x -> export_float x
-    | Value.Float_array tbl -> export_float_array tbl
-    | Value.String str -> export_string str
-    | Value.Object fields -> export_block Obj.object_tag fields
-    | Value.Block (tag, fields) -> export_block tag fields
+    | Int n -> export_int n
+    | Int32 n -> export_int32 n
+    | Int64 n -> export_int64 n
+    | Nativeint n -> export_nativeint n
+    | Float x -> export_float x
+    | Float_array tbl -> export_float_array tbl
+    | Bytes str -> export_bytes str
+    | Object fields -> export_block Obj.object_tag fields
+    | Block (tag, fields) -> export_block tag fields
+    | Closure closure -> export_closure closure
+    | CodePtr pc -> export_code_ptr pc
 
   and export_int n =
     begin
@@ -70,73 +96,85 @@ let export arch data =
     INT n
 
   and export_int32 n =
-    let (n0, n1, n2, n3) = int32_bytes n in
-    match arch with
-    | Arch.A16 ->
-      push (HEADER (Obj.custom_tag, 3));
-      let ptr = pointer () in
-      push (CUSTOM "int32");
-      push (BYTES [ n3; n2 ]);
-      push (BYTES [ n1; n0 ]);
-      ptr
-    | Arch.A32 ->
-      push (HEADER (Obj.custom_tag, 2));
-      let ptr = pointer () in
-      push (CUSTOM "int32");
-      push (BYTES [ n3; n2; n1; n0 ]);
-      ptr
-    | Arch.A64 ->
-      push (HEADER (Obj.custom_tag, 2));
-      let ptr = pointer () in
-      push (CUSTOM "int32");
-      push (BYTES [ 0; 0; 0; 0; n3; n2; n1; n0 ]);
+    try Hashtbl.find int32_cache n with Not_found ->
+      let ptr =
+        let (n0, n1, n2, n3) = int32_bytes n in
+        match arch with
+        | Arch.A16 ->
+          push (HEADER (Obj.custom_tag, 3));
+          let ptr = pointer () in
+          push (CUSTOM "int32");
+          push (BYTES [ n3; n2 ]);
+          push (BYTES [ n1; n0 ]);
+          ptr
+        | Arch.A32 ->
+          push (HEADER (Obj.custom_tag, 2));
+          let ptr = pointer () in
+          push (CUSTOM "int32");
+          push (BYTES [ n3; n2; n1; n0 ]);
+          ptr
+        | Arch.A64 ->
+          push (HEADER (Obj.custom_tag, 2));
+          let ptr = pointer () in
+          push (CUSTOM "int32");
+          push (BYTES [ 0; 0; 0; 0; n3; n2; n1; n0 ]);
+          ptr in
+      Hashtbl.add int32_cache n ptr;
       ptr
 
   and export_int64 n =
-    let (n0, n1, n2, n3, n4, n5, n6, n7) = int64_bytes n in
-    match arch with
-    | Arch.A16 ->
-      push (HEADER (Obj.custom_tag, 5));
-      let ptr = pointer () in
-      push (CUSTOM "int64");
-      push (BYTES [ n7; n6 ]);
-      push (BYTES [ n5; n4 ]);
-      push (BYTES [ n3; n2 ]);
-      push (BYTES [ n1; n0 ]);
-      ptr
-    | Arch.A32 ->
-      push (HEADER (Obj.custom_tag, 3));
-      let ptr = pointer () in
-      push (CUSTOM "int64");
-      push (BYTES [ n7; n6; n5; n4 ]);
-      push (BYTES [ n3; n2; n1; n0 ]);
-      ptr
-    | Arch.A64 ->
-      push (HEADER (Obj.custom_tag, 2));
-      let ptr = pointer () in
-      push (CUSTOM "int64");
-      push (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
+    try Hashtbl.find int64_cache n with Not_found ->
+      let ptr =
+        let (n0, n1, n2, n3, n4, n5, n6, n7) = int64_bytes n in
+        match arch with
+        | Arch.A16 ->
+          push (HEADER (Obj.custom_tag, 5));
+          let ptr = pointer () in
+          push (CUSTOM "int64");
+          push (BYTES [ n7; n6 ]);
+          push (BYTES [ n5; n4 ]);
+          push (BYTES [ n3; n2 ]);
+          push (BYTES [ n1; n0 ]);
+          ptr
+        | Arch.A32 ->
+          push (HEADER (Obj.custom_tag, 3));
+          let ptr = pointer () in
+          push (CUSTOM "int64");
+          push (BYTES [ n7; n6; n5; n4 ]);
+          push (BYTES [ n3; n2; n1; n0 ]);
+          ptr
+        | Arch.A64 ->
+          push (HEADER (Obj.custom_tag, 2));
+          let ptr = pointer () in
+          push (CUSTOM "int64");
+          push (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
+          ptr in
+      Hashtbl.add int64_cache n ptr;
       ptr
 
   and export_nativeint n =
-    push (HEADER (Obj.custom_tag, 2));
-    let ptr = pointer () in
-    push (CUSTOM "nativeint");
-    match arch with
-    | Arch.A16 ->
-      if n < -0x8000n || n >= 0x8000n then Tools.fail "nativeint %nd out of bounds [ %d; %d ]" n (-0x8000) 0x7FFF;
-      let n0 = Nativeint.to_int (Nativeint.logand n 0xFFn) in
-      let n1 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 8) 0xFFn) in
-      push (BYTES [ n1; n0 ]);
-      ptr
-    | Arch.A32 ->
-      if n < -0x8000_0000n || n >= 0x8000_0000n then Tools.fail "nativeint %nd out of bounds [ %d; %d ]" n (-0x8000_0000) 0x7FFF_FFFF;
-      let (n0, n1, n2, n3, _, _, _, _) = nativeint_bytes n in
-      push (BYTES [ n3; n2; n1; n0 ]);
-      ptr
-    | Arch.A64 ->
-      let (n0, n1, n2, n3, n4, n5, n6, n7) = nativeint_bytes n in
-      push (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
+    try Hashtbl.find nativeint_cache n with Not_found ->
+      let ptr =
+        push (HEADER (Obj.custom_tag, 2));
+        let ptr = pointer () in
+        push (CUSTOM "nativeint");
+        match arch with
+        | Arch.A16 ->
+          if n < -0x8000n || n >= 0x8000n then Tools.fail "nativeint %nd out of bounds [ %d; %d ]" n (-0x8000) 0x7FFF;
+          let n0 = Nativeint.to_int (Nativeint.logand n 0xFFn) in
+          let n1 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 8) 0xFFn) in
+          push (BYTES [ n1; n0 ]);
+          ptr
+        | Arch.A32 ->
+          if n < -0x8000_0000n || n >= 0x8000_0000n then Tools.fail "nativeint %nd out of bounds [ %d; %d ]" n (-0x8000_0000) 0x7FFF_FFFF;
+          let (n0, n1, n2, n3, _, _, _, _) = nativeint_bytes n in
+          push (BYTES [ n3; n2; n1; n0 ]);
+          ptr
+        | Arch.A64 ->
+          let (n0, n1, n2, n3, n4, n5, n6, n7) = nativeint_bytes n in
+          push (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
+          ptr in
+      Hashtbl.add nativeint_cache n ptr;
       ptr
 
   and export_float x =
@@ -153,42 +191,85 @@ let export arch data =
       FLOAT [ n7; n6; n5; n4; n3; n2; n1; n0 ]
 
   and export_float_array tbl =
-    push (HEADER (0, Array.length tbl));
-    let ptr = pointer () in
-    Array.iter (fun x -> push (export_float x)) tbl;
-    ptr
+    try QHTBL.find float_array_cache tbl with Not_found ->
+      push (HEADER (0, Array.length tbl));
+      let ptr = pointer () in
+      Array.iter (fun x -> push (export_float x)) tbl;
+      QHTBL.put float_array_cache tbl ptr;
+      ptr
 
-  and export_string str =
-    let len = String.length str in
-    let word_size =
-      match arch with
-      | Arch.A16 -> 2
-      | Arch.A32 -> 4
-      | Arch.A64 -> 8 in
-    let block_size = len / word_size + 1 in
-    let current_strdata = ref [] in
-    push (HEADER (Obj.string_tag, block_size));
-    let ptr = pointer () in
-    String.iter (fun c ->
-      current_strdata := c :: !current_strdata;
-      if List.length !current_strdata = word_size then (
-        push (CHARS (List.rev !current_strdata));
-        current_strdata := [];
-      )
-    ) str;
-    let zero_pad = word_size - List.length !current_strdata - 1 in
-    for _i = 1 to zero_pad do current_strdata := '\x00' :: !current_strdata done;
-    push (CHARS (List.rev (char_of_int zero_pad :: !current_strdata)));
-    ptr
+  and export_bytes str =
+    try QHTBL.find bytes_cache str with Not_found ->
+      let len = Bytes.length str in
+      let word_size =
+        match arch with
+        | Arch.A16 -> 2
+        | Arch.A32 -> 4
+        | Arch.A64 -> 8 in
+      let block_size = len / word_size + 1 in
+      let current_strdata = ref [] in
+      push (HEADER (Obj.string_tag, block_size));
+      let ptr = pointer () in
+      Bytes.iter (fun c ->
+        current_strdata := c :: !current_strdata;
+        if List.length !current_strdata = word_size then (
+          push (CHARS (List.rev !current_strdata));
+          current_strdata := [];
+        )
+      ) str;
+      let zero_pad = word_size - List.length !current_strdata - 1 in
+      for _i = 1 to zero_pad do current_strdata := '\x00' :: !current_strdata done;
+      push (CHARS (List.rev (char_of_int zero_pad :: !current_strdata)));
+      QHTBL.put bytes_cache str ptr;
+      ptr
 
   and export_block tag fields =
-    let words = Array.map export_value fields in
-    push (HEADER (tag, Array.length fields));
-    let ptr = pointer () in
-    Array.iter push words;
-    ptr in
+    try QHTBL.find block_cache fields with Not_found ->
+      push (HEADER (tag, Array.length fields));
+      let ptr = pointer () in
+      QHTBL.put block_cache fields ptr;
+      let refs = Array.map (fun _ -> push_ref ()) fields in
+      Array.iter2 (fun r field -> r := export_value field) refs fields;
+      ptr
 
+  and export_closure { ofs; ptrs; env } =
+    assert (Array.length ptrs > 0 && ofs < Array.length ptrs);
+    match Hashtbl.find closure_cache (ptrs, env) with
+    | POINTER ptr -> POINTER (ptr + 2 * ofs)
+    | _ -> assert false (* Impossible *)
+    | exception Not_found ->
+      push (HEADER (Obj.closure_tag, 2 * Array.length ptrs - 1 + Array.length env));
+      let ptr = pointer () in
+      Hashtbl.add closure_cache (ptrs, env) ptr;
+      push (CODEPTR codemap.(ptrs.(0)));
+      for i = 1 to Array.length ptrs - 1 do
+        push (HEADER (Obj.infix_tag, 2 * i));
+        push (CODEPTR codemap.(ptrs.(i)));
+      done;
+      let refs = Array.map (fun _ -> push_ref ()) env in
+      Array.iter2 (fun r e -> r := export_value e) refs env;
+      match ptr with
+      | POINTER ptr -> POINTER (ptr + 2 * ofs)
+      | _ -> assert false (* Impossible *)
+
+  and export_code_ptr code_ptr =
+    CODEPTR codemap.(code_ptr) in
+
+  let accu = export_value accu in
+  let stack = List.map export_value stack in
   let glob = Array.map export_value data in
-  (Array.to_list glob, List.rev !heap)
+  (accu, stack, Array.to_list glob, List.rev_map (!) !heap)
+
+(******************************************************************************)
+
+let reverse_stack stack_size stackdata =
+  let len = ref (List.length stackdata) in
+  let result = ref stackdata in
+  if !len > stack_size then failwith (Printf.sprintf "too small stack: %d words (%d words required after initialisation)" stack_size !len);
+  while !len < stack_size do
+    result := INT 0 :: !result;
+    incr len;
+  done;
+  !result
 
 (******************************************************************************)

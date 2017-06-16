@@ -1,7 +1,5 @@
 open OByteLib
 
-open! Cleaner
-
 (******************************************************************************)
 
 let stack_size = ref 128
@@ -130,33 +128,38 @@ let () =
   try
     Tools.with_oc output_path (fun oc ->
       let bytefile = Bytefile.read bytecode_path in
-      let (bytecode, opcodes) = Codegen.export bytefile.Bytefile.code in
-      let (globdata, heapdata) = Datagen.export arch bytefile.Bytefile.data in
+      let accu, stack, globals, code = Cleaner.clean bytefile.Bytefile.prim bytefile.Bytefile.data bytefile.Bytefile.code in
+      let bytecode, opcodes, codemap = Codegen.export code in
+      let accudata, stackdata, globdata, heapdata = Datagen.export arch codemap accu stack globals in
+      let stackdata = Datagen.reverse_stack stack_size stackdata in
       if List.length heapdata > heap_size then (
         error (Printf.sprintf "too huge global data (%d words) for the defined heap size (%d words), out of memory before start" (List.length heapdata) heap_size);
       );
-      Printf.fprintf oc "#define OCAML_STACK_WOSIZE       %6d\n" stack_size;
-      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE        %6d\n" heap_size;
-      Printf.fprintf oc "#define OCAML_HEAP_INITIAL_USAGE %6d\n" (List.length heapdata);
-      Printf.fprintf oc "#define OCAML_GLOBDATA_NUMBER    %6d\n" (List.length globdata);
-      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE     %6d\n" (List.length bytecode);
-      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER   %6d\n" (Array.length bytefile.Bytefile.prim);
-      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH       %6s\n" (Arch.to_string arch);
+      Printf.fprintf oc "#define OCAML_STACK_WOSIZE        %6d\n" stack_size;
+      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE         %6d\n" heap_size;
+      Printf.fprintf oc "#define OCAML_HEAP_INITIAL_USAGE  %6d\n" (List.length heapdata);
+      Printf.fprintf oc "#define OCAML_STACK_INITIAL_USAGE %6d\n" (List.length stack);
+      Printf.fprintf oc "#define OCAML_GLOBDATA_NUMBER     %6d\n" (List.length globdata);
+      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE      %6d\n" (List.length bytecode);
+      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER    %6d\n" (Array.length bytefile.Bytefile.prim);
+      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH        %6s\n" (Arch.to_string arch);
       if debug then Printf.fprintf oc "#define OCAML_DEBUG_MODE\n";
       Printf.fprintf oc "\n";
       Printf.fprintf oc "#include <%s>\n" values_h;
       Printf.fprintf oc "\n";
       Printer.print_opcodes oc opcodes;
       Printf.fprintf oc "\n";
-      Printf.fprintf oc "val_t ocaml_stack[OCAML_STACK_WOSIZE];\n";
+      Printer.print_datagen_word_array oc arch "val_t" "ocaml_stack" "OCAML_STACK_WOSIZE" stackdata;
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "val_t" "ocaml_heap1" "OCAML_HEAP_WOSIZE" heapdata;
+      Printf.fprintf oc "val_t acc = %s;\n" (Printer.string_of_dword arch accudata);
+      Printf.fprintf oc "\n";
+      Printer.print_datagen_word_array oc arch "val_t" "ocaml_heap1" "OCAML_HEAP_WOSIZE" heapdata;
       Printf.fprintf oc "\n";
       Printf.fprintf oc "val_t ocaml_heap2[OCAML_HEAP_WOSIZE];\n";
       Printf.fprintf oc "\n";
       Printf.fprintf oc "val_t *ocaml_heap = ocaml_heap1;\n";
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "val_t" "ocaml_global_data" "OCAML_GLOBDATA_NUMBER" globdata;
+      Printer.print_datagen_word_array oc arch "val_t" "ocaml_global_data" "OCAML_GLOBDATA_NUMBER" globdata;
       Printf.fprintf oc "\n";
       Printer.print_codegen_word_array oc "PROGMEM opcode_t" "const ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
       Printf.fprintf oc "\n";
