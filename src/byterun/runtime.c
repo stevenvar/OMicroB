@@ -18,7 +18,7 @@ val_t heap_ptr;
 val_t heap_end;
 
 void gc_init(void) {
-  heap_ptr = Val_block(OCAML_HEAP_INITIAL_USAGE << 3);
+  heap_ptr = Val_block(OCAML_HEAP_INITIAL_WOSIZE << 3);
   heap_end = Val_block(OCAML_HEAP_WOSIZE << 3);
 }
 

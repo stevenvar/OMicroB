@@ -135,14 +135,14 @@ let () =
       if List.length heapdata > heap_size then (
         error (Printf.sprintf "too huge global data (%d words) for the defined heap size (%d words), out of memory before start" (List.length heapdata) heap_size);
       );
-      Printf.fprintf oc "#define OCAML_STACK_WOSIZE        %6d\n" stack_size;
-      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE         %6d\n" heap_size;
-      Printf.fprintf oc "#define OCAML_HEAP_INITIAL_USAGE  %6d\n" (List.length heapdata);
-      Printf.fprintf oc "#define OCAML_STACK_INITIAL_USAGE %6d\n" (List.length stack);
-      Printf.fprintf oc "#define OCAML_GLOBDATA_NUMBER     %6d\n" (List.length globdata);
-      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE      %6d\n" (List.length bytecode);
-      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER    %6d\n" (Array.length bytefile.Bytefile.prim);
-      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH        %6s\n" (Arch.to_string arch);
+      Printf.fprintf oc "#define OCAML_STACK_WOSIZE         %6d\n" stack_size;
+      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE          %6d\n" heap_size;
+      Printf.fprintf oc "#define OCAML_HEAP_INITIAL_WOSIZE  %6d\n" (List.length heapdata);
+      Printf.fprintf oc "#define OCAML_STACK_INITIAL_WOSIZE %6d\n" (List.length stack);
+      Printf.fprintf oc "#define OCAML_GLOBDATA_NUMBER      %6d\n" (List.length globdata);
+      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE       %6d\n" (List.length bytecode);
+      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER     %6d\n" (Array.length bytefile.Bytefile.prim);
+      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH         %6s\n" (Arch.to_string arch);
       if debug then Printf.fprintf oc "#define OCAML_DEBUG_MODE\n";
       Printf.fprintf oc "\n";
       Printf.fprintf oc "#include <%s>\n" values_h;

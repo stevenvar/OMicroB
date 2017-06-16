@@ -126,7 +126,7 @@ void caml_raise_division_by_zero(void) {
 /******************************************************************************/
 
 void interp_init(void) {
-  sp = ocaml_stack + OCAML_STACK_WOSIZE - 1 - OCAML_STACK_INITIAL_USAGE;
+  sp = ocaml_stack + OCAML_STACK_WOSIZE - 1 - OCAML_STACK_INITIAL_WOSIZE;
   trapSp = Val_int(0);
   env = Val_unit;
   extra_args = 0;

@@ -85,7 +85,7 @@ let print_datagen_word_array oc arch ty name size data =
 
 let print_opcodes oc opcodes =
   List.iteri (fun i opcode ->
-    Printf.fprintf oc "#define OCAML_%-21s %3d\n" (Opcode.to_string opcode) i;
+    Printf.fprintf oc "#define OCAML_%-23s %3d\n" (Opcode.to_string opcode) i;
   ) opcodes
 
 let print_prim oc prim =
