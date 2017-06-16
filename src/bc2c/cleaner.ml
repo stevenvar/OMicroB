@@ -157,21 +157,34 @@ let remap_instr code_mapper globals_mapper instr =
   | CLOSUREREC (f, v, o, t) -> CLOSUREREC (f, v, code_mapper.(o), Array.map (fun p -> code_mapper.(p)) t)
   | SWITCH (n, ptrs) -> SWITCH (n, Array.map (fun p -> code_mapper.(p)) ptrs)
 
-let rec remap_value code_mapper v =
+let rec remap_value code_mapper sharer v =
   match v with
   | Int _ | Int32 _ | Int64 _ | Nativeint _
   | Float _ | Float_array _ | Bytes _ ->
     v
-  | Object vs ->
-    Object (Array.map (remap_value code_mapper) vs)
-  | Block (tag, vs) ->
-    Block (tag, Array.map (remap_value code_mapper) vs)
-  | Closure { ofs; ptrs; env } ->
-    Closure {
-      ofs;
-      ptrs = Array.map (fun ptr -> code_mapper.(ptr)) ptrs;
-      env = Array.map (remap_value code_mapper) env;
-    }
+  | Object vs -> (
+    try Sharer.find_block sharer vs with Not_found ->
+      let res = Object (Array.map (remap_value code_mapper sharer) vs) in
+      Sharer.put_block sharer vs res;
+      res
+  )
+  | Block (tag, vs) -> (
+    try Sharer.find_block sharer vs with Not_found ->
+      let res = Block (tag, Array.map (remap_value code_mapper sharer) vs) in
+      Sharer.put_block sharer vs res;
+      res
+  )
+  | Closure { ofs; ptrs; env } -> (
+    try Sharer.find_closure sharer ptrs env with Not_found ->
+      let res =
+        Closure {
+          ofs;
+          ptrs = Array.map (fun ptr -> code_mapper.(ptr)) ptrs;
+          env = Array.map (remap_value code_mapper sharer) env;
+        } in
+      Sharer.put_closure sharer ptrs env res;
+      res
+  )
   | CodePtr ptr ->
     CodePtr code_mapper.(ptr)
 
@@ -203,7 +216,9 @@ let clean prims globals code =
   let globals_mapper = compute_mapper read_globals in
 
   let code = Array.map (remap_instr code_mapper globals_mapper) code in
-  let globals = Array.map (remap_value code_mapper) globals in
-  let stack = List.map (remap_value code_mapper) stack in
+
+  let sharer = Sharer.create () in
+  let globals = Array.map (remap_value code_mapper sharer) globals in
+  let stack = List.map (remap_value code_mapper sharer) stack in
 
   accu, stack, globals, code

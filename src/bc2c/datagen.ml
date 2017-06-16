@@ -2,30 +2,6 @@ open T
 
 (******************************************************************************)
 
-module QHTBL : sig
-  type ('k, 'v) t
-  val create : unit -> ('k, 'v) t
-  val put  : ('k, 'v) t -> 'k -> 'v -> unit
-  val find : ('k, 'v) t -> 'k -> 'v
-end = struct
-  type ('k, 'v) t = ('k, ('k * 'v) list ref) Hashtbl.t
-
-  let create () = Hashtbl.create 16
-
-  let put qhtbl k v =
-    try
-      let rl = Hashtbl.find qhtbl k in
-      assert (not (List.mem_assq k !rl));
-      rl := (k, v) :: !rl;
-    with Not_found ->
-      Hashtbl.add qhtbl k (ref [ (k, v) ])
-
-  let find qhtbl k =
-    List.assq k !(Hashtbl.find qhtbl k)
-end
-
-(******************************************************************************)
-
 let int32_bytes n =
   let n0 = Int32.to_int (Int32.logand n 0xFFl) in
   let n1 = Int32.to_int (Int32.logand (Int32.shift_right n  8) 0xFFl) in
@@ -58,13 +34,7 @@ let nativeint_bytes n =
 (******************************************************************************)
 
 let export arch codemap accu stack data =
-  let int32_cache = Hashtbl.create 16 in
-  let int64_cache = Hashtbl.create 16 in
-  let nativeint_cache = Hashtbl.create 16 in
-  let float_array_cache = QHTBL.create () in
-  let bytes_cache = QHTBL.create () in
-  let block_cache = QHTBL.create () in
-  let closure_cache = Hashtbl.create 16 in
+  let sharer = Sharer.create () in
 
   let heap = ref [] in
   let heap_ind = ref 0 in
@@ -96,7 +66,7 @@ let export arch codemap accu stack data =
     INT n
 
   and export_int32 n =
-    try Hashtbl.find int32_cache n with Not_found ->
+    try Sharer.find_int32 sharer n with Not_found ->
       let ptr =
         let (n0, n1, n2, n3) = int32_bytes n in
         match arch with
@@ -119,11 +89,11 @@ let export arch codemap accu stack data =
           push (CUSTOM "int32");
           push (BYTES [ 0; 0; 0; 0; n3; n2; n1; n0 ]);
           ptr in
-      Hashtbl.add int32_cache n ptr;
+      Sharer.put_int32 sharer n ptr;
       ptr
 
   and export_int64 n =
-    try Hashtbl.find int64_cache n with Not_found ->
+    try Sharer.find_int64 sharer n with Not_found ->
       let ptr =
         let (n0, n1, n2, n3, n4, n5, n6, n7) = int64_bytes n in
         match arch with
@@ -149,11 +119,11 @@ let export arch codemap accu stack data =
           push (CUSTOM "int64");
           push (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
           ptr in
-      Hashtbl.add int64_cache n ptr;
+      Sharer.put_int64 sharer n ptr;
       ptr
 
   and export_nativeint n =
-    try Hashtbl.find nativeint_cache n with Not_found ->
+    try Sharer.find_nativeint sharer n with Not_found ->
       let ptr =
         push (HEADER (Obj.custom_tag, 2));
         let ptr = pointer () in
@@ -174,7 +144,7 @@ let export arch codemap accu stack data =
           let (n0, n1, n2, n3, n4, n5, n6, n7) = nativeint_bytes n in
           push (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
           ptr in
-      Hashtbl.add nativeint_cache n ptr;
+      Sharer.put_nativeint sharer n ptr;
       ptr
 
   and export_float x =
@@ -191,15 +161,15 @@ let export arch codemap accu stack data =
       FLOAT [ n7; n6; n5; n4; n3; n2; n1; n0 ]
 
   and export_float_array tbl =
-    try QHTBL.find float_array_cache tbl with Not_found ->
+    try Sharer.find_float_array sharer tbl with Not_found ->
       push (HEADER (0, Array.length tbl));
       let ptr = pointer () in
+      Sharer.put_float_array sharer tbl ptr;
       Array.iter (fun x -> push (export_float x)) tbl;
-      QHTBL.put float_array_cache tbl ptr;
       ptr
 
   and export_bytes str =
-    try QHTBL.find bytes_cache str with Not_found ->
+    try Sharer.find_bytes sharer str with Not_found ->
       let len = Bytes.length str in
       let word_size =
         match arch with
@@ -210,6 +180,7 @@ let export arch codemap accu stack data =
       let current_strdata = ref [] in
       push (HEADER (Obj.string_tag, block_size));
       let ptr = pointer () in
+      Sharer.put_bytes sharer str ptr;
       Bytes.iter (fun c ->
         current_strdata := c :: !current_strdata;
         if List.length !current_strdata = word_size then (
@@ -220,27 +191,26 @@ let export arch codemap accu stack data =
       let zero_pad = word_size - List.length !current_strdata - 1 in
       for _i = 1 to zero_pad do current_strdata := '\x00' :: !current_strdata done;
       push (CHARS (List.rev (char_of_int zero_pad :: !current_strdata)));
-      QHTBL.put bytes_cache str ptr;
       ptr
 
   and export_block tag fields =
-    try QHTBL.find block_cache fields with Not_found ->
+    try Sharer.find_block sharer fields with Not_found ->
       push (HEADER (tag, Array.length fields));
       let ptr = pointer () in
-      QHTBL.put block_cache fields ptr;
+      Sharer.put_block sharer fields ptr;
       let refs = Array.map (fun _ -> push_ref ()) fields in
       Array.iter2 (fun r field -> r := export_value field) refs fields;
       ptr
 
   and export_closure { ofs; ptrs; env } =
     assert (Array.length ptrs > 0 && ofs < Array.length ptrs);
-    match Hashtbl.find closure_cache (ptrs, env) with
+    match Sharer.find_closure sharer ptrs env with
     | POINTER ptr -> POINTER (ptr + 2 * ofs)
     | _ -> assert false (* Impossible *)
     | exception Not_found ->
       push (HEADER (Obj.closure_tag, 2 * Array.length ptrs - 1 + Array.length env));
       let ptr = pointer () in
-      Hashtbl.add closure_cache (ptrs, env) ptr;
+      Sharer.put_closure sharer ptrs env ptr;
       push (CODEPTR codemap.(ptrs.(0)));
       for i = 1 to Array.length ptrs - 1 do
         push (HEADER (Obj.infix_tag, 2 * i));
