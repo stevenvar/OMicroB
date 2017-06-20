@@ -3,11 +3,12 @@ include ../../etc/Makefile.conf
 ATTY   := /dev/ttyACM0
 CFLAGS := -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -iquote src
 LFLAGS := -Wl,-Os -Wl,--gc-sections
-INCLUDES :=                                                     \
-  -I/usr/share/arduino/libraries/LiquidCrystal                  \
-  -I/usr/share/arduino/hardware/arduino/cores/arduino           \
-  -I/usr/share/arduino/hardware/arduino/variants/mega           \
-  -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
+INCLUDES := -I./stdlib/
+#INCLUDES :=                                                     \
+#  -I/usr/share/arduino/libraries/LiquidCrystal                  \
+#  -I/usr/share/arduino/hardware/arduino/cores/arduino           \
+#  -I/usr/share/arduino/hardware/arduino/variants/mega           \
+#  -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 
 ################################################################################
 
