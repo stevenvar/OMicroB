@@ -18,8 +18,8 @@ and closure = {
 }
 
 and code_ptr = int
-and stack = value list
-and globals = value array
+and stack    = value list
+and globals  = value array
 
 type dword =
 | INT     of int
@@ -32,6 +32,6 @@ type dword =
 | CODEPTR of code_ptr
 
 type cword =
-| SBYTE of int
-| UBYTE of int
+| SBYTE  of int
+| UBYTE  of int
 | OPCODE of Opcode.t

@@ -26,17 +26,24 @@ let pprint_value v =
 (******************************************************************************)
 (* Conversion from OByteLib.Value.t to value. *)
 
-let rec import_value v =
-  match v with
-  | OByteLib.Value.Int n -> Int n
-  | OByteLib.Value.Int32 n -> Int32 n
-  | OByteLib.Value.Int64 n -> Int64 n
-  | OByteLib.Value.Nativeint n -> Nativeint n
-  | OByteLib.Value.Float x -> Float x
-  | OByteLib.Value.Float_array xs -> Float_array (Array.copy xs)
-  | OByteLib.Value.String s -> Bytes (Bytes.of_string s)
-  | OByteLib.Value.Object vs -> Object (Array.map import_value vs)
-  | OByteLib.Value.Block (tag, vs) -> Block (tag, Array.map import_value vs)
+let make_import_value () =
+  let qhtbl = Qhtbl.create () in
+  let rec import_value v =
+    try Qhtbl.find qhtbl v with Not_found ->
+      let result =
+        match v with
+        | OByteLib.Value.Int           n -> Int n
+        | OByteLib.Value.Int32         n -> Int32 n
+        | OByteLib.Value.Int64         n -> Int64 n
+        | OByteLib.Value.Nativeint     n -> Nativeint n
+        | OByteLib.Value.Float         x -> Float x
+        | OByteLib.Value.Float_array  xs -> Float_array (Array.copy xs)
+        | OByteLib.Value.String        s -> Bytes (Bytes.of_string s)
+        | OByteLib.Value.Object       vs -> Object (Array.map import_value vs)
+        | OByteLib.Value.Block (tag, vs) -> Block (tag, Array.map import_value vs) in
+      Qhtbl.put qhtbl v result;
+      result in
+  import_value
 
 (******************************************************************************)
 (* Stack tools. *)
@@ -321,6 +328,7 @@ let ccall prim args =
 (******************************************************************************)
 
 let exec prims globals code cycle_limit =
+  let import_value = make_import_value () in
   let globals = Array.map import_value globals in
   let code_size = Array.length code in
 
