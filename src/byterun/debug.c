@@ -11,6 +11,10 @@ void debug(int n) {
   printf("debug(%d)\n", n);
 }
 
+void debug_blink(int led, int n) {
+  printf("debug_blink(%d, %d)\n", led, n);
+}
+
 #else
 
 #include <Arduino.h>
@@ -25,8 +29,22 @@ void debug(int n) {
   Serial.println(")");
 }
 
+void debug_blink(int led, int n) {
+  int i;
+  pinMode(led, OUTPUT);
+  digitalWrite(led, HIGH);
+  delay(1000);
+  for (i = 0; i < n; i ++) {
+    digitalWrite(led, LOW);
+    delay(300);
+    digitalWrite(led, HIGH);
+    delay(300);
+  }
+  delay(1000);
+}
+
 void assert_failure(void) {
-  int i, led = 13;
+  int i, led = 17;
   while (1) {
     pinMode(led, OUTPUT);
     digitalWrite(led, LOW);

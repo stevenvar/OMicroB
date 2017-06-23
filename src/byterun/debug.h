@@ -15,5 +15,6 @@ void assert_failure(void);
 
 void debug_init(void);
 void debug(int n);
+void debug_blink(int led, int n);
 
 #endif

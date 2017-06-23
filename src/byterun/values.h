@@ -88,13 +88,14 @@ typedef uint32_t code_t;
 /* Blocks */
 
 #define Field(val, i) (ocaml_heap[(Block_val(val) >> 2) + i])
+#define StringVal(val) ((char *) ocaml_heap + Block_val(val))
 #define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
 
 #define Header(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
 #define Make_string_data(c3, c2, c1, c0) \
-  (((val_t) (c3) << 24) | ((val_t) (c2) << 16) | ((val_t) (c1) << 8) | ((val_t) (c0)))
+  (((val_t) (c0) << 24) | ((val_t) (c1) << 16) | ((val_t) (c2) << 8) | ((val_t) (c3)))
 
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
@@ -192,14 +193,15 @@ typedef uint64_t code_t;
 /* Blocks */
 
 #define Field(val, i) (ocaml_heap[(Block_val(val) >> 3) + i])
+#define StringVal(val) ((char *) ocaml_heap + Block_val(val))
 #define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
 
 #define Header(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
 #define Make_string_data(c7, c6, c5, c4, c3, c2, c1, c0)                                       \
-  (((val_t) (c7) << 56) | ((val_t) (c6) << 48) | ((val_t) (c5) << 40) | ((val_t) (c4) << 32) | \
-   ((val_t) (c3) << 24) | ((val_t) (c2) << 16) | ((val_t) (c1) <<  8) | ((val_t) (c0)))
+  (((val_t) (c0) << 56) | ((val_t) (c1) << 48) | ((val_t) (c2) << 40) | ((val_t) (c3) << 32) | \
+   ((val_t) (c4) << 24) | ((val_t) (c5) << 16) | ((val_t) (c6) <<  8) | ((val_t) (c7)))
 
 #define Make_custom_data(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
 
