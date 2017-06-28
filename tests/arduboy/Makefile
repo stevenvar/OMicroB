@@ -1,6 +1,6 @@
 include ../../etc/Makefile.conf
 
-ATTY   := /dev/ttyACM0
+ATTY   := /dev/tty.usbmodem1411
 CFLAGS := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 LFLAGS := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
@@ -26,7 +26,7 @@ blink.byte: blink.ml
 	ocamlclean $@ -o $@
 
 blink.c: blink.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 32 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 48 $< -o $@
 
 blink.elf: blink.c
 	$(GCC) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall $^ -o $@
@@ -40,10 +40,12 @@ blink.hex: blink.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 flash: blink.avr
-	$(AVRDUDE) -c avr109 -P /dev/ttyACM0 -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
+	stty -f $(ATTY) 1200
+	sleep 2
+	$(AVRDUDE) -C/Applications/Arduino.app/Contents/Java/hardware/tools/avr/etc/avrdude.conf -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
 
 listen:
-	stty -F $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
+	stty -f $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
 	cat $(ATTY)
 
 ################################################################################

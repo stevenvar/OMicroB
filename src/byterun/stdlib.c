@@ -50,6 +50,11 @@ val_t ocaml_arduboy_print(val_t str) {
   return Val_unit;
 }
 
+val_t ocaml_arduboy_print_int(val_t i) {
+  arduboy.print(Int_val(i));
+  return Val_unit;
+}
+
 val_t ocaml_arduboy_display(val_t unit) {
   arduboy.display();
   return Val_unit;
@@ -68,6 +73,11 @@ val_t ocaml_arduboy_init(val_t unit) {
 
 val_t ocaml_arduboy_print(val_t str) {
   printf("ocaml_arduino_print(\"%s\")\n", StringVal(str));
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_print_int(val_t i) {
+  printf("ocaml_arduino_print_int(\"%d\")\n", Int_val(i));
   return Val_unit;
 }
 

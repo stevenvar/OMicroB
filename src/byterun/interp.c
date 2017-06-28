@@ -144,79 +144,85 @@ val_t interp(void) {
 #endif
 
     opcode_t opcode = read_opcode();
-
+/* #ifdef DEBUG */
+/*     printf("sp[0] = %d \n", sp[0]); */
+/*     printf("env = %d \n", Int_val(env)); */
+/*     printf("accu = %d \n", Int_val(acc)); */
+/*     printf("pc =%d \n",pc); */
+/*     printf("opcode=%d\n",opcode); */
+/* #endif */
     switch(opcode){
-      
+
 #ifdef OCAML_ACC0
     case OCAML_ACC0 : {
       acc = peek(0);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC1
     case OCAML_ACC1 : {
       acc = peek(1);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC2
     case OCAML_ACC2 : {
       acc = peek(2);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC3
     case OCAML_ACC3 : {
       acc = peek(3);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC4
     case OCAML_ACC4 : {
       acc = peek(4);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC5
     case OCAML_ACC5 : {
       acc = peek(5);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC6
     case OCAML_ACC6 : {
       acc = peek(6);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC7
     case OCAML_ACC7 : {
       acc = peek(7);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ACC
     case OCAML_ACC : {
       acc = peek(read_uint8());
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSH
     case OCAML_PUSH : {
       push(acc);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC1
     case OCAML_PUSHACC1 : {
       push(acc);
@@ -224,7 +230,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC2
     case OCAML_PUSHACC2 : {
       push(acc);
@@ -232,7 +238,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC3
     case OCAML_PUSHACC3 : {
       push(acc);
@@ -240,7 +246,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC4
     case OCAML_PUSHACC4 : {
       push(acc);
@@ -248,7 +254,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC5
     case OCAML_PUSHACC5 : {
       push(acc);
@@ -256,7 +262,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC6
     case OCAML_PUSHACC6 : {
       push(acc);
@@ -264,7 +270,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC7
     case OCAML_PUSHACC7 : {
       push(acc);
@@ -272,7 +278,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHACC
     case OCAML_PUSHACC : {
       push(acc);
@@ -280,14 +286,14 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_POP
     case OCAML_POP : {
       pop_n(read_uint8());
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ASSIGN
     case OCAML_ASSIGN : {
       sp[read_uint8() + 1] = acc;
@@ -295,42 +301,42 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ENVACC1
     case OCAML_ENVACC1 : {
       acc = Field(env, 1);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ENVACC2
     case OCAML_ENVACC2 : {
       acc = Field(env, 2);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ENVACC3
     case OCAML_ENVACC3 : {
       acc = Field(env, 3);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ENVACC4
     case OCAML_ENVACC4 : {
       acc = Field(env, 4);
       break;
     }
 #endif
-      
+
 #ifdef OCAML_ENVACC
     case OCAML_ENVACC : {
       acc = Field(env, read_uint8());
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHENVACC1
     case OCAML_PUSHENVACC1 : {
       push(acc);
@@ -338,7 +344,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHENVACC2
     case OCAML_PUSHENVACC2 : {
       push(acc);
@@ -346,7 +352,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHENVACC3
     case OCAML_PUSHENVACC3 : {
       push(acc);
@@ -354,7 +360,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHENVACC4
     case OCAML_PUSHENVACC4 : {
       push(acc);
@@ -362,7 +368,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHENVACC
     case OCAML_PUSHENVACC : {
       push(acc);
@@ -370,7 +376,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSH_RETADDR_1B
     case OCAML_PUSH_RETADDR_1B : {
       push(Val_int(extra_args));
@@ -379,7 +385,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSH_RETADDR_2B
     case OCAML_PUSH_RETADDR_2B : {
       push(Val_int(extra_args));
@@ -388,7 +394,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSH_RETADDR_4B
     case OCAML_PUSH_RETADDR_4B : {
       push(Val_int(extra_args));
@@ -397,7 +403,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPLY
     case OCAML_APPLY : {
       extra_args = read_uint8() - 1;
@@ -406,7 +412,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPLY1
     case OCAML_APPLY1 : {
       val_t arg1 = pop();
@@ -420,7 +426,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPLY2
     case OCAML_APPLY2 : {
       val_t arg1 = pop();
@@ -436,7 +442,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPLY3
     case OCAML_APPLY3 : {
       val_t arg1 = pop();
@@ -454,7 +460,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPTERM
     case OCAML_APPTERM : {
       uint8_t nargs = read_uint8();
@@ -470,7 +476,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPTERM1
     case OCAML_APPTERM1 : {
       val_t arg = peek(0);
@@ -481,7 +487,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPTERM2
     case OCAML_APPTERM2 : {
       val_t arg1 = peek(0);
@@ -495,7 +501,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_APPTERM3
     case OCAML_APPTERM3 : {
       val_t arg1 = peek(0);
@@ -511,7 +517,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_RETURN
     case OCAML_RETURN : {
       pop_n(read_uint8());
@@ -527,7 +533,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_RESTART
     case OCAML_RESTART : {
       uint8_t nargs = Wosize_val(env) - 2;
@@ -539,7 +545,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_GRAB
     case OCAML_GRAB : {
       uint8_t n = read_uint8();
@@ -560,7 +566,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_CLOSURE_1B
     case OCAML_CLOSURE_1B : {
       uint8_t n = read_uint8();
@@ -577,7 +583,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_CLOSURE_2B
     case OCAML_CLOSURE_2B : {
       uint8_t n = read_uint8();
@@ -594,7 +600,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_CLOSURE_4B
     case OCAML_CLOSURE_4B : {
       uint8_t n = read_uint8();
@@ -611,7 +617,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_CLOSUREREC_1B
     case OCAML_CLOSUREREC_1B : {
       uint8_t f = read_uint8();
@@ -633,7 +639,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_CLOSUREREC_2B
     case OCAML_CLOSUREREC_2B : {
       uint8_t f = read_uint8();
@@ -655,7 +661,7 @@ val_t interp(void) {
        break;
     }
 #endif
-      
+
 #ifdef OCAML_CLOSUREREC_4B
     case OCAML_CLOSUREREC_4B : {
       uint8_t f = read_uint8();
@@ -677,18 +683,18 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHOFFSETCLOSUREM2
     case OCAML_PUSHOFFSETCLOSUREM2 : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_OFFSETCLOSUREM2
     case OCAML_OFFSETCLOSUREM2 :
 #endif
-      
+
 #if defined(OCAML_PUSHOFFSETCLOSUREM2) || defined(OCAML_OFFSETCLOSUREM2)
       {
         /* value + header */
@@ -696,54 +702,54 @@ val_t interp(void) {
         break;
       }
 #endif
-      
+
 #ifdef OCAML_PUSHOFFSETCLOSURE0
     case OCAML_PUSHOFFSETCLOSURE0 : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_OFFSETCLOSURE0
     case OCAML_OFFSETCLOSURE0 :
 #endif
-      
+
 #if defined(OCAML_PUSHOFFSETCLOSURE0) || defined(OCAML_OFFSETCLOSURE0)
       {
         acc = env;
         break;
       }
 #endif
-      
+
 #ifdef OCAML_PUSHOFFSETCLOSURE2
     case OCAML_PUSHOFFSETCLOSURE2 : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_OFFSETCLOSURE2
     case OCAML_OFFSETCLOSURE2 :
 #endif
-      
+
 #if defined(OCAML_PUSHOFFSETCLOSURE2) || defined(OCAML_OFFSETCLOSURE2)
       {
         acc = env + 2 * sizeof(val_t);
         break;
       }
 #endif
-      
+
 #ifdef OCAML_PUSHOFFSETCLOSURE
     case OCAML_PUSHOFFSETCLOSURE : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_OFFSETCLOSURE
     case OCAML_OFFSETCLOSURE :
 #endif
-      
+
 #if defined(OCAML_PUSHOFFSETCLOSURE) || defined(OCAML_OFFSETCLOSURE)
       {
         int n = read_int8();
@@ -751,54 +757,54 @@ val_t interp(void) {
         break;
       }
 #endif
-      
+
 #ifdef OCAML_PUSHGETGLOBAL_1B
     case OCAML_PUSHGETGLOBAL_1B : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_GETGLOBAL_1B
     case OCAML_GETGLOBAL_1B :
 #endif
-      
+
 #if defined(OCAML_PUSHGETGLOBAL_1B) || defined(OCAML_GETGLOBAL_1B)
       {
         acc = ocaml_global_data[read_uint8()];
         break;
       }
 #endif
-      
+
 #ifdef OCAML_PUSHGETGLOBAL_2B
     case OCAML_PUSHGETGLOBAL_2B : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_GETGLOBAL_2B
     case OCAML_GETGLOBAL_2B :
 #endif
-      
+
 #if defined(OCAML_PUSHGETGLOBAL_2B) || defined(OCAML_GETGLOBAL_2B)
       {
         acc = ocaml_global_data[read_uint16()];
         break;
       }
 #endif
-      
+
 #ifdef OCAML_PUSHGETGLOBALFIELD_1B
     case OCAML_PUSHGETGLOBALFIELD_1B : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_GETGLOBALFIELD_1B
     case OCAML_GETGLOBALFIELD_1B :
 #endif
-      
+
 #if defined(OCAML_PUSHGETGLOBALFIELD_1B) || defined(OCAML_GETGLOBALFIELD_1B)
       {
         uint8_t n = read_uint8();
@@ -807,18 +813,18 @@ val_t interp(void) {
         break;
       }
 #endif
-      
+
 #ifdef OCAML_PUSHGETGLOBALFIELD_2B
     case OCAML_PUSHGETGLOBALFIELD_2B : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_GETGLOBALFIELD_2B
     case OCAML_GETGLOBALFIELD_2B :
 #endif
-      
+
 #if defined(OCAML_PUSHGETGLOBALFIELD_2B) || defined(OCAML_GETGLOBALFIELD_2B)
       {
         uint16_t n = read_uint16();
@@ -827,7 +833,7 @@ val_t interp(void) {
         break;
       }
 #endif
-      
+
 #ifdef OCAML_SETGLOBAL_1B
     case OCAML_SETGLOBAL_1B : {
       ocaml_global_data[read_uint8()] = acc;
@@ -835,7 +841,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_SETGLOBAL_2B
     case OCAML_SETGLOBAL_2B : {
       ocaml_global_data[read_uint16()] = acc;
@@ -843,25 +849,25 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_PUSHATOM0
     case OCAML_PUSHATOM0 : {
       push(acc);
       /* fallthrough */
     }
 #endif
-      
+
 #ifdef OCAML_ATOM0
     case OCAML_ATOM0 :
 #endif
-      
+
 #if defined(OCAML_PUSHATOM0) || defined(OCAML_ATOM0)
       {
         acc = Val_block(&((&atom0_header)[1]));
         break;
       }
 #endif
-      
+
 #ifdef OCAML_MAKEBLOCK_1B
     case OCAML_MAKEBLOCK_1B : {
       tag_t tag = read_uint8();
@@ -874,7 +880,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_MAKEBLOCK_2B
     case OCAML_MAKEBLOCK_2B : {
       tag_t tag = read_uint8();
@@ -887,7 +893,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_MAKEBLOCK1
     case OCAML_MAKEBLOCK1 : {
       tag_t tag = read_uint8();
@@ -898,7 +904,7 @@ val_t interp(void) {
       break;
     }
 #endif
-      
+
 #ifdef OCAML_MAKEBLOCK2
     case OCAML_MAKEBLOCK2 : {
       tag_t tag = read_uint8();
@@ -1915,7 +1921,9 @@ val_t interp(void) {
     }
 #endif
 
-    default : assert(0);
+    default :
+      assert(0);
+
     }
   }
 }
@@ -1939,7 +1947,7 @@ void loop(void) {
 
 int main(int argc, char** argv) {
   setup();
-  while (1) loop();
+  /* while (1) loop(); */
   return 0;
 }
 

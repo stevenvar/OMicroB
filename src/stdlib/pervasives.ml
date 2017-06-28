@@ -7,6 +7,16 @@ type mode =
 | INPUT
 | OUTPUT
 
+external ( ~- ) : int -> int = "%negint"
+external ( ~+ ) : int -> int = "%identity"
+external succ : int -> int = "%succint"
+external pred : int -> int = "%predint"
+external ( + ) : int -> int -> int = "%addint"
+external ( - ) : int -> int -> int = "%subint"
+external ( * ) : int -> int -> int = "%mulint"
+external ( / ) : int -> int -> int = "%divint"
+external ( mod ) : int -> int -> int = "%modint"
+
 external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
 
 external digital_read  : pin -> bool         = "caml_digital_read"  [@@noalloc]

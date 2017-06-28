@@ -1,24 +1,35 @@
 module Arduboy = struct
   external init    : unit   -> unit = "ocaml_arduboy_init"
+  external print_int : int -> unit = "ocaml_arduboy_print_int"
   external print   : string -> unit = "ocaml_arduboy_print"
   external display : unit   -> unit = "ocaml_arduboy_display"
 end
 
-let blink pin small_time long_time =
-  pin_mode pin OUTPUT;
-  digital_write pin true;
-  for i = 1 to 100 do
-    delay long_time;
-    for _j = 1 to i do
-      digital_write pin false;
-      delay small_time;
-      digital_write pin true;
-      delay small_time;
-    done;
-  done
+let rec facto x =
+  match x with
+  | 0 -> 1
+  | _ -> facto (x - 1) * x
+
+(* let facto x = *)
+(*   let rec aux x acc = *)
+(*     match x with *)
+(*     | 0 -> acc *)
+(*     | _ -> aux (x-1) (acc*x) *)
+(*   in *)
+(*   aux x 1 *)
+
 
 let () =
   Arduboy.init ();
-  Arduboy.print "Hello from OCaml!";
+  for i = 0 to 10 do
+  (* Arduboy.print "facto "; *)
+  (* Arduboy.print_int i; *)
+  (* Arduboy.print " = "; *)
+    let x = facto i in
+    (* x *)
+  Arduboy.print_int (x);
+  Arduboy.print " \n";
   Arduboy.display ();
-  blink PIN17 100 1000
+  (* delay 1000 *)
+  (* blink PIN17 100 1000 *)
+done
