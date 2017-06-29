@@ -91,6 +91,17 @@ val_t ocaml_arduboy_fill_circle(val_t x0, val_t y0, val_t r, val_t color) {
   return Val_unit;
 }
 
+val_t ocaml_arduboy_pressed(val_t button){
+  int x =  arduboy.pressed(_BV((int)Int_val(button)));
+  if(x) return Val_int(1);
+  return Val_int(0);
+}
+
+val_t ocaml_arduboy_clear(val_t unit){
+  arduboy.clear();
+  return Val_unit;
+}
+
 
 #else
 
@@ -149,8 +160,16 @@ val_t ocaml_arduboy_fill_circle(val_t x0, val_t y0, val_t r, val_t color) {
   return Val_unit;
 }
 
+val_t ocaml_arduboy_pressed(val_t button){
+  printf("pressed(%d)",(int)Int_val(button));
+  return Val_unit;
+}
 
 
+val_t ocaml_arduboy_clear(val_t unit){
+  printf("clear()");
+  return Val_unit;
+}
 
 #endif
 

@@ -41,7 +41,7 @@ blink.hex: blink.avr
 
 flash: blink.avr
 	stty -f $(ATTY) 1200
-	sleep 2
+	sleep 3
 	$(AVRDUDE) -C/Applications/Arduino.app/Contents/Java/hardware/tools/avr/etc/avrdude.conf -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
 
 listen:
