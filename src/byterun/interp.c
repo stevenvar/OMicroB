@@ -27,6 +27,15 @@ static val_t *sp;
 static val_t trapSp;
 static uint8_t extra_args;
 
+
+void caml_raise_stack_overflow(void) {
+#ifdef DEBUG
+  debug(444);
+#endif
+  assert(0);
+  /* TODO */
+}
+
 /******************************************************************************/
 
 void *get_primitive(uint8_t prim_ind) {
@@ -104,8 +113,13 @@ val_t peek(int n) {
 }
 
 void push(val_t x) {
-  *sp = x;
-  sp --;
+  if(sp <= ocaml_stack){
+    caml_raise_stack_overflow();
+  }
+  else {
+    *sp = x;
+    sp --;
+  }
 }
 
 val_t pop(void) {
