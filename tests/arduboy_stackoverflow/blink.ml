@@ -36,12 +36,19 @@ let rec facto x =
 (*   in *)
 (*   aux x 1 *)
 
+let lol x =
+  let f x = (x+1) in
+  f x
+
 let () =
   Arduboy.init ();
-  Arduboy.print "facto 6";
-  Arduboy.print " = ";
-  Arduboy.display ();
-  let x = facto 6 in
-  Arduboy.print_int (x);
-  Arduboy.print " \n";
-  Arduboy.display ();
+  let a = (lol 115) in
+  Arduboy.print_int a ;
+  Arduboy.display ()
+  (* Arduboy.print "facto 6"; *)
+  (* Arduboy.print " = "; *)
+  (* Arduboy.display (); *)
+  (* let x = facto 6 in *)
+  (* Arduboy.print_int (x); *)
+  (* Arduboy.print " \n"; *)
+  (* Arduboy.display (); *)

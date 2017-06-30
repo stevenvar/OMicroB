@@ -158,13 +158,14 @@ val_t interp(void) {
 #endif
 
     opcode_t opcode = read_opcode();
-/* #ifdef DEBUG */
-/*     printf("sp[0] = %d \n", sp[0]); */
-/*     printf("env = %d \n", Int_val(env)); */
-/*     printf("accu = %d \n", Int_val(acc)); */
-/*     printf("pc =%d \n",pc); */
-/*     printf("opcode=%d\n",opcode); */
-/* #endif */
+    for(int i = 0; i <= (sp - ocaml_stack); i ++){
+      printf("stack[%d] = %d |\n", i, Int_val(sp[i]));
+    }
+
+#ifdef DEBUG
+    debug(pc-1);
+    debug(Int_val(acc));
+#endif
     switch(opcode){
 
 #ifdef OCAML_ACC0
@@ -480,7 +481,7 @@ val_t interp(void) {
       uint8_t nargs = read_uint8();
       uint8_t slotsize = read_uint8();
       val_t * newsp = sp + slotsize - nargs;
-      for (int i = nargs ; i > 0; i --) {
+      for (int i = nargs -1 ; i >= 0; i --) {
         newsp[i] = sp[i];
       }
       sp = newsp;
@@ -534,7 +535,8 @@ val_t interp(void) {
 
 #ifdef OCAML_RETURN
     case OCAML_RETURN : {
-      pop_n(read_uint8());
+      uint8_t n = read_uint8();
+      pop_n(n);
       if (extra_args > 0){
         extra_args --;
         pc = Codeptr_val(Code_val(acc));
@@ -1936,6 +1938,9 @@ val_t interp(void) {
 #endif
 
     default :
+#ifdef DEBUG
+      debug(opcode);
+#endif
       assert(0);
 
     }
