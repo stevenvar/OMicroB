@@ -39,8 +39,7 @@ let facto x =
 
 let () =
   Arduboy.init ();
-  let a = (facto 5) in
-  Arduboy.print_int a ;
+  Arduboy.print_int (facto 5) ;
   Arduboy.display ()
   (* Arduboy.print "facto 6"; *)
   (* Arduboy.print " = "; *)

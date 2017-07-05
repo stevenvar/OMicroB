@@ -158,12 +158,12 @@ val_t interp(void) {
 
     opcode_t opcode = read_opcode();
     /* sp pointe sur le dernier bloc écrit  */
-    /* for(int i = 0; i <= 32; i ++){ */
-    /*   printf("stack[%d] = %d\n", i, Int_val(sp[i])); */
-    /* } */
-    /* printf("\n"); */
+    for(int i = 0; i <= 32; i ++){
+      printf("stack[%d] = %d\n", i, Int_val(sp[i]));
+    }
+    printf("\n");
 
-    /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
+    printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc));
 
 #ifdef DEBUG
     debug(pc-1);
