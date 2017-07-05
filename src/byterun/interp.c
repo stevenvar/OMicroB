@@ -109,21 +109,20 @@ code_t read_ptr_4B(void) {
 /******************************************************************************/
 
 val_t peek(int n) {
-  return sp[(val_t) n + 1];
+  return sp[(val_t) n];
 }
 
 void push(val_t x) {
-  if(sp <= ocaml_stack){
+  if(sp < ocaml_stack){
     caml_raise_stack_overflow();
   }
   else {
-    *sp = x;
-    sp --;
+    *--sp = x;
   }
 }
 
 val_t pop(void) {
-  return *(++sp);
+  return *(sp++);
 }
 
 void pop_n(int n) {
@@ -140,7 +139,7 @@ void caml_raise_division_by_zero(void) {
 /******************************************************************************/
 
 void interp_init(void) {
-  sp = ocaml_stack + OCAML_STACK_WOSIZE - 1 - OCAML_STACK_INITIAL_WOSIZE;
+  sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
   trapSp = Val_int(0);
   env = Val_unit;
   extra_args = 0;
@@ -158,13 +157,16 @@ val_t interp(void) {
 #endif
 
     opcode_t opcode = read_opcode();
-    for(int i = 0; i <= (sp - ocaml_stack); i ++){
-      printf("stack[%d] = %d |\n", i, Int_val(sp[i]));
-    }
+    /* sp pointe sur le dernier bloc écrit  */
+    /* for(int i = 0; i <= 32; i ++){ */
+    /*   printf("stack[%d] = %d\n", i, Int_val(sp[i])); */
+    /* } */
+    /* printf("\n"); */
+
+    /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
 
 #ifdef DEBUG
     debug(pc-1);
-    debug(Int_val(acc));
 #endif
     switch(opcode){
 
@@ -481,7 +483,7 @@ val_t interp(void) {
       uint8_t nargs = read_uint8();
       uint8_t slotsize = read_uint8();
       val_t * newsp = sp + slotsize - nargs;
-      for (int i = nargs -1 ; i >= 0; i --) {
+      for (int i = nargs ; i >= 0; i --) {
         newsp[i] = sp[i];
       }
       sp = newsp;
@@ -495,7 +497,7 @@ val_t interp(void) {
 #ifdef OCAML_APPTERM1
     case OCAML_APPTERM1 : {
       val_t arg = peek(0);
-      pop_n(read_uint8() - 1);
+      pop_n(read_uint8());
       push(arg);
       pc = Codeptr_val(Code_val(acc));
       env = acc;
@@ -507,7 +509,7 @@ val_t interp(void) {
     case OCAML_APPTERM2 : {
       val_t arg1 = peek(0);
       val_t arg2 = peek(1);
-      pop_n(read_uint8() - 2);
+      pop_n(read_uint8());
       push(arg2);
       push(arg1);
       pc = Codeptr_val(Code_val(acc));
@@ -522,7 +524,7 @@ val_t interp(void) {
       val_t arg1 = peek(0);
       val_t arg2 = peek(1);
       val_t arg3 = peek(2);
-      pop_n(read_uint8() - 3);
+      pop_n(read_uint8());
       push(arg3);
       push(arg2);
       push(arg1);
@@ -636,22 +638,27 @@ val_t interp(void) {
 
 #ifdef OCAML_CLOSUREREC_1B
     case OCAML_CLOSUREREC_1B : {
+       /* f = number of functions */
+       /* v = number of variables */
+      /* o = array of vars ?  */
       uint8_t f = read_uint8();
       uint8_t v = read_uint8();
-      code_t o = read_ptr_1B() - 2;
+      code_t o = read_ptr_1B() -2 ;
+      int blksize = f * 2 - 1 + v;
       int i;
       if (v > 0) {
         push(acc);
       }
-      Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
-      Field(acc, 0) = o;
+      Alloc_small(acc, blksize, Closure_tag);
+      Field(acc, 0) = Val_int(o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = read_ptr_1B() - i - 2;
       }
-      for (; i < 2 * f - 1 + v ; i ++) {
+      for (; i < blksize ; i ++) {
         Field(acc, i + 2 * f - 1) = pop();
       }
+      push(acc);
       break;
     }
 #endif

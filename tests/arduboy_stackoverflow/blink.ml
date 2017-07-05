@@ -23,26 +23,23 @@ module Arduboy = struct
     | B -> pressed 2
 end
 
-let rec facto x =
-  match x with
-  | 0 -> 1
-  | _ -> facto (x - 1) * x
+(* let rec facto x = *)
+(*   match x with *)
+(*   | 0 -> 1 *)
+(*   | _ -> facto (x - 1) * x *)
 
-(* let facto x = *)
-(*   let rec aux x cpt = *)
-(*     match x with *)
-(*     | 0 -> 1 *)
-(*     | _ -> aux (x-1) (x*cpt) *)
-(*   in *)
-(*   aux x 1 *)
+let facto x =
+  let rec aux x cpt =
+    match x with
+    | 0 -> 1
+    | _ -> aux (x-1) (x*cpt)
+  in
+  aux x 1
 
-let lol x =
-  let f x = (x+1) in
-  f x
 
 let () =
   Arduboy.init ();
-  let a = (lol 115) in
+  let a = (facto 5) in
   Arduboy.print_int a ;
   Arduboy.display ()
   (* Arduboy.print "facto 6"; *)
