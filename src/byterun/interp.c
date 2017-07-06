@@ -1,4 +1,4 @@
-#define DEBUG
+
 
 #include <stdint.h>
 
@@ -140,7 +140,7 @@ void caml_raise_division_by_zero(void) {
 
 void interp_init(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
-  trapSp = Val_int(0);
+  trapSp = Val_int(-1);
   env = Val_unit;
   extra_args = 0;
   pc = 0;
@@ -149,7 +149,9 @@ void interp_init(void) {
 /******************************************************************************/
 
 val_t interp(void) {
+
   while (1) {
+
 #ifdef __AVR__
     if (serialEventRun) {
       serialEventRun();
@@ -158,12 +160,12 @@ val_t interp(void) {
 
     opcode_t opcode = read_opcode();
     /* sp pointe sur le dernier bloc écrit  */
-    for(int i = 0; i <= 32; i ++){
-      printf("stack[%d] = %d\n", i, Int_val(sp[i]));
-    }
-    printf("\n");
+    /* for(int i = 0; i <= 32; i ++){ */
+    /*   printf("stack[%d] = %d\n", i, Int_val(sp[i])); */
+    /* } */
+    /* printf("\n"); */
 
-    printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc));
+    /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
 
 #ifdef DEBUG
     debug(pc-1);
@@ -313,7 +315,7 @@ val_t interp(void) {
 
 #ifdef OCAML_ASSIGN
     case OCAML_ASSIGN : {
-      sp[read_uint8() + 1] = acc;
+      sp[read_uint8()] = acc;
       acc = Val_unit;
       break;
     }
@@ -483,7 +485,7 @@ val_t interp(void) {
       uint8_t nargs = read_uint8();
       uint8_t slotsize = read_uint8();
       val_t * newsp = sp + slotsize - nargs;
-      for (int i = nargs ; i >= 0; i --) {
+      for (int i = nargs -1 ; i >= 0; i --) {
         newsp[i] = sp[i];
       }
       sp = newsp;
@@ -557,7 +559,7 @@ val_t interp(void) {
       uint8_t nargs = Wosize_val(env) - 2;
       uint8_t i;
       sp -= nargs;
-      for (i = 1; i <= nargs; i ++) sp[i] = Field(env, i + 1);
+      for (i = 0; i < nargs; i ++) sp[i] = Field(env, i);
       env = Field(env,1);
       extra_args += nargs;
       break;
@@ -1257,7 +1259,7 @@ val_t interp(void) {
 
 #ifdef OCAML_RAISE
     case OCAML_RAISE : {
-      if (trapSp == 0) {
+      if (trapSp == Val_int(-1)) {
         return Val_unit;
       } else {
         sp = ocaml_stack + Int_val(trapSp);
@@ -1286,7 +1288,7 @@ val_t interp(void) {
 
 #ifdef OCAML_C_CALL2
     case OCAML_C_CALL2 : {
-      acc = ((val_t (*)(val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[1]);
+      acc = ((val_t (*)(val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0]);
       pop();
       break;
     }
@@ -1294,7 +1296,7 @@ val_t interp(void) {
 
 #ifdef OCAML_C_CALL3
     case OCAML_C_CALL3 : {
-      acc = ((val_t (*)(val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[1], sp[2]);
+      acc = ((val_t (*)(val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0], sp[1]);
       pop();
       pop();
       break;
@@ -1303,7 +1305,7 @@ val_t interp(void) {
 
 #ifdef OCAML_C_CALL4
     case OCAML_C_CALL4 : {
-      acc = ((val_t (*)(val_t, val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[1], sp[2], sp[3]);
+      acc = ((val_t (*)(val_t, val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0], sp[1], sp[2]);
       pop();
       pop();
       pop();
@@ -1313,7 +1315,7 @@ val_t interp(void) {
 
 #ifdef OCAML_C_CALL5
     case OCAML_C_CALL5 : {
-      acc = ((val_t (*)(val_t, val_t, val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[1], sp[2], sp[3], sp[4]);
+      acc = ((val_t (*)(val_t, val_t, val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0], sp[1], sp[2], sp[3]);
       pop();
       pop();
       pop();
@@ -1327,7 +1329,7 @@ val_t interp(void) {
       uint8_t narg = read_uint8();
       uint8_t prim = read_uint8();
       push(acc);
-      acc = ((val_t (*)(uint8_t, val_t *)) (get_primitive(prim)))(narg, sp + 1);
+      acc = ((val_t (*)(uint8_t, val_t *)) (get_primitive(prim)))(narg, sp);
       pop_n(narg);
       break;
     }

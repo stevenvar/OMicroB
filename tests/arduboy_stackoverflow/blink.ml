@@ -1,5 +1,6 @@
 module Arduboy = struct
   type button = A | B | UP | DOWN | LEFT | RIGHT
+  external millis : unit -> int = "ocaml_arduino_millis"
   external init    : unit   -> unit = "ocaml_arduboy_init"
   external print_int : int -> unit = "ocaml_arduboy_print_int"
   external print   : string -> unit = "ocaml_arduboy_print"
@@ -23,15 +24,15 @@ module Arduboy = struct
     | B -> pressed 2
 end
 
-(* let rec facto x = *)
-(*   match x with *)
-(*   | 0 -> 1 *)
-(*   | _ -> facto (x - 1) * x *)
+let rec fact x =
+  match x with
+  | 0 -> 1
+  | _ -> fact (x - 1) * x
 
 let facto x =
   let rec aux x cpt =
     match x with
-    | 0 -> 1
+    | 0 -> cpt
     | _ -> aux (x-1) (x*cpt)
   in
   aux x 1
@@ -39,8 +40,17 @@ let facto x =
 
 let () =
   Arduboy.init ();
-  Arduboy.print_int (facto 5) ;
-  Arduboy.display ()
+  let t = Arduboy.millis () in
+  for i = 0 to 9 do
+    (fact i)
+  done;
+  Arduboy.print_int (Arduboy.millis () -t);
+  Arduboy.display ();
+
+  (* for i = 0 to 10 do *)
+  (*   Arduboy.print_int i; *)
+  (* done; *)
+  (* Arduboy.display () *)
   (* Arduboy.print "facto 6"; *)
   (* Arduboy.print " = "; *)
   (* Arduboy.display (); *)

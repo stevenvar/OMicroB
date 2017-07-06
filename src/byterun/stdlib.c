@@ -31,6 +31,7 @@ val_t caml_delay(val_t millis) {
   return Val_unit;
 }
 
+
 /******************************************************************************/
 
 #ifdef __AVR__
@@ -103,6 +104,11 @@ val_t ocaml_arduboy_clear(val_t unit){
 }
 
 
+val_t ocaml_arduino_millis(val_t k){
+  return Val_int(millis());
+}
+
+
 #else
 
 #include <stdio.h>
@@ -171,6 +177,11 @@ val_t ocaml_arduboy_clear(val_t unit){
   return Val_unit;
 }
 
+
+val_t ocaml_arduino_millis(val_t k){
+  printf("millis()");
+  return Val_int(0);
+}
 #endif
 
 /******************************************************************************/

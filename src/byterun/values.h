@@ -32,7 +32,7 @@
   Codage des valeurs par du Nan boxing 32 bits avec :
 
           float : tels quels avec 1 seul Nan 0111 1111 1100 0000 0000 0000 0000 0000
-           int  : 1 bit de marque à la fin 
+           int  : 1 bit de marque à la fin
        pointeur : 1111 1111 11xx xxxx xxxx xxxx xxxx xx00  (alignement)
 pointeurs flash : tels quels mais limités à 2^31-2^22 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
@@ -50,7 +50,14 @@ typedef uint32_t uval_t;
 typedef uint32_t mlsize_t;
 typedef uint8_t tag_t;
 typedef uint8_t opcode_t;
+#if OCAML_BYTECODE_BSIZE < 256
+typedef uint8_t code_t;
+#elif OCAML_BYTECODE_BSIZE < 65536
+typedef uint16_t code_t;
+#else
 typedef uint32_t code_t;
+#endif
+
 
 /******************************************************************************/
 /* Value classification */
