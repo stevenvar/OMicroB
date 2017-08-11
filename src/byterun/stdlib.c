@@ -10,7 +10,7 @@
 #include "debug.h"
 
 /******************************************************************************/
-/* Arduino specific libraries   */
+/* Arduino specific libraries */
 
 val_t caml_pin_mode(val_t pin, val_t mode) {
   pinMode(Int_val(pin), Int_val(mode));
@@ -31,10 +31,16 @@ val_t caml_delay(val_t millis) {
   return Val_unit;
 }
 
+val_t ocaml_arduino_millis(val_t k){
+  return Val_int(millis());
+}
 
 /******************************************************************************/
+/* Arduboy specific libraries */
 
 #ifdef __AVR__
+
+#ifdef OMICROB_WITH_ARDUBOY
 
 #include <Arduboy.h>
 
@@ -103,13 +109,9 @@ val_t ocaml_arduboy_clear(val_t unit){
   return Val_unit;
 }
 
+#endif /* OMICROB_USE_ARDUBOY */
 
-val_t ocaml_arduino_millis(val_t k){
-  return Val_int(millis());
-}
-
-
-#else
+#else /* __AVR__ */
 
 #include <stdio.h>
 
@@ -177,11 +179,6 @@ val_t ocaml_arduboy_clear(val_t unit){
   return Val_unit;
 }
 
-
-val_t ocaml_arduino_millis(val_t k){
-  printf("millis()");
-  return Val_int(0);
-}
-#endif
+#endif /* __AVR__ */
 
 /******************************************************************************/

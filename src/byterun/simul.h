@@ -8,3 +8,4 @@ void digitalWrite(int pin, int val);
 int  digitalRead(int pin);
 
 void delay(int millis);
+int  millis(void);

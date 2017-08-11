@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 #include "simul.h"
 #include "values.h"
@@ -31,6 +33,12 @@ void delay(int millis) {
   req.tv_sec = millis / 1000;
   req.tv_nsec = 1000000 * (millis - 1000 * req.tv_sec);
   nanosleep(&req, &rem);
+}
+
+int millis(void) {
+  struct rusage ru;
+  getrusage(RUSAGE_SELF, &ru);
+  return ru.ru_utime.tv_sec * 1000 + ru.ru_utime.tv_usec;
 }
 
 /******************************************************************************/

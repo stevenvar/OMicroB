@@ -42,7 +42,7 @@ let () =
   Arduboy.init ();
   let t = Arduboy.millis () in
   for i = 0 to 9 do
-    (fact i)
+    let _ = fact i in ()
   done;
   Arduboy.print_int (Arduboy.millis () -t);
   Arduboy.display ();
