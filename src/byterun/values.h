@@ -48,6 +48,7 @@ pointeurs flash : tels quels mais limités à 2^31-2^22 en évitant ainsi d'avoi
 typedef int32_t val_t;
 typedef uint32_t uval_t;
 typedef uint32_t mlsize_t;
+typedef uint32_t header_t;
 typedef uint8_t tag_t;
 typedef uint8_t opcode_t;
 typedef uint32_t code_t;
@@ -56,7 +57,7 @@ typedef uint32_t code_t;
 /* Value classification */
 
 #define Is_int(x) (((x) & 1) != 0)
-#define Is_ptr(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 22) == 0x3FF)
+#define Is_block(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 22) == 0x3FF)
 
 /******************************************************************************/
 /* Conversions */
@@ -92,6 +93,7 @@ typedef uint32_t code_t;
 #define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
 
 #define Header(val) Field(val, -1)
+#define Hd_val(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
 #define Make_string_data(c3, c2, c1, c0) \
@@ -101,16 +103,30 @@ typedef uint32_t code_t;
 
 #define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
-#define Make_header(wosize, tag) (((val_t) (wosize) << 9) | tag)
-#define Wosize_val(val) (Header(val) >> 9)
-#define Color_val(val) ((Header(val) >> 9) & 1)
+#define Make_header(wosize, tag) (((val_t) (wosize) << 10) | tag)
+#define Bsize_wsize(sz) ((sz) * sizeof (val_t))
+#define Wsize_bsize(sz) ((sz) / sizeof (val_t))
+#define Wosize_val(val) (Header(val) >> 10)
+#define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
+
+#define Color_val(val) ((Header(val) >> 8) & 1)
 #define Tag_val(val) (Header(val) & 0xFF)
+
+#define Tag_hd(hd) (hd & 0xFF)
+#define Wosize_hd(hd) (hd >> 10)
+#define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
+
 
 #define Color_white 0
 #define Color_black 1
 
+#define Is_black_val(val) ((Header(val) >> 8) & Color_black)
+#define Is_black_hd(hd) (((hd) >> 8) & Color_black)
+
+#define Set_black_hd(hd) ((hd | (Color_black << 8)))
 /******************************************************************************/
 /* Tags */
+
 
 #define Lazy_tag     246
 #define Closure_tag  247
@@ -120,6 +136,26 @@ typedef uint32_t code_t;
 #define Abstract_tag 251
 #define String_tag   252
 #define Custom_tag   255
+
+#define No_scan_tag  251 // ??
+
+/* Closure_tag 247 */
+//#define Code_val(val) (((code_t *) (val)) [0])
+
+/* Object_tag 248 */
+#define Class_val(val) Field((val), 0)
+#define Oid_val(val) Int_val(Field((val), 1))
+
+/* Infix_tag 249 */
+#define Infix_offset_hd(hd) (Bosize_hd(hd))
+#define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
+
+
+/* Forward_tag 250 */
+#define Forward_val(v) Field(v, 0)
+
+/* Custom_tag 255 */
+#define Data_custom_val(v) ((void *) &Field((v), 1))
 
 /******************************************************************************/
 /* Custom operations */
@@ -156,6 +192,7 @@ pointeurs flash : tels quels mais limités à 2^63-2^51 en évitant ainsi d'avoi
 typedef int64_t val_t;
 typedef uint64_t uval_t;
 typedef uint64_t mlsize_t;
+typedef uint64_t header_t;
 typedef uint8_t tag_t;
 typedef uint8_t opcode_t;
 typedef uint64_t code_t;
@@ -164,7 +201,7 @@ typedef uint64_t code_t;
 /* Value classification */
 
 #define Is_int(x) (((x) & 1) != 0)
-#define Is_ptr(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 51) == 0x1FFF)
+#define Is_block(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 51) == 0x1FFF)
 
 /******************************************************************************/
 /* Conversions */
@@ -197,6 +234,7 @@ typedef uint64_t code_t;
 #define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
 
 #define Header(val) Field(val, -1)
+#define Hd_val(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
 #define Make_string_data(c7, c6, c5, c4, c3, c2, c1, c0)                                       \
@@ -207,25 +245,61 @@ typedef uint64_t code_t;
 
 #define Make_float(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
 
-#define Make_header(wosize, tag) (((mlsize_t) (wosize) << 9) | tag)
-#define Wosize_val(val) ((mlsize_t) (Header(val) >> 9))
-#define Color_val(val) ((Header(val) >> 9) & 1)
+#define Make_header(wosize, tag) (((val_t) (wosize) << 10) | tag)
+
+#define Bsize_wsize(sz) ((sz) * sizeof (val_t))
+#define Wsize_bsize(sz) ((sz) / sizeof (val_t))
+
+#define Wosize_val(val) ((mlsize_t) (Header(val) >> 10))
+#define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
+
+#define Color_val(val) ((Header(val) >> 8) & 1)
 #define Tag_val(val) (Header(val) & 0xFF)
+
+#define Tag_hd(hd) (hd & 0xFF)
+#define Wosize_hd(hd) (hd >> 10)
+#define Bosize_hd(hd) (Bsize_wsize (Wosize_hd(hd)))
 
 #define Color_white 0
 #define Color_black 1
 
+#define Is_black_val(val) ((Header(val) >> 8) & Color_black)
+#define Is_black_hd(hd) (((hd) >> 8) & Color_black)
+
+#define Set_black_hd(hd) ((hd | (Color_black << 8)))
 /******************************************************************************/
 /* Tags */
 
 #define Lazy_tag     246
 #define Closure_tag  247
 #define Object_tag   248
+
+
 #define Infix_tag    249
 #define Forward_tag  250
 #define Abstract_tag 251
 #define String_tag   252
 #define Custom_tag   255
+
+#define No_scan_tag  251 // ??
+
+/* Closure_tag 247 */
+//#define Code_val(val) (((code_t *) (val)) [0])
+
+/* Object_tag 248 */
+#define Class_val(val) Field((val), 0)
+#define Oid_val(val) Int_val(Field((val), 1))
+
+/* Infix_tag 249 */
+#define Infix_offset_hd(hd) (Bosize_hd(hd))
+#define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
+
+
+/* Forward_tag 250 */
+#define Forward_val(v) Field(v, 0)
+
+/* Custom_tag 255 */
+#define Data_custom_val(v) ((void *) &Field((v), 1))
 
 /******************************************************************************/
 /* Custom operations */

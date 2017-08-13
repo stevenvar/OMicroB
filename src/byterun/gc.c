@@ -81,58 +81,58 @@ void gc_init(int32_t heap_size) {
  */
 
 void gc_one_val(val_t* ptr, int update) {
-  val_t v ;
-  header_t hd;
+  val_t val ;
+  uint32_t hd;
   tag_t tag;
   mlsize_t sz;
-  
-  v = *ptr; 
 
   DEBUGassert(heap_ptr == new_heap); 
 
-  if (Is_ptr(v)) { 
+  val = *ptr;
+    
+  if (Is_block(val)) { 
     /* tester si c'est une globale ? */
-    hd = (Hd_val(v));
+    hd = (Hd_val(val));
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
-      *ptr = Field(v, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
+      *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
     }
     else {                 /* ici il faut le copier*/
      tag = Tag_hd(hd);
      sz = Wosize_hd(hd);
      if (tag >=  No_scan_tag) { /* le cas où l'on copie sans ensuite parcourir les sous-blocs*/
-       memcpy((void*)new_heap, (void*)hd, sizeof (header_t));
+       memcpy((void*)new_heap, (void*)&hd, sizeof (header_t));
        new_heap += sizeof (header_t);
-       val_t *  new_addr = new_heap;
-       memcpy((void *)new_heap,  (void*)v, sz * sizeof (val_t));
-       Field(v, 0) = (val_t)new_heap;
+       val_t new_val = (val_t)new_heap;
+       memcpy((void *)new_heap,  (void *)val, sz * sizeof (val_t));
+       Field(val, 0) = (val_t)new_heap;
        new_heap += sz * sizeof (val_t);
-       Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
-       Field(ptr, 0) = (val_t)new_addr;
+       Hd_val(*ptr) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
+       Field(ptr, 0) = (val_t)new_val;
        /*       if (update) */
-	 *ptr = new_addr ; /* on le copie systematiquement (à voir pour les glob)*/
+	 *ptr = new_val ; /* on le copie systematiquement (à voir pour les globales) */
     }
      else if (tag == Infix_tag) {
-      val_t start = v - Infix_offset_hd(hd);
+      val_t start = val - Infix_offset_hd(hd);
       if (Is_black_val(start)) { /* déjà déplacé*/
-	*ptr = Field(Block_val(start), 0) + Infix_offset_hd(hd);
+	     *ptr = Field(Block_val(start), 0) + Infix_offset_hd(hd);
         } else {
- 	  caml_gc_one_val(&start,1);
+ 	      gc_one_val(&start,1);
           *ptr = Field(Block_val(start), 0) + Infix_offset_hd(hd);
         }
      }
      else { /* tag < No_scan_tag : tous les autres */
        memcpy((void *)new_heap, (void *)(Block_val(hd)), sizeof (header_t));
        new_heap += sizeof (header_t);
-       val_t *  new_addr = new_heap;
-       memcpy((void *)new_heap,  (void *)(Block_val(v)), sz * sizeof (val_t));
-       Field(Block_val(v), 0) = (val_t)new_heap;
+       val_t   new_val = (val_t)new_heap;
+       memcpy((void *)new_heap,  (void *)(Block_val(val)), sz * sizeof (val_t));
+       Field(Block_val(val), 0) = (val_t)new_heap;
        new_heap += sz * sizeof (val_t);
-       Hd_val(*ptr) = Blackhd_hd (hd); /* bloc  copié, mise à jour de l'entête */
-       Field(ptr, 0) = (val_t)new_addr;
+       Hd_val(*ptr) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
+       Field(ptr, 0) = (val_t)new_val;
        /*       if (update) */
-         *ptr = new_addr ; /* on le copie systematiquement (à voir pour les glob)*/
+         *ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
        /* il faudra faire en tailrec et avec parcours en largeur si possible */
-       val_t * old_addr = new_addr ;
+	 val_t * old_addr = (val_t *)new_val ;
        for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr,1); old_addr++;}
      }
    }
@@ -148,7 +148,7 @@ void gc_one_val(val_t* ptr, int update) {
  */
 
 
-void gc(int32_t size) {
+void gc(mlsize_t size) {
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
   current_heap = (current_heap + 1) % 2; 
@@ -165,10 +165,10 @@ void gc(int32_t size) {
   }
 
   gc_one_val(&acc,1);
-  gc_one_value(&env,1);
+  gc_one_val(&env,1);
 
   /* il n y a pas eu assez de récupération */
- if (heap_ptr + size > heap_end) {exit(200);} 
+  if (heap_ptr + size > heap_end) {exit(200);} 
 }
 
 
