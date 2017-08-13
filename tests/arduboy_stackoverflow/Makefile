@@ -1,8 +1,8 @@
 include ../../etc/Makefile.conf
 
-ATTY     := /dev/tty.usbmodem14111
-CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
-LFLAGS   := -Wl,-Os -Wl,--gc-sections
+ATTY   := /dev/tty.usbmodem1411
+CFLAGS := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -O2 -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
+LFLAGS := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
@@ -26,7 +26,7 @@ blink.byte: blink.ml
 	ocamlclean $@ -o $@
 
 blink.c: blink.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 48 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 64 $< -o $@
 
 blink.elf: blink.c
 	$(GCC) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall $^ -o $@

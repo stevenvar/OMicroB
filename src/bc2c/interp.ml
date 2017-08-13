@@ -1,4 +1,5 @@
 open OByteLib.Instr
+open Mstack
 open T
 
 (******************************************************************************)
@@ -44,44 +45,6 @@ let make_import_value () =
       Qhtbl.put qhtbl v result;
       result in
   import_value
-
-(******************************************************************************)
-(* Stack tools. *)
-
-let acc stack i =
-  let rec loop stack i =
-    match i, stack with
-    | _, [] -> assert false
-    | 0, v :: _ -> v
-    | _, _ :: r -> loop r (i - 1) in
-  assert (i >= 0);
-  loop !stack i
-
-let push stack v =
-  stack := v :: !stack
-
-let pop stack =
-  match !stack with
-  | [] -> assert false
-  | v :: rest -> stack := rest; v
-
-let popn stack n =
-  let rec loop stack n =
-    match n, stack with
-    | 0, _ -> stack
-    | _, _ :: rest -> loop rest (n - 1)
-    | _, [] -> assert false in
-  assert (n >= 0);
-  stack := loop !stack n
-
-let assign stack i v =
-  let rec loop stack i v =
-    match i, stack with
-    | 0, _ :: rest -> v :: rest
-    | _, t :: rest -> t :: loop rest (i - 1) v
-    | _, [] -> assert false in
-  assert (i >= 0);
-  stack := loop !stack i v
 
 (******************************************************************************)
 (* Value tools. *)
@@ -577,7 +540,7 @@ let exec prims globals code cycle_limit =
         for i = 1 to v - 1 do blk.(i) <- pop stack done;
         let ptrs = Array.make (Array.length t + 1) o in
         Array.blit t 0 ptrs 1 (Array.length t);
-        accu :=  Closure { ofs = 0; ptrs; env = blk };
+        accu := Closure { ofs = 0; ptrs; env = blk };
         push stack !accu;
         for i = 1 to Array.length t do
           push stack (Closure { ofs = i; ptrs; env = blk });

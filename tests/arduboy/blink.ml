@@ -58,6 +58,7 @@ let () =
   (* done; *)
   let x = { contents = 0} in
   let y = { contents = 0} in
+  let max (x:int) (y:int) = if x > y then x else y in
   while true do
     Arduboy.clear ();
     if Arduboy.is_pressed Arduboy.LEFT then
@@ -68,6 +69,8 @@ let () =
       y.contents <- y.contents - 1;
     if Arduboy.is_pressed Arduboy.DOWN then
       y.contents <- y.contents + 1;
+    x.contents <- max 0 x.contents;
+    y.contents <- max 0 y.contents;
     Arduboy.draw_circle x.contents y.contents 10 255;
     if Arduboy.is_pressed Arduboy.A then
       Arduboy.fill_rect 0 0 22 22 100;
