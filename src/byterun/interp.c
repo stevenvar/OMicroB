@@ -1961,7 +1961,7 @@ val_t interp(void) {
 void setup(void) {
   debug_init();
   interp_init();
-  gc_init();
+  gc_init(OCAML_HEAP_WOSIZE);
   interp();
 }
 

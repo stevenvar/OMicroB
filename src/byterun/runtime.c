@@ -7,7 +7,7 @@
 #include "stdlib.c"
 #include "simul.c"
 #include "gc.h"
-// #include "gc.c"
+#include "gc.c"
 
 /******************************************************************************/
 // GC dummy implementation, remove me later
