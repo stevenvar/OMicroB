@@ -133,12 +133,12 @@ start:
             else { /* tag < No_scan_tag : tous les autres */
                 *heap_ptr = hd; 
                 heap_ptr += sizeof (header_t);
-                val_t new_val = (val_t)heap_ptr;
+                val_t new_val = Val_block(heap_ptr);
                 memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
                 Field(val, 0) = new_val;
                 heap_ptr += sz;
                 Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
-                Field(ptr, 0) = (val_t)new_val;
+                Field(ptr, 0) = new_val;
                 /*       if (update) */
                 *ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
                 /* il faudra faire en tailrec et avec parcours en largeur si possible */
