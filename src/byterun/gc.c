@@ -2,6 +2,7 @@
 #include <string.h>
 #include "values.h"
 #include "gc.h"
+#include <stdio.h> 
 
 extern val_t acc;
 extern val_t ocaml_stack[];
@@ -78,7 +79,7 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
     val_t result;
     printf("alloc start \n");
     Alloc_small(result, wosize, tag);
-    printf("alloc size = %d, tag = %d , sp = %d \n",wosize, tag, sp);
+    printf("alloc size = %lu, tag = %d , sp = %p \n",wosize, tag, sp);
     return result;
 }
 
@@ -89,7 +90,7 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
 
 void gc_one_val(val_t* ptr, int update) {
     val_t val ;
-    uint32_t hd;
+    header_t hd;
     tag_t tag;
     mlsize_t sz;
     int todo = 0;
@@ -110,14 +111,13 @@ start:
             tag = Tag_hd(hd);
             sz = Wosize_hd(hd);
             if (tag >=  No_scan_tag) { /* le cas où l'on copie sans ensuite parcourir les sous-blocs*/
-                memcpy((void*)heap_ptr, (void*)(val_t *)&hd, sizeof (header_t));
-                heap_ptr += sizeof (header_t);
-                val_t new_val = (val_t)heap_ptr;
-                memcpy((void *)heap_ptr,  (void *)(val_t *)val, sz * sizeof (val_t));
-                Field(val, 0) = (val_t)heap_ptr;
-                heap_ptr += sz * sizeof (val_t);
-                Hd_val(*ptr) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
-                Field(ptr, 0) = (val_t)new_val;
+                *heap_ptr = hd ;
+                heap_ptr++;
+                val_t new_val = Val_block(heap_ptr);
+                memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
+                Field(val, 0) = new_val;
+                heap_ptr += sz;
+                Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
                 /*       if (update) */
                 *ptr = new_val ; /* on le copie systematiquement (à voir pour les globales) */
             }
@@ -131,10 +131,10 @@ start:
                 }
             }
             else { /* tag < No_scan_tag : tous les autres */
-                memcpy((void *)heap_ptr, (void *)(val_t *)(Block_val(hd)), sizeof (header_t));
+                *heap_ptr = hd; 
                 heap_ptr += sizeof (header_t);
-                val_t   new_val = (val_t)heap_ptr;
-                memcpy((void *)heap_ptr,  (void *)(val_t *)(Block_val(val)), sz * sizeof (val_t));
+                val_t new_val = (val_t)heap_ptr;
+                memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
                 Field(Block_val(val), 0) = (val_t)heap_ptr;
                 heap_ptr += sz * sizeof (val_t);
                 Hd_val(*ptr) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */

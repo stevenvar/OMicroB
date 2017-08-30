@@ -72,8 +72,8 @@ typedef uint32_t code_t;
 #define Val_int(x) (((val_t) (x) << 1) + 1)
 #define Int_val(x) ((val_t) (x) >> 1)
 
-#define Val_block(x) ((val_t) (x) | ((val_t) 0x3FF << 22))
-#define Block_val(x) ((val_t) (x) ^ ((val_t) 0x3FF << 22))
+#define Val_block(x) ((val_t) ( ((x) - ocaml_heap)) << 2 | ((val_t) 0x3FF << 22))
+#define Block_val(x) (ocaml_heap + (((x) ^ ((val_t) 0x3FF << 22)) >> 2))
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
@@ -95,9 +95,9 @@ typedef uint32_t code_t;
 /******************************************************************************/
 /* Blocks */
 
-#define Field(val, i) (ocaml_heap[(Block_val(val) >> 2) + i])
-#define StringVal(val) ((char *) ocaml_heap + Block_val(val))
-#define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
+#define Field(val, i) (Block_val(val)[i])
+#define StringVal(val) ((char *) Block_val(val))
+#define StringField(val, i) ( StringVal(val)[i])
 
 #define Header(val) Field(val, -1)
 #define Hd_val(val) Field(val, -1)
@@ -216,8 +216,8 @@ typedef uint64_t code_t;
 #define Val_int(x) (((val_t) (x) << 1) | 1)
 #define Int_val(x) ((val_t) (x) >> 1)
 
-#define Val_block(x) ((val_t) (x) | ((val_t) 0x1FFF << 51))
-#define Block_val(x) ((val_t) (x) ^ ((val_t) 0x1FFF << 51))
+#define Val_block(x) ((val_t) ((x - ocaml_heap) << 3) | ((val_t) 0x1FFF << 51))
+#define Block_val(x) (ocaml_heap + (((x) ^ ((val_t) 0x1FFF << 51)) >> 3))
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
@@ -236,9 +236,9 @@ typedef uint64_t code_t;
 /******************************************************************************/
 /* Blocks */
 
-#define Field(val, i) (ocaml_heap[(Block_val(val) >> 3) + i])
-#define StringVal(val) ((char *) ocaml_heap + Block_val(val))
-#define StringField(val, i) (*((unsigned char *) ocaml_heap + Block_val(val) + i))
+#define Field(val, i) (Block_val(val)[i])
+#define StringVal(val) ((char *) Block_val(val))
+#define StringField(val, i) (StringVal(val)[i])
 
 #define Header(val) Field(val, -1)
 #define Hd_val(val) Field(val, -1)
