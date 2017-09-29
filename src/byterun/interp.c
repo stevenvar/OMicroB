@@ -140,7 +140,7 @@ void caml_raise_division_by_zero(void) {
 
 void interp_init(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
-  trapSp = Val_int(-1);
+  trapSp = Val_int(0); /* -1 */
   env = Val_unit;
   extra_args = 0;
   pc = 0;

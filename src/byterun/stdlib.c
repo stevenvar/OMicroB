@@ -115,7 +115,7 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #include <stdio.h>
 
-val_t *ocaml_heap;
+val_t ocaml_heap[];
 
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");

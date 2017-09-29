@@ -76,8 +76,8 @@ let string_of_dword arch dword =
   | CHARS chars        -> print_chars chars
   | BYTES bytes        -> print_bytes "Make_custom_data" bytes
   | CUSTOM name        -> Printf.sprintf "(val_t) &%s_custom_operations" name
-  | HEADER (tag, size) -> Printf.sprintf "Make_header(%s, %d)" (print_tag tag) size
-  | POINTER ind        -> Printf.sprintf "Val_block(%d * %d)" (Arch.byte_count arch) ind
+  | HEADER (tag, size) -> Printf.sprintf "Make_header(%d, %s)" size (print_tag tag)
+  | POINTER ind        -> Printf.sprintf "Init_val_block(%d * %d)" (Arch.byte_count arch) ind
   | CODEPTR ptr        -> Printf.sprintf "Val_codeptr(%d)" ptr
 
 let print_datagen_word_array oc arch ty name size data =
