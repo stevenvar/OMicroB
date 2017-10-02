@@ -168,6 +168,7 @@ val_t interp(void) {
     /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
 
 #ifdef DEBUG
+    printf("acc = %d \n", acc);
     debug(pc-1);
 #endif
     switch(opcode){
@@ -601,6 +602,7 @@ val_t interp(void) {
         Field(acc, i + 1) = pop();
       }
       break;
+
     }
 #endif
 

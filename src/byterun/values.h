@@ -79,8 +79,11 @@ typedef uint32_t code_t;
 #define Int_val(x) ((val_t) (x) >> 1)
 
 #define Init_val_block(x) ((val_t) ( (x) << 2) | ((val_t) 0x3FF << 22))
-#define Val_block(x) ((val_t) ( ((x) - (int) ocaml_heap)) << 2 | ((val_t) 0x3FF << 22))
-#define Block_val(x) (ocaml_heap + (((x) ^ ((val_t) 0x3FF << 22)) >> 2))
+/* #Define Val_block(x) ((val_t) ( ((x) - (int) ocaml_heap)) << 2 | ((val_t) 0x3FF << 22)) */
+/* #define Block_val(x) (ocaml_heap + (((x) ^ ((val_t) 0x3FF << 22)) >> 2)) */
+#define Val_block(x) (val_t)( (((val_t)x - (val_t)ocaml_heap) << 2) | (val_t)(0x3FF << 22) )
+#define Block_val(x)  (val_t*)((intptr_t)ocaml_heap + ((intptr_t)(x ^ (0x3FF << 22) ) >> 2))
+
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)

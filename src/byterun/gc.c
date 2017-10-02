@@ -2,7 +2,7 @@
 #include <string.h>
 #include "values.h"
 #include "gc.h"
-#include <stdio.h> 
+#include <stdio.h>
 
 extern val_t acc;
 extern val_t ocaml_stack[];
@@ -33,8 +33,9 @@ extern val_t ocaml_global_data[];
  * current_heap : 1 ou 2 selon le tas actif
  * les appels d'allocations mémoires ne savent pas dans quel tas seront placé les données.
  */
-val_t *heap1_start, *heap2_start;
-val_t *heap1_end, *heap2_end;
+extern const val_t *ocaml_heap1, *ocaml_heap2;
+const val_t *heap1_start, *heap2_start;
+const val_t *heap1_end, *heap2_end;
 int current_heap;
 
 
@@ -57,17 +58,19 @@ val_t* tab_heap_end[2];
  */
 void gc_init(int32_t heap_size) {
   /* il faudra probablement remplacer le malloc */
-  heap1_start = (val_t *) malloc(heap_size * sizeof (val_t));
+  /* heap1_start = (val_t *) malloc(heap_size * sizeof (val_t)); */
+  heap1_start = ocaml_heap1;
   heap1_end = heap1_start + heap_size * sizeof (val_t);
-  tab_heap_start[0] = heap1_start;
-  tab_heap_end[0] = heap1_end;
+  tab_heap_start[0] = (val_t*)heap1_start;
+  tab_heap_end[0] = (val_t*)heap1_end;
 
-  heap2_start = (val_t *) malloc(heap_size * sizeof (val_t));
+  /* heap2_start = (val_t *) malloc(heap_size * sizeof (val_t)); */
+  heap2_start = ocaml_heap2;
   heap2_end = heap2_start + heap_size * sizeof (val_t);
-  tab_heap_start[1] = heap2_start;
-  tab_heap_end[1] = heap2_end;
+  tab_heap_start[1] = (val_t*)heap2_start;
+  tab_heap_end[1] = (val_t*)heap2_end;
 
-  heap_ptr = heap1_start;
+  heap_ptr = (val_t*)heap1_start;
   heap_end = heap_ptr + heap_size * sizeof (val_t);
 
   current_heap = 0;
@@ -79,7 +82,7 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
   val_t result;
   printf("alloc start \n");
   Alloc_small(result, wosize, tag);
-  printf("alloc size = %lu, tag = %d , sp = %p \n",wosize, tag, sp);
+  printf("alloc size = %d, tag = %d , sp = %p \n",wosize, tag, sp);
   return result;
 }
 
@@ -114,17 +117,17 @@ void gc_one_val(val_t* ptr, int update) {
     else {                 /* ici il faut le copier*/
       tag = Tag_hd(hd);
       sz = Wosize_hd(hd);
-     
+
       if (tag == Infix_tag) {
         val_t start = val - Infix_offset_hd(hd);
         if (!(Is_black_val(start))) { /* déjà déplacé*/
           gc_one_val(&start,1);
-        } 
+        }
         *ptr = Field(start, 0) + Infix_offset_hd(hd);
-        
+
       }
       else { /* tag < No_scan_tag : tous les autres */
-        *heap_ptr = hd; 
+        *heap_ptr = hd;
         heap_ptr += sizeof (header_t);
         val_t new_val = Val_block(heap_ptr);
         memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
@@ -164,6 +167,19 @@ void gc_one_val(val_t* ptr, int update) {
  *
  */
 
+void print_heap(){
+  val_t* ptr;
+  int i = 0;
+  val_t* from = tab_heap_start[current_heap];
+  val_t* to = tab_heap_end[current_heap];
+  printf("HEAP ( starts at %p , ends at %p) :  \n", from , to );
+  for(ptr = from ; ptr < from + 10 ; ptr++){
+    printf("%d (%p) : %d \n",i, ptr, *ptr);
+    i++;
+  }
+  printf("________________________ \n");
+}
+
 
 void gc(mlsize_t size) {
   printf("gc start \n");
@@ -175,13 +191,14 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
+  /* La pile grandit vers le haut */
   for (ptr = ocaml_stack; ptr != sp; ptr++) {
     gc_one_val(ptr, 1);
   }
 
-  for (ptr = ocaml_global_data; ptr < heap1_start; ptr++) {
-    gc_one_val(ptr, 1);  /* c'est ici que l'on pourra avoir traiter les globales*/
-  }
+  /* for (ptr = ocaml_global_data; ptr < heap1_start; ptr++) { */
+  /*   gc_one_val(ptr, 1);  /\* c'est ici que l'on pourra avoir traité les globales*\/ */
+  /* } */
 
   gc_one_val(&acc,1);
   gc_one_val(&env,1);

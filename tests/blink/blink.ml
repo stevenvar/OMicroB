@@ -18,13 +18,15 @@
 (* let () = *)
 (*   blink PIN13 100 1000 *)
 
-let fst k (x,y) = x 
+let fst k (x,y) = x
 
 let _ =
-  let f x = x in 
-  for i = 1 to 1000 do 
-    let fst = fst () in
-    let p = (1,2) in
-    digital_write PIN13 true;
-    f (fst p )
-  done
+  digital_write PIN13 true;
+  let f x = x + 3 in
+  f 2
+  (* for i = 1 to 1000 do *)
+  (*   let fst = fst () in *)
+  (*   let p = (1,2) in *)
+  (*   digital_write PIN13 true; *)
+  (*   f (fst p ) *)
+  (* done *)
