@@ -20,7 +20,7 @@ extern void print_heap();
     printf("alloc size = %d, tag = %d , sp = %p \n",wosize, tag, sp); \
     print_heap();							\
     DEBUGassert((wosize) >= 1);                                         \
-    if ((heap_ptr + (wosize + 1) * sizeof(val_t)) > heap_end) gc(wosize); \
+    /* if ((heap_ptr + (wosize + 1) * sizeof(val_t)) > heap_end) gc(wosize); \ */ \
     printf("heap_ptr = %p \n",heap_ptr); \
     *heap_ptr = Make_header((wosize), (tag));				\
     heap_ptr ++ ; \

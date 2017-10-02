@@ -168,7 +168,11 @@ val_t interp(void) {
     /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
 
 #ifdef DEBUG
-    printf("acc = %d \n", acc);
+    if (Is_int(acc)) {
+      printf("acc = %d \n", Int_val(acc));
+    } else {
+      printf("acc = 0x%08x \n", acc);
+    }
     debug(pc-1);
 #endif
     switch(opcode){
@@ -1950,7 +1954,7 @@ val_t interp(void) {
 
     default :
 #ifdef DEBUG
-      debug(opcode);
+      printf("OPCODE = %d", opcode);
 #endif
       assert(0);
 

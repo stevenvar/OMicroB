@@ -172,12 +172,20 @@ void print_heap(){
   int i = 0;
   val_t* from = tab_heap_start[current_heap];
   val_t* to = tab_heap_end[current_heap];
-  printf("HEAP ( starts at %p , ends at %p) :  \n", from , to );
-  for(ptr = from ; ptr < from + 10 ; ptr++){
-    printf("%d (%p) : %d \n",i, ptr, *ptr);
+  printf("HEAP ( starts at %p , ends at %p) : \n", from , to );
+  for(ptr = from ; ptr < from+10 ; ptr++){
+    if (*ptr != 0){
+      if (Is_int(*ptr)){
+	printf("@%p : %d | ", ptr, Int_val(*ptr));
+      }
+      else
+	printf("@%p : 0x%08x | ", ptr, *ptr);
+      /* if ( i % 10 == 0) */
+	printf("\n");
+    }
     i++;
   }
-  printf("________________________ \n");
+  printf("\n________________________ \n");
 }
 
 
