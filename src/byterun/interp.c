@@ -135,8 +135,8 @@ void pop_n(int n) {
 void print_stack(){
   printf(" STACK : \n");
   int i = 0;
-  for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE + 1;
-       ptr >= sp; ptr --){
+  for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
+       ptr > sp; ptr --){
     if (Is_int(sp[i])){
       printf("\t %d : %d \n", i, Int_val(sp[i]));
     }
@@ -451,7 +451,7 @@ val_t interp(void) {
 #ifdef OCAML_APPLY
     case OCAML_APPLY : {
       extra_args = read_uint8() - 1;
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       break;
     }
@@ -464,7 +464,7 @@ val_t interp(void) {
       push(env);
       push(Val_codeptr(pc));
       push(arg1);
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       extra_args = 0;
       break;
@@ -480,7 +480,7 @@ val_t interp(void) {
       push(Val_codeptr(pc));
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       extra_args = 1;
       break;
@@ -498,7 +498,7 @@ val_t interp(void) {
       push(arg3);
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       extra_args = 2;
       break;
@@ -514,7 +514,7 @@ val_t interp(void) {
         newsp[i] = sp[i];
       }
       sp = newsp;
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       extra_args += nargs - 1;
       break;
@@ -526,7 +526,7 @@ val_t interp(void) {
       val_t arg = peek(0);
       pop_n(read_uint8());
       push(arg);
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       break;
     }
@@ -539,7 +539,7 @@ val_t interp(void) {
       pop_n(read_uint8());
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       extra_args ++;
       break;
@@ -555,7 +555,7 @@ val_t interp(void) {
       push(arg3);
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(Code_val(acc));
+      pc = Codeptr_val(acc);
       env = acc;
       extra_args += 2;
       break;
@@ -568,7 +568,7 @@ val_t interp(void) {
       pop_n(n);
       if (extra_args > 0){
         extra_args --;
-        pc = Codeptr_val(Code_val(acc));
+        pc = Codeptr_val(acc);
         env = acc;
       } else {
         pc = Codeptr_val(pop());
