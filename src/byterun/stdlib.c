@@ -9,6 +9,8 @@
 #include "values.h"
 #include "debug.h"
 
+
+
 /******************************************************************************/
 /* Arduino specific libraries */
 
@@ -115,6 +117,7 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #include <stdio.h>
 
+/* This creates a warning (I don't get why it needs to be declared here) */
 val_t ocaml_heap[];
 
 val_t ocaml_arduboy_init(val_t unit) {

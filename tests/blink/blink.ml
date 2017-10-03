@@ -18,14 +18,14 @@
 (* let () = *)
 (*   blink PIN13 100 1000 *)
 
-let make_pair x = (1,x)
-let fst k (x,y) = x
+let make_pair x = (345,x)
+(* let fst k (x,y) = x *)
 
 let _ =
   digital_write PIN13 true;
-  let f x = x + 5 in
+  (* let f x = x + 5 in *)
   for i = 1 to 100 do
-    make_pair 1909
+    make_pair i
   done
     (*   digital_write PIN13 true; *)
   (*   f (fst p ) *)

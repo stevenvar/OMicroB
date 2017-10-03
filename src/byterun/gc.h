@@ -17,7 +17,7 @@ extern void print_heap();
 
 #define Alloc_small(result, wosize, tag)                                \
   do {                                                                  \
-    printf("alloc size = %d, tag = %d , sp = %p \n",wosize, tag, sp); \
+    printf("*****ALLOC******\nalloc size = %d, tag = %d , sp = %p \nheap before : \n",wosize, tag, sp); \
     print_heap();							\
     DEBUGassert((wosize) >= 1);                                         \
     /* if ((heap_ptr + (wosize + 1) * sizeof(val_t)) > heap_end) gc(wosize); \ */ \
@@ -27,6 +27,7 @@ extern void print_heap();
     result = Val_block(heap_ptr); \
     heap_ptr += wosize ;						\
     /* DEBUGclear((result), (wosize));                                     \ */ \
-    printf("end of alloc \n"); \
+    printf("heap after : \n"); \
     print_heap();	       \
+    printf("*******END ALLOC******\n");		\
   } while(0)

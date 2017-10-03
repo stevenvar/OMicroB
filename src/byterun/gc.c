@@ -70,7 +70,11 @@ void gc_init(int32_t heap_size) {
   tab_heap_start[1] = (val_t*)heap2_start;
   tab_heap_end[1] = (val_t*)heap2_end;
 
+  #ifdef OCAML_HEAP_INITIAL_WOSIZE
+  heap_ptr = (val_t*)heap1_start + OCAML_HEAP_INITIAL_WOSIZE;
+  #else
   heap_ptr = (val_t*)heap1_start;
+  #endif
   heap_end = heap_ptr + heap_size * sizeof (val_t);
 
   current_heap = 0;
@@ -161,20 +165,15 @@ void gc_one_val(val_t* ptr, int update) {
 
 }
 
-/* fonction principale pour récupérer de la mémoire
- * en effectuant le GC, et en mettant à jour les deux tas
- * sp : le pointeur de pile courant dans interp.c
- *
- */
-
+/* Pour debug */
 void print_heap(){
   val_t* ptr;
   int i = 0;
   val_t* from = tab_heap_start[current_heap];
   val_t* to = tab_heap_end[current_heap];
-  printf("HEAP ( starts at %p , ends at %p) : \n", from , to );
-  for(ptr = from ; ptr < from+10 ; ptr++){
-    if (*ptr != 0){
+  printf("HEAP ( starts at %p , ends at %p) : (100 first blocks) \n", from , to );
+  for(ptr = from ; ptr < from+100 ; ptr++){
+    /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
 	printf("@%p : %d | ", ptr, Int_val(*ptr));
       }
@@ -182,12 +181,17 @@ void print_heap(){
 	printf("@%p : 0x%08x | ", ptr, *ptr);
       /* if ( i % 10 == 0) */
 	printf("\n");
-    }
+    /* } */
     i++;
   }
-  printf("\n________________________ \n");
+  printf("\n...\n________________________ \n");
 }
 
+/* fonction principale pour récupérer de la mémoire
+ * en effectuant le GC, et en mettant à jour les deux tas
+ * sp : le pointeur de pile courant dans interp.c
+ *
+ */
 
 void gc(mlsize_t size) {
   printf("gc start \n");

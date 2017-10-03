@@ -131,6 +131,24 @@ void pop_n(int n) {
 
 /******************************************************************************/
 
+/* for debugging */
+void print_stack(){
+  printf(" STACK : \n");
+  int i = 0;
+  for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE + 1;
+       ptr >= sp; ptr --){
+    if (Is_int(sp[i])){
+      printf("\t %d : %d \n", i, Int_val(sp[i]));
+    }
+    else
+          printf("\t %d : 0x%04x \n", i, sp[i]);
+    i++;
+  }
+    printf(" __________________ \n\n");
+}
+
+/******************************************************************************/
+
 void caml_raise_division_by_zero(void) {
   assert(0);
   /* TODO */
@@ -168,12 +186,14 @@ val_t interp(void) {
     /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
 
 #ifdef DEBUG
+    print_stack();
     if (Is_int(acc)) {
       printf("acc = %d \n", Int_val(acc));
     } else {
       printf("acc = 0x%08x \n", acc);
     }
-    debug(pc-1);
+    printf("pc = %d\n", pc-1);
+    printf("opcode = %d\n", opcode);
 #endif
     switch(opcode){
 
