@@ -451,7 +451,7 @@ val_t interp(void) {
 #ifdef OCAML_APPLY
     case OCAML_APPLY : {
       extra_args = read_uint8() - 1;
-      pc = Codeptr_val(acc);
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       break;
     }
@@ -464,7 +464,10 @@ val_t interp(void) {
       push(env);
       push(Val_codeptr(pc));
       push(arg1);
-      pc = Codeptr_val(acc);
+      /* print_heap(); */
+      /* printf(" f(0x%04x) =  %p \n", acc, Block_val(acc)); */
+      /* printf(" *(%p) =  0x%04x \n", Block_val(acc), *(Block_val(acc))); */
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       extra_args = 0;
       break;
@@ -480,7 +483,7 @@ val_t interp(void) {
       push(Val_codeptr(pc));
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(acc);
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       extra_args = 1;
       break;
@@ -498,7 +501,7 @@ val_t interp(void) {
       push(arg3);
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(acc);
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       extra_args = 2;
       break;
@@ -514,7 +517,7 @@ val_t interp(void) {
         newsp[i] = sp[i];
       }
       sp = newsp;
-      pc = Codeptr_val(acc);
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       extra_args += nargs - 1;
       break;
@@ -526,7 +529,7 @@ val_t interp(void) {
       val_t arg = peek(0);
       pop_n(read_uint8());
       push(arg);
-      pc = Codeptr_val(acc);
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       break;
     }
@@ -539,7 +542,7 @@ val_t interp(void) {
       pop_n(read_uint8());
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(acc);
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       extra_args ++;
       break;
@@ -555,7 +558,7 @@ val_t interp(void) {
       push(arg3);
       push(arg2);
       push(arg1);
-      pc = Codeptr_val(acc);
+      pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       extra_args += 2;
       break;
@@ -568,7 +571,7 @@ val_t interp(void) {
       pop_n(n);
       if (extra_args > 0){
         extra_args --;
-        pc = Codeptr_val(acc);
+        pc = Codeptr_val(*(Block_val(acc)));
         env = acc;
       } else {
         pc = Codeptr_val(pop());

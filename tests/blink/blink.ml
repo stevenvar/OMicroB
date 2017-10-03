@@ -26,9 +26,10 @@ let rec facto x =
 let _ =
   digital_write PIN13 true;
   (* let f x = x + 5 in *)
-  let x = (facto 5,42) in
-  let y = (facto 5,32) in
-  y
+  let x = (facto 7,42) in
+  let y = fst x in
+  let z = y + 9 in
+  delay z
     (*   digital_write PIN13 true; *)
   (*   f (fst p ) *)
   (* done *)
