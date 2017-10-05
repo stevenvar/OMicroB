@@ -140,8 +140,11 @@ void print_stack(){
     if (Is_int(sp[i])){
       printf("\t %d : %d \n", i, Int_val(sp[i]));
     }
+    else if (Is_block(sp[i])){
+      printf("\t %d : @(%p) \n", i, Block_val(sp[i]));
+    }
     else
-          printf("\t %d : 0x%04x \n", i, sp[i]);
+          printf("\t %d : ? 0x%04x \n", i, sp[i]);
     i++;
   }
     printf(" __________________ \n\n");
@@ -187,13 +190,14 @@ val_t interp(void) {
 
 #ifdef DEBUG
     print_stack();
-    if (Is_int(acc)) {
-      printf("acc = %d \n", Int_val(acc));
-    } else {
-      printf("acc = 0x%08x \n", acc);
-    }
-    printf("pc = %d\n", pc-1);
-    printf("opcode = %d\n", opcode);
+    /* if (Is_int(acc)) { */
+      /* printf("acc = %d \n", Int_val(acc)); */
+    /* } else { */
+      /* printf("acc = 0x%08x \n", acc); */
+    /* } */
+    /* printf("pc = %d\n", pc-1); */
+    /* printf("opcode = %d\n", opcode); */
+
 #endif
     switch(opcode){
 

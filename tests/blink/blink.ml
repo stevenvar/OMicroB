@@ -18,18 +18,31 @@
 (* let () = *)
 (*   blink PIN13 100 1000 *)
 
+type 'a ref = { mutable contents : 'a } 
+
+let ref x = { contents= x }
+
+let (:=) a b =
+  a.contents <- b
+
+external (!) : 'a ref -> 'a =  "%field0"
+
+let incr x = x := !x+1
+
+let cpt =
+  let cpt = ref 0 in
+  fun () ->
+    incr cpt;
+    !cpt
+
+let u = 42
+
+let make_pair x = (x,x+u)
 let fst (x,y) = x
 
-let rec facto x =
-  if x = 0 then 1
-  else x * facto (x-1)
 let _ =
   digital_write PIN13 true;
-  (* let f x = x + 5 in *)
-  let x = (facto 7,42) in
-  let y = fst x in
-  let z = y + 9 in
-  delay z
-    (*   digital_write PIN13 true; *)
-  (*   f (fst p ) *)
-  (* done *)
+  for i = 0 to 1000 do
+    let v =  make_pair i in
+    delay 500
+  done

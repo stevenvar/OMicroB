@@ -60,13 +60,15 @@ void gc_init(int32_t heap_size) {
   /* il faudra probablement remplacer le malloc */
   /* heap1_start = (val_t *) malloc(heap_size * sizeof (val_t)); */
   heap1_start = ocaml_heap1;
-  heap1_end = heap1_start + heap_size * sizeof (val_t);
+  /* heap1_end = heap1_start + heap_size * sizeof (val_t); */
+  heap1_end = heap1_start + heap_size;
   tab_heap_start[0] = (val_t*)heap1_start;
   tab_heap_end[0] = (val_t*)heap1_end;
 
   /* heap2_start = (val_t *) malloc(heap_size * sizeof (val_t)); */
   heap2_start = ocaml_heap2;
-  heap2_end = heap2_start + heap_size * sizeof (val_t);
+  /* heap2_end = heap2_start + heap_size * sizeof (val_t); */
+  heap2_end = heap2_start + heap_size;
   tab_heap_start[1] = (val_t*)heap2_start;
   tab_heap_end[1] = (val_t*)heap2_end;
 
@@ -75,11 +77,14 @@ void gc_init(int32_t heap_size) {
   #else
   heap_ptr = (val_t*)heap1_start;
   #endif
-  heap_end = heap_ptr + heap_size * sizeof (val_t);
+  /* heap_end = heap_ptr + heap_size * sizeof (val_t); */
+  heap_end = heap_ptr + heap_size;
 
   current_heap = 0;
   printf("init end \n");
 }
+
+int cpt = 0;
 
 
 val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
@@ -114,6 +119,7 @@ void gc_one_val(val_t* ptr, int update) {
   if (Is_block(val)) {
     /* tester si c'est une globale ? */
     hd = (Hd_val(val));
+    printf("HD = 0x%04x \n", hd);
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
       *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
       goto next;
@@ -171,11 +177,17 @@ void print_heap(){
   int i = 0;
   val_t* from = tab_heap_start[current_heap];
   val_t* to = tab_heap_end[current_heap];
-  printf("HEAP ( starts at %p , ends at %p) : (100 first blocks) \n", from , to );
-  for(ptr = from ; ptr < from+100 ; ptr++){
+  printf("HEAP ( starts at %p , ends at %p (size = %d) ) : (100 first blocks) \n", from , to, to-from );
+  for(ptr = from ; ptr < to; ptr++){
     /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
 	printf("@%p : %d | ", ptr, Int_val(*ptr));
+      }
+      else if (Is_block(*ptr)){
+	printf("@%p : @(%p) | ", ptr, Block_val(*ptr));
+      }
+      else if (*ptr == 0){
+	printf("@%p : _ | ", ptr);
       }
       else
 	printf("@%p : 0x%08x | ", ptr, *ptr);
@@ -194,7 +206,7 @@ void print_heap(){
  */
 
 void gc(mlsize_t size) {
-  printf("gc start \n");
+  printf("******************** GC START **************************** \n");
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
   current_heap = (current_heap + 1) % 2;
@@ -203,14 +215,13 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
-  /* La pile grandit vers le haut */
   for (ptr = ocaml_stack; ptr != sp; ptr++) {
     gc_one_val(ptr, 1);
   }
 
-  /* for (ptr = ocaml_global_data; ptr < heap1_start; ptr++) { */
-  /*   gc_one_val(ptr, 1);  /\* c'est ici que l'on pourra avoir traité les globales*\/ */
-  /* } */
+  for (ptr = ocaml_global_data; ptr < heap1_start; ptr++) {
+    gc_one_val(ptr, 1);  /* c'est ici que l'on pourra avoir traité les globales*/
+  }
 
   gc_one_val(&acc,1);
   gc_one_val(&env,1);
@@ -218,5 +229,6 @@ void gc(mlsize_t size) {
   /* il n y a pas eu assez de récupération */
   if (heap_ptr + size > heap_end) {exit(200);}
 
+ 
   printf("gc end \n");
 }

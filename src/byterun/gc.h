@@ -21,13 +21,14 @@ extern void print_heap();
     print_heap();							\
     DEBUGassert((wosize) >= 1);                                         \
     /* if ((heap_ptr + (wosize + 1) * sizeof(val_t)) > heap_end) gc(wosize); \ */ \
-    printf("heap_ptr = %p \n",heap_ptr); \
+    if (heap_ptr + (wosize + 1) > heap_end) gc(wosize); \ 
     *heap_ptr = Make_header((wosize), (tag));				\
     heap_ptr ++ ; \
     result = Val_block(heap_ptr); \
     heap_ptr += wosize ;						\
-    /* DEBUGclear((result), (wosize));                                     \ */ \
+    /* DEBUGclear((result), (wosize));                                      \ */ \
     printf("heap after : \n"); \
     print_heap();	       \
+    printf("heap_ptr = %p \n",heap_ptr); \
     printf("*******END ALLOC******\n");		\
   } while(0)

@@ -26,7 +26,7 @@ blink.byte: blink.ml
 	ocamlclean $@ -o $@
 
 blink.c: blink.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 32 $< -o $@
 
 blink.elf: blink.c
 	$(GCC) -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $< -o $@

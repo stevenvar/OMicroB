@@ -70,7 +70,7 @@ typedef uint32_t code_t;
 /* Value classification */
 
 #define Is_int(x) (((x) & 1) != 0)
-#define Is_block(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 22) == 0x3FF)
+#define Is_block(x) (((val_t) (x) & 0x3) == 0 && (((uval_t) (x)) >> 22) == 0x3FF)
 
 /******************************************************************************/
 /* Conversions */
