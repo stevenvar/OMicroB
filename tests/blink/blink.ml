@@ -18,7 +18,7 @@
 (* let () = *)
 (*   blink PIN13 100 1000 *)
 
-type 'a ref = { mutable contents : 'a } 
+type 'a ref = { mutable contents : 'a }
 
 let ref x = { contents= x }
 
@@ -42,7 +42,9 @@ let fst (x,y) = x
 
 let _ =
   digital_write PIN13 true;
+  let k = ref 0 in
   for i = 0 to 1000 do
     let v =  make_pair i in
-    delay 500
-  done
+    k := fst v;
+    delay !k
+  done;

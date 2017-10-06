@@ -195,7 +195,7 @@ val_t interp(void) {
     /* } else { */
       /* printf("acc = 0x%08x \n", acc); */
     /* } */
-    /* printf("pc = %d\n", pc-1); */
+    printf("pc = %d\n", pc-1);
     /* printf("opcode = %d\n", opcode); */
 
 #endif

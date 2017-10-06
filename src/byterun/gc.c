@@ -96,81 +96,6 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
 }
 
 
-/* fonction qui traite complètement une racine
- *    c'est-à-dire effectue tous les déplacements attendus
- */
-
-
-/* tags in values.h */
-
-
-void gc_one_val(val_t* ptr, int update) {
-  val_t val ;
-  header_t hd;
-  tag_t tag;
-  mlsize_t sz;
-  int todo = 0;
-
-  DEBUGassert(heap_ptr == heap_todo);
-
- start:
-  val = *ptr;
-
-  if (Is_block(val)) {
-    /* tester si c'est une globale ? */
-    hd = (Hd_val(val));
-    printf("HD = 0x%04x \n", hd);
-    if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
-      *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
-      goto next;
-    }
-    else {                 /* ici il faut le copier*/
-      tag = Tag_hd(hd);
-      sz = Wosize_hd(hd);
-
-      if (tag == Infix_tag) {
-        val_t start = val - Infix_offset_hd(hd);
-        if (!(Is_black_val(start))) { /* déjà déplacé*/
-          gc_one_val(&start,1);
-        }
-        *ptr = Field(start, 0) + Infix_offset_hd(hd);
-
-      }
-      else { /* tag < No_scan_tag : tous les autres */
-        *heap_ptr = hd;
-        heap_ptr += sizeof (header_t);
-        val_t new_val = Val_block(heap_ptr);
-        memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
-        Field(val, 0) = new_val;
-        heap_ptr += sz;
-        Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
-        /* Field(ptr, 0) = new_val; */
-        /*       if (update) */
-        *ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
-        /* il faudra faire en tailrec et avec parcours en largeur si possible */
-        //                val_t * old_addr = (val_t *)new_val ;
-        //                for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr,1); old_addr++;}
-      }
-    }
-  }
-
- next:
-  if (heap_todo == heap_ptr) return;
-  if (todo == 0) {
-    header_t hd_local = Hd_val(*heap_todo);
-    todo = Wosize_hd(hd_local);
-    if (Tag_hd(hd_local) >= No_scan_tag)  {
-      heap_todo += (todo + 1) ;
-      todo = 0;
-      goto  next;
-    }
-  }
-  ptr = ++heap_todo;
-  todo--;
-  goto start;
-
-}
-
 /* Pour debug */
 void print_heap(){
   val_t* ptr;
@@ -199,6 +124,87 @@ void print_heap(){
   printf("\n...\n________________________ \n");
 }
 
+/* fonction qui traite complètement une racine
+ *    c'est-à-dire effectue tous les déplacements attendus
+ */
+/* tags in values.h */
+void gc_one_val(val_t* ptr, int update) {
+  val_t val ;
+  header_t hd;
+  tag_t tag;
+  mlsize_t sz;
+  int todo = 0;
+
+  DEBUGassert(heap_ptr == heap_todo);
+
+ start:
+  val = *ptr;
+  /* printf("\t val = %p \n",Block_val(val)); */
+  if (Is_block(val)) {
+    /* tester si c'est une globale ? */
+    hd = (Hd_val(val));
+    if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
+      *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
+      goto next;
+    }
+    else {                 /* ici il faut le copier*/
+      tag = Tag_hd(hd);
+      sz = Wosize_hd(hd);
+      /* printf("HD = 0x%04x, tag = 0x%04x, size = 0x%04x \n", hd, tag, sz); */
+
+      if (tag == Infix_tag) {
+        val_t start = val - Infix_offset_hd(hd);
+        if (!(Is_black_val(start))) { /* déjà déplacé*/
+          gc_one_val(&start,1);
+        }
+        *ptr = Field(start, 0) + Infix_offset_hd(hd);
+      }
+      else { /* tag < No_scan_tag : tous les autres */
+	/* printf("I put the header in %p \n",heap_ptr); */
+        *heap_ptr = hd;
+        /* heap_ptr += sizeof (header_t); */
+	heap_ptr ++;
+	/* printf("I moved heap_ptr to %p \n",heap_ptr); */
+        val_t new_val = Val_block(heap_ptr);
+	/* printf("The new value is %p\n", Val_block(new_val)); */
+        memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
+	/* printf("I put %ld bytes starting from %p in %p \n",sz * sizeof(val_t), Block_val(val),heap_ptr); */
+        Field(val, 0) = new_val;
+	/* printf("I set the old value to point to the new value ( should be @%p, is now @%p) \n",Block_val(new_val),Block_val(val)); */
+        heap_ptr += sz;
+	/* printf("I move heap_ptr to %p \n",heap_ptr); */
+        Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
+	/* printf("I set the original to black \n"); */
+        /* Field(ptr, 0) = new_val; */
+        /*       if (update) */
+        *ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
+	/* printf("The new_val is copied into the original (?) : %p \n", Block_val(*ptr)); */
+        /* il faudra faire en tailrec et avec parcours en largeur si possible */
+        //                val_t * old_addr = (val_t *)new_val ;
+        //                for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr,1); old_addr++;}
+      }
+    }
+  }
+ next:
+  if (heap_todo == heap_ptr) return;
+  if (todo == 0) {
+    /* header_t hd_local = Hd_val(*heap_todo); */
+    header_t hd_local = *heap_todo;
+    /* printf("hd_local = 0x%04x \n",hd_local); */
+    todo = Wosize_hd(hd_local);
+    if (Tag_hd(hd_local) >= No_scan_tag)  {
+      heap_todo += (todo + 1) ;
+      todo = 0;
+      goto  next;
+    }
+  }
+  ptr = ++heap_todo;
+  todo--;
+  goto start;
+
+}
+
+
 /* fonction principale pour récupérer de la mémoire
  * en effectuant le GC, et en mettant à jour les deux tas
  * sp : le pointeur de pile courant dans interp.c
@@ -215,7 +221,7 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
-  for (ptr = ocaml_stack; ptr != sp; ptr++) {
+  for (ptr = ocaml_stack + OCAML_STACK_WOSIZE; ptr > sp; ptr--) {
     gc_one_val(ptr, 1);
   }
 
@@ -229,6 +235,6 @@ void gc(mlsize_t size) {
   /* il n y a pas eu assez de récupération */
   if (heap_ptr + size > heap_end) {exit(200);}
 
- 
+
   printf("gc end \n");
 }
