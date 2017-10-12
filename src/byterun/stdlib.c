@@ -2,14 +2,11 @@
 
 #ifdef __AVR__
 #include <Arduino.h>
+#include "values.h"
+#include "debug.h"
 #else
 #include "simul.h"
 #endif
-
-#include "values.h"
-#include "debug.h"
-
-
 
 /******************************************************************************/
 /* Arduino specific libraries */
@@ -115,10 +112,6 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #else /* __AVR__ */
 
-#include <stdio.h>
-
-/* This creates a warning (I don't get why it needs to be declared here) */
-val_t ocaml_heap[];
 
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");
@@ -126,7 +119,7 @@ val_t ocaml_arduboy_init(val_t unit) {
 }
 
 val_t ocaml_arduboy_print(val_t str) {
-  printf("ocaml_arduino_print(\"%s\")\n", StringVal(str));
+  printf("ocaml_arduino_print(\"%s\")\n", String_val(str));
   return Val_unit;
 }
 

@@ -10,7 +10,7 @@ $(LIB)/libcamlrun.a: debug.o prims.o stdlib.o simul.o gc.o
 	ar rs $@ $^
 
 %.o: %.c
-	gcc -c -Wall -Os -DDEBUG -DOCAML_VIRTUAL_ARCH=32 $<
+	ocamlc -c -ccopt -Wall -ccopt -Os -ccopt -DDEBUG -ccopt -DOCAML_VIRTUAL_ARCH=32 $<
 
 clean:
 	@rm -f *.o *.a *.elf *~ $(TARGETS)
