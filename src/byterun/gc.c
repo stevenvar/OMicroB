@@ -102,7 +102,7 @@ void print_heap(){
   int i = 0;
   val_t* from = tab_heap_start[current_heap];
   val_t* to = tab_heap_end[current_heap];
-  printf("HEAP ( starts at %p , ends at %p (size = %d) ) : (100 first blocks) \n", from , to, to-from );
+  printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : (100 first blocks) \n", from , to, to-from );
   for(ptr = from ; ptr < to; ptr++){
     /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
@@ -221,9 +221,11 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
+  #ifdef OCAML_HEAP_INITIAL_WOSIZE
   for (ptr = ocaml_stack + OCAML_STACK_WOSIZE; ptr > sp; ptr--) {
     gc_one_val(ptr, 1);
   }
+  #endif
 
   for (ptr = ocaml_global_data; ptr < heap1_start; ptr++) {
     gc_one_val(ptr, 1);  /* c'est ici que l'on pourra avoir traité les globales*/
