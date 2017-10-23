@@ -98,7 +98,8 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
   return result;
 }
 
-#ifndef __PIC18F
+#ifdef DEBUG
+
 /* Pour debug */
 void print_heap(){
   val_t* ptr;

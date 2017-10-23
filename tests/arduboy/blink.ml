@@ -2,8 +2,9 @@ module Arduboy = struct
   external init    : unit   -> unit = "ocaml_arduboy_init"
   external print_int : int -> unit = "ocaml_arduboy_print_int"
   external display : unit   -> unit = "ocaml_arduboy_display"
-end
+end;;
 
+Arduboy.init ();;
 
 (* let facto x = *)
 (*   let rec aux x acc = *)
@@ -15,16 +16,12 @@ end
 
 (* type 'a ref = { mutable contents : 'a } *)
 
-let plus x y = x + y
+
+let rec facto x =
+  if x = 0 then 1
+  else
+    (facto (x-1)) * x
 
 let () =
-  let c () = 8 in
-  (* Arduboy.init (); *)
-  for i = 0 to 10 do
-    for i = 0 to 10 do ()
-    done;
-  done;
-  (* let k = plus 3 4 in *)
-  ();
-  print_int (c ());
-  (* Arduboy.display(); *)
+  Arduboy.print_int (facto 7);
+  Arduboy.display();

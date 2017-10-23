@@ -17,7 +17,7 @@ extern void print_heap();
 
 #define Alloc_small(result, wosize, tag)                                \
   do {                                                                  \
-    DEBUGassert((wosize) >= 1);                                         \
+    /* DEBUGassert((wosize) >= 1);                                         \ */ \
     if (heap_ptr + (wosize + 1) > heap_end) gc(wosize); \
     *heap_ptr = Make_header((wosize), (tag));				\
     heap_ptr ++ ; \

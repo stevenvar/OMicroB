@@ -5,7 +5,9 @@
 #include "prims.c"
 #include "interp.c"
 #include "stdlib.c"
+#ifndef __PIC18F__
 #include "simul.c"
+#endif
 #include "gc.h"
 #include "gc.c"
 

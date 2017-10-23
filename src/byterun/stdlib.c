@@ -13,6 +13,8 @@
 
 #ifdef __PIC18F__
 
+#include <xc.h>
+
 val_t caml_write_reg (val_t pin,val_t v){
   TRISD = 0x00;
   return Val_unit;
@@ -48,6 +50,7 @@ val_t caml_delay(val_t millis) {
 val_t ocaml_arduino_millis(val_t k){
   return Val_int(0);
 }
+
 #elif defined(__AVR__)
 
 /******************************************************************************/
@@ -75,16 +78,15 @@ val_t caml_delay(val_t millis) {
 val_t ocaml_arduino_millis(val_t k){
   return Val_int(millis());
 }
-#endif
+
 /******************************************************************************/
 /* Arduboy specific libraries */
 
-#ifdef __AVR__
+
 
 #ifdef OMICROB_WITH_ARDUBOY
 
-#include <Arduboy.h>
-
+#include "Arduboy.h"
 Arduboy arduboy;
 
 val_t ocaml_arduboy_init(val_t unit) {
@@ -99,8 +101,6 @@ val_t ocaml_arduboy_print(val_t str) {
 }
 
 val_t ocaml_arduboy_print_int(val_t i) {
-  debug_init();
-  debug(i);
   arduboy.print(Int_val(i));
   return Val_unit;
 }
@@ -175,7 +175,13 @@ void debug_init(void){
 
 }
 
+val_t caml_write_reg(val_t reg, val_t val){
+  printf("REG n°%d = %d \n" , reg, Int_val(val));
+}
+
+
 #else
+
 
 val_t caml_print_int(val_t x){
 
