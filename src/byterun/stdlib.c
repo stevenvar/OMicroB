@@ -1,12 +1,54 @@
 /* Binding to arduino libraries */
 
-#ifdef __AVR__
+#ifdef  __AVR__
 #include <Arduino.h>
-#include "values.h"
 #include "debug.h"
+#elif defined(__PIC18F__)
+/* #include "debug.h" */
+#elif defined(__PC__)
+/* #include "simul.h" */
 #else
 #include "simul.h"
 #endif
+
+#ifdef __PIC18F__
+
+val_t caml_write_reg (val_t pin,val_t v){
+  TRISD = 0x00;
+  return Val_unit;
+}
+
+val_t caml_set_bit(val_t pin){
+  LATD2 = 1;
+  return Val_unit;
+}
+
+val_t caml_clear_bit(val_t pin){
+  LATD2 = 0;
+  return Val_unit;
+}
+
+val_t caml_pin_mode(val_t pin, val_t mode) {
+  return Val_unit;
+}
+
+val_t caml_digital_write(val_t pin, val_t state) {
+  return Val_unit;
+}
+
+val_t caml_digital_read(val_t pin) {
+  return Val_int(0);
+}
+
+val_t caml_delay(val_t millis) {
+
+  return Val_unit;
+}
+
+val_t ocaml_arduino_millis(val_t k){
+  return Val_int(0);
+}
+#elif defined(__AVR__)
 
 /******************************************************************************/
 /* Arduino specific libraries */
@@ -33,7 +75,7 @@ val_t caml_delay(val_t millis) {
 val_t ocaml_arduino_millis(val_t k){
   return Val_int(millis());
 }
-
+#endif
 /******************************************************************************/
 /* Arduboy specific libraries */
 
@@ -57,6 +99,8 @@ val_t ocaml_arduboy_print(val_t str) {
 }
 
 val_t ocaml_arduboy_print_int(val_t i) {
+  debug_init();
+  debug(i);
   arduboy.print(Int_val(i));
   return Val_unit;
 }
@@ -112,6 +156,30 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #else /* __AVR__ */
 
+#ifdef __PIC18F
+
+#else
+
+#ifdef __PC__
+
+val_t caml_print_int(val_t x){
+  printf("==> %d\n", Int_val(x));
+  return Val_unit;
+}
+
+void debug(int n){
+
+}
+
+void debug_init(void){
+
+}
+
+#else
+
+val_t caml_print_int(val_t x){
+
+}
 
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");
@@ -175,6 +243,8 @@ val_t ocaml_arduboy_clear(val_t unit){
   return Val_unit;
 }
 
+#endif /* PC */
+#endif /* PIC */
 #endif /* __AVR__ */
 
 /******************************************************************************/

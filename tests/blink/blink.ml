@@ -1,50 +1,21 @@
+module Arduboy = struct
+  external init    : unit   -> unit = "ocaml_arduboy_init"
+  external print_int : int -> unit = "ocaml_arduboy_print_int"
+end
 
-(* let fst t (x,y) = x *)
-
-(* let blink pin small_time long_time = *)
-
-(*   pin_mode pin OUTPUT; *)
-(*   for i = 1 to 100 do *)
-(*     let g = fst 8 in *)
-(*     for _j = 1 to i do *)
-(*       digital_write pin true; *)
-(*       delay (small_time + g (1,2) ); *)
-(*       digital_write pin false; *)
-(*       delay small_time; *)
-(*     done; *)
-(*     delay long_time; *)
-(*   done *)
-
-(* let () = *)
-(*   blink PIN13 100 1000 *)
-
-type 'a ref = { mutable contents : 'a }
-
-let ref x = { contents= x }
-
-let (:=) a b =
-  a.contents <- b
-
-external (!) : 'a ref -> 'a =  "%field0"
-
-let incr x = x := !x+1
-
-let cpt =
-  let cpt = ref 0 in
-  fun () ->
-    incr cpt;
-    !cpt
-
-let u = 42
-
-let make_pair x = (x,x+u)
-let fst (x,y) = x
+let rec facto x =
+  if x = 0 then 1
+  else
+    facto (x-1) * x
 
 let _ =
-  digital_write PIN13 true;
-  let k = ref 0 in
-  for i = 0 to 1000 do
-    let v =  make_pair i in
-    k := fst v;
-    delay !k
-  done;
+    let x = facto 3 in
+  Arduboy.init();
+    (* Disp.init (); *)
+  (* Disp.config (); *)
+  (* Disp.print_string "Hello world"; *)
+  (* Disp.print_int (facto 3) *)
+  (* write_reg TRISB 0x00; *)
+  (* print_int 8; *)
+  Arduboy.print_int x
+  (* write_reg PORTB (facto 3) *)

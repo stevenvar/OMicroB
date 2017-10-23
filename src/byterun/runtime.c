@@ -12,7 +12,7 @@
 /******************************************************************************/
 // GC dummy implementation, remove me later
 
-#include "debug.h"
+/* #include "debug.h" */
 
 //val_t heap_ptr;
 //val_t heap_end;

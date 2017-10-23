@@ -5,10 +5,13 @@
 #include <stdio.h>
 
 extern val_t acc;
-extern val_t ocaml_stack[];
-extern val_t env;
 extern val_t *sp;
-extern val_t ocaml_global_data[];
+
+extern val_t env;
+extern val_t ocaml_stack[OCAML_STACK_WOSIZE];
+extern val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER];
+
+
 
 /*
  * implantation d'un S&C
@@ -39,7 +42,7 @@ const val_t *heap1_end, *heap2_end;
 int current_heap;
 
 
-/* heap_ptr : pointeur du premier emplacement libre du tas
+/* heap_ptr : pgointeur du premier emplacement libre du tas
  * heap_end : pointeur de fin du tas courant */
 val_t *heap_ptr, *heap_end;
 
@@ -81,7 +84,7 @@ void gc_init(int32_t heap_size) {
   heap_end = heap_ptr + heap_size;
 
   current_heap = 0;
-  printf("init end \n");
+  /* printf("init end \n"); */
 }
 
 int cpt = 0;
@@ -89,13 +92,13 @@ int cpt = 0;
 
 val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
   val_t result;
-  printf("alloc start \n");
+  /* printf("alloc start \n"); */
   Alloc_small(result, wosize, tag);
-  printf("alloc size = %d, tag = %d , sp = %p \n",wosize, tag, sp);
+  /* printf("alloc size = %d, tag = %d , sp = %p \n",wosize, tag, sp); */
   return result;
 }
 
-
+#ifndef __PIC18F
 /* Pour debug */
 void print_heap(){
   val_t* ptr;
@@ -123,12 +126,14 @@ void print_heap(){
   }
   printf("\n...\n________________________ \n");
 }
-
+#endif
 /* fonction qui traite complètement une racine
  *    c'est-à-dire effectue tous les déplacements attendus
  */
 /* tags in values.h */
 void gc_one_val(val_t* ptr, int update) {
+
+  #ifndef __PIC18F
   val_t val ;
   header_t hd;
   tag_t tag;
@@ -201,7 +206,7 @@ void gc_one_val(val_t* ptr, int update) {
   ptr = ++heap_todo;
   todo--;
   goto start;
-
+#endif
 }
 
 
@@ -212,7 +217,7 @@ void gc_one_val(val_t* ptr, int update) {
  */
 
 void gc(mlsize_t size) {
-  printf("******************** GC START **************************** \n");
+  /* printf("******************** GC START **************************** \n"); */
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
   current_heap = (current_heap + 1) % 2;
@@ -238,5 +243,5 @@ void gc(mlsize_t size) {
   if (heap_ptr + size > heap_end) {exit(200);}
 
 
-  printf("gc end \n");
+  /* printf("gc end \n"); */
 }

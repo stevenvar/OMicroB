@@ -1,6 +1,6 @@
 #include "debug.h"
 
-#ifndef __AVR__
+#if !defined(__AVR__) && !defined(__PC__) && !defined(__PIC18F__)
 
 #include <stdio.h>
 #include "simul.h"
@@ -16,6 +16,8 @@ void debug_blink(int led, int n) {
 }
 
 #else
+
+#ifdef __AVR__
 
 #include <Arduino.h>
 
@@ -59,4 +61,5 @@ void assert_failure(void) {
   }
 }
 
+#endif
 #endif

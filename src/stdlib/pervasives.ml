@@ -3,6 +3,11 @@ type pin =
 | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
 | PIN15 | PIN16 | PIN17
 
+
+type picReg = PORTB | TRISB
+type picPin = RB1 | RB2 | RB3 | RB4
+
+
 type mode =
 | INPUT
 | OUTPUT
@@ -25,6 +30,11 @@ external ( <= ) : 'a -> 'a -> bool = "%lessequal"
 external ( >= ) : 'a -> 'a -> bool = "%greaterequal"
 external compare : 'a -> 'a -> int = "%compare"
 
+external print_int : int -> unit = "caml_print_int"
+
+external write_reg : picReg -> int -> unit = "caml_write_reg"
+external set_bit : picPin -> unit = "caml_set_bit"
+external clear_bit : picPin -> unit = "caml_clear_bit"
 
 external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
 

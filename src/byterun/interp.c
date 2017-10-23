@@ -22,8 +22,8 @@ val_t atom0_header = Make_header(0, 0);
 PROGMEM extern void * const ocaml_primitives[];
 
 static code_t pc;
-static val_t env;
-static val_t *sp;
+val_t env;
+val_t *sp;
 static val_t trapSp;
 static uint8_t extra_args;
 
@@ -131,6 +131,7 @@ void pop_n(int n) {
 
 /******************************************************************************/
 
+#ifdef DEBUG
 /* for debugging */
 void print_stack(){
   printf(" STACK : \n");
@@ -149,6 +150,7 @@ void print_stack(){
   }
     printf(" __________________ \n\n");
 }
+#endif
 
 /******************************************************************************/
 
@@ -178,7 +180,6 @@ val_t interp(void) {
       serialEventRun();
     }
 #endif
-
     opcode_t opcode = read_opcode();
     /* sp pointe sur le dernier bloc écrit  */
     /* for(int i = 0; i <= 32; i ++){ */
@@ -196,9 +197,11 @@ val_t interp(void) {
       /* printf("acc = 0x%08x \n", acc); */
     /* } */
     printf("pc = %d\n", pc-1);
-    /* printf("opcode = %d\n", opcode); */
+    printf("opcode = %d\n", opcode);
 
 #endif
+    debug_init();
+    debug(pc);
     switch(opcode){
 
 #ifdef OCAML_ACC0
@@ -455,6 +458,7 @@ val_t interp(void) {
 #ifdef OCAML_APPLY
     case OCAML_APPLY : {
       extra_args = read_uint8() - 1;
+      printf("i'm in apply");
       pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       break;
@@ -1981,12 +1985,13 @@ val_t interp(void) {
 
     default :
 #ifdef DEBUG
-      printf("OPCODE = %d", opcode);
+      printf("OPCODE = %d\n", opcode);
 #endif
       assert(0);
 
     }
   }
+  return 0;
 }
 
 /******************************************************************************/
@@ -1994,12 +1999,12 @@ val_t interp(void) {
 void setup(void) {
   debug_init();
   interp_init();
-  gc_init(OCAML_HEAP_WOSIZE);
+  /* gc_init(OCAML_HEAP_WOSIZE); */
   interp();
 }
 
 void loop(void) {
-  assert(0);
+
 }
 
 /******************************************************************************/

@@ -3,6 +3,8 @@
 #define LOW 0
 
 #include <stdio.h>
+
+#ifndef __PIC18F
 #include <caml/mlvalues.h>
 
 typedef value val_t;
@@ -14,3 +16,7 @@ int  digitalRead(int pin);
 
 void delay(int millis);
 int  millis(void);
+
+#else
+#include <xc.h>
+#endif

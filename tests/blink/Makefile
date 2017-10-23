@@ -1,13 +1,13 @@
 include ../../etc/Makefile.conf
 
 ATTY   := /dev/ttyACM0
-CFLAGS := -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions
+CFLAGS := -mmcu=atmega2560 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 LFLAGS := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I./stdlib/
 
 ################################################################################
 
-TARGETS := blink.byte blink.c blink.elf blink.avr blink.hex
+TARGETS := blink.byte blink.c blink.elf blink.avr blink.avr.hex
 
 blink: $(TARGETS)
 
@@ -26,17 +26,23 @@ blink.byte: blink.ml
 	ocamlclean $@ -o $@
 
 blink.c: blink.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 32 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 16 -stack-size 32 $< -o $@
 
 blink.elf: blink.c
-	$(GCC) -I $(OCAMLWHERE) -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $< -o $@
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -g -std=c99 -w -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $< -o $@
+
+################################################################################
+
+blink.pic.hex : blink.c
+	mkdir  -p pic
+	xc8 --chip=18f4620 -D__PIC18F $^
 
 ################################################################################
 
 blink.avr: blink.c $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp)
-	$(AVR_GXX) $(INCLUDES) $(CFLAGS) $(LFLAGS) $^ -o $@
+	$(AVR_GXX) -D__AVR__ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) $^ -o $@
 
-blink.hex: blink.avr
+blink.avr.hex: blink.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 flash: blink.avr

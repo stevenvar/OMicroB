@@ -17,6 +17,12 @@ type pin =
   | PIN15
   | PIN16
   | PIN17
+
+
+type picReg = PORTB | TRISB
+type picPin = RB1 | RB2 | RB3 | RB4
+
+
 type mode = INPUT | OUTPUT
 external ( ~- ) : int -> int = "%negint"
 external ( ~+ ) : int -> int = "%identity"
@@ -39,3 +45,9 @@ external digital_read : pin -> bool = "caml_digital_read" [@@noalloc]
 external digital_write : pin -> bool -> unit = "caml_digital_write"
   [@@noalloc]
 external delay : int -> unit = "caml_delay" [@@noalloc]
+
+external write_reg : picReg -> int -> unit = "caml_write_reg"
+external set_bit : picPin -> unit = "caml_set_bit"
+external clear_bit : picPin -> unit = "caml_clear_bit"
+
+external print_int : int -> unit = "caml_print_int"
