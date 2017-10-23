@@ -134,7 +134,7 @@ void print_heap(){
 /* tags in values.h */
 void gc_one_val(val_t* ptr, int update) {
 
-  #ifndef __PIC18F
+  #ifndef __PIC18F__
   val_t val ;
   header_t hd;
   tag_t tag;

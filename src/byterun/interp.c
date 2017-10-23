@@ -201,7 +201,9 @@ val_t interp(void) {
 
 #endif
     /* debug_init(); */
+    #ifdef DEBUG
     debug(pc);
+    #endif
     switch(opcode){
 
 #ifdef OCAML_ACC0
@@ -577,7 +579,6 @@ val_t interp(void) {
     case OCAML_RETURN : {
       uint8_t n = read_uint8();
       pop_n(n);
-      debug(Int_val(acc));
       if (extra_args > 0){
         extra_args --;
         pc = Codeptr_val(*(Block_val(acc)));
@@ -1319,7 +1320,6 @@ val_t interp(void) {
 
 #ifdef OCAML_C_CALL1
     case OCAML_C_CALL1 : {
-      debug(Int_val(acc));
       acc = ((val_t (*)(val_t)) (get_primitive(read_uint8())))(acc);
       break;
     }
@@ -2004,7 +2004,9 @@ void setup(void) {
   /* arduboy.clear(); */
   /* arduboy.print("ok\n"); */
   /* arduboy.display(); */
+  #ifdef DEBUG
   debug_init();
+  #endif
   interp_init();
   gc_init(OCAML_HEAP_WOSIZE);
   interp();

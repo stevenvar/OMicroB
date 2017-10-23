@@ -1,7 +1,9 @@
 /* Entry point including the whole runtime */
 
 #include "values.h"
+#ifdef DEBUG
 #include "debug.c"
+#endif
 #include "prims.c"
 #include "interp.c"
 #include "stdlib.c"

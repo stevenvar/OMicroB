@@ -2,7 +2,9 @@
 
 #ifdef  __AVR__
 #include <Arduino.h>
+#ifdef DEBUG
 #include "debug.h"
+#endif
 #elif defined(__PIC18F__)
 /* #include "debug.h" */
 #elif defined(__PC__)
@@ -78,6 +80,8 @@ val_t caml_delay(val_t millis) {
 val_t ocaml_arduino_millis(val_t k){
   return Val_int(millis());
 }
+
+
 
 /******************************************************************************/
 /* Arduboy specific libraries */
