@@ -14,7 +14,7 @@ end;;
 
 open Arduboy;;
 
-(* Arduboy.init ();; *)
+Arduboy.init ();;
 
 (* let facto x = *)
 (*   let rec aux x acc = *)
@@ -28,10 +28,6 @@ open Arduboy;;
 
 type 'a list = Cons of 'a * 'a list | Nil 
 
-let rec facto x =
-  if x = 0 then 1
-  else
-    (facto (x-1)) * x
 
 let incr x = x:=!x+1;;
 let print_endline s = print_string s;print_string "\n";;
@@ -124,11 +120,6 @@ let print_board board =
  done
 ;;
 
-for i = 1 to 5 do
-  if solve 0 then (print_string "\n"; print_board board)
-  else print_endline "Pas trouve"
-done;; 
-
 (*
 .........
 ...   ...
@@ -143,9 +134,12 @@ done;;
 
 
 let () =
-  (* Arduboy.init(); *)
-  Arduboy.print_int (facto 4);
-  for i = 0 to 10000 do 
-    Cons (i,Nil)
+  
+  for i = 1 to 5 do
+    if solve 0 then (print_string "\n"; print_board board)
+    else print_endline "Pas trouve"
   done;
+
+  (* Arduboy.init(); *)
+
   Arduboy.display();

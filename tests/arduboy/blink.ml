@@ -37,7 +37,7 @@ type 'a list = Cons of 'a * 'a list | Nil
 
 (* let succ x = x + 1 *)
 
-let sleep () = for i = 0 to 100000 do () done 
+let sleep () = for i = 0 to 100000 do () done
 
 let () =
   let x = Arduboy.millis () in 
