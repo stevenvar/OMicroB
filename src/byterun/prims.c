@@ -1,4 +1,6 @@
 #include "values.h"
+#include "gc.h"
+#include <string.h>
 
 /******************************************************************************/
 
@@ -42,7 +44,7 @@ extern void *caml_blit_string;
 extern void *caml_greaterequal;
 extern void *caml_lessequal;
 extern void *caml_register_named_value;
-extern void *caml_fresh_oo_id;
+/* extern void *caml_fresh_oo_id; */
 extern void *caml_compare;
 extern void *caml_ml_bytes_length;
 extern void *caml_fill_bytes;
@@ -61,7 +63,7 @@ extern void *caml_sys_const_max_wosize;
 extern void *caml_output_value_to_buffer;
 extern void *caml_array_unsafe_get;
 extern void *caml_array_unsafe_set;
-extern void *caml_make_vect;
+/* extern void *caml_make_vect; */
 extern void *caml_array_blit;
 extern void *caml_array_sub;
 extern void *caml_array_append;
@@ -72,8 +74,8 @@ extern void *caml_int64_add;
 extern void *caml_nativeint_format;
 extern void *caml_nativeint_add;
 extern void *caml_bytes_get;
-extern void *caml_array_get_addr;
-extern void *caml_array_set_addr;
+/* extern void *caml_array_get_addr; */
+/* extern void *caml_array_set_addr; */
 extern void *caml_new_lex_engine;
 extern void *caml_lex_engine;
 extern void *caml_notequal;
@@ -142,7 +144,7 @@ extern void *caml_sys_getcwd;
 extern void *caml_terminfo_backup;
 extern void *caml_terminfo_standout;
 extern void *caml_terminfo_resume;
-extern void *caml_obj_dup;
+/* extern void *caml_obj_dup; */
 extern void *caml_string_lessthan;
 extern void *caml_int_compare;
 extern void *caml_array_set;
@@ -165,3 +167,78 @@ void *caml_builtin_cprim;
 void *caml_names_of_builtin_cprim;
 
 /******************************************************************************/
+extern val_t ocaml_heap[];
+
+
+static val_t oo_last_id = Val_int(0);
+
+
+val_t caml_fresh_oo_id (val_t v) {
+  v = oo_last_id;
+  oo_last_id += 2;
+  return v;
+}
+
+
+val_t caml_obj_dup(val_t arg)
+{
+  /* CAMLparam1 (arg); */
+  /* CAMLlocal1 (res); */
+  val_t res;
+  mlsize_t sz, i;
+  tag_t tg;
+
+  sz = Wosize_val(arg);
+  if (sz == 0) 
+    return arg;
+  tg = Tag_val(arg);
+  if (tg >= No_scan_tag) {
+    Alloc_small(res,sz,tg);
+/* not sure ..  */
+    memcpy((char *)res, (char *)arg, sz * sizeof(val_t));
+  } else {
+    Alloc_small(res,sz,tg);
+    for (i = 0; i < sz; i++) 
+      Field(res, i) = Field(arg, i);
+  }
+  return res;
+}
+
+#define Long_val Int_val
+/* #define Modify(fp,val) caml_modify((fp), (val)) */
+val_t caml_make_vect(val_t len, val_t init)
+{
+  /* CAMLparam2 (len, init); */
+  /* CAMLlocal1 (res); */
+  val_t res;
+  mlsize_t size, i;
+
+  size = Long_val(len);
+  if (size == 0) {
+    res = Val_unit; 
+/* Atom(0); */
+  } else {
+      Alloc_small(res,size, 0);
+      for (i = 0; i < size; i++) 
+        Field(res, i) =  init;
+      /* res = caml_check_urgent_gc (res); */
+    
+  }
+  /* CAMLreturn (res); */
+  return res;
+}
+
+val_t caml_array_get_addr(val_t array, val_t index)
+{
+  val_t idx = Int_val(index);
+  /* if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error(); */
+  return Field(array, idx);
+}
+
+val_t caml_array_set_addr(val_t array, val_t index, val_t newval)
+{
+  val_t idx = Int_val(index);
+  /* if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error(); */
+  Field(array, idx) =  newval;
+  return Val_unit;
+}

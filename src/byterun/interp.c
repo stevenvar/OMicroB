@@ -19,6 +19,11 @@
 
 val_t atom0_header = Make_header(0, 0);
 
+#ifdef __AVR__
+#include "Arduboy.h"
+extern Arduboy arduboy;
+#endif
+
 PROGMEM extern void * const ocaml_primitives[];
 
 static code_t pc;
@@ -29,10 +34,14 @@ static uint8_t extra_args;
 
 
 void caml_raise_stack_overflow(void) {
+#ifdef __AVR__
+arduboy.print("stack overflow");
+arduboy.display();
+#endif
 #ifdef DEBUG
   debug(444);
 #endif
-  assert(0);
+  /* assert(0); */
   /* TODO */
 }
 
@@ -155,7 +164,7 @@ void print_stack(){
 /******************************************************************************/
 
 void caml_raise_division_by_zero(void) {
-  assert(0);
+  /* assert(0); */
   /* TODO */
 }
 
@@ -175,11 +184,11 @@ val_t interp(void) {
 
   while (1) {
 
-#ifdef __AVR__
-    if (serialEventRun) {
-      serialEventRun();
-    }
-#endif
+/* #ifdef __AVR__ */
+    /* if (serialEventRun) { */
+      /* serialEventRun(); */
+    /* } */
+/* #endif */
     opcode_t opcode = read_opcode();
     /* sp pointe sur le dernier bloc écrit  */
     /* for(int i = 0; i <= 32; i ++){ */
@@ -190,20 +199,21 @@ val_t interp(void) {
     /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
 
 #ifdef DEBUG
-    print_stack();
+    /* print_stack(); */
     /* if (Is_int(acc)) { */
       /* printf("acc = %d \n", Int_val(acc)); */
     /* } else { */
       /* printf("acc = 0x%08x \n", acc); */
     /* } */
-    printf("pc = %d\n", pc-1);
-    printf("opcode = %d\n", opcode);
+    /* printf("pc = %d\n", pc-1); */
+    /* printf("opcode = %d\n", opcode); */
 
 #endif
     /* debug_init(); */
     #ifdef DEBUG
     debug(pc);
     #endif
+
     switch(opcode){
 
 #ifdef OCAML_ACC0
@@ -474,9 +484,6 @@ val_t interp(void) {
       push(env);
       push(Val_codeptr(pc));
       push(arg1);
-      /* print_heap(); */
-      /* printf(" f(0x%04x) =  %p \n", acc, Block_val(acc)); */
-      /* printf(" *(%p) =  0x%04x \n", Block_val(acc), *(Block_val(acc))); */
       pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       extra_args = 0;
@@ -639,7 +646,6 @@ val_t interp(void) {
         Field(acc, i + 1) = pop();
       }
       break;
-
     }
 #endif
 
@@ -1987,10 +1993,10 @@ val_t interp(void) {
 
     default :
 #ifdef DEBUG
-      printf("OPCODE = %d\n", opcode);
+      /* printf("OPCODE = %d\n", opcode); */
 #endif
-      assert(0);
-
+      /* assert(0); */
+      break;
     }
   }
   return 0;
@@ -1998,8 +2004,8 @@ val_t interp(void) {
 
 /******************************************************************************/
 
-void setup(void) {
 
+void setup(void) {
   /* arduboy.begin(); */
   /* arduboy.clear(); */
   /* arduboy.print("ok\n"); */

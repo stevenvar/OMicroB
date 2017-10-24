@@ -1,6 +1,6 @@
 include ../../etc/Makefile.conf
 
-ATTY     := /dev/tty.usbmodem14331
+ATTY     := /dev/tty.usbmodem1421
 CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
@@ -26,7 +26,7 @@ blink.byte: blink.ml
 	ocamlclean $@ -o $@
 
 blink.c: blink.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 48 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 blink.elf: blink.c
 	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall $^ -o $@
@@ -34,7 +34,7 @@ blink.elf: blink.c
 ################################################################################
 
 blink.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) blink.c
-	$(AVR_GXX) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -DDEBUG -Wall $^ -o $@
+	$(AVR_GXX)  -O2 -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -DDEBUG -Wall $^ -o $@
 
 blink.hex: blink.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@

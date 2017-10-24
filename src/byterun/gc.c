@@ -141,7 +141,9 @@ void gc_one_val(val_t* ptr, int update) {
   mlsize_t sz;
   int todo = 0;
 
+#ifdef DEBUG
   DEBUGassert(heap_ptr == heap_todo);
+#endif 
 
  start:
   val = *ptr;

@@ -77,7 +77,7 @@ val_t caml_delay(val_t millis) {
   return Val_unit;
 }
 
-val_t ocaml_arduino_millis(val_t k){
+val_t ocaml_arduino_millis(val_t unit){
   return Val_int(millis());
 }
 
@@ -90,8 +90,13 @@ val_t ocaml_arduino_millis(val_t k){
 
 #ifdef OMICROB_WITH_ARDUBOY
 
-#include <Arduboy.h>
+#include "Arduboy.h"
 Arduboy arduboy;
+
+
+val_t ocaml_arduboy_millis(val_t unit){
+  return Val_int(millis());
+}
 
 val_t ocaml_arduboy_init(val_t unit) {
   arduboy.begin();
@@ -188,7 +193,8 @@ val_t caml_write_reg(val_t reg, val_t val){
 
 
 val_t caml_print_int(val_t x){
-
+  printf("caml_print_int(%ld)",Val_int(x));
+  return Val_unit;
 }
 
 val_t ocaml_arduboy_init(val_t unit) {
@@ -245,6 +251,11 @@ val_t ocaml_arduboy_fill_circle(val_t x0, val_t y0, val_t r, val_t color) {
 val_t ocaml_arduboy_pressed(val_t button){
   printf("pressed(%d)",(int)Int_val(button));
   return Val_unit;
+}
+
+val_t ocaml_arduboy_millis(val_t unit){
+  printf("millis()");
+  return Val_int(0);
 }
 
 
