@@ -34,7 +34,7 @@ blink.elf: blink.c
 ################################################################################
 
 blink.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) blink.c
-	$(AVR_GXX) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
+	$(AVR_GXX) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -DDEBUG -Wall $^ -o $@
 
 blink.hex: blink.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@

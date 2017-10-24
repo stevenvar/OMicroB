@@ -90,7 +90,7 @@ val_t ocaml_arduino_millis(val_t k){
 
 #ifdef OMICROB_WITH_ARDUBOY
 
-#include "Arduboy.h"
+#include <Arduboy.h>
 Arduboy arduboy;
 
 val_t ocaml_arduboy_init(val_t unit) {

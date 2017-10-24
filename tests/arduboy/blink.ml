@@ -4,7 +4,7 @@ module Arduboy = struct
   external display : unit   -> unit = "ocaml_arduboy_display"
 end;;
 
-Arduboy.init ();;
+(*Arduboy.init ();; *)
 
 (* let facto x = *)
 (*   let rec aux x acc = *)
@@ -23,5 +23,6 @@ let rec facto x =
     (facto (x-1)) * x
 
 let () =
+  Arduboy.init();
   Arduboy.print_int (facto 7);
   Arduboy.display();
