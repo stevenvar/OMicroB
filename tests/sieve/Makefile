@@ -7,39 +7,39 @@ INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
-TARGETS := blink.byte blink.c blink.elf blink.avr blink.hex
+TARGETS := sieve.byte sieve.c sieve.elf sieve.avr sieve.hex
 
-blink: $(TARGETS)
+sieve: $(TARGETS)
 
-run: blink.elf
-	./blink.elf
+run: sieve.elf
+	./sieve.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
 
-.PHONY: blink run clean flash
+.PHONY: sieve run clean flash
 
 ################################################################################
 
-blink.byte: blink.ml
+sieve.byte: sieve.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
-blink.c: blink.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 32 -stack-size 64 $< -o $@
+sieve.c: sieve.byte $(BIN)/bc2c
+	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
-blink.elf: blink.c
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall $^ -DDEBUG -o $@
+sieve.elf: sieve.c
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@
 
 ################################################################################
 
-blink.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) blink.c
+sieve.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) sieve.c
 	$(AVR_GXX)  -O2 -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
-blink.hex: blink.avr
+sieve.hex: sieve.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-flash: blink.avr
+flash: sieve.avr
 	stty -f $(ATTY) 1200
 	sleep 3
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e

@@ -732,7 +732,7 @@ val_t interp(void) {
       printf("f = %d , v = %d , o = %d \n",f,v,o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
-        Field(acc, 2 * i) = read_ptr_1B() - i - 2;
+        Field(acc, 2 * i) = Val_codeptr(read_ptr_1B() - i - 2);
       }
         /* pop what should be elems of the closure (??) */
       for (i = 0 ; i < v ; i ++) {
@@ -740,6 +740,10 @@ val_t interp(void) {
         Field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
+      for (i = 1; i < f ; i ++){
+        /* printf("push(%d)",Field(acc,2*i)); */
+        push(Field(acc,2*i));
+      }
       /* pc += f; */
       break;
     }
@@ -758,7 +762,7 @@ val_t interp(void) {
       Field(acc, 0) = Val_codeptr(o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
-        Field(acc, 2 * i) = read_ptr_2B() - 2 * i - 2;
+        Field(acc, 2 * i) = Val_codeptr(read_ptr_2B() - 2 * i - 2);
       }
       printf("f = %d , v = %d , o = %d \n",f,v,o);
       /* pop v elems into the closure */
@@ -766,7 +770,10 @@ val_t interp(void) {
         Field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
-
+      for (i = 1; i < f ; i ++){
+        /* printf("push(%d)",Field(acc,2*i)); */
+        push(Field(acc,2*i));
+      }
       /* for (i = 1; i < f; i++){ */
       /*   push(Field(o,i)); */
       /* } */
@@ -787,12 +794,16 @@ val_t interp(void) {
       Field(acc, 0) = o;
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
-        Field(acc, 2 * i) = read_ptr_4B() - 4 * i - 2;
+        Field(acc, 2 * i) = Val_codeptr(read_ptr_4B() - 4 * i - 2);
       }
-      for (; i < 2 * f - 1 + v ; i ++) {
+      for (; i < v ; i ++) {
         Field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
+      for (i = 1; i < f ; i ++){
+        /* printf("push(%d)",Field(acc,2*i)); */
+        push(Field(acc,2*i));
+      }
       break;
     }
 #endif
@@ -811,7 +822,7 @@ val_t interp(void) {
 #if defined(OCAML_PUSHOFFSETCLOSUREM2) || defined(OCAML_OFFSETCLOSUREM2)
       {
         /* value + header */
-        acc = env - 2 * sizeof(val_t);
+        acc = Val_block(Block_val(env) - 2 * sizeof(val_t));
         break;
       }
 #endif
@@ -847,7 +858,7 @@ val_t interp(void) {
 
 #if defined(OCAML_PUSHOFFSETCLOSURE2) || defined(OCAML_OFFSETCLOSURE2)
       {
-        acc = env + 2 * sizeof(val_t);
+        acc = Val_block(Block_val(env) + 2 * sizeof(val_t));
         break;
       }
 #endif
@@ -866,7 +877,7 @@ val_t interp(void) {
 #if defined(OCAML_PUSHOFFSETCLOSURE) || defined(OCAML_OFFSETCLOSURE)
       {
         int n = read_int8();
-        acc = env + n * sizeof(val_t);
+        acc = Val_block(Block_val(env) + n * sizeof(val_t));
         break;
       }
 #endif

@@ -250,7 +250,10 @@ void gc(mlsize_t size) {
   /* il n y a pas eu assez de récupération */
   if (heap_ptr + size > heap_end) {
     #ifdef DEBUG
+    #ifdef __PC__
+    printf("HEAP OVERFLOW\n");
     debug(200);
+#endif
 #endif
     exit(200);
 }

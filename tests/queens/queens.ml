@@ -6,7 +6,6 @@ module Arduboy = struct
   external print_string : string -> unit = "ocaml_arduboy_print"
   external display : unit   -> unit = "ocaml_arduboy_display"
 end;;
-Arduboy.init();;
 
 let print_newline () =
   Arduboy.print_string "\n";
@@ -36,6 +35,7 @@ let rec filter p = function
    [] -> []
  | x::l -> if p x then x::filter p l else filter p l;;
 let range = interval 1;;
+
 let queens n =
  let qs = range n in
  let testcol = function b -> filter ok (map (fun q -> q::b) qs) in
@@ -46,4 +46,5 @@ let queens n =
          concmap testcol (gen (n - 1)) in
  list_length (gen n);;
 
+  Arduboy.init();;
 queens 3 ;;
