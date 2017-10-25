@@ -7,5 +7,6 @@ let rec facto x =
 
 let _ =
     let x = facto 7  in
-    write_reg TRISB 0x00;
-    write_reg PORTB x
+    (* write_reg TRISB 0x00; *)
+    (* write_reg PORTB x *)
+    ()

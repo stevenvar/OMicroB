@@ -20,6 +20,11 @@ type pin =
 type mode = INPUT | OUTPUT
 type picReg = PORTB | TRISB
 type picPin = RB1 | RB2 | RB3 | RB4
+external not : bool -> bool = "%boolnot"
+external ( & ) : bool -> bool -> bool = "%sequand"
+external ( && ) : bool -> bool -> bool = "%sequand"
+external ( or ) : bool -> bool -> bool = "%sequor"
+external ( || ) : bool -> bool -> bool = "%sequor"
 external ( ~- ) : int -> int = "%negint"
 external ( ~+ ) : int -> int = "%identity"
 external succ : int -> int = "%succint"
@@ -52,3 +57,4 @@ external digital_write : pin -> bool -> unit = "caml_digital_write"
   [@@noalloc]
 external delay : int -> unit = "caml_delay" [@@noalloc]
 external raise : exn -> 'a = "%raise"
+val ( @ ) : 'a list -> 'a list -> 'a list

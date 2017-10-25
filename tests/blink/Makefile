@@ -40,7 +40,7 @@ blink.pic.hex : blink.c
 ################################################################################
 
 blink.avr: blink.c $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp)
-	$(AVR_GXX) -D__AVR__ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) $^ -o $@
+	$(AVR_GXX) -D__AVR__ $(INCLUDES) $(CFLAGS) $(LFLAGS) $^ -o $@
 
 blink.avr.hex: blink.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@

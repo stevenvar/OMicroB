@@ -123,7 +123,7 @@ code_t read_ptr_4B(void) {
 /******************************************************************************/
 
 val_t peek(int n) {
-  return sp[(val_t) n];
+  return sp[n];
 }
 
 void push(val_t x) {
@@ -614,8 +614,9 @@ val_t interp(void) {
     case OCAML_RESTART : {
       uint8_t nargs = Wosize_val(env) - 2;
       uint8_t i;
-      printf("NARGS=%d\n",nargs);
+      /* pop_n(nargs); */
       sp -= nargs;
+      printf("NARGS = %d \n", nargs);
       for (i = 0; i < nargs; i ++) sp[i] = Field(env, i+2);
       env = Field(env,1);
       extra_args += nargs;
@@ -699,25 +700,32 @@ val_t interp(void) {
     case OCAML_CLOSUREREC_1B : {
        /* f = number of functions */
        /* v = number of variables */
-      /* o = array of vars ?  */
+      /* o = offset   */
       uint8_t f = read_uint8();
       uint8_t v = read_uint8();
       code_t o = read_ptr_1B() -2 ;
       int blksize = f * 2 - 1 + v;
       int i;
+      val_t * p;
       if (v > 0) {
         push(acc);
       }
       Alloc_small(acc, blksize, Closure_tag);
-      Field(acc, 0) = Val_int(o);
+      /* p = &Field(accu, f*2 - 1); */
+      /* Field(acc, 0) = Val_int(o); */
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = read_ptr_1B() - i - 2;
       }
-      for (; i < blksize ; i ++) {
-        Field(acc, i + 2 * f - 1) = pop();
-      }
+      pop_n(v);
       push(acc);
+      /* for (; i < blksize ; i ++) { */
+        /* Field(acc, i + 2 * f - 1) = pop(); */
+      /* } */
+
+      for (i = 1; i < f; i++){
+        push(Field(o,i));
+      }
       break;
     }
 #endif
@@ -737,8 +745,14 @@ val_t interp(void) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = read_ptr_2B() - 2 * i - 2;
       }
-      for (; i < 2 * f - 1 + v ; i ++) {
-        Field(acc, i + 2 * f - 1) = pop();
+      pop_n(v);
+      push(acc);
+      /* for (; i < blksize ; i ++) { */
+        /* Field(acc, i + 2 * f - 1) = pop(); */
+      /* } */
+
+      for (i = 1; i < f; i++){
+        push(Field(o,i));
       }
        break;
     }
@@ -762,6 +776,7 @@ val_t interp(void) {
       for (; i < 2 * f - 1 + v ; i ++) {
         Field(acc, i + 2 * f - 1) = pop();
       }
+      push(acc);
       break;
     }
 #endif

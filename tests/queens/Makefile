@@ -7,39 +7,39 @@ INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
-TARGETS := oapply.byte oapply.c oapply.elf oapply.avr oapply.hex
+TARGETS := queens.byte queens.c queens.elf queens.avr queens.hex
 
-oapply: $(TARGETS)
+queens: $(TARGETS)
 
-run: oapply.elf
-	./oapply.elf
+run: queens.elf
+	./queens.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
 
-.PHONY: oapply run clean flash
+.PHONY: queens run clean flash
 
 ################################################################################
 
-oapply.byte: oapply.ml
+queens.byte: queens.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
-oapply.c: oapply.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 32 -stack-size 32 $< -o $@
+queens.c: queens.byte $(BIN)/bc2c
+	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
-oapply.elf: oapply.c
+queens.elf: queens.c
 	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@
 
 ################################################################################
 
-oapply.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) oapply.c
+queens.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) queens.c
 	$(AVR_GXX) -O2 -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
-oapply.hex: oapply.avr
+queens.hex: queens.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-flash: oapply.avr
+flash: queens.avr
 	stty -f $(ATTY) 1200
 	sleep 3
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
@@ -48,3 +48,4 @@ listen:
 	stty -f $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
 	cat $(ATTY)
 
+################################################################################

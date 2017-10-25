@@ -13,7 +13,13 @@ type mode =
 type picReg = PORTB | TRISB
 type picPin = RB1 | RB2 | RB3 | RB4
 
+(* Boolean operations *)
 
+external not : bool -> bool = "%boolnot"
+external ( & ) : bool -> bool -> bool = "%sequand"
+external ( && ) : bool -> bool -> bool = "%sequand"
+external ( or ) : bool -> bool -> bool = "%sequor"
+external ( || ) : bool -> bool -> bool = "%sequor"
 
 (* Arithmetics *)
 
@@ -63,3 +69,9 @@ external delay         : int -> unit         = "caml_delay"         [@@noalloc]
 (* Exceptions *)
 
 external raise : exn -> 'a = "%raise"
+
+(* Listes *)
+let rec ( @ ) l1 l2 =
+  match l1 with
+    [] -> l2
+  | hd :: tl -> hd :: (tl @ l2)
