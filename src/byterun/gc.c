@@ -110,16 +110,16 @@ void print_heap(){
   for(ptr = from ; ptr < to; ptr++){
     /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
-	printf("@%p : int : %d | ", ptr, Int_val(*ptr));
+	printf("%d  @%p : int : %d | ",i, ptr, Int_val(*ptr));
       }
       else if (Is_block(*ptr)){
-	printf("@%p : @(%p) | ", ptr, Block_val(*ptr));
+	printf("%d  @%p : @(%p) | ",i, ptr, Block_val(*ptr));
       }
       else if (*ptr == 0){
-	printf("@%p : _ | ", ptr);
+	printf("%d  @%p : _ | ",i, ptr);
       }
       else
-	printf("@%p : 0x%08x | ", ptr, *ptr);
+	printf("%d  @%p : 0x%08x | ",i, ptr, *ptr);
       /* if ( i % 10 == 0) */
 	printf("\n");
     /* } */

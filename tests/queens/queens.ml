@@ -7,9 +7,6 @@ module Arduboy = struct
   external display : unit   -> unit = "ocaml_arduboy_display"
 end;;
 
-let print_newline () =
-  Arduboy.print_string "\n";
-  Arduboy.display();;
 
 let rec map f l = match l with [] -> [] | h::t -> (f h)::(map f t);;
 
@@ -42,9 +39,10 @@ let queens n =
  let rec gen = function
     0 -> [[]]
   | n -> Arduboy.print_int n;
-         print_newline();
          concmap testcol (gen (n - 1)) in
  list_length (gen n);;
 
-  Arduboy.init();;
-queens 3 ;;
+let _ = 
+  Arduboy.init();
+  queens 1 ;
+  Arduboy.display();
