@@ -42,7 +42,7 @@ const val_t *heap1_end, *heap2_end;
 int current_heap;
 
 
-/* heap_ptr : pgointeur du premier emplacement libre du tas
+/* heap_ptr : pointeur du premier emplacement libre du tas
  * heap_end : pointeur de fin du tas courant */
 val_t *heap_ptr, *heap_end;
 
@@ -110,7 +110,7 @@ void print_heap(){
   for(ptr = from ; ptr < to; ptr++){
     /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
-	printf("@%p : %d | ", ptr, Int_val(*ptr));
+	printf("@%p : int : %d | ", ptr, Int_val(*ptr));
       }
       else if (Is_block(*ptr)){
 	printf("@%p : @(%p) | ", ptr, Block_val(*ptr));
@@ -220,6 +220,11 @@ void gc_one_val(val_t* ptr, int update) {
  */
 
 void gc(mlsize_t size) {
+#ifdef DEBUG
+#ifdef __PC__
+  print_heap();
+#endif
+#endif
   /* printf("******************** GC START **************************** \n"); */
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
@@ -243,7 +248,12 @@ void gc(mlsize_t size) {
   gc_one_val(&env,1);
 
   /* il n y a pas eu assez de récupération */
-  if (heap_ptr + size > heap_end) {exit(200);}
+  if (heap_ptr + size > heap_end) {
+    #ifdef DEBUG
+    debug(200);
+#endif
+    exit(200);
+}
 
 
   /* printf("gc end \n"); */

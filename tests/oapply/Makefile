@@ -7,39 +7,39 @@ INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
-TARGETS := solitaire.byte solitaire.c solitaire.elf solitaire.avr solitaire.hex
+TARGETS := oapply.byte oapply.c oapply.elf oapply.avr oapply.hex
 
-solitaire: $(TARGETS)
+oapply: $(TARGETS)
 
-run: solitaire.elf
-	./solitaire.elf
+run: oapply.elf
+	./oapply.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
 
-.PHONY: solitaire run clean flash
+.PHONY: oapply run clean flash
 
 ################################################################################
 
-solitaire.byte: solitaire.ml
+oapply.byte: oapply.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
-solitaire.c: solitaire.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
+oapply.c: oapply.byte $(BIN)/bc2c
+	$(BIN)/bc2c -local -arch 32 -heap-size 15 -stack-size 32 $< -o $@
 
-solitaire.elf: solitaire.c
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall $^ -o $@
+oapply.elf: oapply.c
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@
 
 ################################################################################
 
-solitaire.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) solitaire.c
+oapply.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) oapply.c
 	$(AVR_GXX) -O2 -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
-solitaire.hex: solitaire.avr
+oapply.hex: oapply.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-flash: solitaire.avr
+flash: oapply.avr
 	stty -f $(ATTY) 1200
 	sleep 3
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
@@ -48,4 +48,3 @@ listen:
 	stty -f $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
 	cat $(ATTY)
 
-################################################################################

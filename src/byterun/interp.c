@@ -38,9 +38,14 @@ void caml_raise_stack_overflow(void) {
 arduboy.print("stack overflow");
 arduboy.display();
 #endif
+#ifdef __PC__
+#include <stdio.h>
+printf("stack overflow");
+#endif
 #ifdef DEBUG
   debug(444);
 #endif
+  exit(0);
   /* assert(0); */
   /* TODO */
 }
@@ -157,7 +162,7 @@ void print_stack(){
           printf("\t %d : ? 0x%04x \n", i, sp[i]);
     i++;
   }
-    printf(" __________________ \n\n");
+
 }
 #endif
 
@@ -199,19 +204,24 @@ val_t interp(void) {
     /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
 
 #ifdef DEBUG
-    /* print_stack(); */
-    /* if (Is_int(acc)) { */
-      /* printf("acc = %d \n", Int_val(acc)); */
-    /* } else { */
-      /* printf("acc = 0x%08x \n", acc); */
-    /* } */
-    /* printf("pc = %d\n", pc-1); */
+#ifdef __PC__
+    print_heap();
+    print_stack();
+    if (Is_int(acc)) {
+      printf("acc = %d \n", Int_val(acc));
+    } else {
+      printf("acc = 0x%08x \n", Block_val(acc));
+    }
+    printf("env = @(0x%08x) \n", Block_val(env));
+    printf("pc = %d\n", pc-1);
+    printf("extra_args=%d \n",extra_args);
+    printf(" __________________ \n\n");
     /* printf("opcode = %d\n", opcode); */
-
+#endif
 #endif
     /* debug_init(); */
     #ifdef DEBUG
-    debug(pc);
+    debug(pc-1);
     #endif
 
     switch(opcode){
@@ -589,6 +599,7 @@ val_t interp(void) {
       if (extra_args > 0){
         extra_args --;
         pc = Codeptr_val(*(Block_val(acc)));
+        
         env = acc;
       } else {
         pc = Codeptr_val(pop());
@@ -603,8 +614,9 @@ val_t interp(void) {
     case OCAML_RESTART : {
       uint8_t nargs = Wosize_val(env) - 2;
       uint8_t i;
+      printf("NARGS=%d\n",nargs);
       sp -= nargs;
-      for (i = 0; i < nargs; i ++) sp[i] = Field(env, i);
+      for (i = 0; i < nargs; i ++) sp[i] = Field(env, i+2);
       env = Field(env,1);
       extra_args += nargs;
       break;
@@ -619,14 +631,14 @@ val_t interp(void) {
         extra_args -= n;
       } else {
         Alloc_small(acc, extra_args + 3, Closure_tag);
-        Code_val(acc) = Val_codeptr(pc - 3);
         Field(acc, 1) = env;
+        Code_val(acc) = Val_codeptr(pc - 3);
         for (i = 0 ; i < n; i ++) {
-          Field(env, i + 1) = pop();
+          Field(acc, i + 2) = pop();
         }
         pc = Codeptr_val(pop());
         env = pop();
-        extra_args = pop();
+        extra_args = Int_val(pop());
       }
       break;
     }

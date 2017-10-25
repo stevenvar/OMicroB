@@ -93,6 +93,10 @@ val_t ocaml_arduino_millis(val_t unit){
 #include "Arduboy.h"
 Arduboy arduboy;
 
+/* val_t ocaml_arduboy_reset_cursor(val_t unit){ */
+/*   arduboy.resetCursor(); */
+/*   return Val_unit; */
+/* } */
 
 val_t ocaml_arduboy_millis(val_t unit){
   return Val_int(millis());
@@ -171,26 +175,68 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #ifdef __PC__
 
-val_t caml_print_int(val_t x){
-  printf("==> %d\n", Int_val(x));
-  return Val_unit;
-}
+#include <stdio.h>
 
 void debug(int n){
-
+  printf("DEBUG(%d)\n",n);
 }
 
 void debug_init(void){
-
+  
 }
 
 val_t caml_write_reg(val_t reg, val_t val){
   printf("REG n°%d = %d \n" , reg, Int_val(val));
 }
 
+/* val_t ocaml_arduboy_reset_cursor(val_t unit){ */
+/*   printf("\n"); */
+/*   return Val_unit; */
+/* } */
+
+val_t caml_print_int(val_t x){
+  printf("%d",Val_int(x));
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_init(val_t unit) {
+  printf("ocaml_arduino_init()\n");
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_print(val_t str) {
+  printf("%s", StringVal(str));
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_print_int(val_t i) {
+  printf("%d", Int_val(i));
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_display(val_t unit) {
+  printf("\n");
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_millis(val_t unit){
+  return Val_int(5);
+}
+
+
+val_t ocaml_arduboy_clear(val_t unit){
+  printf("\n\n\n");
+  return Val_unit;
+}
+
 
 #else
 
+
+val_t ocaml_arduboy_reset_cursor(val_t unit){
+  printf("ocaml_arduboy_reset_cursor()");
+  return Val_unit;
+}
 
 val_t caml_print_int(val_t x){
   printf("caml_print_int(%ld)",Val_int(x));
