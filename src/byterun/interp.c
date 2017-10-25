@@ -147,6 +147,17 @@ void pop_n(int n) {
 
 #ifdef DEBUG
 /* for debugging */
+
+void print_global(){
+  for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
+    if (Is_block(ocaml_global_data[i])){
+    printf("%d : 0x%08x\n",i, Block_val(ocaml_global_data[i]));
+    }
+    else
+      printf("%d : %d\n",i, Int_val(ocaml_global_data[i]));
+  }
+}
+
 void print_stack(){
   printf(" STACK : \n");
   int i = 0;
@@ -205,6 +216,7 @@ val_t interp(void) {
 
 #ifdef DEBUG
 #ifdef __PC__
+    print_global();
     print_heap();
     print_stack();
     if (Is_int(acc)) {
@@ -599,7 +611,7 @@ val_t interp(void) {
       if (extra_args > 0){
         extra_args --;
         pc = Codeptr_val(*(Block_val(acc)));
-        
+
         env = acc;
       } else {
         pc = Codeptr_val(pop());
@@ -710,22 +722,25 @@ val_t interp(void) {
       if (v > 0) {
         push(acc);
       }
+      /* Alloc a closure of size blksize */
       Alloc_small(acc, blksize, Closure_tag);
       /* p = &Field(accu, f*2 - 1); */
-      /* Field(acc, 0) = Val_int(o); */
+      /* The acc contains the offset */
+      Field(acc, 0) = Val_codeptr(o);
+
+      /* Create f functions in the closure */
+      printf("f = %d , v = %d , o = %d \n",f,v,o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = read_ptr_1B() - i - 2;
       }
-      pop_n(v);
-      push(acc);
-      /* for (; i < blksize ; i ++) { */
-        /* Field(acc, i + 2 * f - 1) = pop(); */
-      /* } */
-
-      for (i = 1; i < f; i++){
-        push(Field(o,i));
+        /* pop what should be elems of the closure (??) */
+      for (i = 0 ; i < v ; i ++) {
+	printf("Field(acc,%d) = 0x%08x \n", i+2*f-1,Block_val(peek(0)));
+        Field(acc, i + 2 * f - 1) = pop();
       }
+      push(acc);
+      /* pc += f; */
       break;
     }
 #endif
@@ -740,20 +755,21 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
-      Field(acc, 0) = o;
+      Field(acc, 0) = Val_codeptr(o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = read_ptr_2B() - 2 * i - 2;
       }
-      pop_n(v);
-      push(acc);
-      /* for (; i < blksize ; i ++) { */
-        /* Field(acc, i + 2 * f - 1) = pop(); */
-      /* } */
-
-      for (i = 1; i < f; i++){
-        push(Field(o,i));
+      printf("f = %d , v = %d , o = %d \n",f,v,o);
+      /* pop v elems into the closure */
+      for (; i < v ; i ++) {
+        Field(acc, i + 2 * f - 1) = pop();
       }
+      push(acc);
+
+      /* for (i = 1; i < f; i++){ */
+      /*   push(Field(o,i)); */
+      /* } */
        break;
     }
 #endif

@@ -1,0 +1,1326 @@
+Version 3.2 HI-TECH Software Intermediate Code
+"18 /Applications/microchip/xc8/v1.44/include/assert.h
+[v __fassert `(v ~T0 @X0 0 ef3`i`*Cuc`*Cuc ]
+[v F260 `*v ~T0 @X0 1 t ]
+"22 /Users/steven/github/OMicroB/src/byterun/interp.c
+[v _ocaml_primitives `C*v ~T0 @X0 -> 0 `x e ]
+"10 /Users/steven/github/OMicroB/src/byterun/gc.h
+[v _gc_init `(v ~T0 @X0 0 ef1`l ]
+[p mainexit ]
+"2044 /Applications/microchip/xc8/v1.44/include/pic18f4620.h
+[v _TRISD `Vuc ~T0 @X0 0 e@3989 ]
+"7139
+[v _LATD2 `Vb ~T0 @X0 0 e@31842 ]
+"9 /Users/steven/github/OMicroB/src/byterun/gc.h
+[v _gc `(v ~T0 @X0 0 ef1`ul ]
+"27 blink.c
+[v _ocaml_heap `l ~T0 @X0 * -> 16 `i -> 2 `i e ]
+[i _ocaml_heap
+:U ..
+"28
+| << -> -> 1 `i `l -> 10 `i -> -> 247 `i `l
+"30
++ << -> -> 2 `i `l -> 1 `i -> -> 1 `i `l
+..
+]
+"32
+[v _ocaml_heap1 `*Cl ~T0 @X0 1 e ]
+[i _ocaml_heap1
+-> &U _ocaml_heap `*Cl
+]
+"33
+[v _ocaml_heap2 `*Cl ~T0 @X0 1 e ]
+[i _ocaml_heap2
+-> + &U _ocaml_heap * -> -> 16 `i `x -> -> # *U &U _ocaml_heap `i `x `*Cl
+]
+"35
+[v _acc `l ~T0 @X0 1 e ]
+[i _acc
++ << -> -> 1 `i `l -> 1 `i -> -> 1 `i `l
+]
+"37
+[v _ocaml_stack `l ~T0 @X0 -> 32 `i e ]
+[i _ocaml_stack
+:U ..
+"38
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"39
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"40
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"41
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"42
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"43
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"44
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"45
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"46
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"47
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"48
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"49
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"50
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"51
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"52
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"53
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"54
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"55
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"56
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"57
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"58
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"59
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"60
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"61
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"62
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"63
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"64
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"65
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"66
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"67
++ << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l
+"68
++ << -> -> 5040 `i `l -> 1 `i -> -> 1 `i `l
+"70
+| -> << * -> 4 `i -> 1 `i -> 2 `i `l << -> -> 1023 `i `l -> 22 `i
+..
+]
+"72
+[v _ocaml_global_data `l ~T0 @X0 -> -> 1 `i `ux e ]
+[i _ocaml_global_data
+:U ..
+..
+]
+"75
+[v _ocaml_bytecode `Cuc ~T0 @X0 -> 26 `i e ]
+[i _ocaml_bytecode
+:U ..
+"76
+-> -> 6 `i `uc
+"77
+-> -> 17 `i `uc
+"78
+-> -> 0 `i `uc
+"79
+-> -> 7 `i `uc
+"80
+-> -> 5 `i `uc
+"81
+-> -> 9 `i `uc
+"82
+-> -> 4 `i `uc
+"83
+-> -> 1 `i `uc
+"84
+-> -> 0 `i `uc
+"85
+-> -> 1 `i `uc
+"86
+-> -> 12 `i `uc
+"87
+-> -U -> 1 `i `uc
+"88
+-> -> 5 `i `uc
+"89
+-> -> 3 `i `uc
+"90
+-> -> 11 `i `uc
+"91
+-> -> 4 `i `uc
+"92
+-> -> 1 `i `uc
+"93
+-> -> 8 `i `uc
+"94
+-> -> 0 `i `uc
+"95
+-> -> 0 `i `uc
+"96
+-> -> 10 `i `uc
+"97
+-> -> 8 `i `uc
+"98
+-> -> 0 `i `uc
+"99
+-> -> 2 `i `uc
+"100
+-> -> 2 `i `uc
+"102
+-> -> 13 `i `uc
+..
+]
+"5 /Users/steven/github/OMicroB/src/byterun/prims.c
+[v _int32_custom_operations `*v ~T0 @X0 1 e ]
+"6
+[v _int64_custom_operations `*v ~T0 @X0 1 e ]
+"7
+[v _nativeint_custom_operations `*v ~T0 @X0 1 e ]
+"164
+[v _caml_builtin_cprim `*v ~T0 @X0 1 e ]
+"165
+[v _caml_names_of_builtin_cprim `*v ~T0 @X0 1 e ]
+"20 /Users/steven/github/OMicroB/src/byterun/interp.c
+[v _atom0_header `l ~T0 @X0 1 e ]
+[i _atom0_header
+| << -> -> 0 `i `l -> 10 `i -> -> 0 `i `l
+]
+"24
+[v _pc `uc ~T0 @X0 1 s ]
+"25
+[v _env `l ~T0 @X0 1 e ]
+"26
+[v _sp `*l ~T0 @X0 1 e ]
+"27
+[v _trapSp `l ~T0 @X0 1 s ]
+"28
+[v _extra_args `uc ~T0 @X0 1 s ]
+"31
+[v _caml_raise_stack_overflow `(v ~T0 @X0 1 ef ]
+{
+[e :U _caml_raise_stack_overflow ]
+[f ]
+"35
+[e $ ! ! != -> 0 `i -> 0 `i 2  ]
+{
+[e ( __fassert (3 , , -> 35 `i :s 1C :s 2C ]
+}
+[e :U 2 ]
+"37
+[e :UE 1 ]
+}
+"41
+[v _get_primitive `(*v ~T0 @X0 1 ef1`uc ]
+{
+[e :U _get_primitive ]
+[v _prim_ind `uc ~T0 @X0 1 r1 ]
+[f ]
+"45
+[e ) -> *U + &U _ocaml_primitives * -> _prim_ind `ux -> -> # *U &U _ocaml_primitives `ui `ux `*v ]
+[e $UE 3  ]
+"47
+[e :UE 3 ]
+}
+"49
+[v _read_byte `(uc ~T0 @X0 1 ef ]
+{
+[e :U _read_byte ]
+[f ]
+"50
+[v _c `uc ~T0 @X0 1 a ]
+"54
+[e = _c *U + &U _ocaml_bytecode * -> _pc `ux -> -> # *U &U _ocaml_bytecode `ui `ux ]
+"56
+[e ++ _pc -> -> 1 `i `uc ]
+"57
+[e ) _c ]
+[e $UE 4  ]
+"58
+[e :UE 4 ]
+}
+"60
+[v _read_opcode `(uc ~T0 @X0 1 ef ]
+{
+[e :U _read_opcode ]
+[f ]
+"61
+[e ) ( _read_byte ..  ]
+[e $UE 5  ]
+"62
+[e :UE 5 ]
+}
+"64
+[v _read_uint8 `(uc ~T0 @X0 1 ef ]
+{
+[e :U _read_uint8 ]
+[f ]
+"65
+[e ) ( _read_byte ..  ]
+[e $UE 6  ]
+"66
+[e :UE 6 ]
+}
+"68
+[v _read_int8 `(c ~T0 @X0 1 ef ]
+{
+[e :U _read_int8 ]
+[f ]
+"69
+[e ) -> ( _read_byte ..  `c ]
+[e $UE 7  ]
+"70
+[e :UE 7 ]
+}
+"72
+[v _read_uint16 `(ui ~T0 @X0 1 ef ]
+{
+[e :U _read_uint16 ]
+[f ]
+"73
+[v _n1 `uc ~T0 @X0 1 a ]
+[e = _n1 ( _read_uint8 ..  ]
+"74
+[v _n0 `uc ~T0 @X0 1 a ]
+[e = _n0 ( _read_uint8 ..  ]
+"75
+[e ) | << -> _n1 `ui -> 8 `i -> _n0 `ui ]
+[e $UE 8  ]
+"76
+[e :UE 8 ]
+}
+"78
+[v _read_int16 `(i ~T0 @X0 1 ef ]
+{
+[e :U _read_int16 ]
+[f ]
+"79
+[e ) -> ( _read_uint16 ..  `i ]
+[e $UE 9  ]
+"80
+[e :UE 9 ]
+}
+"82
+[v _read_uint32 `(ul ~T0 @X0 1 ef ]
+{
+[e :U _read_uint32 ]
+[f ]
+"83
+[v _n3 `uc ~T0 @X0 1 a ]
+[e = _n3 ( _read_uint8 ..  ]
+"84
+[v _n2 `uc ~T0 @X0 1 a ]
+[e = _n2 ( _read_uint8 ..  ]
+"85
+[v _n1 `uc ~T0 @X0 1 a ]
+[e = _n1 ( _read_uint8 ..  ]
+"86
+[v _n0 `uc ~T0 @X0 1 a ]
+[e = _n0 ( _read_uint8 ..  ]
+"87
+[e ) | | | << -> _n3 `ul -> 24 `i << -> _n2 `ul -> 16 `i << -> _n1 `ul -> 8 `i -> _n0 `ul ]
+[e $UE 10  ]
+"88
+[e :UE 10 ]
+}
+"90
+[v _read_int32 `(l ~T0 @X0 1 ef ]
+{
+[e :U _read_int32 ]
+[f ]
+"91
+[e ) -> ( _read_uint32 ..  `l ]
+[e $UE 11  ]
+"92
+[e :UE 11 ]
+}
+"94
+[v _read_ptr_1B `(uc ~T0 @X0 1 ef ]
+{
+[e :U _read_ptr_1B ]
+[f ]
+"95
+[v _ofs `c ~T0 @X0 1 a ]
+[e = _ofs ( _read_int8 ..  ]
+"96
+[e ) -> + - -> _pc `i -> 2 `i -> _ofs `i `uc ]
+[e $UE 12  ]
+"97
+[e :UE 12 ]
+}
+"99
+[v _read_ptr_2B `(uc ~T0 @X0 1 ef ]
+{
+[e :U _read_ptr_2B ]
+[f ]
+"100
+[v _ofs `i ~T0 @X0 1 a ]
+[e = _ofs ( _read_int16 ..  ]
+"101
+[e ) -> + - -> _pc `i -> 3 `i _ofs `uc ]
+[e $UE 13  ]
+"102
+[e :UE 13 ]
+}
+"104
+[v _read_ptr_4B `(uc ~T0 @X0 1 ef ]
+{
+[e :U _read_ptr_4B ]
+[f ]
+"105
+[v _ofs `l ~T0 @X0 1 a ]
+[e = _ofs ( _read_int32 ..  ]
+"106
+[e ) -> + -> - -> _pc `i -> 5 `i `l _ofs `uc ]
+[e $UE 14  ]
+"107
+[e :UE 14 ]
+}
+"111
+[v _peek `(l ~T0 @X0 1 ef1`i ]
+{
+[e :U _peek ]
+[v _n `i ~T0 @X0 1 r1 ]
+[f ]
+"112
+[e ) *U + _sp * -> -> _n `l `x -> -> # *U _sp `i `x ]
+[e $UE 15  ]
+"113
+[e :UE 15 ]
+}
+"115
+[v _push `(v ~T0 @X0 1 ef1`l ]
+{
+[e :U _push ]
+[v _x `l ~T0 @X0 1 r1 ]
+[f ]
+"116
+[e $ ! < _sp &U _ocaml_stack 17  ]
+{
+"117
+[e ( _caml_raise_stack_overflow ..  ]
+"118
+}
+[e $U 18  ]
+"119
+[e :U 17 ]
+{
+"120
+[e = *U =- _sp * -> -> 1 `i `x -> -> # *U _sp `i `x _x ]
+"121
+}
+[e :U 18 ]
+"122
+[e :UE 16 ]
+}
+"124
+[v _pop `(l ~T0 @X0 1 ef ]
+{
+[e :U _pop ]
+[f ]
+"125
+[e ) *U ++ _sp * -> -> 1 `i `x -> -> # *U _sp `i `x ]
+[e $UE 19  ]
+"126
+[e :UE 19 ]
+}
+"128
+[v _pop_n `(v ~T0 @X0 1 ef1`i ]
+{
+[e :U _pop_n ]
+[v _n `i ~T0 @X0 1 r1 ]
+[f ]
+"129
+[e =+ _sp * -> _n `x -> -> # *U _sp `i `x ]
+"130
+[e :UE 20 ]
+}
+"157
+[v _caml_raise_division_by_zero `(v ~T0 @X0 1 ef ]
+{
+[e :U _caml_raise_division_by_zero ]
+[f ]
+"158
+[e $ ! ! != -> 0 `i -> 0 `i 22  ]
+{
+[e ( __fassert (3 , , -> 158 `i :s 3C :s 4C ]
+}
+[e :U 22 ]
+"160
+[e :UE 21 ]
+}
+"164
+[v _interp_init `(v ~T0 @X0 1 ef ]
+{
+[e :U _interp_init ]
+[f ]
+"165
+[e = _sp - + &U _ocaml_stack * -> -> 32 `i `x -> -> # *U &U _ocaml_stack `i `x * -> -> 3 `i `x -> -> # *U + &U _ocaml_stack * -> -> 32 `i `x -> -> # *U &U _ocaml_stack `i `x `i `x ]
+"166
+[e = _trapSp + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+"167
+[e = _env + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+"168
+[e = _extra_args -> -> 0 `i `uc ]
+"169
+[e = _pc -> -> 0 `i `uc ]
+"170
+[e :UE 23 ]
+}
+"174
+[v _interp `(l ~T0 @X0 1 ef ]
+{
+[e :U _interp ]
+[f ]
+"176
+[e :U 26 ]
+{
+"183
+[v _opcode `uc ~T0 @X0 1 a ]
+[e = _opcode ( _read_opcode ..  ]
+"207
+[e $U 29  ]
+{
+"210
+[e :U 30 ]
+{
+"211
+[e = _acc ( _peek (1 -> 0 `i ]
+"212
+[e $U 28  ]
+"213
+}
+"280
+[e :U 31 ]
+{
+"281
+[e ( _push (1 _acc ]
+"282
+[e = _acc ( _peek (1 -> 1 `i ]
+"283
+[e $U 28  ]
+"284
+}
+"344
+[e :U 32 ]
+{
+"345
+[e ( _pop_n (1 -> ( _read_uint8 ..  `i ]
+"346
+[e $U 28  ]
+"347
+}
+"471
+[e :U 33 ]
+{
+"472
+[v _arg1 `l ~T0 @X0 1 a ]
+[e = _arg1 ( _pop ..  ]
+"473
+[e ( _push (1 + << -> _extra_args `l -> 1 `i -> -> 1 `i `l ]
+"474
+[e ( _push (1 _env ]
+"475
+[e ( _push (1 + << -> _pc `l -> 1 `i -> -> 1 `i `l ]
+"476
+[e ( _push (1 _arg1 ]
+"480
+[e = _pc -> >> *U -> + -> &U _ocaml_heap `i >> -> ^ _acc -> << -> 1023 `i -> 22 `i `l `i -> 2 `i `*l -> 1 `i `uc ]
+"481
+[e = _env _acc ]
+"482
+[e = _extra_args -> -> 0 `i `uc ]
+"483
+[e $U 28  ]
+"484
+}
+"579
+[e :U 34 ]
+{
+"580
+[v _n `uc ~T0 @X0 1 a ]
+[e = _n ( _read_uint8 ..  ]
+"581
+[e ( _pop_n (1 -> _n `i ]
+"582
+[e $ ! > -> _extra_args `i -> 0 `i 35  ]
+{
+"583
+[e -- _extra_args -> -> 1 `i `uc ]
+"584
+[e = _pc -> >> *U -> + -> &U _ocaml_heap `i >> -> ^ _acc -> << -> 1023 `i -> 22 `i `l `i -> 2 `i `*l -> 1 `i `uc ]
+"585
+[e = _env _acc ]
+"586
+}
+[e $U 36  ]
+[e :U 35 ]
+{
+"587
+[e = _pc -> >> ( _pop ..  -> 1 `i `uc ]
+"588
+[e = _env ( _pop ..  ]
+"589
+[e = _extra_args -> >> ( _pop ..  -> 1 `i `uc ]
+"590
+}
+[e :U 36 ]
+"591
+[e $U 28  ]
+"592
+}
+"771
+[e :U 37 ]
+{
+"772
+[e ( _push (1 _acc ]
+"774
+}
+"782
+{
+"783
+[e = _acc _env ]
+"784
+[e $U 28  ]
+"785
+}
+"1114
+[e :U 38 ]
+{
+"1115
+[e = _pc ( _read_ptr_1B ..  ]
+"1116
+[e $U 28  ]
+"1117
+}
+"1135
+[e :U 39 ]
+{
+"1136
+[e $ ! != _acc + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l 40  ]
+{
+"1137
+[e = _pc ( _read_ptr_1B ..  ]
+"1138
+}
+[e $U 41  ]
+[e :U 40 ]
+{
+"1139
+[e =+ _pc -> -> 1 `i `uc ]
+"1140
+}
+[e :U 41 ]
+"1141
+[e $U 28  ]
+"1142
+}
+"1329
+[e :U 42 ]
+{
+[v F344 `(l ~T0 @X0 0 tf2`l`l ]
+"1330
+[e = _acc ( *U -> ( _get_primitive (1 ( _read_uint8 ..  `*F344 (2 , _acc *U + _sp * -> -> 0 `i `x -> -> # *U _sp `i `x ]
+"1331
+[e ( _pop ..  ]
+"1332
+[e $U 28  ]
+"1333
+}
+"1385
+[e :U 43 ]
+{
+"1386
+[e = _acc + << -> -> 1 `i `l -> 1 `i -> -> 1 `i `l ]
+"1387
+[e $U 28  ]
+"1388
+}
+"1427
+[e :U 44 ]
+{
+"1428
+[e ( _push (1 _acc ]
+"1429
+[e = _acc + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+"1430
+[e $U 28  ]
+"1431
+}
+"1504
+[e :U 45 ]
+{
+"1505
+[e = _acc + << * >> _acc -> 1 `i >> ( _pop ..  -> 1 `i -> 1 `i -> -> 1 `i `l ]
+"1506
+[e $U 28  ]
+"1507
+}
+"1632
+[e :U 46 ]
+{
+"1633
+[e = _acc + << + >> _acc -> 1 `i -> ( _read_int8 ..  `l -> 1 `i -> -> 1 `i `l ]
+"1634
+[e $U 28  ]
+"1635
+}
+"1983
+[e :U 47 ]
+{
+"1984
+[e ) _acc ]
+[e $UE 24  ]
+"1985
+}
+"1988
+[e :U 48 ]
+"1992
+[e $ ! ! != -> 0 `i -> 0 `i 49  ]
+{
+[e ( __fassert (3 , , -> 1992 `i :s 5C :s 6C ]
+}
+[e :U 49 ]
+"1994
+}
+[e $U 28  ]
+"207
+[e :U 29 ]
+[e [\ _opcode , $ -> -> 0 `i `uc 30
+ , $ -> -> 1 `i `uc 31
+ , $ -> -> 2 `i `uc 32
+ , $ -> -> 3 `i `uc 33
+ , $ -> -> 4 `i `uc 34
+ , $ -> -> 5 `i `uc 37
+ , $ -> -> 6 `i `uc 38
+ , $ -> -> 7 `i `uc 39
+ , $ -> -> 8 `i `uc 42
+ , $ -> -> 9 `i `uc 43
+ , $ -> -> 10 `i `uc 44
+ , $ -> -> 11 `i `uc 45
+ , $ -> -> 12 `i `uc 46
+ , $ -> -> 13 `i `uc 47
+ 48 ]
+"1994
+[e :U 28 ]
+"1995
+}
+[e :U 25 ]
+"176
+[e $U 26  ]
+[e :U 27 ]
+"1996
+[e ) -> -> 0 `i `l ]
+[e $UE 24  ]
+"1997
+[e :UE 24 ]
+}
+"2001
+[v _setup `(v ~T0 @X0 1 ef ]
+{
+[e :U _setup ]
+[f ]
+"2010
+[e ( _interp_init ..  ]
+"2011
+[e ( _gc_init (1 -> -> 16 `i `l ]
+"2012
+[e ( _interp ..  ]
+"2013
+[e :UE 50 ]
+}
+"2015
+[v _loop `(v ~T0 @X0 1 ef ]
+{
+[e :U _loop ]
+[f ]
+"2017
+[e :UE 51 ]
+}
+[v $root$_main `(v ~T0 @X0 0 e ]
+"2023
+[v _main `(i ~T0 @X0 1 ef2`i`**uc ]
+{
+[e :U _main ]
+[v _argc `i ~T0 @X0 1 r1 ]
+[v _argv `**uc ~T0 @X0 1 r2 ]
+[f ]
+"2024
+[e ( _setup ..  ]
+"2026
+[e ) -> 0 `i ]
+[e $UE 52  ]
+"2027
+[e :UE 52 ]
+}
+"52 /Applications/microchip/xc8/v1.44/include/pic18f4620.h
+[; <" PORTA equ 0F80h ;# ">
+"189
+[; <" PORTB equ 0F81h ;# ">
+"360
+[; <" PORTC equ 0F82h ;# ">
+"535
+[; <" PORTD equ 0F83h ;# ">
+"677
+[; <" PORTE equ 0F84h ;# ">
+"880
+[; <" LATA equ 0F89h ;# ">
+"992
+[; <" LATB equ 0F8Ah ;# ">
+"1104
+[; <" LATC equ 0F8Bh ;# ">
+"1216
+[; <" LATD equ 0F8Ch ;# ">
+"1328
+[; <" LATE equ 0F8Dh ;# ">
+"1380
+[; <" TRISA equ 0F92h ;# ">
+"1385
+[; <" DDRA equ 0F92h ;# ">
+"1602
+[; <" TRISB equ 0F93h ;# ">
+"1607
+[; <" DDRB equ 0F93h ;# ">
+"1824
+[; <" TRISC equ 0F94h ;# ">
+"1829
+[; <" DDRC equ 0F94h ;# ">
+"2046
+[; <" TRISD equ 0F95h ;# ">
+"2051
+[; <" DDRD equ 0F95h ;# ">
+"2268
+[; <" TRISE equ 0F96h ;# ">
+"2273
+[; <" DDRE equ 0F96h ;# ">
+"2432
+[; <" OSCTUNE equ 0F9Bh ;# ">
+"2497
+[; <" PIE1 equ 0F9Dh ;# ">
+"2574
+[; <" PIR1 equ 0F9Eh ;# ">
+"2651
+[; <" IPR1 equ 0F9Fh ;# ">
+"2728
+[; <" PIE2 equ 0FA0h ;# ">
+"2794
+[; <" PIR2 equ 0FA1h ;# ">
+"2860
+[; <" IPR2 equ 0FA2h ;# ">
+"2926
+[; <" EECON1 equ 0FA6h ;# ">
+"2992
+[; <" EECON2 equ 0FA7h ;# ">
+"2999
+[; <" EEDATA equ 0FA8h ;# ">
+"3006
+[; <" EEADR equ 0FA9h ;# ">
+"3013
+[; <" EEADRH equ 0FAAh ;# ">
+"3020
+[; <" RCSTA equ 0FABh ;# ">
+"3025
+[; <" RCSTA1 equ 0FABh ;# ">
+"3230
+[; <" TXSTA equ 0FACh ;# ">
+"3235
+[; <" TXSTA1 equ 0FACh ;# ">
+"3486
+[; <" TXREG equ 0FADh ;# ">
+"3491
+[; <" TXREG1 equ 0FADh ;# ">
+"3498
+[; <" RCREG equ 0FAEh ;# ">
+"3503
+[; <" RCREG1 equ 0FAEh ;# ">
+"3510
+[; <" SPBRG equ 0FAFh ;# ">
+"3515
+[; <" SPBRG1 equ 0FAFh ;# ">
+"3522
+[; <" SPBRGH equ 0FB0h ;# ">
+"3529
+[; <" T3CON equ 0FB1h ;# ">
+"3641
+[; <" TMR3 equ 0FB2h ;# ">
+"3648
+[; <" TMR3L equ 0FB2h ;# ">
+"3655
+[; <" TMR3H equ 0FB3h ;# ">
+"3662
+[; <" CMCON equ 0FB4h ;# ">
+"3752
+[; <" CVRCON equ 0FB5h ;# ">
+"3831
+[; <" ECCP1AS equ 0FB6h ;# ">
+"3913
+[; <" PWM1CON equ 0FB7h ;# ">
+"3983
+[; <" BAUDCON equ 0FB8h ;# ">
+"3988
+[; <" BAUDCTL equ 0FB8h ;# ">
+"4155
+[; <" CCP2CON equ 0FBAh ;# ">
+"4234
+[; <" CCPR2 equ 0FBBh ;# ">
+"4241
+[; <" CCPR2L equ 0FBBh ;# ">
+"4248
+[; <" CCPR2H equ 0FBCh ;# ">
+"4255
+[; <" CCP1CON equ 0FBDh ;# ">
+"4352
+[; <" CCPR1 equ 0FBEh ;# ">
+"4359
+[; <" CCPR1L equ 0FBEh ;# ">
+"4366
+[; <" CCPR1H equ 0FBFh ;# ">
+"4373
+[; <" ADCON2 equ 0FC0h ;# ">
+"4444
+[; <" ADCON1 equ 0FC1h ;# ">
+"4529
+[; <" ADCON0 equ 0FC2h ;# ">
+"4648
+[; <" ADRES equ 0FC3h ;# ">
+"4655
+[; <" ADRESL equ 0FC3h ;# ">
+"4662
+[; <" ADRESH equ 0FC4h ;# ">
+"4669
+[; <" SSPCON2 equ 0FC5h ;# ">
+"4731
+[; <" SSPCON1 equ 0FC6h ;# ">
+"4801
+[; <" SSPSTAT equ 0FC7h ;# ">
+"5022
+[; <" SSPADD equ 0FC8h ;# ">
+"5029
+[; <" SSPBUF equ 0FC9h ;# ">
+"5036
+[; <" T2CON equ 0FCAh ;# ">
+"5107
+[; <" PR2 equ 0FCBh ;# ">
+"5112
+[; <" MEMCON equ 0FCBh ;# ">
+"5217
+[; <" TMR2 equ 0FCCh ;# ">
+"5224
+[; <" T1CON equ 0FCDh ;# ">
+"5327
+[; <" TMR1 equ 0FCEh ;# ">
+"5334
+[; <" TMR1L equ 0FCEh ;# ">
+"5341
+[; <" TMR1H equ 0FCFh ;# ">
+"5348
+[; <" RCON equ 0FD0h ;# ">
+"5481
+[; <" WDTCON equ 0FD1h ;# ">
+"5509
+[; <" HLVDCON equ 0FD2h ;# ">
+"5514
+[; <" LVDCON equ 0FD2h ;# ">
+"5779
+[; <" OSCCON equ 0FD3h ;# ">
+"5856
+[; <" T0CON equ 0FD5h ;# ">
+"5933
+[; <" TMR0 equ 0FD6h ;# ">
+"5940
+[; <" TMR0L equ 0FD6h ;# ">
+"5947
+[; <" TMR0H equ 0FD7h ;# ">
+"5954
+[; <" STATUS equ 0FD8h ;# ">
+"6025
+[; <" FSR2 equ 0FD9h ;# ">
+"6032
+[; <" FSR2L equ 0FD9h ;# ">
+"6039
+[; <" FSR2H equ 0FDAh ;# ">
+"6046
+[; <" PLUSW2 equ 0FDBh ;# ">
+"6053
+[; <" PREINC2 equ 0FDCh ;# ">
+"6060
+[; <" POSTDEC2 equ 0FDDh ;# ">
+"6067
+[; <" POSTINC2 equ 0FDEh ;# ">
+"6074
+[; <" INDF2 equ 0FDFh ;# ">
+"6081
+[; <" BSR equ 0FE0h ;# ">
+"6088
+[; <" FSR1 equ 0FE1h ;# ">
+"6095
+[; <" FSR1L equ 0FE1h ;# ">
+"6102
+[; <" FSR1H equ 0FE2h ;# ">
+"6109
+[; <" PLUSW1 equ 0FE3h ;# ">
+"6116
+[; <" PREINC1 equ 0FE4h ;# ">
+"6123
+[; <" POSTDEC1 equ 0FE5h ;# ">
+"6130
+[; <" POSTINC1 equ 0FE6h ;# ">
+"6137
+[; <" INDF1 equ 0FE7h ;# ">
+"6144
+[; <" WREG equ 0FE8h ;# ">
+"6156
+[; <" FSR0 equ 0FE9h ;# ">
+"6163
+[; <" FSR0L equ 0FE9h ;# ">
+"6170
+[; <" FSR0H equ 0FEAh ;# ">
+"6177
+[; <" PLUSW0 equ 0FEBh ;# ">
+"6184
+[; <" PREINC0 equ 0FECh ;# ">
+"6191
+[; <" POSTDEC0 equ 0FEDh ;# ">
+"6198
+[; <" POSTINC0 equ 0FEEh ;# ">
+"6205
+[; <" INDF0 equ 0FEFh ;# ">
+"6212
+[; <" INTCON3 equ 0FF0h ;# ">
+"6304
+[; <" INTCON2 equ 0FF1h ;# ">
+"6374
+[; <" INTCON equ 0FF2h ;# ">
+"6491
+[; <" PROD equ 0FF3h ;# ">
+"6498
+[; <" PRODL equ 0FF3h ;# ">
+"6505
+[; <" PRODH equ 0FF4h ;# ">
+"6512
+[; <" TABLAT equ 0FF5h ;# ">
+"6521
+[; <" TBLPTR equ 0FF6h ;# ">
+"6528
+[; <" TBLPTRL equ 0FF6h ;# ">
+"6535
+[; <" TBLPTRH equ 0FF7h ;# ">
+"6542
+[; <" TBLPTRU equ 0FF8h ;# ">
+"6551
+[; <" PCLAT equ 0FF9h ;# ">
+"6558
+[; <" PC equ 0FF9h ;# ">
+"6565
+[; <" PCL equ 0FF9h ;# ">
+"6572
+[; <" PCLATH equ 0FFAh ;# ">
+"6579
+[; <" PCLATU equ 0FFBh ;# ">
+"6586
+[; <" STKPTR equ 0FFCh ;# ">
+"6692
+[; <" TOS equ 0FFDh ;# ">
+"6699
+[; <" TOSL equ 0FFDh ;# ">
+"6706
+[; <" TOSH equ 0FFEh ;# ">
+"6713
+[; <" TOSU equ 0FFFh ;# ">
+"20 /Users/steven/github/OMicroB/src/byterun/stdlib.c
+[v _caml_write_reg `(l ~T0 @X0 1 ef2`l`l ]
+{
+[e :U _caml_write_reg ]
+[v _pin `l ~T0 @X0 1 r1 ]
+[v _v `l ~T0 @X0 1 r2 ]
+[f ]
+"21
+[e = _TRISD -> -> 0 `i `uc ]
+"22
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 317  ]
+"23
+[e :UE 317 ]
+}
+"25
+[v _caml_set_bit `(l ~T0 @X0 1 ef1`l ]
+{
+[e :U _caml_set_bit ]
+[v _pin `l ~T0 @X0 1 r1 ]
+[f ]
+"26
+[e = _LATD2 -> -> 1 `i `b ]
+"27
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 318  ]
+"28
+[e :UE 318 ]
+}
+"30
+[v _caml_clear_bit `(l ~T0 @X0 1 ef1`l ]
+{
+[e :U _caml_clear_bit ]
+[v _pin `l ~T0 @X0 1 r1 ]
+[f ]
+"31
+[e = _LATD2 -> -> 0 `i `b ]
+"32
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 319  ]
+"33
+[e :UE 319 ]
+}
+"35
+[v _caml_pin_mode `(l ~T0 @X0 1 ef2`l`l ]
+{
+[e :U _caml_pin_mode ]
+[v _pin `l ~T0 @X0 1 r1 ]
+[v _mode `l ~T0 @X0 1 r2 ]
+[f ]
+"36
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 320  ]
+"37
+[e :UE 320 ]
+}
+"39
+[v _caml_digital_write `(l ~T0 @X0 1 ef2`l`l ]
+{
+[e :U _caml_digital_write ]
+[v _pin `l ~T0 @X0 1 r1 ]
+[v _state `l ~T0 @X0 1 r2 ]
+[f ]
+"40
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 321  ]
+"41
+[e :UE 321 ]
+}
+"43
+[v _caml_digital_read `(l ~T0 @X0 1 ef1`l ]
+{
+[e :U _caml_digital_read ]
+[v _pin `l ~T0 @X0 1 r1 ]
+[f ]
+"44
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 322  ]
+"45
+[e :UE 322 ]
+}
+"47
+[v _caml_delay `(l ~T0 @X0 1 ef1`l ]
+{
+[e :U _caml_delay ]
+[v _millis `l ~T0 @X0 1 r1 ]
+[f ]
+"49
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 323  ]
+"50
+[e :UE 323 ]
+}
+"52
+[v _ocaml_arduino_millis `(l ~T0 @X0 1 ef1`l ]
+{
+[e :U _ocaml_arduino_millis ]
+[v _k `l ~T0 @X0 1 r1 ]
+[f ]
+"53
+[e ) + << -> -> 0 `i `l -> 1 `i -> -> 1 `i `l ]
+[e $UE 324  ]
+"54
+[e :UE 324 ]
+}
+"40 /Users/steven/github/OMicroB/src/byterun/gc.c
+[v _heap1_start `*Cl ~T0 @X0 1 e ]
+[i _heap1_start
+-> -> 0 `i `*Cl
+]
+[v _heap2_start `*Cl ~T0 @X0 1 e ]
+[i _heap2_start
+-> -> 0 `i `*Cl
+]
+"41
+[v _heap1_end `*Cl ~T0 @X0 1 e ]
+[i _heap1_end
+-> -> 0 `i `*Cl
+]
+[v _heap2_end `*Cl ~T0 @X0 1 e ]
+[i _heap2_end
+-> -> 0 `i `*Cl
+]
+"42
+[v _current_heap `i ~T0 @X0 1 e ]
+"47
+[v _heap_ptr `*l ~T0 @X0 1 e ]
+[v _heap_end `*l ~T0 @X0 1 e ]
+"50
+[v _heap_todo `*l ~T0 @X0 1 e ]
+"53
+[v _new_heap `*l ~T0 @X0 1 e ]
+[v _old_heap `*l ~T0 @X0 1 e ]
+"54
+[v _tab_heap_start `*l ~T0 @X0 -> 2 `i e ]
+"55
+[v _tab_heap_end `*l ~T0 @X0 -> 2 `i e ]
+"62
+[v _gc_init `(v ~T0 @X0 1 ef1`l ]
+{
+[e :U _gc_init ]
+[v _heap_size `l ~T0 @X0 1 r1 ]
+[f ]
+"65
+[e = _heap1_start _ocaml_heap1 ]
+"67
+[e = _heap1_end + _heap1_start * -> _heap_size `x -> -> # *U _heap1_start `i `x ]
+"68
+[e = *U + &U _tab_heap_start * -> -> -> 0 `i `ui `ux -> -> # *U &U _tab_heap_start `ui `ux -> _heap1_start `*l ]
+"69
+[e = *U + &U _tab_heap_end * -> -> -> 0 `i `ui `ux -> -> # *U &U _tab_heap_end `ui `ux -> _heap1_end `*l ]
+"72
+[e = _heap2_start _ocaml_heap2 ]
+"74
+[e = _heap2_end + _heap2_start * -> _heap_size `x -> -> # *U _heap2_start `i `x ]
+"75
+[e = *U + &U _tab_heap_start * -> -> -> 1 `i `ui `ux -> -> # *U &U _tab_heap_start `ui `ux -> _heap2_start `*l ]
+"76
+[e = *U + &U _tab_heap_end * -> -> -> 1 `i `ui `ux -> -> # *U &U _tab_heap_end `ui `ux -> _heap2_end `*l ]
+"79
+[e = _heap_ptr + -> _heap1_start `*l * -> -> 2 `i `x -> -> # *U -> _heap1_start `*l `i `x ]
+"84
+[e = _heap_end + _heap_ptr * -> _heap_size `x -> -> # *U _heap_ptr `i `x ]
+"86
+[e = _current_heap -> 0 `i ]
+"88
+[e :UE 330 ]
+}
+"90
+[v _cpt `i ~T0 @X0 1 e ]
+[i _cpt
+-> 0 `i
+]
+"93
+[v _Alloc_small_f `(l ~T0 @X0 1 ef2`ul`uc ]
+{
+[e :U _Alloc_small_f ]
+[v _wosize `ul ~T0 @X0 1 r1 ]
+[v _tag `uc ~T0 @X0 1 r2 ]
+[f ]
+"94
+[v _result `l ~T0 @X0 1 a ]
+"96
+[e :U 334 ]
+{
+[e $ ! > + _heap_ptr * -> + _wosize -> -> -> 1 `i `l `ul `ux -> -> # *U _heap_ptr `ui `ux _heap_end 335  ]
+[e ( _gc (1 _wosize ]
+[e :U 335 ]
+[e = *U _heap_ptr | << -> _wosize `l -> 10 `i -> _tag `l ]
+[e ++ _heap_ptr * -> -> 1 `i `x -> -> # *U _heap_ptr `i `x ]
+[e = _result | << - -> _heap_ptr `l -> &U _ocaml_heap `l -> 2 `i -> << -> 1023 `i -> 22 `i `l ]
+[e =+ _heap_ptr * -> _wosize `ux -> -> # *U _heap_ptr `ui `ux ]
+}
+[e :U 333 ]
+"98
+[e ) _result ]
+[e $UE 331  ]
+"99
+[e :UE 331 ]
+}
+"135
+[v _gc_one_val `(v ~T0 @X0 1 ef2`*l`i ]
+{
+[e :U _gc_one_val ]
+[v _ptr `*l ~T0 @X0 1 r1 ]
+[v _update `i ~T0 @X0 1 r2 ]
+[f ]
+"211
+[e :UE 336 ]
+}
+"220
+[v _gc `(v ~T0 @X0 1 ef1`ul ]
+{
+[e :U _gc ]
+[v _size `ul ~T0 @X0 1 r1 ]
+[f ]
+"222
+[v _ptr `*l ~T0 @X0 1 a ]
+"223
+[e = _old_heap *U + &U _tab_heap_start * -> -> % _current_heap -> 2 `i `ui `ux -> -> # *U &U _tab_heap_start `ui `ux ]
+"224
+[e = _current_heap % + _current_heap -> 1 `i -> 2 `i ]
+"225
+[e = _heap_end *U + &U _tab_heap_end * -> -> % _current_heap -> 2 `i `ui `ux -> -> # *U &U _tab_heap_end `ui `ux ]
+"226
+[e = _new_heap *U + &U _tab_heap_start * -> -> % _current_heap -> 2 `i `ui `ux -> -> # *U &U _tab_heap_start `ui `ux ]
+"227
+[e = _heap_ptr _new_heap ]
+"228
+[e = _heap_todo _new_heap ]
+"231
+{
+[e = _ptr + &U _ocaml_stack * -> -> 32 `i `x -> -> # *U &U _ocaml_stack `i `x ]
+[e $U 341  ]
+[e :U 338 ]
+{
+"232
+[e ( _gc_one_val (2 , _ptr -> 1 `i ]
+"233
+}
+"231
+[e -- _ptr * -> -> 1 `i `x -> -> # *U _ptr `i `x ]
+[e :U 341 ]
+[e $ > _ptr _sp 338  ]
+[e :U 339 ]
+"233
+}
+"236
+{
+[e = _ptr &U _ocaml_global_data ]
+[e $U 345  ]
+[e :U 342 ]
+{
+"237
+[e ( _gc_one_val (2 , _ptr -> 1 `i ]
+"238
+}
+"236
+[e ++ _ptr * -> -> 1 `i `x -> -> # *U _ptr `i `x ]
+[e :U 345 ]
+[e $ < _ptr -> _heap1_start `*l 342  ]
+[e :U 343 ]
+"238
+}
+"240
+[e ( _gc_one_val (2 , &U _acc -> 1 `i ]
+"241
+[e ( _gc_one_val (2 , &U _env -> 1 `i ]
+"244
+[e $ ! > + _heap_ptr * -> _size `ux -> -> # *U _heap_ptr `ui `ux _heap_end 346  ]
+{
+[e :U 349 ]
+{
+[e -> 0 `i ]
+[; <" reset ;# ">
+}
+[e :U 348 ]
+}
+[e :U 346 ]
+"248
+[e :UE 337 ]
+}
+"106 blink.c
+[v _ocaml_primitives `C*v ~T0 @X0 -> -> 1 `i `ux e ]
+[i _ocaml_primitives
+:U ..
+"108
+-> &U _caml_write_reg `*v
+..
+]
+[a 1C 47 85 115 101 114 115 47 115 116 101 118 101 110 47 103 105 116 104 117 98 47 79 77 105 99 114 111 66 47 115 114 99 47 98 121 116 101 114 117 110 47 105 110 116 101 114 112 46 99 0 ]
+[a 3C 47 85 115 101 114 115 47 115 116 101 118 101 110 47 103 105 116 104 117 98 47 79 77 105 99 114 111 66 47 115 114 99 47 98 121 116 101 114 117 110 47 105 110 116 101 114 112 46 99 0 ]
+[a 5C 47 85 115 101 114 115 47 115 116 101 118 101 110 47 103 105 116 104 117 98 47 79 77 105 99 114 111 66 47 115 114 99 47 98 121 116 101 114 117 110 47 105 110 116 101 114 112 46 99 0 ]
+[a 2C 48 0 ]
+[a 4C 48 0 ]
+[a 6C 48 0 ]

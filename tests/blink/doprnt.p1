@@ -1,0 +1,195 @@
+Version 3.2 HI-TECH Software Intermediate Code
+"10 /Applications/microchip/xc8/v1.44/include/stdarg.h
+[v ___va_start `(*v ~T0 @X0 0 ef ]
+[p i ___va_start ]
+"16 /Applications/microchip/xc8/v1.44/include/conio.h
+[v _putch `(v ~T0 @X0 0 ef1`uc ]
+"13 /Applications/microchip/xc8/v1.44/include/stdarg.h
+[v ___va_arg `(*v ~T0 @X0 0 ev`*v ]
+[p i ___va_arg ]
+"13 /Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+[p n 350 ]
+"354
+[v _dpowers `Cui ~T0 @X0 -> 0 `x s ]
+[i _dpowers
+:U ..
+-> -> 1 `i `ui
+-> -> 10 `i `ui
+-> -> 100 `i `ui
+-> -> 1000 `i `ui
+-> -> 10000 `i `ui
+..
+]
+"464
+[v _printf `(i ~T0 @X0 1 ev`*Cuc ]
+"465
+{
+[e :U _printf ]
+"464
+[v _f `*Cuc ~T0 @X0 1 r0 ]
+"465
+[f ]
+"466
+[v _ap `*v ~T0 @X0 -> -> 1 `i `ux a ]
+"499
+[v _c `c ~T0 @X0 1 a ]
+"506
+[v _prec `c ~T0 @X0 1 a ]
+"508
+[v _flag `uc ~T0 @X0 1 a ]
+"523
+[u S6 `ul 1 `d 1 ]
+[n S6 . vd integ ]
+"526
+[v _tmpval `S6 ~T0 @X0 1 a ]
+"528
+[v _val `ui ~T0 @X0 1 a ]
+"529
+[v _len `ui ~T0 @X0 1 a ]
+"530
+[v _cp `*Cuc ~T0 @X0 1 a ]
+"533
+[e = *U &U _ap ( ___va_start ..  ]
+"536
+[e $U 8  ]
+[e :U 9 ]
+{
+"538
+[e $ ! != -> -> _c `i `ui -> 37 `ui 11  ]
+"540
+{
+"541
+[e ( _putch (1 -> _c `uc ]
+"542
+[e $U 8  ]
+"543
+}
+[e :U 11 ]
+"548
+[e = _flag -> -> 0 `i `uc ]
+"635
+[e $U 13  ]
+{
+"637
+[e :U 14 ]
+"638
+[e $U 15  ]
+"697
+[e :U 16 ]
+"698
+[e :U 17 ]
+"699
+[e $U 12  ]
+"728
+[e :U 18 ]
+"734
+[e = _cp *U -> ( ___va_arg , (. -> *U -> &U _ap `***Cuc `*v -> -> 0 `i `*Cuc `**Cuc ]
+"740
+[e $ ! ! != _cp -> -> 0 `i `*Cuc 19  ]
+"741
+[e = _cp :s 1C ]
+[e :U 19 ]
+"777
+[e $U 20  ]
+[e :U 21 ]
+"778
+[e ( _putch (1 *U ++ _cp * -> -> 1 `i `x -> -> # *U _cp `i `x ]
+[e :U 20 ]
+"777
+[e $ != -> *U _cp `i -> -> -> 0 `i `Cuc `i 21  ]
+[e :U 22 ]
+"779
+[e $U 8  ]
+"802
+[e :U 23 ]
+"813
+[e $U 8  ]
+"822
+}
+[e $U 12  ]
+"635
+[e :U 13 ]
+[e [\ = _c -> *U ++ _f * -> -> 1 `i `x -> -> # *U _f `i `x `c , $ -> -> 0 `i `c 14
+ , $ -> -> 100 `ui `c 16
+ , $ -> -> 105 `ui `c 17
+ , $ -> -> 115 `ui `c 18
+ 23 ]
+"822
+[e :U 12 ]
+"1253
+{
+"1259
+[e = _val -> *U -> ( ___va_arg , (. -> *U -> &U _ap `**i `*v -> 0 `i `*i `ui ]
+"1261
+[e $ ! < -> _val `i -> 0 `i 24  ]
+{
+"1262
+[e =| _flag -> -> 3 `i `uc ]
+"1263
+[e = _val -U _val ]
+"1264
+}
+[e :U 24 ]
+"1266
+}
+"1305
+{
+[e = _c -> -> 1 `i `c ]
+[e $ != -> -> _c `i `ui / -> # _dpowers `ui -> # *U + &U _dpowers * -> -> -> 0 `i `ui `ux -> -> # *U &U _dpowers `ui `ux `ui 25  ]
+[e $U 26  ]
+"1306
+[e :U 25 ]
+[e $ ! < _val *U + &U _dpowers * -> -> _c `uc `ux -> -> # *U &U _dpowers `ui `ux 28  ]
+"1307
+[e $U 26  ]
+[e :U 28 ]
+"1305
+[e ++ _c -> -> 1 `i `c ]
+[e $ != -> -> _c `i `ui / -> # _dpowers `ui -> # *U + &U _dpowers * -> -> -> 0 `i `ui `ux -> -> # *U &U _dpowers `ui `ux `ui 25  ]
+[e :U 26 ]
+"1422
+}
+{
+"1438
+[e $ ! != & -> _flag `i -> 3 `i -> 0 `i 29  ]
+"1439
+[e ( _putch (1 -> -> 45 `ui `uc ]
+[e :U 29 ]
+"1469
+}
+"1472
+[e = _prec _c ]
+"1474
+[e $U 30  ]
+[e :U 31 ]
+{
+"1478
+{
+"1489
+[e = _c -> + % / _val *U + &U _dpowers * -> -> _prec `uc `ux -> -> # *U &U _dpowers `ui `ux -> -> 10 `i `ui -> 48 `ui `c ]
+"1523
+}
+"1524
+[e ( _putch (1 -> _c `uc ]
+"1525
+}
+[e :U 30 ]
+"1474
+[e $ != -> -- _prec -> -> 1 `i `c `i -> -> -> 0 `i `c `i 31  ]
+[e :U 32 ]
+"1533
+}
+[e :U 8 ]
+"536
+[e $ != -> = _c -> *U ++ _f * -> -> 1 `i `x -> -> # *U _f `i `x `c `i -> -> -> 0 `i `c `i 9  ]
+[e :U 10 ]
+"1535
+[e :U 15 ]
+"1540
+[e ) -> 0 `i ]
+[e $UE 7  ]
+"1541
+[e :UE 7 ]
+}
+[a 1C 40 110 117 108 108 41 0 ]
+

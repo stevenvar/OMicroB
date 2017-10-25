@@ -1,0 +1,304 @@
+[p LITE_MODE AUTOSTATIC LFSROK ]
+[d version 1.1 ]
+[d edition pro ]
+[d chip 18F4620 ]
+[d frameptr 4065 ]
+"8 /Applications/microchip/xc8/v1.44/sources/common/assert.c
+[v __fassert _fassert `(v  1 e 1 0 ]
+"464 /Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+[v _printf printf `(i  1 e 2 0 ]
+"62 /Applications/microchip/xc8/v1.44/sources/common/float.c
+[v ___ftpack __ftpack `(f  1 e 3 0 ]
+"86 /Applications/microchip/xc8/v1.44/sources/common/ftadd.c
+[v ___ftadd __ftadd `(f  1 e 3 0 ]
+"54 /Applications/microchip/xc8/v1.44/sources/common/ftdiv.c
+[v ___ftdiv __ftdiv `(f  1 e 3 0 ]
+"62 /Applications/microchip/xc8/v1.44/sources/common/ftmul.c
+[v ___ftmul __ftmul `(f  1 e 3 0 ]
+"20 /Applications/microchip/xc8/v1.44/sources/common/ftsub.c
+[v ___ftsub __ftsub `(f  1 e 3 0 ]
+"8 /Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+[v ___lwdiv __lwdiv `(ui  1 e 2 0 ]
+"8 /Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+[v ___lwmod __lwmod `(ui  1 e 2 0 ]
+"7 /Applications/microchip/xc8/v1.44/sources/common/putch.c
+[v _putch putch `(v  1 e 1 0 ]
+"10 /Applications/microchip/xc8/v1.44/sources/common/sprcadd.c
+[v ___fladd __fladd `(d  1 e 3 0 ]
+"245
+[v ___flsub __flsub `(d  1 e 3 0 ]
+"11 /Applications/microchip/xc8/v1.44/sources/common/sprcdiv.c
+[v ___fldiv __fldiv `(d  1 e 3 0 ]
+"8 /Applications/microchip/xc8/v1.44/sources/common/sprcmul.c
+[v ___flmul __flmul `(d  1 e 3 0 ]
+"15 /Applications/microchip/xc8/v1.44/sources/common/Umul16.c
+[v ___wmul __wmul `(ui  1 e 2 0 ]
+"15 /Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+[v ___lmul __lmul `(ul  1 e 4 0 ]
+"62 /Users/steven/github/OMicroB/src/byterun/gc.c
+[v _gc_init gc_init `(v  1 e 1 0 ]
+"135
+[v _gc_one_val gc_one_val `(v  1 e 1 0 ]
+"220
+[v _gc gc `(v  1 e 1 0 ]
+"31 /Users/steven/github/OMicroB/src/byterun/interp.c
+[v _caml_raise_stack_overflow caml_raise_stack_overflow `(v  1 e 1 0 ]
+"41
+[v _get_primitive get_primitive `(*.2v  1 e 2 0 ]
+"49
+[v _read_byte read_byte `(uc  1 e 1 0 ]
+"60
+[v _read_opcode read_opcode `(uc  1 e 1 0 ]
+"64
+[v _read_uint8 read_uint8 `(uc  1 e 1 0 ]
+"68
+[v _read_int8 read_int8 `(c  1 e 1 0 ]
+"72
+[v _read_uint16 read_uint16 `(ui  1 e 2 0 ]
+"78
+[v _read_int16 read_int16 `(i  1 e 2 0 ]
+"82
+[v _read_uint32 read_uint32 `(ul  1 e 4 0 ]
+"90
+[v _read_int32 read_int32 `(l  1 e 4 0 ]
+"94
+[v _read_ptr_1B read_ptr_1B `(uc  1 e 1 0 ]
+"111
+[v _peek peek `(l  1 e 4 0 ]
+"115
+[v _push push `(v  1 e 1 0 ]
+"124
+[v _pop pop `(l  1 e 4 0 ]
+"128
+[v _pop_n pop_n `(v  1 e 1 0 ]
+"164
+[v _interp_init interp_init `(v  1 e 1 0 ]
+"174
+[v _interp interp `(l  1 e 4 0 ]
+"2001
+[v _setup setup `(v  1 e 1 0 ]
+"2023
+[v _main main `(i  1 e 2 0 ]
+"20 /Users/steven/github/OMicroB/src/byterun/stdlib.c
+[v _caml_write_reg caml_write_reg `(l  1 e 4 0 ]
+"2044 /Applications/microchip/xc8/v1.44/include/pic18f4620.h
+[v _TRISD TRISD `VEuc  1 e 1 @3989 ]
+"7139
+[v _LATD2 LATD2 `VEb  1 e 0 @31842 ]
+"354 /Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+[v _dpowers dpowers `C[5]ui  1 s 10 dpowers ]
+"40 /Users/steven/github/OMicroB/src/byterun/gc.c
+[v _heap1_start heap1_start `*.36Cl  1 e 3 0 ]
+[v _heap2_start heap2_start `*.36Cl  1 e 3 0 ]
+"41
+[v _heap1_end heap1_end `*.36Cl  1 e 3 0 ]
+[v _heap2_end heap2_end `*.36Cl  1 e 3 0 ]
+"42
+[v _current_heap current_heap `i  1 e 2 0 ]
+"47
+[v _heap_ptr heap_ptr `*.36l  1 e 3 0 ]
+[v _heap_end heap_end `*.36l  1 e 3 0 ]
+"50
+[v _heap_todo heap_todo `*.36l  1 e 3 0 ]
+"53
+[v _new_heap new_heap `*.36l  1 e 3 0 ]
+[v _old_heap old_heap `*.36l  1 e 3 0 ]
+"54
+[v _tab_heap_start tab_heap_start `[2]*.36l  1 e 6 0 ]
+"55
+[v _tab_heap_end tab_heap_end `[2]*.36l  1 e 6 0 ]
+"24 /Users/steven/github/OMicroB/src/byterun/interp.c
+[v _pc pc `uc  1 s 1 pc ]
+"25
+[v _env env `l  1 e 4 0 ]
+"26
+[v _sp sp `*.39l  1 e 2 0 ]
+"27
+[v _trapSp trapSp `l  1 s 4 trapSp ]
+"28
+[v _extra_args extra_args `uc  1 s 1 extra_args ]
+"27 /Users/steven/github/OMicroB/tests/blink/blink.c
+[v _ocaml_heap ocaml_heap `[32]l  1 e 128 0 ]
+"32
+[v _ocaml_heap1 ocaml_heap1 `*.39Cl  1 e 2 0 ]
+"33
+[v _ocaml_heap2 ocaml_heap2 `*.39Cl  1 e 2 0 ]
+"35
+[v _acc acc `l  1 e 4 0 ]
+"37
+[v _ocaml_stack ocaml_stack `[32]l  1 e 128 0 ]
+"72
+[v _ocaml_global_data ocaml_global_data `[1]l  1 e 4 0 ]
+"75
+[v _ocaml_bytecode ocaml_bytecode `C[26]uc  1 e 26 0 ]
+"106
+[v _ocaml_primitives ocaml_primitives `C[1]*.2v  1 e 2 0 ]
+"2023 /Users/steven/github/OMicroB/src/byterun/interp.c
+[v _main main `(i  1 e 2 0 ]
+{
+"2027
+} 0
+"2001
+[v _setup setup `(v  1 e 1 0 ]
+{
+"2013
+} 0
+"164
+[v _interp_init interp_init `(v  1 e 1 0 ]
+{
+"170
+} 0
+"174
+[v _interp interp `(l  1 e 4 0 ]
+{
+"580
+[v interp@n n `uc  1 a 1 63 ]
+"472
+[v interp@arg1 arg1 `l  1 a 4 58 ]
+"183
+[v interp@opcode opcode `uc  1 a 1 62 ]
+"1997
+} 0
+"64
+[v _read_uint8 read_uint8 `(uc  1 e 1 0 ]
+{
+"66
+} 0
+"94
+[v _read_ptr_1B read_ptr_1B `(uc  1 e 1 0 ]
+{
+"95
+[v read_ptr_1B@ofs ofs `c  1 a 1 1 ]
+"97
+} 0
+"68
+[v _read_int8 read_int8 `(c  1 e 1 0 ]
+{
+"70
+} 0
+"60
+[v _read_opcode read_opcode `(uc  1 e 1 0 ]
+{
+"62
+} 0
+"49
+[v _read_byte read_byte `(uc  1 e 1 0 ]
+{
+"50
+[v read_byte@c c `uc  1 a 1 0 ]
+"58
+} 0
+"115
+[v _push push `(v  1 e 1 0 ]
+{
+[v push@x x `l  1 p 4 36 ]
+"122
+} 0
+"31
+[v _caml_raise_stack_overflow caml_raise_stack_overflow `(v  1 e 1 0 ]
+{
+"37
+} 0
+"8 /Applications/microchip/xc8/v1.44/sources/common/assert.c
+[v __fassert _fassert `(v  1 e 1 0 ]
+{
+[v __fassert@line line `i  1 p 2 30 ]
+[v __fassert@file file `*.32Cuc  1 p 2 32 ]
+[v __fassert@exp exp `*.32Cuc  1 p 2 34 ]
+"12
+} 0
+"464 /Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+[v _printf printf `(i  1 e 2 0 ]
+{
+"528
+[v printf@val val `ui  1 a 2 27 ]
+"530
+[v printf@cp cp `*.32Cuc  1 a 2 25 ]
+"466
+[v printf@ap ap `[1]*.39v  1 a 2 23 ]
+"499
+[v printf@c c `c  1 a 1 29 ]
+"506
+[v printf@prec prec `c  1 a 1 22 ]
+"508
+[v printf@flag flag `uc  1 a 1 21 ]
+"464
+[v printf@f f `*.32Cuc  1 p 2 12 ]
+"1541
+} 0
+"7 /Applications/microchip/xc8/v1.44/sources/common/putch.c
+[v _putch putch `(v  1 e 1 0 ]
+{
+"9
+} 0
+"8 /Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+[v ___lwmod __lwmod `(ui  1 e 2 0 ]
+{
+"11
+[v ___lwmod@counter counter `uc  1 a 1 11 ]
+"8
+[v ___lwmod@dividend dividend `ui  1 p 2 7 ]
+[v ___lwmod@divisor divisor `ui  1 p 2 9 ]
+"26
+} 0
+"8 /Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+[v ___lwdiv __lwdiv `(ui  1 e 2 0 ]
+{
+"11
+[v ___lwdiv@quotient quotient `ui  1 a 2 4 ]
+"12
+[v ___lwdiv@counter counter `uc  1 a 1 6 ]
+"8
+[v ___lwdiv@dividend dividend `ui  1 p 2 0 ]
+[v ___lwdiv@divisor divisor `ui  1 p 2 2 ]
+"31
+} 0
+"128 /Users/steven/github/OMicroB/src/byterun/interp.c
+[v _pop_n pop_n `(v  1 e 1 0 ]
+{
+[v pop_n@n n `i  1 p 2 1 ]
+"130
+} 0
+"124
+[v _pop pop `(l  1 e 4 0 ]
+{
+"126
+} 0
+"111
+[v _peek peek `(l  1 e 4 0 ]
+{
+[v peek@n n `i  1 p 2 0 ]
+"113
+} 0
+"41
+[v _get_primitive get_primitive `(*.2v  1 e 2 0 ]
+{
+[v get_primitive@prim_ind prim_ind `uc  1 a 1 wreg ]
+[v get_primitive@prim_ind prim_ind `uc  1 a 1 wreg ]
+"45
+[v get_primitive@prim_ind prim_ind `uc  1 a 1 2 ]
+"47
+} 0
+"20 /Users/steven/github/OMicroB/src/byterun/stdlib.c
+[v _caml_write_reg caml_write_reg `(l  1 e 4 0 ]
+{
+[v caml_write_reg@pin pin `l  1 p 4 3 ]
+[v caml_write_reg@v v `l  1 p 4 7 ]
+"23
+} 0
+"15 /Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+[v ___lmul __lmul `(ul  1 e 4 0 ]
+{
+"17
+[v ___lmul@product product `ul  1 a 4 12 ]
+"15
+[v ___lmul@multiplier multiplier `ul  1 p 4 4 ]
+[v ___lmul@multiplicand multiplicand `ul  1 p 4 8 ]
+"129
+} 0
+"62 /Users/steven/github/OMicroB/src/byterun/gc.c
+[v _gc_init gc_init `(v  1 e 1 0 ]
+{
+[v gc_init@heap_size heap_size `l  1 p 4 0 ]
+"88
+} 0

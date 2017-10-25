@@ -1,0 +1,806 @@
+%CMF
+# %PSECTS Section
+# For each object file, details of its psects are enumerated here.
+# The begining of the section is indicated by %PSECTS.  The first
+# line indicates the name of the first object file, e.g.
+#    $foo.obj
+# Each line that follows describes a psect in that object file, until
+# the next object file.  The lines that describe a psect have the
+# format:
+#    <psect name> <class name> <space> <link address> <load addresses> <length> <delta>
+# All addresses and the length are given in unqualified hexadecimal
+# in delta units.  Any other numeric values are decimal.
+%PSECTS
+$blink.obj
+cinit CODE 0 1850 1850 62 1
+text0 CODE 0 1B4E 1B4E 8 1
+text1 CODE 0 1AC8 1AC8 1E 1
+text2 CODE 0 19D8 19D8 34 1
+text3 CODE 0 1088 1088 43E 1
+text4 CODE 0 1B56 1B56 6 1
+text5 CODE 0 1B38 1B38 E 1
+text6 CODE 0 1B5C 1B5C 6 1
+text7 CODE 0 1B62 1B62 6 1
+text8 CODE 0 1A84 1A84 22 1
+text9 CODE 0 199C 199C 3C 1
+nvCOMRAM COMRAM 1 66 66 12 1
+text10 CODE 0 1AE6 1AE6 1E 1
+text11 CODE 0 1A36 1A36 28 1
+text12 CODE 0 14C6 14C6 18E 1
+text13 CODE 0 1B68 1B68 2 1
+text14 CODE 0 195A 195A 42 1
+text15 CODE 0 1908 1908 52 1
+text16 CODE 0 1B04 1B04 1E 1
+text17 CODE 0 1AA6 1AA6 22 1
+text18 CODE 0 1A0C 1A0C 2A 1
+text19 CODE 0 1A5E 1A5E 26 1
+text20 CODE 0 1B22 1B22 16 1
+text21 CODE 0 18B2 18B2 56 1
+text22 CODE 0 1754 1754 FC 1
+nvBANK0 BANK0 1 8D 8D A 1
+idataCOMRAM CODE 0 1B46 1B46 8 1
+cstackCOMRAM COMRAM 1 1 1 45 1
+bssBANK0 BANK0 1 80 80 D 1
+smallconst SMALLCONST 0 1000 1000 88 1
+idataBANK1 CODE 0 1654 1654 100 1
+dataBANK1 BANK1 1 100 100 100 1
+dataCOMRAM COMRAM 1 78 78 8 1
+bssCOMRAM COMRAM 1 46 46 20 1
+$startup.obj
+init CODE 0 0 0 4 1
+# %UNUSED Section
+# This section enumerates the unused ranges of each CLASS. Each entry
+# is described on a single line as follows:
+#    <class name> <range> <delta>
+# Addresses given in the range are in hexadecimal and units of delta.
+%UNUSED
+RAM 97-FF 1
+RAM 200-F7F 1
+SFR F80-FFF 1
+BANK0 97-FF 1
+BANK2 200-2FF 1
+BANK3 300-3FF 1
+BANK4 400-4FF 1
+BANK5 500-5FF 1
+BANK6 600-6FF 1
+BANK7 700-7FF 1
+BANK8 800-8FF 1
+BANK9 900-9FF 1
+CONST 4-FFF 1
+CONST 1B6A-FFFF 1
+IDLOC 200000-200007 1
+STACK 200-F7F 1
+SMALLCONST 1B6A-FFFF 1
+CODE 4-FFF 1
+CODE 1B6A-FFFF 1
+BANK10 A00-AFF 1
+BANK11 B00-BFF 1
+BANK12 C00-CFF 1
+BANK13 D00-DFF 1
+BANK14 E00-EFF 1
+BANK15 F00-F7F 1
+BIGRAM 97-FF 1
+BIGRAM 200-F7F 1
+CONFIG 300000-30000D 1
+EEDATA F00000-F003FF 1
+MEDIUMCONST 1B6A-FFFF 1
+# %LINETAB Section
+# This section enumerates the file/line to address mappings.
+# The beginning of the section is indicated by %LINETAB.
+# The first line indicates the name of the first object file, e.g.
+#   $foo.obj
+# Each line that follows describes a single mapping until the next
+# object file.  Mappings have the following format:
+#    <address> <psect name> <class name> ><line number>:<file name>
+# The address is absolute and given given in unqualified hex 
+# in delta units of the psect. All mappings within an object file
+# are in ascending order of addresses.
+# All other numeric values are in decimal.
+%LINETAB
+$blink.obj
+1754 text22 CODE >62:/Users/steven/github/OMicroB/src/byterun/gc.c
+1754 text22 CODE >65:/Users/steven/github/OMicroB/src/byterun/gc.c
+1766 text22 CODE >67:/Users/steven/github/OMicroB/src/byterun/gc.c
+1792 text22 CODE >68:/Users/steven/github/OMicroB/src/byterun/gc.c
+179E text22 CODE >69:/Users/steven/github/OMicroB/src/byterun/gc.c
+17AA text22 CODE >72:/Users/steven/github/OMicroB/src/byterun/gc.c
+17BC text22 CODE >74:/Users/steven/github/OMicroB/src/byterun/gc.c
+17E6 text22 CODE >75:/Users/steven/github/OMicroB/src/byterun/gc.c
+17F2 text22 CODE >76:/Users/steven/github/OMicroB/src/byterun/gc.c
+17FE text22 CODE >79:/Users/steven/github/OMicroB/src/byterun/gc.c
+181C text22 CODE >84:/Users/steven/github/OMicroB/src/byterun/gc.c
+1846 text22 CODE >86:/Users/steven/github/OMicroB/src/byterun/gc.c
+184E text22 CODE >88:/Users/steven/github/OMicroB/src/byterun/gc.c
+18B2 text21 CODE >15:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18B2 text21 CODE >119:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18C2 text21 CODE >120:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18C2 text21 CODE >121:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18C6 text21 CODE >122:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18D6 text21 CODE >123:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18E0 text21 CODE >124:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18EA text21 CODE >125:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+18F6 text21 CODE >128:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+1906 text21 CODE >129:/Applications/microchip/xc8/v1.44/sources/common/Umul32.c
+1B22 text20 CODE >20:/Users/steven/github/OMicroB/src/byterun/stdlib.c
+1B22 text20 CODE >21:/Users/steven/github/OMicroB/src/byterun/stdlib.c
+1B26 text20 CODE >22:/Users/steven/github/OMicroB/src/byterun/stdlib.c
+1A5E text19 CODE >41:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A60 text19 CODE >45:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A0C text18 CODE >111:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A0C text18 CODE >112:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AA6 text17 CODE >124:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AA6 text17 CODE >125:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B04 text16 CODE >128:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B04 text16 CODE >129:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B20 text16 CODE >130:/Users/steven/github/OMicroB/src/byterun/interp.c
+1908 text15 CODE >8:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1908 text15 CODE >14:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1910 text15 CODE >15:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1918 text15 CODE >16:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+191C text15 CODE >17:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+191E text15 CODE >18:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1924 text15 CODE >19:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1926 text15 CODE >17:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1926 text15 CODE >20:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+192A text15 CODE >22:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1930 text15 CODE >23:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+193C text15 CODE >24:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1944 text15 CODE >25:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1946 text15 CODE >26:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1946 text15 CODE >27:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+194C text15 CODE >28:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1950 text15 CODE >30:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+1958 text15 CODE >31:/Applications/microchip/xc8/v1.44/sources/common/lwdiv.c
+195A text14 CODE >8:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+195A text14 CODE >13:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1962 text14 CODE >14:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1966 text14 CODE >15:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1968 text14 CODE >16:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+196E text14 CODE >17:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1970 text14 CODE >15:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1970 text14 CODE >18:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1974 text14 CODE >20:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1980 text14 CODE >21:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1988 text14 CODE >22:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+198E text14 CODE >23:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1992 text14 CODE >25:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+199A text14 CODE >26:/Applications/microchip/xc8/v1.44/sources/common/lwmod.c
+1B68 text13 CODE >7:/Applications/microchip/xc8/v1.44/sources/common/putch.c
+1B68 text13 CODE >9:/Applications/microchip/xc8/v1.44/sources/common/putch.c
+14C6 text12 CODE >464:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14C6 text12 CODE >533:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14CE text12 CODE >536:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14D0 text12 CODE >538:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14D8 text12 CODE >541:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14DE text12 CODE >542:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14E0 text12 CODE >543:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14E0 text12 CODE >548:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14E4 text12 CODE >635:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14E6 text12 CODE >728:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14E6 text12 CODE >734:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+14FE text12 CODE >740:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1506 text12 CODE >741:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+150E text12 CODE >777:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1510 text12 CODE >778:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1526 text12 CODE >777:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+153C text12 CODE >635:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+156C text12 CODE >822:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+156C text12 CODE >1259:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1584 text12 CODE >1261:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1588 text12 CODE >1262:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+158C text12 CODE >1263:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1594 text12 CODE >1264:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1594 text12 CODE >1305:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+15A0 text12 CODE >1306:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+15C6 text12 CODE >1305:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+15CA text12 CODE >1438:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+15D6 text12 CODE >1439:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+15DC text12 CODE >1472:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+15E0 text12 CODE >1474:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+15E2 text12 CODE >1489:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+162A text12 CODE >1524:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1630 text12 CODE >1474:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1630 text12 CODE >1525:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1638 text12 CODE >536:/Applications/microchip/xc8/v1.44/sources/common/doprnt.c
+1A36 text11 CODE >8:/Applications/microchip/xc8/v1.44/sources/common/assert.c
+1A36 text11 CODE >10:/Applications/microchip/xc8/v1.44/sources/common/assert.c
+1A5A text11 CODE >11:/Applications/microchip/xc8/v1.44/sources/common/assert.c
+1AE6 text10 CODE >31:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AE6 text10 CODE >35:/Users/steven/github/OMicroB/src/byterun/interp.c
+199C text9 CODE >115:/Users/steven/github/OMicroB/src/byterun/interp.c
+199C text9 CODE >116:/Users/steven/github/OMicroB/src/byterun/interp.c
+19B0 text9 CODE >117:/Users/steven/github/OMicroB/src/byterun/interp.c
+19B4 text9 CODE >118:/Users/steven/github/OMicroB/src/byterun/interp.c
+19B6 text9 CODE >119:/Users/steven/github/OMicroB/src/byterun/interp.c
+19B6 text9 CODE >120:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A84 text8 CODE >49:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A84 text8 CODE >54:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AA0 text8 CODE >56:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AA2 text8 CODE >57:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B62 text7 CODE >60:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B62 text7 CODE >61:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B5C text6 CODE >68:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B5C text6 CODE >69:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B38 text5 CODE >94:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B38 text5 CODE >95:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B3E text5 CODE >96:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B56 text4 CODE >64:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B56 text4 CODE >65:/Users/steven/github/OMicroB/src/byterun/interp.c
+1088 text3 CODE >174:/Users/steven/github/OMicroB/src/byterun/interp.c
+1088 text3 CODE >183:/Users/steven/github/OMicroB/src/byterun/interp.c
+108E text3 CODE >207:/Users/steven/github/OMicroB/src/byterun/interp.c
+1090 text3 CODE >210:/Users/steven/github/OMicroB/src/byterun/interp.c
+1090 text3 CODE >211:/Users/steven/github/OMicroB/src/byterun/interp.c
+109E text3 CODE >280:/Users/steven/github/OMicroB/src/byterun/interp.c
+109E text3 CODE >281:/Users/steven/github/OMicroB/src/byterun/interp.c
+10B2 text3 CODE >282:/Users/steven/github/OMicroB/src/byterun/interp.c
+10CE text3 CODE >283:/Users/steven/github/OMicroB/src/byterun/interp.c
+10D0 text3 CODE >344:/Users/steven/github/OMicroB/src/byterun/interp.c
+10D0 text3 CODE >345:/Users/steven/github/OMicroB/src/byterun/interp.c
+10E0 text3 CODE >346:/Users/steven/github/OMicroB/src/byterun/interp.c
+10E2 text3 CODE >471:/Users/steven/github/OMicroB/src/byterun/interp.c
+10E2 text3 CODE >472:/Users/steven/github/OMicroB/src/byterun/interp.c
+10F6 text3 CODE >473:/Users/steven/github/OMicroB/src/byterun/interp.c
+112E text3 CODE >474:/Users/steven/github/OMicroB/src/byterun/interp.c
+1142 text3 CODE >475:/Users/steven/github/OMicroB/src/byterun/interp.c
+117A text3 CODE >476:/Users/steven/github/OMicroB/src/byterun/interp.c
+118E text3 CODE >480:/Users/steven/github/OMicroB/src/byterun/interp.c
+11DC text3 CODE >481:/Users/steven/github/OMicroB/src/byterun/interp.c
+11EC text3 CODE >482:/Users/steven/github/OMicroB/src/byterun/interp.c
+11F0 text3 CODE >579:/Users/steven/github/OMicroB/src/byterun/interp.c
+11F0 text3 CODE >580:/Users/steven/github/OMicroB/src/byterun/interp.c
+11F6 text3 CODE >581:/Users/steven/github/OMicroB/src/byterun/interp.c
+1200 text3 CODE >582:/Users/steven/github/OMicroB/src/byterun/interp.c
+1206 text3 CODE >583:/Users/steven/github/OMicroB/src/byterun/interp.c
+1208 text3 CODE >584:/Users/steven/github/OMicroB/src/byterun/interp.c
+1256 text3 CODE >585:/Users/steven/github/OMicroB/src/byterun/interp.c
+1266 text3 CODE >586:/Users/steven/github/OMicroB/src/byterun/interp.c
+1268 text3 CODE >587:/Users/steven/github/OMicroB/src/byterun/interp.c
+127A text3 CODE >588:/Users/steven/github/OMicroB/src/byterun/interp.c
+128E text3 CODE >589:/Users/steven/github/OMicroB/src/byterun/interp.c
+12A0 text3 CODE >591:/Users/steven/github/OMicroB/src/byterun/interp.c
+12A2 text3 CODE >771:/Users/steven/github/OMicroB/src/byterun/interp.c
+12A2 text3 CODE >772:/Users/steven/github/OMicroB/src/byterun/interp.c
+12B6 text3 CODE >783:/Users/steven/github/OMicroB/src/byterun/interp.c
+12C6 text3 CODE >784:/Users/steven/github/OMicroB/src/byterun/interp.c
+12C8 text3 CODE >1114:/Users/steven/github/OMicroB/src/byterun/interp.c
+12C8 text3 CODE >1115:/Users/steven/github/OMicroB/src/byterun/interp.c
+12CE text3 CODE >1135:/Users/steven/github/OMicroB/src/byterun/interp.c
+12CE text3 CODE >1136:/Users/steven/github/OMicroB/src/byterun/interp.c
+12DA text3 CODE >1137:/Users/steven/github/OMicroB/src/byterun/interp.c
+12E0 text3 CODE >1138:/Users/steven/github/OMicroB/src/byterun/interp.c
+12E2 text3 CODE >1139:/Users/steven/github/OMicroB/src/byterun/interp.c
+12E4 text3 CODE >1141:/Users/steven/github/OMicroB/src/byterun/interp.c
+12E6 text3 CODE >1329:/Users/steven/github/OMicroB/src/byterun/interp.c
+12E6 text3 CODE >1330:/Users/steven/github/OMicroB/src/byterun/interp.c
+133C text3 CODE >1331:/Users/steven/github/OMicroB/src/byterun/interp.c
+1340 text3 CODE >1332:/Users/steven/github/OMicroB/src/byterun/interp.c
+1342 text3 CODE >1385:/Users/steven/github/OMicroB/src/byterun/interp.c
+1342 text3 CODE >1386:/Users/steven/github/OMicroB/src/byterun/interp.c
+1346 text3 CODE >1427:/Users/steven/github/OMicroB/src/byterun/interp.c
+1346 text3 CODE >1428:/Users/steven/github/OMicroB/src/byterun/interp.c
+135A text3 CODE >1429:/Users/steven/github/OMicroB/src/byterun/interp.c
+136A text3 CODE >1504:/Users/steven/github/OMicroB/src/byterun/interp.c
+136A text3 CODE >1505:/Users/steven/github/OMicroB/src/byterun/interp.c
+13E0 text3 CODE >1632:/Users/steven/github/OMicroB/src/byterun/interp.c
+13E0 text3 CODE >1633:/Users/steven/github/OMicroB/src/byterun/interp.c
+144E text3 CODE >1634:/Users/steven/github/OMicroB/src/byterun/interp.c
+1450 text3 CODE >1988:/Users/steven/github/OMicroB/src/byterun/interp.c
+1450 text3 CODE >1992:/Users/steven/github/OMicroB/src/byterun/interp.c
+146C text3 CODE >1994:/Users/steven/github/OMicroB/src/byterun/interp.c
+146E text3 CODE >207:/Users/steven/github/OMicroB/src/byterun/interp.c
+19D8 text2 CODE >164:/Users/steven/github/OMicroB/src/byterun/interp.c
+19D8 text2 CODE >165:/Users/steven/github/OMicroB/src/byterun/interp.c
+19E0 text2 CODE >166:/Users/steven/github/OMicroB/src/byterun/interp.c
+19F2 text2 CODE >167:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A02 text2 CODE >168:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A06 text2 CODE >169:/Users/steven/github/OMicroB/src/byterun/interp.c
+1A0A text2 CODE >170:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AC8 text1 CODE >2001:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AC8 text1 CODE >2010:/Users/steven/github/OMicroB/src/byterun/interp.c
+1ACC text1 CODE >2011:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AE0 text1 CODE >2012:/Users/steven/github/OMicroB/src/byterun/interp.c
+1AE4 text1 CODE >2013:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B4E text0 CODE >2023:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B4E text0 CODE >2024:/Users/steven/github/OMicroB/src/byterun/interp.c
+1B52 text0 CODE >2027:/Users/steven/github/OMicroB/src/byterun/interp.c
+1850 cinit CODE >801:/Users/steven/github/OMicroB/tests/blink/blink.as
+1850 cinit CODE >803:/Users/steven/github/OMicroB/tests/blink/blink.as
+1850 cinit CODE >806:/Users/steven/github/OMicroB/tests/blink/blink.as
+1850 cinit CODE >901:/Users/steven/github/OMicroB/tests/blink/blink.as
+1852 cinit CODE >902:/Users/steven/github/OMicroB/tests/blink/blink.as
+1854 cinit CODE >903:/Users/steven/github/OMicroB/tests/blink/blink.as
+1856 cinit CODE >904:/Users/steven/github/OMicroB/tests/blink/blink.as
+1858 cinit CODE >905:/Users/steven/github/OMicroB/tests/blink/blink.as
+185A cinit CODE >906:/Users/steven/github/OMicroB/tests/blink/blink.as
+185C cinit CODE >907:/Users/steven/github/OMicroB/tests/blink/blink.as
+1860 cinit CODE >908:/Users/steven/github/OMicroB/tests/blink/blink.as
+1864 cinit CODE >909:/Users/steven/github/OMicroB/tests/blink/blink.as
+1864 cinit CODE >910:/Users/steven/github/OMicroB/tests/blink/blink.as
+1866 cinit CODE >911:/Users/steven/github/OMicroB/tests/blink/blink.as
+186A cinit CODE >912:/Users/steven/github/OMicroB/tests/blink/blink.as
+186C cinit CODE >913:/Users/steven/github/OMicroB/tests/blink/blink.as
+186E cinit CODE >914:/Users/steven/github/OMicroB/tests/blink/blink.as
+1870 cinit CODE >915:/Users/steven/github/OMicroB/tests/blink/blink.as
+1872 cinit CODE >916:/Users/steven/github/OMicroB/tests/blink/blink.as
+1874 cinit CODE >920:/Users/steven/github/OMicroB/tests/blink/blink.as
+1876 cinit CODE >921:/Users/steven/github/OMicroB/tests/blink/blink.as
+1878 cinit CODE >922:/Users/steven/github/OMicroB/tests/blink/blink.as
+187A cinit CODE >923:/Users/steven/github/OMicroB/tests/blink/blink.as
+187C cinit CODE >924:/Users/steven/github/OMicroB/tests/blink/blink.as
+187E cinit CODE >925:/Users/steven/github/OMicroB/tests/blink/blink.as
+1880 cinit CODE >926:/Users/steven/github/OMicroB/tests/blink/blink.as
+1884 cinit CODE >927:/Users/steven/github/OMicroB/tests/blink/blink.as
+1888 cinit CODE >928:/Users/steven/github/OMicroB/tests/blink/blink.as
+1888 cinit CODE >929:/Users/steven/github/OMicroB/tests/blink/blink.as
+188A cinit CODE >930:/Users/steven/github/OMicroB/tests/blink/blink.as
+188E cinit CODE >931:/Users/steven/github/OMicroB/tests/blink/blink.as
+1890 cinit CODE >932:/Users/steven/github/OMicroB/tests/blink/blink.as
+1892 cinit CODE >933:/Users/steven/github/OMicroB/tests/blink/blink.as
+1894 cinit CODE >937:/Users/steven/github/OMicroB/tests/blink/blink.as
+1898 cinit CODE >938:/Users/steven/github/OMicroB/tests/blink/blink.as
+189A cinit CODE >939:/Users/steven/github/OMicroB/tests/blink/blink.as
+189A cinit CODE >940:/Users/steven/github/OMicroB/tests/blink/blink.as
+189C cinit CODE >941:/Users/steven/github/OMicroB/tests/blink/blink.as
+189E cinit CODE >942:/Users/steven/github/OMicroB/tests/blink/blink.as
+18A0 cinit CODE >945:/Users/steven/github/OMicroB/tests/blink/blink.as
+18A4 cinit CODE >946:/Users/steven/github/OMicroB/tests/blink/blink.as
+18A6 cinit CODE >947:/Users/steven/github/OMicroB/tests/blink/blink.as
+18A6 cinit CODE >948:/Users/steven/github/OMicroB/tests/blink/blink.as
+18A8 cinit CODE >949:/Users/steven/github/OMicroB/tests/blink/blink.as
+18AA cinit CODE >950:/Users/steven/github/OMicroB/tests/blink/blink.as
+18AC cinit CODE >956:/Users/steven/github/OMicroB/tests/blink/blink.as
+18AC cinit CODE >958:/Users/steven/github/OMicroB/tests/blink/blink.as
+18AE cinit CODE >959:/Users/steven/github/OMicroB/tests/blink/blink.as
+$startup.obj
+0 text CODE >51:/Users/steven/github/OMicroB/tests/blink/startup.as
+0 text CODE >52:/Users/steven/github/OMicroB/tests/blink/startup.as
+0 text CODE >53:/Users/steven/github/OMicroB/tests/blink/startup.as
+0 text CODE >55:/Users/steven/github/OMicroB/tests/blink/startup.as
+0 init CODE >118:/Users/steven/github/OMicroB/tests/blink/startup.as
+0 init CODE >120:/Users/steven/github/OMicroB/tests/blink/startup.as
+0 reset_vec CODE >97:/Users/steven/github/OMicroB/tests/blink/startup.as
+# %SYMTAB Section
+# An enumeration of all symbols in the program.
+# The beginning of the section is indicated by %SYMTAB.
+# Each line describes a single symbol as follows:
+#    <label> <value> [-]<load-adj> <class> <space> <psect> <file-name>
+# The value and load-adj are both in unqualified hexadecimal.
+# All other numeric values are in decimal.  The load-adj is the
+# quantity one needs to add to the symbol value in order to obtain the load
+# address of the symbol.  This value may be signed. If the symbol
+# was defined in a psect then <psect> will be "-". File-name
+# is the name of the object file in which the symbol was defined.
+%SYMTAB
+_ocaml_heap1 7A 0 COMRAM 1 dataCOMRAM blink.obj
+_ocaml_heap2 78 0 COMRAM 1 dataCOMRAM blink.obj
+_ocaml_stack 100 0 BANK1 1 dataBANK1 blink.obj
+___lwmod@counter C 0 COMRAM 1 cstackCOMRAM blink.obj
+__LdataBANK1 0 0 ABS 0 dataBANK1 blink.obj
+__Lmediumconst 0 0 MEDIUMCONST 0 mediumconst blink.obj
+__Hspace_0 1B6A 0 ABS 0 - blink.obj
+__Hspace_1 200 0 ABS 0 - blink.obj
+__Hspace_2 0 0 ABS 0 - blink.obj
+__HidataBANK1 0 0 ABS 0 idataBANK1 blink.obj
+_old_heap 8A 0 BANK0 1 bssBANK0 blink.obj
+__Hibigdata 0 0 CODE 0 ibigdata blink.obj
+__mediumconst 0 0 MEDIUMCONST 0 mediumconst startup.obj
+_int64_custom_operations 5C 0 COMRAM 1 bssCOMRAM blink.obj
+_tab_heap_start 46 0 COMRAM 1 bssCOMRAM blink.obj
+__Heeprom_data 0 0 EEDATA 0 eeprom_data blink.obj
+_pc 61 0 COMRAM 1 bssCOMRAM blink.obj
+_sp 72 0 COMRAM 1 nvCOMRAM blink.obj
+_atom0_header 86 0 BANK0 1 bssBANK0 blink.obj
+?_pop 1 0 COMRAM 1 cstackCOMRAM blink.obj
+__Lsmallconst 1000 0 SMALLCONST 0 smallconst blink.obj
+_gc_init 1754 0 CODE 0 text22 blink.obj
+___sp 0 0 STACK 2 stack startup.obj
+_main 1B4E 0 CODE 0 text0 blink.obj
+_peek 1A0C 0 CODE 0 text18 blink.obj
+_push 199C 0 CODE 0 text9 blink.obj
+start 0 0 CODE 0 init startup.obj
+__size_of_main 0 0 ABS 0 - blink.obj
+__size_of_peek 0 0 ABS 0 - blink.obj
+__size_of_push 0 0 ABS 0 - blink.obj
+__size_of___lwdiv 0 0 ABS 0 - blink.obj
+__size_of___lwmod 0 0 ABS 0 - blink.obj
+__HbssCOMRAM 0 0 ABS 0 bssCOMRAM blink.obj
+peek@n 1 0 COMRAM 1 cstackCOMRAM blink.obj
+?___lmul 5 0 COMRAM 1 cstackCOMRAM blink.obj
+push@x 25 0 COMRAM 1 cstackCOMRAM blink.obj
+_ocaml_primitives 1025 0 SMALLCONST 0 smallconst blink.obj
+__size_of_read_uint8 0 0 ABS 0 - blink.obj
+__LidataBANK1 0 0 ABS 0 idataBANK1 blink.obj
+caml_write_reg@v 8 0 COMRAM 1 cstackCOMRAM blink.obj
+__Hpowerup 0 0 CODE 0 powerup blink.obj
+printf@c 1E 0 COMRAM 1 cstackCOMRAM blink.obj
+printf@f D 0 COMRAM 1 cstackCOMRAM blink.obj
+__LnvCOMRAM 0 0 ABS 0 nvCOMRAM blink.obj
+__HdataCOMRAM 0 0 ABS 0 dataCOMRAM blink.obj
+__accesstop 80 0 ABS 0 - startup.obj
+intlevel0 0 0 CODE 0 text startup.obj
+intlevel1 0 0 CODE 0 text startup.obj
+intlevel2 0 0 CODE 0 text startup.obj
+intlevel3 0 0 CODE 0 text startup.obj
+__LbssCOMRAM 0 0 ABS 0 bssCOMRAM blink.obj
+__LnvFARRAM 0 0 FARRAM 0 nvFARRAM blink.obj
+__Hifardata 0 0 CODE 0 ifardata blink.obj
+read_ptr_1B@ofs 2 0 COMRAM 1 cstackCOMRAM blink.obj
+__Hclrtext 0 0 ABS 0 clrtext blink.obj
+_new_heap 4C 0 COMRAM 1 bssCOMRAM blink.obj
+__pidataCOMRAM 1B46 0 CODE 0 idataCOMRAM blink.obj
+__size_of_get_primitive 0 0 ABS 0 - blink.obj
+printf@flag 16 0 COMRAM 1 cstackCOMRAM blink.obj
+printf@prec 17 0 COMRAM 1 cstackCOMRAM blink.obj
+__size_of_read_opcode 0 0 ABS 0 - blink.obj
+___inthi_sp 0 0 STACK 2 stack startup.obj
+___intlo_sp 0 0 STACK 2 stack startup.obj
+__LdataCOMRAM 0 0 ABS 0 dataCOMRAM blink.obj
+__size_of_read_ptr_1B 0 0 ABS 0 - blink.obj
+__Hintcode_body 0 0 ABS 0 intcode_body blink.obj
+__end_of___lmul 1908 0 CODE 0 text21 blink.obj
+__Lintsave_regs 0 0 BIGRAM 1 intsave_regs blink.obj
+__fassert@file 21 0 COMRAM 1 cstackCOMRAM blink.obj
+__fassert@line 1F 0 COMRAM 1 cstackCOMRAM blink.obj
+caml_write_reg@pin 4 0 COMRAM 1 cstackCOMRAM blink.obj
+__Hmediumconst 0 0 MEDIUMCONST 0 mediumconst blink.obj
+?_printf D 0 COMRAM 1 cstackCOMRAM blink.obj
+__LnvBANK0 0 0 ABS 0 nvBANK0 blink.obj
+__Hintcodelo 0 0 CODE 0 intcodelo blink.obj
+___lwmod@divisor A 0 COMRAM 1 cstackCOMRAM blink.obj
+__end_of_get_primitive 1A84 0 CODE 0 text19 blink.obj
+_int32_custom_operations 5E 0 COMRAM 1 bssCOMRAM blink.obj
+__end_of___lwdiv 195A 0 CODE 0 text15 blink.obj
+__end_of___lwmod 199C 0 CODE 0 text14 blink.obj
+_interp_init 19D8 0 CODE 0 text2 blink.obj
+__end_of_ocaml_primitives 1027 0 SMALLCONST 0 smallconst blink.obj
+_dpowers 101B 0 SMALLCONST 0 smallconst blink.obj
+___lwdiv@quotient 5 0 COMRAM 1 cstackCOMRAM blink.obj
+__LidataCOMRAM 0 0 ABS 0 idataCOMRAM blink.obj
+__size_of_pop_n 0 0 ABS 0 - blink.obj
+__size_of_putch 0 0 ABS 0 - blink.obj
+__size_of_setup 0 0 ABS 0 - blink.obj
+__HnvCOMRAM 0 0 ABS 0 nvCOMRAM blink.obj
+___lwmod@dividend 8 0 COMRAM 1 cstackCOMRAM blink.obj
+__Lintcodelo 0 0 CODE 0 intcodelo blink.obj
+__size_of__fassert 0 0 ABS 0 - blink.obj
+__end_of_interp 14C6 0 CODE 0 text3 blink.obj
+start_initialization 1850 0 CODE 0 cinit blink.obj
+__HnvFARRAM 0 0 FARRAM 0 nvFARRAM blink.obj
+___rparam_used 1 0 ABS 0 - blink.obj
+__size_of_caml_write_reg 0 0 ABS 0 - blink.obj
+_ocaml_global_data 62 0 COMRAM 1 bssCOMRAM blink.obj
+__end_of_printf 1654 0 CODE 0 text12 blink.obj
+__Hbank0 0 0 ABS 0 bank0 blink.obj
+__Hbank1 0 0 ABS 0 bank1 blink.obj
+__Hbank2 0 0 ABS 0 bank2 blink.obj
+__Hbank3 0 0 ABS 0 bank3 blink.obj
+__Hbank4 0 0 ABS 0 bank4 blink.obj
+__Hbank5 0 0 ABS 0 bank5 blink.obj
+__Hbank6 0 0 ABS 0 bank6 blink.obj
+__Hbank7 0 0 ABS 0 bank7 blink.obj
+__Hbank8 0 0 ABS 0 bank8 blink.obj
+__Hbank9 0 0 ABS 0 bank9 blink.obj
+__Hcinit 0 0 ABS 0 cinit blink.obj
+__Hconst 0 0 CONST 0 const blink.obj
+__Hidata 0 0 CODE 0 idata blink.obj
+__Hidloc 0 0 IDLOC 0 idloc blink.obj
+__Hnvbit 0 0 COMRAM 1 nvbit blink.obj
+__Hparam 0 0 COMRAM 1 rparam blink.obj
+__Hrdata 0 0 COMRAM 1 rdata blink.obj
+__Hstack 0 0 STACK 2 stack blink.obj
+__Htext0 0 0 ABS 0 text0 blink.obj
+__Htext1 0 0 ABS 0 text1 blink.obj
+__Htext2 0 0 ABS 0 text2 blink.obj
+__Htext3 0 0 ABS 0 text3 blink.obj
+__Htext4 0 0 ABS 0 text4 blink.obj
+__Htext5 0 0 ABS 0 text5 blink.obj
+__Htext6 0 0 ABS 0 text6 blink.obj
+__Htext7 0 0 ABS 0 text7 blink.obj
+__Htext8 0 0 ABS 0 text8 blink.obj
+__Htext9 0 0 ABS 0 text9 blink.obj
+___lwdiv@counter 7 0 COMRAM 1 cstackCOMRAM blink.obj
+_heap1_start 6F 0 COMRAM 1 nvCOMRAM blink.obj
+__Hbank10 0 0 ABS 0 bank10 blink.obj
+__Hbank11 0 0 ABS 0 bank11 blink.obj
+__Hbank12 0 0 ABS 0 bank12 blink.obj
+__Hbank13 0 0 ABS 0 bank13 blink.obj
+__Hbank14 0 0 ABS 0 bank14 blink.obj
+__Hbank15 0 0 ABS 0 bank15 blink.obj
+__Hbigbss 0 0 BIGRAM 1 bigbss blink.obj
+__Hbigram 0 0 ABS 0 bigram blink.obj
+__smallconst 1000 0 SMALLCONST 0 smallconst startup.obj
+_nativeint_custom_operations 5A 0 COMRAM 1 bssCOMRAM blink.obj
+__Hcomram 0 0 ABS 0 comram blink.obj
+__Hconfig 0 0 CONFIG 0 config blink.obj
+_caml_builtin_cprim 58 0 COMRAM 1 bssCOMRAM blink.obj
+__fassert 1A36 0 CODE 0 text11 blink.obj
+_heap_end 66 0 COMRAM 1 nvCOMRAM blink.obj
+_heap_ptr 69 0 COMRAM 1 nvCOMRAM blink.obj
+__Lbank0 0 0 ABS 0 bank0 blink.obj
+__Lbank1 0 0 ABS 0 bank1 blink.obj
+__Lbank2 0 0 ABS 0 bank2 blink.obj
+__Lbank3 0 0 ABS 0 bank3 blink.obj
+__Lbank4 0 0 ABS 0 bank4 blink.obj
+__Lbank5 0 0 ABS 0 bank5 blink.obj
+__Lbank6 0 0 ABS 0 bank6 blink.obj
+__Lbank7 0 0 ABS 0 bank7 blink.obj
+__Lbank8 0 0 ABS 0 bank8 blink.obj
+__Lbank9 0 0 ABS 0 bank9 blink.obj
+__Lcinit 0 0 ABS 0 cinit blink.obj
+__Lconst 0 0 CONST 0 const blink.obj
+_heap1_end 94 0 BANK0 1 nvBANK0 blink.obj
+__Lidata 0 0 CODE 0 idata blink.obj
+__Lidloc 0 0 IDLOC 0 idloc blink.obj
+_heap2_end 91 0 BANK0 1 nvBANK0 blink.obj
+__Lnvbit 0 0 COMRAM 1 nvbit blink.obj
+__Lparam 0 0 COMRAM 1 rparam blink.obj
+__Lrdata 0 0 COMRAM 1 rdata blink.obj
+__Lstack 0 0 STACK 2 stack blink.obj
+__Ltext0 0 0 ABS 0 text0 blink.obj
+__Ltext1 0 0 ABS 0 text1 blink.obj
+__Ltext2 0 0 ABS 0 text2 blink.obj
+__Ltext3 0 0 ABS 0 text3 blink.obj
+__Ltext4 0 0 ABS 0 text4 blink.obj
+__Ltext5 0 0 ABS 0 text5 blink.obj
+__Ltext6 0 0 ABS 0 text6 blink.obj
+__Ltext7 0 0 ABS 0 text7 blink.obj
+__Ltext8 0 0 ABS 0 text8 blink.obj
+__Ltext9 0 0 ABS 0 text9 blink.obj
+__Hfarbss 0 0 FARRAM 0 farbss blink.obj
+__Lintcode_body 0 0 ABS 0 intcode_body blink.obj
+_heap_todo 4F 0 COMRAM 1 bssCOMRAM blink.obj
+__end_of__fassert 1A5E 0 CODE 0 text11 blink.obj
+__Habs1 0 0 ABS 0 abs1 blink.obj
+__Hdata 0 0 ABS 0 data blink.obj
+__Hinit 4 0 CODE 0 init blink.obj
+__Hrbit 0 0 COMRAM 1 rbit blink.obj
+__Hrbss 0 0 COMRAM 1 rbss blink.obj
+__Htemp 0 0 COMRAM 1 temp blink.obj
+__Htext 0 0 ABS 0 text blink.obj
+__Labs1 0 0 ABS 0 abs1 blink.obj
+__Ldata 0 0 ABS 0 data blink.obj
+__Linit 0 0 CODE 0 init blink.obj
+__Lrbit 0 0 COMRAM 1 rbit blink.obj
+__Lrbss 0 0 COMRAM 1 rbss blink.obj
+__Ltemp 0 0 COMRAM 1 temp blink.obj
+__Ltext 0 0 ABS 0 text blink.obj
+__pnvBANK0 8D 0 BANK0 1 nvBANK0 blink.obj
+___lmul 18B2 0 CODE 0 text21 blink.obj
+_caml_names_of_builtin_cprim 56 0 COMRAM 1 bssCOMRAM blink.obj
+__HcstackCOMRAM 0 0 ABS 0 cstackCOMRAM blink.obj
+__Hintret 0 0 ABS 0 intret blink.obj
+__Hirdata 0 0 CODE 0 irdata blink.obj
+__S0 1B6A 0 ABS 0 - blink.obj
+__S1 200 0 ABS 0 - blink.obj
+__S2 0 0 ABS 0 - blink.obj
+_acc 7C 0 COMRAM 1 dataCOMRAM blink.obj
+_cpt 52 0 COMRAM 1 bssCOMRAM blink.obj
+_env 74 0 COMRAM 1 nvCOMRAM blink.obj
+_pop 1AA6 0 CODE 0 text17 blink.obj
+__pnvCOMRAM 66 0 COMRAM 1 nvCOMRAM blink.obj
+__size_of_gc_init 0 0 ABS 0 - blink.obj
+_ocaml_heap 180 0 BANK1 1 dataBANK1 blink.obj
+__HidataCOMRAM 0 0 ABS 0 idataCOMRAM blink.obj
+_read_opcode 1B62 0 CODE 0 text7 blink.obj
+__end_of_caml_raise_stack_overflow 1B04 0 CODE 0 text10 blink.obj
+__Lbigdata 0 0 BIGRAM 1 bigdata blink.obj
+__Hnvrram 0 0 COMRAM 1 nvrram blink.obj
+gc_init@heap_size 1 0 COMRAM 1 cstackCOMRAM blink.obj
+_read_ptr_1B 1B38 0 CODE 0 text5 blink.obj
+__end_of_pop 1AC8 0 CODE 0 text17 blink.obj
+interp@n 40 0 COMRAM 1 cstackCOMRAM blink.obj
+__HnvBANK0 0 0 ABS 0 nvBANK0 blink.obj
+__Lintentry 0 0 ABS 0 intentry blink.obj
+interp@opcode 3F 0 COMRAM 1 cstackCOMRAM blink.obj
+__Hramtop 1000 0 RAM 0 ramtop blink.obj
+__Hrparam 0 0 COMRAM 1 rparam blink.obj
+_interp 1088 0 CODE 0 text3 blink.obj
+__pdataBANK1 100 0 BANK1 1 dataBANK1 blink.obj
+__activetblptr 3 0 ABS 0 - blink.obj
+__Hstruct 0 0 COMRAM 1 struct blink.obj
+__size_of___lmul 0 0 ABS 0 - blink.obj
+__LbssBANK0 0 0 ABS 0 bssBANK0 blink.obj
+__Htext10 0 0 ABS 0 text10 blink.obj
+__Htext11 0 0 ABS 0 text11 blink.obj
+__Htext12 0 0 ABS 0 text12 blink.obj
+__Htext13 0 0 ABS 0 text13 blink.obj
+__Htext14 0 0 ABS 0 text14 blink.obj
+__Htext15 0 0 ABS 0 text15 blink.obj
+__Htext16 0 0 ABS 0 text16 blink.obj
+__Htext17 0 0 ABS 0 text17 blink.obj
+__Htext18 0 0 ABS 0 text18 blink.obj
+__Htext19 0 0 ABS 0 text19 blink.obj
+__Htext20 0 0 ABS 0 text20 blink.obj
+__Htext21 0 0 ABS 0 text21 blink.obj
+__Htext22 0 0 ABS 0 text22 blink.obj
+__Htext23 0 0 ABS 0 text23 blink.obj
+__ptext10 1AE6 0 CODE 0 text10 blink.obj
+__ptext11 1A36 0 CODE 0 text11 blink.obj
+__ptext12 14C6 0 CODE 0 text12 blink.obj
+__ptext13 1B68 0 CODE 0 text13 blink.obj
+__ptext14 195A 0 CODE 0 text14 blink.obj
+__ptext15 1908 0 CODE 0 text15 blink.obj
+__ptext16 1B04 0 CODE 0 text16 blink.obj
+__ptext17 1AA6 0 CODE 0 text17 blink.obj
+__ptext18 1A0C 0 CODE 0 text18 blink.obj
+__ptext19 1A5E 0 CODE 0 text19 blink.obj
+__ptext20 1B22 0 CODE 0 text20 blink.obj
+__ptext21 18B2 0 CODE 0 text21 blink.obj
+__ptext22 1754 0 CODE 0 text22 blink.obj
+__ptext23 0 0 CODE 0 text23 blink.obj
+__fassert@exp 23 0 COMRAM 1 cstackCOMRAM blink.obj
+___lwdiv 1908 0 CODE 0 text15 blink.obj
+___lwmod 195A 0 CODE 0 text14 blink.obj
+__Lbank10 0 0 ABS 0 bank10 blink.obj
+__Lbank11 0 0 ABS 0 bank11 blink.obj
+__Lbank12 0 0 ABS 0 bank12 blink.obj
+__Lbank13 0 0 ABS 0 bank13 blink.obj
+__Lbank14 0 0 ABS 0 bank14 blink.obj
+__Lbank15 0 0 ABS 0 bank15 blink.obj
+__Lbigbss 0 0 BIGRAM 1 bigbss blink.obj
+__Lbigram 0 0 ABS 0 bigram blink.obj
+___lmul@multiplier 5 0 COMRAM 1 cstackCOMRAM blink.obj
+_tab_heap_end 80 0 BANK0 1 bssBANK0 blink.obj
+?_peek 1 0 COMRAM 1 cstackCOMRAM blink.obj
+__Lcomram 0 0 ABS 0 comram blink.obj
+__Lconfig 0 0 CONFIG 0 config blink.obj
+_printf 14C6 0 CODE 0 text12 blink.obj
+_read_uint8 1B56 0 CODE 0 text4 blink.obj
+__Lfarbss 0 0 FARRAM 0 farbss blink.obj
+___lwdiv@divisor 3 0 COMRAM 1 cstackCOMRAM blink.obj
+__Lfardata 0 0 FARRAM 0 fardata blink.obj
+__end_of_interp_init 1A0C 0 CODE 0 text2 blink.obj
+interp@arg1 3B 0 COMRAM 1 cstackCOMRAM blink.obj
+_trapSp 8D 0 BANK0 1 nvBANK0 blink.obj
+__size_of_interp 0 0 ABS 0 - blink.obj
+stackhi F7F 0 ABS 0 - startup.obj
+stacklo 200 0 ABS 0 - startup.obj
+__Lintcode 0 0 CODE 0 intcode blink.obj
+__Lintret 0 0 ABS 0 intret blink.obj
+__size_of_caml_raise_stack_overflow 0 0 ABS 0 - blink.obj
+__Lirdata 0 0 CODE 0 irdata blink.obj
+__end_of_gc_init 1850 0 CODE 0 text22 blink.obj
+__Lspace_0 0 0 ABS 0 - blink.obj
+__Lspace_1 0 0 ABS 0 - blink.obj
+__Lspace_2 0 0 ABS 0 - blink.obj
+__pbssCOMRAM 46 0 COMRAM 1 bssCOMRAM blink.obj
+?_get_primitive 1 0 COMRAM 1 cstackCOMRAM blink.obj
+_heap2_start 6C 0 COMRAM 1 nvCOMRAM blink.obj
+__LcstackCOMRAM 0 0 ABS 0 cstackCOMRAM blink.obj
+printf@ap 18 0 COMRAM 1 cstackCOMRAM blink.obj
+printf@cp 1A 0 COMRAM 1 cstackCOMRAM blink.obj
+end_of_initialization 18AC 0 CODE 0 cinit blink.obj
+__Lnvrram 0 0 COMRAM 1 nvrram blink.obj
+__Hintentry 0 0 ABS 0 intentry blink.obj
+pop_n@n 2 0 COMRAM 1 cstackCOMRAM blink.obj
+__size_of_printf 0 0 ABS 0 - blink.obj
+___lwdiv@dividend 1 0 COMRAM 1 cstackCOMRAM blink.obj
+?___lwdiv 1 0 COMRAM 1 cstackCOMRAM blink.obj
+?___lwmod 8 0 COMRAM 1 cstackCOMRAM blink.obj
+_ocaml_bytecode 1001 0 SMALLCONST 0 smallconst blink.obj
+__Hreset_vec 0 0 CODE 0 reset_vec blink.obj
+__HbssBANK0 0 0 ABS 0 bssBANK0 blink.obj
+__Lramtop 1000 0 RAM 0 ramtop blink.obj
+__Lrparam 0 0 COMRAM 1 rparam blink.obj
+__pcinit 1850 0 CODE 0 cinit blink.obj
+__ptext0 1B4E 0 CODE 0 text0 blink.obj
+__ptext1 1AC8 0 CODE 0 text1 blink.obj
+__ptext2 19D8 0 CODE 0 text2 blink.obj
+__ptext3 1088 0 CODE 0 text3 blink.obj
+__ptext4 1B56 0 CODE 0 text4 blink.obj
+__ptext5 1B38 0 CODE 0 text5 blink.obj
+__ptext6 1B5C 0 CODE 0 text6 blink.obj
+__ptext7 1B62 0 CODE 0 text7 blink.obj
+__ptext8 1A84 0 CODE 0 text8 blink.obj
+__ptext9 199C 0 CODE 0 text9 blink.obj
+__Lstruct 0 0 COMRAM 1 struct blink.obj
+__Ltext10 0 0 ABS 0 text10 blink.obj
+__Ltext11 0 0 ABS 0 text11 blink.obj
+__Ltext12 0 0 ABS 0 text12 blink.obj
+__Ltext13 0 0 ABS 0 text13 blink.obj
+__Ltext14 0 0 ABS 0 text14 blink.obj
+__Ltext15 0 0 ABS 0 text15 blink.obj
+__Ltext16 0 0 ABS 0 text16 blink.obj
+__Ltext17 0 0 ABS 0 text17 blink.obj
+__Ltext18 0 0 ABS 0 text18 blink.obj
+__Ltext19 0 0 ABS 0 text19 blink.obj
+__Ltext20 0 0 ABS 0 text20 blink.obj
+__Ltext21 0 0 ABS 0 text21 blink.obj
+__Ltext22 0 0 ABS 0 text22 blink.obj
+__Ltext23 0 0 ABS 0 text23 blink.obj
+__end_of_read_uint8 1B5C 0 CODE 0 text4 blink.obj
+__ramtop 1000 0 RAM 0 ramtop startup.obj
+_caml_write_reg 1B22 0 CODE 0 text20 blink.obj
+__Lpowerup 0 0 CODE 0 powerup blink.obj
+__Leeprom_data 0 0 EEDATA 0 eeprom_data blink.obj
+_current_heap 54 0 COMRAM 1 bssCOMRAM blink.obj
+get_primitive@prim_ind 3 0 COMRAM 1 cstackCOMRAM blink.obj
+__psmallconst 1000 0 SMALLCONST 0 smallconst blink.obj
+__Lreset_vec 0 0 CODE 0 reset_vec blink.obj
+read_byte@c 1 0 COMRAM 1 cstackCOMRAM blink.obj
+___param_bank 0 0 ABS 0 - blink.obj
+__Hbigdata 0 0 BIGRAM 1 bigdata blink.obj
+__end_of__initialization 18AC 0 CODE 0 cinit blink.obj
+__end_of_read_byte 1AA6 0 CODE 0 text8 blink.obj
+__end_of_read_int8 1B62 0 CODE 0 text6 blink.obj
+__Libigdata 0 0 CODE 0 ibigdata blink.obj
+_extra_args 60 0 COMRAM 1 bssCOMRAM blink.obj
+__size_of_read_byte 0 0 ABS 0 - blink.obj
+__size_of_read_int8 0 0 ABS 0 - blink.obj
+__pidataBANK1 1654 0 CODE 0 idataBANK1 blink.obj
+__Lclrtext 0 0 ABS 0 clrtext blink.obj
+__end_of_ocaml_bytecode 101B 0 SMALLCONST 0 smallconst blink.obj
+___lmul@product D 0 COMRAM 1 cstackCOMRAM blink.obj
+___lmul@multiplicand 9 0 COMRAM 1 cstackCOMRAM blink.obj
+__pcstackCOMRAM 1 0 COMRAM 1 cstackCOMRAM blink.obj
+_read_byte 1A84 0 CODE 0 text8 blink.obj
+_read_int8 1B5C 0 CODE 0 text6 blink.obj
+_caml_raise_stack_overflow 1AE6 0 CODE 0 text10 blink.obj
+__end_of_main 1B56 0 CODE 0 text0 blink.obj
+__end_of_peek 1A36 0 CODE 0 text18 blink.obj
+__end_of_push 19D8 0 CODE 0 text9 blink.obj
+__end_of_caml_write_reg 1B38 0 CODE 0 text20 blink.obj
+printf@val 1C 0 COMRAM 1 cstackCOMRAM blink.obj
+__end_of_dpowers 1025 0 SMALLCONST 0 smallconst blink.obj
+_LATD2 7C62 0 ABS 0 - blink.obj
+_TRISD F95 0 ABS 0 - blink.obj
+__end_of_pop_n 1B22 0 CODE 0 text16 blink.obj
+__end_of_putch 1B6A 0 CODE 0 text13 blink.obj
+__end_of_setup 1AE6 0 CODE 0 text1 blink.obj
+__HRAM 0 0 ABS 0 - blink.obj
+__Hbss 0 0 RAM 1 bss blink.obj
+__Hram 0 0 ABS 0 ram blink.obj
+__Hsfr 0 0 ABS 0 sfr blink.obj
+__LRAM 1 0 ABS 0 - blink.obj
+__Lbss 0 0 RAM 1 bss blink.obj
+__Lram 0 0 ABS 0 ram blink.obj
+__Lsfr 0 0 ABS 0 sfr blink.obj
+__end_of_read_opcode 1B68 0 CODE 0 text7 blink.obj
+_pop_n 1B04 0 CODE 0 text16 blink.obj
+_putch 1B68 0 CODE 0 text13 blink.obj
+_setup 1AC8 0 CODE 0 text1 blink.obj
+__end_of_read_ptr_1B 1B46 0 CODE 0 text5 blink.obj
+__size_of_interp_init 0 0 ABS 0 - blink.obj
+__size_of_pop 0 0 ABS 0 - blink.obj
+__HdataBANK1 0 0 ABS 0 dataBANK1 blink.obj
+?_caml_write_reg 4 0 COMRAM 1 cstackCOMRAM blink.obj
+__initialization 1850 0 CODE 0 cinit blink.obj
+__pbssBANK0 80 0 BANK0 1 bssBANK0 blink.obj
+__pdataCOMRAM 78 0 COMRAM 1 dataCOMRAM blink.obj
+__Hfardata 0 0 FARRAM 0 fardata blink.obj
+__Hsmallconst 1088 0 SMALLCONST 0 smallconst blink.obj
+_get_primitive 1A5E 0 CODE 0 text19 blink.obj
+__Lifardata 0 0 CODE 0 ifardata blink.obj
+__Hintsave_regs 0 0 BIGRAM 1 intsave_regs blink.obj
+__Hintcode 0 0 CODE 0 intcode blink.obj
+# %SPLITSTAB Section
+# This section enumerates all the psect splits performed by the assembler.
+# The beginning of the section is indicated by %SPLITSTAB.
+# Each line is a record a particular split, where the parent psect is on
+# the left and the child on the right.  Note that a child psect is always
+# split form the top of the parent psect. All splits from a given parent
+# are listed in the order in which they occurred.
+%SPLITSTAB
+# %DABS Section
+# This section contains a table of all usuage of the assember
+# directive DABS in the program. Each line has the following format:
+#   <name> <space> <address> <size>
+# If the DABS was originally labelled then that shall be <name>,
+# otherwise name will be "-".  The <space> number is in decimal.
+# <address> and <size> are in byte units as unqaulified hexadecimal
+%DABS
+# %SEGMENTS Section
+# This sections enumerates the segments of the program.  Each segment
+# is described on a single line as follows:
+#    <name> <space> <link address> <file address> <size> <delta>
+# Addresses and size are in unqualified hexadecimal.  The link address
+# and size are in units of delta. The file address is in units of bytes.
+# All other numeric quantities are in decimal.
+%SEGMENTS
+text3 0 1088 1088 AE2 1
+cstackCOMRAM 1 1 1 7F 1
+reset_vec 0 0 0 4 1
+bssBANK0 1 80 80 17 1
+smallconst 0 1000 1000 88 1
+dataBANK1 1 100 100 100 1

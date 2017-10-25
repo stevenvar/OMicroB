@@ -26,7 +26,7 @@ queens.byte: queens.ml
 	ocamlclean $@ -o $@
 
 queens.c: queens.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 100 -stack-size 100 $< -o $@
 
 queens.elf: queens.c
 	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@

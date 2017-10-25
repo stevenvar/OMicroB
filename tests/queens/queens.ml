@@ -8,7 +8,7 @@ module Arduboy = struct
 end;;
 Arduboy.init();;
 
-let print_newline () = 
+let print_newline () =
   Arduboy.print_string "\n";
   Arduboy.display();;
 
@@ -46,5 +46,4 @@ let queens n =
          concmap testcol (gen (n - 1)) in
  list_length (gen n);;
 
-queens 9 ;;
-
+queens 3 ;;

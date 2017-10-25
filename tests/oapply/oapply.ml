@@ -23,10 +23,9 @@ let oct x = quad quad x
 (* let add_12 = add_x 12 *)
 
 let _ =
-  let x = double oct succ 1 in 
   Arduboy.init();
+  let x = double oct succ 1 in
   (* Arduboy.print_int (repeat 10); *)
   Arduboy.print_int x;
   (* Arduboy.print_int (add_12 8); *)
   Arduboy.display();
-  
