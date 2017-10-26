@@ -14,10 +14,11 @@ let rec facto = function
   | x -> facto (x-1) * x 
 
 let _ =
-  Arduboy.init();
+  Arduboy.init ();
   let x = Arduboy.millis () in 
   for i = 0 to 10 do 
-    Arduboy.print_int(facto i);
+    (* Arduboy.print_int(facto i); *)
+    facto i;
   done;
   let y = Arduboy.millis () in 
   Arduboy.print_string "\n";

@@ -54,34 +54,30 @@ let (@) a b = Dexpr (T, [a;b])
 let (+) a b = Dexpr (P, [a;b])
 let x = Symbole xx
 (* x^2 + x *)
-let pol = (x@x) + x
+let pol = x
 
 let rec iter f = function
     [] -> ()
   | x :: xs -> (f x) ; iter f xs
 
-let rec print_expr = function
-  | Numb x -> print_int x
-  | Symbole x -> print_string x
-  | Dexpr (P, lexpr) -> print_string "(+"; iter print_expr lexpr; print_string ")"
-  | Dexpr (M, lexpr) -> print_string "(-"; iter print_expr lexpr; print_string ")"
-  | Dexpr (T, lexpr) -> print_string "(*"; iter print_expr lexpr; print_string ")"
-  | Dexpr (D, lexpr) -> print_string "(/"; iter print_expr lexpr; print_string ")"
+(* let rec print_expr = function *)
+(*   | Numb x -> print_int x *)
+(*   | Symbole x -> print_string x *)
+(*   | Dexpr (P, lexpr) -> print_string "(+"; iter print_expr lexpr; print_string ")" *)
+(*   | Dexpr (M, lexpr) -> print_string "(-"; iter print_expr lexpr; print_string ")" *)
+(*   | Dexpr (T, lexpr) -> print_string "(\*"; iter print_expr lexpr; print_string ")" *)
+(*   | Dexpr (D, lexpr) -> print_string "(/"; iter print_expr lexpr; print_string ")" *)
 
 let res = ref pol
 
 let main() =
   Arduboy.init();
   let x = Arduboy.millis () in
-  (* for i = 0 to 999 do *)
-  (*   res := derive pol; *)
-  (*   res := derive pol; *)
-  (*   res := derive pol; *)
-  (*   res := derive pol; *)
-  (*   res := derive pol *)
-  (* done; *)
-  res := derive pol;
-  print_expr !res;
+  for i = 0 to 999 do
+    derive pol
+  done;
+  (* print_expr !res; *)
+  derive pol;
   let y = Arduboy.millis () in
   Arduboy.print_string("\n");
   Arduboy.print_int (y-x);

@@ -152,6 +152,8 @@ void pop_n(int n) {
 #ifdef DEBUG
 /* for debugging */
 
+int cptinst = 0; 
+
 void print_global(){
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     if (Is_block(ocaml_global_data[i])){
@@ -239,9 +241,11 @@ val_t interp(void) {
     #ifdef DEBUG
     debug(pc-1);
     #endif
-
+#ifdef DEBUG
+    cptinst++;
+#endif
     switch(opcode){
-
+ 
 #ifdef OCAML_ACC0
     case OCAML_ACC0 : {
       acc = peek(0);
@@ -2045,6 +2049,11 @@ val_t interp(void) {
 
 #ifdef OCAML_STOP
     case OCAML_STOP : {
+#ifdef DEBUG
+      debug(999);
+      debug(cptinst);
+      debug(999);
+#endif
       return acc;
     }
 #endif

@@ -45,7 +45,7 @@ let rec do_list f l = match l with
 let _ =
   Arduboy.init ();
   let x = Arduboy.millis () in 
-  do_list (fun n -> Arduboy.print_int n; Arduboy.print_string " ") (sieve 10);
-  Arduboy.print_string "\n";
+  do_list (fun n -> (); ()) (sieve 10);
   Arduboy.print_int (Arduboy.millis () -x);
+  Arduboy.print_string "\n";
   Arduboy.display()

@@ -1,7 +1,7 @@
 include ../../etc/Makefile.conf
 
 ATTY     := /dev/tty.usbmodem1411
-CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
+CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
@@ -34,7 +34,7 @@ ofacto.elf: ofacto.c
 ################################################################################
 
 ofacto.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) ofacto.c
-	$(AVR_GXX) -O2 -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
+	$(AVR_GXX) -O2 -I$(SRC)/byterun/ -D__ARDUINO__ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
 ofacto.hex: ofacto.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
