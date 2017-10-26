@@ -17,6 +17,18 @@ extern void print_heap();
 
     //    DEBUGassert((tag_t) (tag) < 256);
 
+#ifdef NOGC
+#define Alloc_small(result, wosize, tag)                                \
+  do {                                                                  \
+    /* DEBUGassert((wosize) >= 1);                                         \ */ \
+    /* if (heap_ptr + (wosize + 1) > heap_end) gc(wosize); \ */ \
+    *heap_ptr = Make_header((wosize), (tag));				\
+    heap_ptr ++ ; \
+    result = Val_block(heap_ptr); \
+    heap_ptr += wosize ;						\
+    /* DEBUGclear((result), (wosize));                                      \ */ \
+  } while(0)
+#else
 #define Alloc_small(result, wosize, tag)                                \
   do {                                                                  \
     /* DEBUGassert((wosize) >= 1);                                         \ */ \
@@ -27,3 +39,4 @@ extern void print_heap();
     heap_ptr += wosize ;						\
     /* DEBUGclear((result), (wosize));                                      \ */ \
   } while(0)
+#endif

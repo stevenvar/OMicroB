@@ -11,7 +11,7 @@ extern val_t env;
 extern val_t ocaml_stack[OCAML_STACK_WOSIZE];
 extern val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER];
 
-
+#ifndef NOGC
 
 /*
  * implantation d'un S&C
@@ -143,7 +143,7 @@ void gc_one_val(val_t* ptr, int update) {
 
 #ifdef DEBUG
   DEBUGassert(heap_ptr == heap_todo);
-#endif 
+#endif
 
  start:
   val = *ptr;
@@ -261,3 +261,52 @@ void gc(mlsize_t size) {
 
   /* printf("gc end \n"); */
 }
+
+#else
+
+/* heap_ptr : pointeur du premier emplacement libre du tas
+ * heap_end : pointeur de fin du tas courant */
+val_t *heap_ptr, *heap_end;
+#ifdef DEBUG
+void print_heap(){
+  val_t* ptr;
+  int i = 0;
+  val_t* from = ocaml_heap;
+  val_t* to = heap_end;
+  printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : (100 first blocks) \n", from , to, to-from );
+  for(ptr = from ; ptr < to; ptr++){
+    /* if (*ptr != 0){ */
+      if (Is_int(*ptr)){
+	printf("%d  @%p : int : %d | ",i, ptr, Int_val(*ptr));
+      }
+      else if (Is_block(*ptr)){
+	printf("%d  @%p : @(%p) | ",i, ptr, Block_val(*ptr));
+      }
+      else if (*ptr == 0){
+	printf("%d  @%p : _ | ",i, ptr);
+      }
+      else
+	printf("%d  @%p : 0x%08x | ",i, ptr, *ptr);
+      /* if ( i % 10 == 0) */
+	printf("\n");
+    /* } */
+    i++;
+  }
+  printf("\n...\n________________________ \n");
+}
+#endif
+
+
+
+void gc_init(int32_t heap_size) {
+  #ifdef OCAML_HEAP_INITIAL_WOSIZE
+  heap_ptr = (val_t*)ocaml_heap + OCAML_HEAP_INITIAL_WOSIZE;
+  #else
+  heap_ptr = (val_t*)ocaml_heap;
+  #endif
+  /* heap_end = heap_ptr + heap_size * sizeof (val_t); */
+  heap_end = heap_ptr + (OCAML_HEAP_WOSIZE * 2);
+  /* printf("init end \n"); */
+}
+
+#endif

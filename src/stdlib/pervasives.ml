@@ -51,7 +51,7 @@ external ( := ) : 'a ref -> 'a -> unit = "%setfield0"
 external incr : int ref -> unit = "%incr"
 external decr : int ref -> unit = "%decr"
 
-
+external print_string : int -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
 
 (* PIC *)
@@ -64,7 +64,8 @@ external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
 external digital_read  : pin -> bool         = "caml_digital_read"  [@@noalloc]
 external digital_write : pin -> bool -> unit = "caml_digital_write" [@@noalloc]
 external delay         : int -> unit         = "caml_delay"         [@@noalloc]
-
+external millis        : unit -> int         = "ocaml_arduino_millis" [@@noalloc]
+external serial_begin : int -> unit          = "ocaml_arduino_serial_begin" [@@noalloc]
 
 (* Exceptions *)
 

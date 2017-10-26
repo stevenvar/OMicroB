@@ -29,12 +29,12 @@ oderiv.c: oderiv.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 oderiv.elf: oderiv.c
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall $^ -DDEBUG -o $@
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall $^ -DNOGC -o $@
 
 ################################################################################
 
 oderiv.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) oderiv.c
-	$(AVR_GXX) -O2 -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
+	$(AVR_GXX) -O2 -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -DNOGC  $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
 oderiv.hex: oderiv.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@

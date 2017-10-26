@@ -1,7 +1,10 @@
 /* Binding to arduino libraries */
 
 #ifdef  __AVR__
-#include <Arduino.h>
+#ifdef __ARDUINO__
+#include "Arduino.h"
+#endif
+#include "values.h"
 #ifdef DEBUG
 #include "debug.h"
 #endif
@@ -9,7 +12,9 @@
 /* #include "debug.h" */
 #elif defined(__PC__)
 /* #include "simul.h" */
+#include "values.h"
 #else
+
 #include "simul.h"
 #endif
 
@@ -58,8 +63,13 @@ val_t ocaml_arduino_millis(val_t k){
 /******************************************************************************/
 /* Arduino specific libraries */
 
+#ifdef __ARDUINO__
 val_t caml_pin_mode(val_t pin, val_t mode) {
   pinMode(Int_val(pin), Int_val(mode));
+  return Val_unit;
+}
+val_t ocaml_arduino_serial_begin(val_t i){
+  Serial.begin(Int_val(i));
   return Val_unit;
 }
 
@@ -82,6 +92,16 @@ val_t ocaml_arduino_millis(val_t unit){
 }
 
 
+val_t caml_print_int(val_t i){
+  Serial.print(Int_val(i));
+  return Val_unit;
+}
+
+val_t caml_print_string(val_t s){
+  Serial.print(StringVal(s));
+  return Val_unit;
+}
+#endif
 
 /******************************************************************************/
 /* Arduboy specific libraries */
@@ -89,7 +109,6 @@ val_t ocaml_arduino_millis(val_t unit){
 
 
 #ifdef OMICROB_WITH_ARDUBOY
-
 #include "Arduboy.h"
 Arduboy arduboy;
 
@@ -174,15 +193,17 @@ val_t ocaml_arduboy_clear(val_t unit){
 #else
 
 #ifdef __PC__
-
+#include <unistd.h>
 #include <stdio.h>
-
+#include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 void debug(int n){
   printf("DEBUG(%d)\n",n);
 }
 
 void debug_init(void){
-  
+
 }
 
 val_t caml_write_reg(val_t reg, val_t val){
@@ -194,10 +215,6 @@ val_t caml_write_reg(val_t reg, val_t val){
 /*   return Val_unit; */
 /* } */
 
-val_t caml_print_int(val_t x){
-  printf("%d",Val_int(x));
-  return Val_unit;
-}
 
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");
@@ -226,6 +243,46 @@ val_t ocaml_arduboy_millis(val_t unit){
 
 val_t ocaml_arduboy_clear(val_t unit){
   printf("\n\n\n");
+  return Val_unit;
+}
+
+val_t caml_delay(val_t millis){
+  struct timespec req, rem;
+  printf("delay(%d)\n", millis);
+  req.tv_sec = millis / 1000;
+  req.tv_nsec = 1000000 * (millis - 1000 * req.tv_sec);
+  nanosleep(&req, &rem);
+  return Val_unit;
+}
+
+val_t caml_pin_mode(val_t pin, val_t mode) {
+  printf("pin_mode(%d,%d)\n", Val_int(pin),Val_int(mode));
+  return Val_unit;
+}
+
+val_t caml_digital_write(val_t pin, val_t state) {
+  printf("digital_write(%d,%d)\n", Val_int(pin),Val_int(state));
+  return Val_unit;
+}
+
+val_t ocaml_arduino_millis(val_t unit){
+  return Val_int(0);
+}
+
+
+val_t caml_print_int(val_t i){
+  printf("%d",Int_val(i));
+  return Val_unit;
+}
+
+val_t caml_print_string(val_t s){
+  printf("%s",StringVal(s));
+  return Val_unit;
+}
+
+
+val_t ocaml_arduino_serial_begin(val_t i){
+  printf("serialbegin\n");
   return Val_unit;
 }
 
@@ -309,6 +366,34 @@ val_t ocaml_arduboy_clear(val_t unit){
   printf("clear()");
   return Val_unit;
 }
+
+
+val_t caml_delay(val_t i){
+  printf("delay()");
+  return Val_unit;
+}
+
+
+val_t caml_pin_mode(val_t pin, val_t mode) {
+  printf("pin_mode(%d,%d)", Val_int(pin),Val_int(mode));
+  return Val_unit;
+}
+
+val_t caml_digital_write(val_t pin, val_t state) {
+  printf("digital_write(%d,%d)", Val_int(pin),Val_int(state));
+  return Val_unit;
+}
+
+val_t ocaml_arduino_millis(val_t unit){
+  return Val_int(0);
+}
+
+
+val_t ocaml_arduino_serial_begin(val_t i){
+  printf("serial_begin\n");
+  return Val_unit;
+}
+
 
 #endif /* PC */
 #endif /* PIC */

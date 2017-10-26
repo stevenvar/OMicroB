@@ -36,5 +36,9 @@
 (*     Arduboy.display(); *)
 (*   done; *)
 
-let _ =
-  ()
+(* let _ = *)
+  (* Arduboy.init() *)
+
+(* let _ = () *)
+  (* Arduboy.print_int 1; *)
+  (* Arduboy.display(); *)

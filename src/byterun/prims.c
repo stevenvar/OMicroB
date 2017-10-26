@@ -169,21 +169,37 @@ void *caml_names_of_builtin_cprim;
 
 /******************************************************************************/
 extern val_t ocaml_heap[];
-
-
 static val_t oo_last_id = Val_int(0);
+
+/*   #ifdef __AVR__ */
+/* #include "Arduboy.h" */
+/*   extern Arduboy arduboy; */
+/* #endif */
 val_t caml_string_equal(val_t s1, val_t s2)
 {
   mlsize_t sz1, sz2;
-  val_t * p1, * p2;
+  /* val_t * p1, * p2; */
+/* #ifdef __AVR__ */
+/*   arduboy.print(Val_int(-4)); */
+/*   arduboy.print("\n"); */
+/*   arduboy.display(); */
+/*   /\* arduboy.print(s1); *\/ */
+/*   /\* arduboy.print("\n"); *\/ */
+/*   /\* arduboy.print(s2); *\/ */
+/*   /\* arduboy.display(); *\/ */
+/*   #endif */
+/*   #ifdef __PC__ */
+/*   printf("%d", Val_int(-4)); */
+/*   #endif */
 
   if (s1 == s2) return Val_true;
   sz1 = Wosize_val(s1);
   sz2 = Wosize_val(s2);
   if (sz1 != sz2) return Val_false;
-  for(p1 = (val_t *)(s1), p2 = (val_t *)(s2); sz1 > 0; sz1--, p1++, p2++)
-    if (*p1 != *p2) return Val_false;
-  return Val_true;
+  /* for(p1 = (val_t *)(s1), p2 = (val_t *)(s2); sz1 > 0; sz1--, p1++, p2++) */
+    /* if (*p1 != *p2) return Val_false; */
+  /* return Val_true; */
+  return Val_false;
 }
 
  val_t caml_bytes_equal(val_t s1, val_t s2)

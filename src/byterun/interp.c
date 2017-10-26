@@ -18,12 +18,12 @@
 */
 
 val_t atom0_header = Make_header(0, 0);
-
 #ifdef __AVR__
+#ifdef OMICROB_WITH_ARDUBOY
 #include "Arduboy.h"
 extern Arduboy arduboy;
 #endif
-
+#endif
 PROGMEM extern void * const ocaml_primitives[];
 
 static code_t pc;
@@ -34,9 +34,12 @@ static uint8_t extra_args;
 
 
 void caml_raise_stack_overflow(void) {
-#ifdef __AVR__
-arduboy.print("stack overflow");
-arduboy.display();
+  #ifdef __AVR__
+#ifdef OMICROB_WITH_ARDUBOY
+  arduboy.print("stack overflow");
+  arduboy.display();
+ exit(0);
+#endif
 #endif
 #ifdef __PC__
 #include <stdio.h>
@@ -44,8 +47,9 @@ printf("stack overflow");
 #endif
 #ifdef DEBUG
   debug(444);
-#endif
   exit(0);
+#endif
+
   /* assert(0); */
   /* TODO */
 }
@@ -2078,7 +2082,7 @@ void loop(void) {
 
 /******************************************************************************/
 
-#ifndef __AVR__
+#ifndef __ARDUINO__
 
 int main(int argc, char** argv) {
   setup();
