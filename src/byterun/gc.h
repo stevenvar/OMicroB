@@ -1,4 +1,7 @@
 #include <stdint.h>
+#ifdef DEBUG
+#include <stdio.h>
+#endif
 #include "debug.h"
 #include "values.h"
 

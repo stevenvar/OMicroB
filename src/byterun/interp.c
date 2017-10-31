@@ -180,7 +180,7 @@ void print_stack(){
       printf("\t %d : ? 0x%04x (float = %f) \n", i, sp[i],f);
     i++;
   }
-
+  printf("<size=%d>\n", ocaml_stack + OCAML_STACK_WOSIZE - sp);
 }
 #endif
 
@@ -244,6 +244,7 @@ val_t interp(void) {
     debug(pc-1);
     #endif
 #ifdef DEBUG
+    printf("cpt=%d\n",cptinst);
     cptinst++;
 #endif
     switch(opcode){

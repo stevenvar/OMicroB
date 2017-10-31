@@ -107,10 +107,11 @@ void print_heap(){
   val_t* from = tab_heap_start[current_heap];
   val_t* to = tab_heap_end[current_heap];
   printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : \n", from , to, to-from );
-  for(ptr = from ; ptr <= to + 5; ptr++){
+  for(ptr = from ; ptr < to; ptr++){
+    float f = *(float *)ptr;
     /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
-	printf("%d  @%p : %04x (int = %d) | ",i, ptr,*ptr, Int_val(*ptr));
+	printf("%d  @%p : %04x (int = %d / float = %f) | ",i, ptr,*ptr, Int_val(*ptr),f);
       }
       else if (Is_block(*ptr)){
 	printf("%d  @%p : @(%p) | ",i, ptr, Block_val(*ptr));
@@ -119,8 +120,8 @@ void print_heap(){
 	printf("%d  @%p : _ | ",i, ptr);
       }
       else
-	printf("size = %d, tag = %d \n", Wosize_hd(*ptr), Tag_hd(*ptr));
-	/* printf("%d  @%p : 0x%08x | ",i, ptr, *ptr); */
+	/* printf("size = %d, tag = %d \n", Wosize_hd(*ptr), Tag_hd(*ptr)); */
+	printf("%d  @%p : 0x%08x (=%f) | ",i, ptr, *ptr,f);
       /* if ( i % 10 == 0) */
 	printf("\n");
     /* } */
@@ -242,7 +243,8 @@ void gc(mlsize_t size) {
   }
   #endif
 
-  for (ptr = ocaml_global_data; ptr < heap1_start; ptr++) {
+  for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
+    /* printf("glob = 0x%04x\n", ptr); */
     gc_one_val(ptr, 1);  /* c'est ici que l'on pourra avoir traité les globales*/
   }
 

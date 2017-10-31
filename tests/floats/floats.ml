@@ -19,7 +19,7 @@ let poly x = x *. x
 let repeat n =
   for i = 0 to (n-1) do
     integrale poly 0.0 1.0 10.;
-      force_gc();
+    force_gc();
   done;
   integrale poly 0.0 1.0 10.
 
@@ -29,7 +29,8 @@ let _ =
   (* let x = Arduboy.millis () in *)
   (* integrale poly 0.0 1.0 10.; *)
   (* force_gc(); *)
-  repeat 11;
+  (* Arduboy.print_float 4.5; *)
+  Arduboy.print_float (repeat 11);
 
   (* let y = Arduboy.millis () - x in *)
   (* Arduboy.print_int y; *)

@@ -26,7 +26,7 @@ floats.byte: floats.ml
 	ocamlclean $@ -o $@
 
 floats.c: floats.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 32 -stack-size 128 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 32 -stack-size 96 $< -o $@
 
 floats.elf: floats.c
 	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
@@ -40,12 +40,12 @@ floats.hex: floats.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 flash: floats.avr
-	stty -f $(ATTY) 1200
-	sleep 3
+	stty -F $(ATTY) 1200
+	sleep 1
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
 
 listen:
-	stty -f $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
+	stty -F $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
 	cat $(ATTY)
 
 ################################################################################

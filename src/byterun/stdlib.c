@@ -14,6 +14,7 @@
 #include "gc.h"
 #elif defined(__PC__)
 /* #include "simul.h" */
+#include <stdio.h>
 #include "gc.h"
 #include "values.h"
 #else
@@ -26,7 +27,9 @@
 #include <xc.h>
 
 val_t caml_force_gc (val_t unit){
+  #ifndef NOGC
   gc(0);
+  #endif
   return Val_unit;
 }
 
@@ -74,7 +77,9 @@ val_t ocaml_arduino_millis(val_t k){
 #ifdef __ARDUINO__
 
 val_t caml_force_gc (val_t unit){
+   #ifndef NOGC
   gc(0);
+  #endif
   return Val_unit;
 }
 
@@ -239,7 +244,9 @@ val_t caml_force_gc (val_t unit){
   printf("HEAP before : \n");
   print_heap();
   #endif
+#ifndef NOGC
   gc(0);
+  #endif
   #ifdef DEBUG
   printf("HEAP after : \n");
   print_heap();
@@ -370,15 +377,14 @@ val_t ocaml_arduboy_print_int(val_t i) {
 }
 
 val_t ocaml_arduboy_print_float(val_t i) {
-  int32_t val = Double_val(i);
-  float f = *((float*)&val);
-  printf("ocaml_arduino_print_float(\"%f\")\n", f);
+  float f = Double_val(i);
+  printf("ocaml_arduino_print_float(%f)\n",f);
   return Val_unit;
 }
 
 
 val_t ocaml_arduboy_display(val_t unit) {
-  printf("ocaml_arduino_print()\n");
+  printf("ocaml_arduino_display()\n");
   return Val_unit;
 }
 
@@ -458,7 +464,7 @@ val_t ocaml_arduino_serial_begin(val_t i){
 
 
 val_t caml_print_float(val_t i){
-  printf("print_float(%f)",(float)i);
+  printf("print_float(%f)\n",(float)Double_val(i));
   return Val_unit;
 }
 
