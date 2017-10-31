@@ -2,6 +2,7 @@
 
 #ifdef  __AVR__
 #ifdef __ARDUINO__
+#include "gc.h"
 #include "Arduino.h"
 #endif
 #include "values.h"
@@ -10,8 +11,10 @@
 #endif
 #elif defined(__PIC18F__)
 /* #include "debug.h" */
+#include "gc.h"
 #elif defined(__PC__)
 /* #include "simul.h" */
+#include "gc.h"
 #include "values.h"
 #else
 
@@ -21,6 +24,11 @@
 #ifdef __PIC18F__
 
 #include <xc.h>
+
+val_t caml_force_gc (val_t unit){
+  gc(0);
+  return Val_unit;
+}
 
 val_t caml_write_reg (val_t pin,val_t v){
   TRISD = 0x00;
@@ -64,6 +72,12 @@ val_t ocaml_arduino_millis(val_t k){
 /* Arduino specific libraries */
 
 #ifdef __ARDUINO__
+
+val_t caml_force_gc (val_t unit){
+  gc(0);
+  return Val_unit;
+}
+
 val_t caml_pin_mode(val_t pin, val_t mode) {
   pinMode(Int_val(pin), Int_val(mode));
   return Val_unit;
@@ -86,9 +100,14 @@ val_t caml_delay(val_t millis) {
   delay(Int_val(millis));
   return Val_unit;
 }
-
 val_t ocaml_arduino_millis(val_t unit){
   return Val_int(millis());
+}
+
+
+val_t caml_print_float(val_t i){
+  Serial.print((float)i);
+  return Val_unit;
 }
 
 
@@ -117,6 +136,7 @@ Arduboy arduboy;
 /*   return Val_unit; */
 /* } */
 
+
 val_t ocaml_arduboy_millis(val_t unit){
   return Val_int(millis());
 }
@@ -129,6 +149,13 @@ val_t ocaml_arduboy_init(val_t unit) {
 
 val_t ocaml_arduboy_print(val_t str) {
   arduboy.print(StringVal(str));
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_print_float(val_t i) {
+  alpha a;
+  a.v = i;
+  arduboy.print(a.f);
   return Val_unit;
 }
 
@@ -206,6 +233,21 @@ void debug_init(void){
 
 }
 
+
+val_t caml_force_gc (val_t unit){
+#ifdef DEBUG
+  printf("HEAP before : \n");
+  print_heap();
+  #endif
+  gc(0);
+  #ifdef DEBUG
+  printf("HEAP after : \n");
+  print_heap();
+  #endif
+
+  return Val_unit;
+}
+
 val_t caml_write_reg(val_t reg, val_t val){
   printf("REG n°%d = %d \n" , reg, Int_val(val));
 }
@@ -256,12 +298,12 @@ val_t caml_delay(val_t millis){
 }
 
 val_t caml_pin_mode(val_t pin, val_t mode) {
-  printf("pin_mode(%d,%d)\n", Val_int(pin),Val_int(mode));
+  printf("pin_mode(%ld,%ld)\n", Val_int(pin),Val_int(mode));
   return Val_unit;
 }
 
 val_t caml_digital_write(val_t pin, val_t state) {
-  printf("digital_write(%d,%d)\n", Val_int(pin),Val_int(state));
+  printf("digital_write(%ld,%ld)\n", Val_int(pin),Val_int(state));
   return Val_unit;
 }
 
@@ -287,8 +329,20 @@ val_t ocaml_arduino_serial_begin(val_t i){
 }
 
 
-#else
+val_t ocaml_arduboy_print_float(val_t i) {
+  alpha a1;
+  a1.v = i;
+  printf("ocaml_arduino_print_float(\"%f\")\n", a1.f);
+  return Val_unit;
+}
 
+
+val_t caml_print_float(val_t i){
+  printf("print_float(%d)",Double_val(i));
+  return Val_unit;
+}
+
+#else
 
 val_t ocaml_arduboy_reset_cursor(val_t unit){
   printf("ocaml_arduboy_reset_cursor()");
@@ -314,6 +368,14 @@ val_t ocaml_arduboy_print_int(val_t i) {
   printf("ocaml_arduino_print_int(\"%d\")\n", (int)Int_val(i));
   return Val_unit;
 }
+
+val_t ocaml_arduboy_print_float(val_t i) {
+  int32_t val = Double_val(i);
+  float f = *((float*)&val);
+  printf("ocaml_arduino_print_float(\"%f\")\n", f);
+  return Val_unit;
+}
+
 
 val_t ocaml_arduboy_display(val_t unit) {
   printf("ocaml_arduino_print()\n");
@@ -375,12 +437,12 @@ val_t caml_delay(val_t i){
 
 
 val_t caml_pin_mode(val_t pin, val_t mode) {
-  printf("pin_mode(%d,%d)", Val_int(pin),Val_int(mode));
+  printf("pin_mode(%ld,%ld)", Val_int(pin),Val_int(mode));
   return Val_unit;
 }
 
 val_t caml_digital_write(val_t pin, val_t state) {
-  printf("digital_write(%d,%d)", Val_int(pin),Val_int(state));
+  printf("digital_write(%ld,%ld)", Val_int(pin),Val_int(state));
   return Val_unit;
 }
 
@@ -394,6 +456,17 @@ val_t ocaml_arduino_serial_begin(val_t i){
   return Val_unit;
 }
 
+
+val_t caml_print_float(val_t i){
+  printf("print_float(%f)",(float)i);
+  return Val_unit;
+}
+
+
+val_t caml_force_gc (val_t unit){
+  printf("gc()\n");
+  return Val_unit;
+}
 
 #endif /* PC */
 #endif /* PIC */

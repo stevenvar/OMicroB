@@ -51,15 +51,15 @@ int millis(void) {
 }
 
 val_t caml_write_reg (val_t pin,val_t v){
-
+  return 0;
 }
 
 val_t caml_set_bit(val_t pin){
-
+  return 0;
 }
 
 val_t caml_clear_bit(val_t pin){
-
+  return 0;
 }
 
 /******************************************************************************/

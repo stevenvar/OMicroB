@@ -152,7 +152,7 @@ void pop_n(int n) {
 #ifdef DEBUG
 /* for debugging */
 
-int cptinst = 0; 
+int cptinst = 0;
 
 void print_global(){
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
@@ -169,14 +169,15 @@ void print_stack(){
   int i = 0;
   for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
        ptr > sp; ptr --){
+    float f = *(float *)&sp[i];
     if (Is_int(sp[i])){
-      printf("\t %d : %d \n", i, Int_val(sp[i]));
+      printf("\t %d : %04x (=%d or %f) \n", i, sp[i], Int_val(sp[i]),f);
     }
     else if (Is_block(sp[i])){
-      printf("\t %d : @(%p) \n", i, Block_val(sp[i]));
+      printf("\t %d : @(%p) %f \n", i, Block_val(sp[i]),f);
     }
     else
-          printf("\t %d : ? 0x%04x \n", i, sp[i]);
+      printf("\t %d : ? 0x%04x (float = %f) \n", i, sp[i],f);
     i++;
   }
 
@@ -222,13 +223,14 @@ val_t interp(void) {
 
 #ifdef DEBUG
 #ifdef __PC__
+    printf("GLOBAL VARS = \n");
     print_global();
-    print_heap();
     print_stack();
+    float f = *(float *)&acc;
     if (Is_int(acc)) {
-      printf("acc = %d \n", Int_val(acc));
+      printf("acc = %d or %f \n", Int_val(acc), f);
     } else {
-      printf("acc = 0x%08x \n", Block_val(acc));
+      printf("acc = 0x%08x or %f \n", Block_val(acc),f);
     }
     printf("env = @(0x%08x) \n", Block_val(env));
     printf("pc = %d\n", pc-1);
@@ -245,7 +247,7 @@ val_t interp(void) {
     cptinst++;
 #endif
     switch(opcode){
- 
+
 #ifdef OCAML_ACC0
     case OCAML_ACC0 : {
       acc = peek(0);
@@ -474,7 +476,7 @@ val_t interp(void) {
     case OCAML_PUSH_RETADDR_1B : {
       push(Val_int(extra_args));
       push(env);
-      push(read_ptr_1B());
+      push(Val_codeptr(read_ptr_1B()));
       break;
     }
 #endif
@@ -483,7 +485,7 @@ val_t interp(void) {
     case OCAML_PUSH_RETADDR_2B : {
       push(Val_int(extra_args));
       push(env);
-      push(read_ptr_2B());
+      push(Val_codeptr(read_ptr_2B()));
       break;
     }
 #endif
@@ -492,7 +494,7 @@ val_t interp(void) {
     case OCAML_PUSH_RETADDR_4B : {
       push(Val_int(extra_args));
       push(env);
-      push(read_ptr_4B());
+      push(Val_codeptr(read_ptr_4B()));
       break;
     }
 #endif
@@ -500,7 +502,7 @@ val_t interp(void) {
 #ifdef OCAML_APPLY
     case OCAML_APPLY : {
       extra_args = read_uint8() - 1;
-      printf("i'm in apply");
+      /* printf("i'm in apply"); */
       pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
       break;
@@ -636,7 +638,7 @@ val_t interp(void) {
       uint8_t i;
       /* pop_n(nargs); */
       sp -= nargs;
-      printf("NARGS = %d \n", nargs);
+      /* printf("NARGS = %d \n", nargs); */
       for (i = 0; i < nargs; i ++) sp[i] = Field(env, i+2);
       env = Field(env,1);
       extra_args += nargs;
@@ -651,7 +653,10 @@ val_t interp(void) {
       if (extra_args >= n){
         extra_args -= n;
       } else {
-        Alloc_small(acc, extra_args + 3, Closure_tag);
+	Alloc_small(acc, extra_args + 3, Closure_tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
         Field(acc, 1) = env;
         Code_val(acc) = Val_codeptr(pc - 3);
         for (i = 0 ; i < n; i ++) {
@@ -674,6 +679,9 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
+      	#ifdef DEBUG
+		print_heap();
+	#endif
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -691,6 +699,9 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
+      	#ifdef DEBUG
+		print_heap();
+	#endif
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -708,6 +719,9 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
+      	#ifdef DEBUG
+		print_heap();
+	#endif
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -732,19 +746,20 @@ val_t interp(void) {
       }
       /* Alloc a closure of size blksize */
       Alloc_small(acc, blksize, Closure_tag);
+
       /* p = &Field(accu, f*2 - 1); */
       /* The acc contains the offset */
       Field(acc, 0) = Val_codeptr(o);
 
       /* Create f functions in the closure */
-      printf("f = %d , v = %d , o = %d \n",f,v,o);
+      /* printf("f = %d , v = %d , o = %d \n",f,v,o); */
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = Val_codeptr(read_ptr_1B() - i - 2);
       }
         /* pop what should be elems of the closure (??) */
       for (i = 0 ; i < v ; i ++) {
-	printf("Field(acc,%d) = 0x%08x \n", i+2*f-1,Block_val(peek(0)));
+	/* printf("Field(acc,%d) = 0x%08x \n", i+2*f-1,Block_val(peek(0))); */
         Field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
@@ -753,6 +768,9 @@ val_t interp(void) {
         push(Field(acc,2*i));
       }
       /* pc += f; */
+       	#ifdef DEBUG
+		print_heap();
+	#endif
       break;
     }
 #endif
@@ -767,12 +785,15 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
       Field(acc, 0) = Val_codeptr(o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = Val_codeptr(read_ptr_2B() - 2 * i - 2);
       }
-      printf("f = %d , v = %d , o = %d \n",f,v,o);
+      /* printf("f = %d , v = %d , o = %d \n",f,v,o); */
       /* pop v elems into the closure */
       for (; i < v ; i ++) {
         Field(acc, i + 2 * f - 1) = pop();
@@ -799,6 +820,9 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
       Field(acc, 0) = o;
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
@@ -1006,6 +1030,9 @@ val_t interp(void) {
       uint8_t size = read_uint8();
       val_t block;
       Alloc_small(block, size, tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
       Field(block, 0) = acc;
       for (uint8_t i = 1; i < size; i ++) Field(block, i) = pop();
       acc = block;
@@ -1019,6 +1046,9 @@ val_t interp(void) {
       uint16_t size = read_uint16();
       val_t block;
       Alloc_small(block, size, tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
       Field(block, 0) = acc;
       for (uint16_t i = 1; i < size; i ++) Field(block, i) = pop();
       acc = block;
@@ -1031,6 +1061,9 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       val_t block;
       Alloc_small(block, 1, tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
       Field(block, 0) = acc;
       acc = block;
       break;
@@ -1042,6 +1075,9 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       val_t block;
       Alloc_small(block, 2, tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
       Field(block, 0) = acc;
       Field(block, 1) = pop();
       acc = block;
@@ -1054,6 +1090,9 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       val_t block;
       Alloc_small(block, 3, tag);
+	#ifdef DEBUG
+		print_heap();
+	#endif
       Field(block, 0) = acc;
       Field(block, 1) = pop();
       Field(block, 2) = pop();
@@ -1327,7 +1366,7 @@ val_t interp(void) {
     case OCAML_PUSHTRAP_1B : {
       push(Val_int(extra_args));
       push(trapSp);
-      push(read_ptr_1B());
+      push(Val_codeptr(read_ptr_1B()));
       trapSp = Val_int(sp - ocaml_stack);
       break;
     }
@@ -1337,7 +1376,7 @@ val_t interp(void) {
     case OCAML_PUSHTRAP_2B : {
       push(Val_int(extra_args));
       push(trapSp);
-      push(read_ptr_2B());
+      push(Val_codeptr(read_ptr_2B()));
       trapSp = Val_int(sp - ocaml_stack);
       break;
     }
@@ -1348,7 +1387,7 @@ val_t interp(void) {
       push(Val_int(extra_args));
       push(env);
       push(trapSp);
-      push(read_ptr_4B());
+      push(Val_codeptr(read_ptr_4B()));
       trapSp = Val_int(sp - ocaml_stack);
       break;
     }
@@ -2050,9 +2089,9 @@ val_t interp(void) {
 #ifdef OCAML_STOP
     case OCAML_STOP : {
 #ifdef DEBUG
-      debug(999);
+      debug(5709);
       debug(cptinst);
-      debug(999);
+      debug(5709);
 #endif
       return acc;
     }

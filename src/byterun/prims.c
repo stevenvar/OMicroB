@@ -107,10 +107,10 @@ extern void *caml_int64_shift_left;
 extern void *caml_int64_or;
 extern void *caml_int64_mod;
 extern void *caml_int64_sub;
-extern void *caml_mul_float;
+/* extern void *caml_mul_float; */
 extern void *caml_float_of_int;
-extern void *caml_div_float;
-extern void *caml_add_float;
+/* extern void *caml_div_float; */
+/* extern void *caml_add_float; */
 extern void *caml_int64_of_nativeint;
 extern void *caml_int64_to_nativeint;
 extern void *caml_nativeint_to_int32;
@@ -136,7 +136,7 @@ extern void *caml_sys_file_exists;
 extern void *caml_sys_remove;
 extern void *caml_eq_float;
 extern void *caml_int_of_float;
-extern void *caml_sub_float;
+/* extern void *caml_sub_float; */
 extern void *caml_sys_time;
 extern void *caml_float_compare;
 extern void *caml_sys_system_command;
@@ -149,7 +149,7 @@ extern void *caml_terminfo_resume;
 extern void *caml_string_lessthan;
 extern void *caml_int_compare;
 extern void *caml_array_set;
-extern void *caml_ge_float;
+/* extern void *caml_ge_float; */
 extern void *caml_dynlink_get_current_libs;
 extern void *caml_dynlink_add_primitive;
 extern void *caml_dynlink_lookup_symbol;
@@ -170,6 +170,46 @@ void *caml_names_of_builtin_cprim;
 /******************************************************************************/
 extern val_t ocaml_heap[];
 static val_t oo_last_id = Val_int(0);
+
+val_t caml_add_float(val_t f1, val_t f2){
+  alpha a1, a2, a3;
+  a1.v = f1;
+  a2.v = f2;
+  a3.f = a1.f + a2.f ;
+  return a3.v;
+}
+
+val_t caml_mul_float(val_t f1, val_t f2){
+  alpha a1, a2, a3;
+  a1.v = f1;
+  a2.v = f2;
+  a3.f = a1.f * a2.f ;
+  return a3.v;
+}
+val_t caml_div_float(val_t f1, val_t f2){
+  alpha a1, a2, a3;
+  a1.v = f1;
+  a2.v = f2;
+  a3.f = a1.f / a2.f ;
+  return a3.v;
+}
+
+val_t caml_sub_float(val_t f1, val_t f2){
+  alpha a1, a2, a3;
+  a1.v = f1;
+  a2.v = f2;
+  a3.f = a1.f - a2.f ;
+  return a3.v;
+}
+
+val_t caml_ge_float(val_t f1, val_t f2){
+  alpha a1, a2;
+  a1.v = f1;
+  a2.v = f2;
+  if (a1.f >= a2.f) return Val_int(1);
+  return Val_int(0);
+}
+
 
 /*   #ifdef __AVR__ */
 /* #include "Arduboy.h" */

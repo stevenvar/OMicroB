@@ -56,6 +56,13 @@ typedef uint32_t mlsize_t;
 typedef int32_t header_t;
 typedef uint8_t tag_t;
 typedef uint8_t opcode_t;
+/* for floats  */
+typedef union alpha{
+  val_t v;
+  float f;
+} alpha;
+
+
 #if OCAML_BYTECODE_BSIZE < 256
 typedef uint8_t code_t;
 #elif OCAML_BYTECODE_BSIZE < 65536
@@ -118,7 +125,8 @@ typedef uint32_t code_t;
 
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
-#define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
+/* #define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0) */
+#define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
 
 #define Make_header(wosize, tag) (((val_t) (wosize) << 10) | tag)
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
@@ -141,6 +149,10 @@ typedef uint32_t code_t;
 #define Is_black_hd(hd) (((hd) >> 8) & Color_black)
 
 #define Set_black_hd(hd) ((hd | (Color_black << 8)))
+
+#define Val_double(x) (x)
+#define Double_val(x) (x)
+
 /******************************************************************************/
 /* Tags */
 

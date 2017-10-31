@@ -81,7 +81,7 @@ void gc_init(int32_t heap_size) {
   heap_ptr = (val_t*)heap1_start;
   #endif
   /* heap_end = heap_ptr + heap_size * sizeof (val_t); */
-  heap_end = heap_ptr + heap_size;
+  heap_end = (val_t *)heap1_start + heap_size;
 
   current_heap = 0;
   /* printf("init end \n"); */
@@ -106,11 +106,11 @@ void print_heap(){
   int i = 0;
   val_t* from = tab_heap_start[current_heap];
   val_t* to = tab_heap_end[current_heap];
-  printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : (100 first blocks) \n", from , to, to-from );
-  for(ptr = from ; ptr < to; ptr++){
+  printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : \n", from , to, to-from );
+  for(ptr = from ; ptr <= to + 5; ptr++){
     /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
-	printf("%d  @%p : int : %d | ",i, ptr, Int_val(*ptr));
+	printf("%d  @%p : %04x (int = %d) | ",i, ptr,*ptr, Int_val(*ptr));
       }
       else if (Is_block(*ptr)){
 	printf("%d  @%p : @(%p) | ",i, ptr, Block_val(*ptr));
@@ -119,7 +119,8 @@ void print_heap(){
 	printf("%d  @%p : _ | ",i, ptr);
       }
       else
-	printf("%d  @%p : 0x%08x | ",i, ptr, *ptr);
+	printf("size = %d, tag = %d \n", Wosize_hd(*ptr), Tag_hd(*ptr));
+	/* printf("%d  @%p : 0x%08x | ",i, ptr, *ptr); */
       /* if ( i % 10 == 0) */
 	printf("\n");
     /* } */
@@ -222,15 +223,16 @@ void gc_one_val(val_t* ptr, int update) {
 void gc(mlsize_t size) {
 #ifdef DEBUG
 #ifdef __PC__
-  print_heap();
+  printf("GC START\n");
+  /* print_heap(); */
 #endif
 #endif
   /* printf("******************** GC START **************************** \n"); */
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
   current_heap = (current_heap + 1) % 2;
-  heap_end = tab_heap_end[current_heap % 2];
-  new_heap = tab_heap_start[current_heap % 2];
+  heap_end = tab_heap_end[current_heap];
+  new_heap = tab_heap_start[current_heap];
   heap_ptr = new_heap;
   heap_todo = new_heap;
 

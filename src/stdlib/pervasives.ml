@@ -13,6 +13,10 @@ type mode =
 type picReg = PORTB | TRISB
 type picPin = RB1 | RB2 | RB3 | RB4
 
+(* GC *)
+
+external force_gc : unit -> unit = "caml_force_gc"
+
 (* Boolean operations *)
 
 external not : bool -> bool = "%boolnot"
@@ -33,6 +37,15 @@ external ( * ) : int -> int -> int = "%mulint"
 external ( / ) : int -> int -> int = "%divint"
 external ( mod ) : int -> int -> int = "%modint"
 
+(* floats *)
+
+external ( ~-. ) : float -> float = "%negfloat"
+external ( ~+. ) : float -> float = "%identity"
+external ( +. ) : float -> float -> float = "%addfloat"
+external ( -. ) : float -> float -> float = "%subfloat"
+external ( *. ) : float -> float -> float = "%mulfloat"
+external ( /. ) : float -> float -> float = "%divfloat"
+
 (* Comparisons *)
 external ( = ) : 'a -> 'a -> bool = "%equal"
 external ( <> ) : 'a -> 'a -> bool = "%notequal"
@@ -51,8 +64,10 @@ external ( := ) : 'a ref -> 'a -> unit = "%setfield0"
 external incr : int ref -> unit = "%incr"
 external decr : int ref -> unit = "%decr"
 
+(* Printing *)
 external print_string : int -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
+external print_float : float -> unit = "caml_print_float"
 
 (* PIC *)
 external write_reg : picReg -> int -> unit = "caml_write_reg"
