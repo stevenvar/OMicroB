@@ -9,10 +9,11 @@ extern val_t *heap_ptr;
 extern val_t ocaml_heap[OCAML_HEAP_WOSIZE*2];
 extern val_t *heap_end;
 
+
 extern void gc(mlsize_t wosize);
 extern void gc_init(int32_t heap_size);
 void print_heap();
-
+void clean_heap();
 #ifdef DEBUG
 #define DEBUGassert(test) assert(test)
 #define DEBUGclear(val, sz) do { for (int i = 0; i < sz; i ++) Field(val, i) = Val_unit; } while(0)

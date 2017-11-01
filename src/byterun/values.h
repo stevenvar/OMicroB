@@ -91,9 +91,9 @@ typedef uint32_t code_t;
 /* #define Val_block(x) (val_t)( (((val_t)x - (val_t)ocaml_heap) << 2) | ((val_t)0x3FF << 22) ) */
 /* #define Block_val(x)  (val_t*)((intptr_t)ocaml_heap + ((intptr_t)(x ^ ((val_t)0x3FF << 22) ) >> 2)) */
 
-#define Init_val_block(x) ((val_t) ( (x) << 2) | (val_t)0xFFC00000)
-#define Val_block(x) (val_t)( (((val_t)x - (val_t)ocaml_heap) << 2) | 0xFFC00000)
-#define Block_val(x)  (val_t*)((intptr_t)ocaml_heap + ((intptr_t)((val_t)x ^ 0xFFC00000) >> 2))
+#define Init_val_block(x) (val_t)((uval_t) ( (x) << 1) | (uval_t)0xFFC00000)
+#define Val_block(x) (val_t)( (((uval_t)x - (uval_t)ocaml_heap) << 1) | 0xFFC00000)
+#define Block_val(x)  (val_t*)((intptr_t)ocaml_heap + ((intptr_t)((uval_t)x ^ 0xFFC00000) >> 1))
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
@@ -131,16 +131,16 @@ typedef uint32_t code_t;
 /* #define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0) */
 #define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
 
-#define Make_header(wosize, tag) (((val_t) (wosize) << 10) | tag)
+#define Make_header(wosize, tag) (((uval_t) (wosize) << (uval_t)10) | (uval_t)tag)
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
 #define Wsize_bsize(sz) ((sz) / sizeof (val_t))
 #define Wosize_val(val) (Header(val) >> 10)
 #define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
 
 #define Color_val(val) ((Header(val) >> 8) & 1)
-#define Tag_val(val) (Header(val) & 0xFF)
+#define Tag_val(val) ((uval_t)(Header(val)) & (uval_t)0xFF)
 
-#define Tag_hd(hd) (hd & 0xFF)
+#define Tag_hd(hd) ((uval_t)hd & (uval_t)0xFF)
 #define Wosize_hd(hd) (hd >> 10)
 #define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
 
@@ -148,10 +148,10 @@ typedef uint32_t code_t;
 #define Color_white 0
 #define Color_black 1
 
-#define Is_black_val(val) ((Header(val) >> 8) & Color_black)
-#define Is_black_hd(hd) (((hd) >> 8) & Color_black)
+#define Is_black_val(val) (((uval_t)Header(val) >> 8) & Color_black)
+#define Is_black_hd(hd) ((((uval_t)hd) >> 8) & Color_black)
 
-#define Set_black_hd(hd) ((hd | (Color_black << 8)))
+#define Set_black_hd(hd) ( (uval_t)hd | (uval_t)256)
 
 #define Val_double(x) (x)
 #define Double_val(x) (x)

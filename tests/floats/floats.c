@@ -1,4 +1,4 @@
-#define OCAML_STACK_WOSIZE             96
+#define OCAML_STACK_WOSIZE             64
 #define OCAML_HEAP_WOSIZE              16
 #define OCAML_HEAP_INITIAL_WOSIZE       6
 #define OCAML_STACK_INITIAL_WOSIZE      1
@@ -40,7 +40,7 @@
 #define OCAML_C_CALL1                  28
 #define OCAML_C_CALL2                  29
 #define OCAML_CONST0                   30
-#define OCAML_CONST3                   31
+#define OCAML_CONST2                   31
 #define OCAML_NEQ                      32
 #define OCAML_GTINT                    33
 #define OCAML_OFFSETINT_1B             34
@@ -124,39 +124,7 @@ val_t ocaml_stack[OCAML_STACK_WOSIZE] = {
   /* 60 */  Val_int(0),
   /* 61 */  Val_int(0),
   /* 62 */  Val_int(0),
-  /* 63 */  Val_int(0),
-  /* 64 */  Val_int(0),
-  /* 65 */  Val_int(0),
-  /* 66 */  Val_int(0),
-  /* 67 */  Val_int(0),
-  /* 68 */  Val_int(0),
-  /* 69 */  Val_int(0),
-  /* 70 */  Val_int(0),
-  /* 71 */  Val_int(0),
-  /* 72 */  Val_int(0),
-  /* 73 */  Val_int(0),
-  /* 74 */  Val_int(0),
-  /* 75 */  Val_int(0),
-  /* 76 */  Val_int(0),
-  /* 77 */  Val_int(0),
-  /* 78 */  Val_int(0),
-  /* 79 */  Val_int(0),
-  /* 80 */  Val_int(0),
-  /* 81 */  Val_int(0),
-  /* 82 */  Val_int(0),
-  /* 83 */  Val_int(0),
-  /* 84 */  Val_int(0),
-  /* 85 */  Val_int(0),
-  /* 86 */  Val_int(0),
-  /* 87 */  Val_int(0),
-  /* 88 */  Val_int(0),
-  /* 89 */  Val_int(0),
-  /* 90 */  Val_int(0),
-  /* 91 */  Val_int(0),
-  /* 92 */  Val_int(0),
-  /* 93 */  Val_int(0),
-  /* 94 */  Val_int(0),
-  /* 95 */  Init_val_block(4 * 1)
+  /* 63 */  Init_val_block(4 * 1)
 };
 
 val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER] = {
@@ -280,7 +248,7 @@ PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
   /* 105 */  6,
   /* 106 */  OCAML_C_CALL1,
   /* 107 */  5,
-  /* 108 */  OCAML_CONST3,
+  /* 108 */  OCAML_CONST2,
   /* 109 */  OCAML_PUSHACC1,
   /* 110 */  OCAML_APPLY1,
   /* 111 */  OCAML_C_CALL1,

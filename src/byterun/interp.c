@@ -160,7 +160,9 @@ void print_global(){
     Serial.println("GLOBALS =");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     Serial.print(i);
-    Serial.print(":");
+    Serial.print(" : ");
+    Serial.print(ocaml_global_data[i],HEX);
+    Serial.print(" - ");
     if (Is_block(ocaml_global_data[i])){
       Serial.print("0x");
       Serial.println((val_t)Block_val(ocaml_global_data[i]),HEX);
@@ -178,9 +180,13 @@ void print_stack(){
        ptr > sp; ptr --){
     Serial.print(i);
     Serial.print(":");
+    Serial.print((val_t)sp+i,HEX);
+    Serial.print(" (adresse) - ");
     if (Is_int(sp[i])){
       Serial.print("int/float =");
-      Serial.println(Int_val(sp[i]),DEC);
+      Serial.print(Int_val(sp[i]),DEC);
+      Serial.print("/");
+      Serial.println(*(float *)&sp[i],5);
     }
     else if (Is_block(sp[i])){
       Serial.print("@(0x");
@@ -256,82 +262,58 @@ void interp_init(void) {
 val_t interp(void) {
 
   while (1) {
-
-/* #ifdef __AVR__ */
-    /* if (serialEventRun) { */
-      /* serialEventRun(); */
-    /* } */
-/* #endif */
     opcode_t opcode = read_opcode();
     /* sp pointe sur le dernier bloc écrit  */
-    /* for(int i = 0; i <= 32; i ++){ */
-    /*   printf("stack[%d] = %d\n", i, Int_val(sp[i])); */
-    /* } */
-    /* printf("\n"); */
 
-    /* printf("PC = %d\nINSTR=%d\nACC=%d\n\n", pc-1,opcode,Int_val(acc)); */
+/* #ifdef DEBUG */
+/* #ifdef __AVR__ */
+/*     print_heap(); */
+/*     print_global(); */
+/*     print_stack(); */
+/*     Serial.println("\n\n"); */
+/*     Serial.print("pc="); */
+/*     Serial.println(pc); */
+/*     Serial.print("cpt="); */
+/*     Serial.println(cptinst); */
+/*     Serial.print("env=0x"); */
+/*     Serial.println((val_t)Block_val(env),HEX); */
+/*     Serial.print("acc=0x"); */
+/*     Serial.println((val_t)Block_val(acc),HEX); */
+/* #endif */
+/* #ifdef __PC__ */
+/*     print_global(); */
+/*     print_heap(); */
+/*     print_stack(); */
+/*     float f = *(float *)&acc; */
+/*     if (Is_int(acc)) { */
+/*       printf("acc = %p, %d or %f \n", acc, Int_val(acc), f); */
+/*     } else { */
+/*       printf("acc = %p, 0x%08x or %f \n", acc, Block_val(acc),f); */
+/*     } */
+/*     printf("env = @(0x%08x) \n", Block_val(env)); */
+/*     printf("pc = %d\n", pc-1); */
+/*     printf("extra_args=%d \n",extra_args); */
+/*     printf(" __________________ \n\n"); */
+/* #endif */
+/* #endif */
 
-#ifdef DEBUG
-    /* debug(stack_size()); */
-#ifdef __AVR__
-    print_heap();
-    print_global();
-    print_stack();
-    Serial.println("\n\n");
-#endif
-#ifdef __PC__
-    printf("GLOBAL VARS = \n");
-    print_global();
-    print_heap();
-    print_stack();
-    float f = *(float *)&acc;
-    if (Is_int(acc)) {
-      printf("acc = %d or %f \n", Int_val(acc), f);
-    } else {
-      printf("acc = 0x%08x or %f \n", Block_val(acc),f);
-    }
-    printf("env = @(0x%08x) \n", Block_val(env));
-    printf("pc = %d\n", pc-1);
-    printf("extra_args=%d \n",extra_args);
-    printf(" __________________ \n\n");
-    /* printf("opcode = %d\n", opcode); */
-#endif
-#endif
-    /* debug_init(); */
-    #if defined(DEBUG)
-    if(pc > OCAML_BYTECODE_BSIZE || pc <= 0){
-      #ifdef __PC__
-      printf("error : pc");
-      exit(1);
-      #endif 
-      #ifdef __AVR__
-      arduboy.print("error : pc =");
-      arduboy.println(pc);
-      arduboy.display();
-      Serial.println("error : pc");
-      while(1){}
-      /* exit(1); */
-      #endif
-    }
-    #ifdef __PC__
-    printf("cpt=%d\n",cptinst);
-    #endif
-    cptinst++;
-#endif
 
 #ifdef DEBUG
     debug(pc-1);
-    #ifdef __AVR__
-    Serial.print("env=0x");
-    Serial.println((val_t)Block_val(env),HEX);
-    Serial.print("acc=0x");
-    Serial.print((val_t)Block_val(acc),HEX);
-    Serial.println("");
-    #endif
+    cptinst++;
 #endif
 
-    switch(opcode){
 
+    if(pc > OCAML_BYTECODE_BSIZE || pc <= 0){
+      printf("error : pc");
+#ifdef __AVR__
+      while(1){}
+#endif
+      exit(1);
+    }
+
+
+    switch(opcode){
 #ifdef OCAML_ACC0
     case OCAML_ACC0 : {
 #if defined(DEBUG) && defined (__PC__)
@@ -870,9 +852,6 @@ val_t interp(void) {
         extra_args -= n;
       } else {
 	Alloc_small(acc, extra_args + 3, Closure_tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
         Field(acc, 1) = env;
         Code_val(acc) = Val_codeptr(pc - 3);
         for (i = 0 ; i < n; i ++) {
@@ -898,9 +877,6 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
-      	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -921,9 +897,6 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
-      	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -944,9 +917,6 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, n + 1, Closure_tag);
-      	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -974,31 +944,22 @@ val_t interp(void) {
       }
       /* Alloc a closure of size blksize */
       Alloc_small(acc, blksize, Closure_tag);
-
-      /* p = &Field(accu, f*2 - 1); */
       /* The acc contains the offset */
       Field(acc, 0) = Val_codeptr(o);
 
       /* Create f functions in the closure */
-      /* printf("f = %d , v = %d , o = %d \n",f,v,o); */
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = Val_codeptr(read_ptr_1B() - i - 2);
       }
-        /* pop what should be elems of the closure (??) */
+        /* pop what should be elems of the closure */
       for (i = 0 ; i < v ; i ++) {
-	/* printf("Field(acc,%d) = 0x%08x \n", i+2*f-1,Block_val(peek(0))); */
         Field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
       for (i = 1; i < f ; i ++){
-        /* printf("push(%d)",Field(acc,2*i)); */
         push(Field(acc,2*i));
       }
-      /* pc += f; */
-       	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       break;
     }
 #endif
@@ -1016,9 +977,6 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Field(acc, 0) = Val_codeptr(o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
@@ -1054,9 +1012,6 @@ val_t interp(void) {
         push(acc);
       }
       Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Field(acc, 0) = o;
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
@@ -1327,9 +1282,6 @@ val_t interp(void) {
       uint8_t size = read_uint8();
       val_t block;
       Alloc_small(block, size, tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Field(block, 0) = acc;
       for (uint8_t i = 1; i < size; i ++) Field(block, i) = pop();
       acc = block;
@@ -1346,9 +1298,6 @@ val_t interp(void) {
       uint16_t size = read_uint16();
       val_t block;
       Alloc_small(block, size, tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Field(block, 0) = acc;
       for (uint16_t i = 1; i < size; i ++) Field(block, i) = pop();
       acc = block;
@@ -1364,9 +1313,6 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       val_t block;
       Alloc_small(block, 1, tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Field(block, 0) = acc;
       acc = block;
       break;
@@ -1381,9 +1327,6 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       val_t block;
       Alloc_small(block, 2, tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Field(block, 0) = acc;
       Field(block, 1) = pop();
       acc = block;
@@ -1399,9 +1342,6 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       val_t block;
       Alloc_small(block, 3, tag);
-	#if defined(DEBUG) && defined (__PC__)
-		print_heap();
-	#endif
       Field(block, 0) = acc;
       Field(block, 1) = pop();
       Field(block, 2) = pop();

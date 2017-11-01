@@ -26,7 +26,7 @@ floats.byte: floats.ml
 	ocamlclean $@ -o $@
 
 floats.c: floats.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 16 -stack-size 96 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 16 -stack-size 64 $< -o $@
 
 floats.elf: floats.c
 	$(GCC) -m32 -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
@@ -34,7 +34,7 @@ floats.elf: floats.c
 ################################################################################
 
 floats.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) floats.c
-	$(AVR_GXX)  -O2 -I$(SRC)/byterun/ -D__ARDUINO__ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall -DDEBUG $^ -o $@
+	$(AVR_GXX) -O2  -I$(SRC)/byterun/ -D__ARDUINO__ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall -DDEBUG $^ -o $@
 
 floats.hex: floats.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
@@ -48,6 +48,6 @@ flash: floats.avr
 
 listen:
 	stty -f $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts
-	cat $(ATTY)
+	tail -f $(ATTY)
 
 ################################################################################
