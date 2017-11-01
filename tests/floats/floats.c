@@ -3,7 +3,7 @@
 #define OCAML_HEAP_INITIAL_WOSIZE       6
 #define OCAML_STACK_INITIAL_WOSIZE      1
 #define OCAML_GLOBDATA_NUMBER           9
-#define OCAML_BYTECODE_BSIZE          120
+#define OCAML_BYTECODE_BSIZE          119
 #define OCAML_PRIMITIVE_NUMBER          8
 #define OCAML_VIRTUAL_ARCH             32
 
@@ -40,7 +40,7 @@
 #define OCAML_C_CALL1                  28
 #define OCAML_C_CALL2                  29
 #define OCAML_CONST0                   30
-#define OCAML_CONSTINT_1B              31
+#define OCAML_CONST3                   31
 #define OCAML_NEQ                      32
 #define OCAML_GTINT                    33
 #define OCAML_OFFSETINT_1B             34
@@ -280,18 +280,17 @@ PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
   /* 105 */  6,
   /* 106 */  OCAML_C_CALL1,
   /* 107 */  5,
-  /* 108 */  OCAML_CONSTINT_1B,
-  /* 109 */  11,
-  /* 110 */  OCAML_PUSHACC1,
-  /* 111 */  OCAML_APPLY1,
-  /* 112 */  OCAML_C_CALL1,
-  /* 113 */  6,
-  /* 114 */  OCAML_CONST0,
-  /* 115 */  OCAML_C_CALL1,
-  /* 116 */  7,
-  /* 117 */  OCAML_POP,
-  /* 118 */  1,
-  /* 119 */  OCAML_STOP
+  /* 108 */  OCAML_CONST3,
+  /* 109 */  OCAML_PUSHACC1,
+  /* 110 */  OCAML_APPLY1,
+  /* 111 */  OCAML_C_CALL1,
+  /* 112 */  6,
+  /* 113 */  OCAML_CONST0,
+  /* 114 */  OCAML_C_CALL1,
+  /* 115 */  7,
+  /* 116 */  OCAML_POP,
+  /* 117 */  1,
+  /* 118 */  OCAML_STOP
 };
 
 #include </Users/arcadium/github/OMicroB/src/byterun/runtime.c>

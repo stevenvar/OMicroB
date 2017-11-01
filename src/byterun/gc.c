@@ -131,6 +131,9 @@ void print_heap(){
       else if (*ptr == 0){
         Serial.println("_");
       }
+      else{
+        Serial.println("");
+      }
  }
  Serial.println("_____\n");
   /* exit(0); */
@@ -225,6 +228,21 @@ void gc_one_val(val_t* ptr, int update) {
         /* heap_ptr += sizeof (header_t); */
 	heap_ptr ++;
 	/* printf("I moved heap_ptr to %p \n",heap_ptr); */
+#ifdef __AVR__
+        /* (((val_t)x - (val_t)ocaml_heap) << 2) | (val_t)(0x3FF << 22) */
+        Serial.print("heap_ptr=");
+        Serial.println((long)heap_ptr,HEX);
+        Serial.print("ocaml_heap = ");
+        Serial.println((val_t)ocaml_heap,HEX);
+        Serial.print("heap_ptr - ocaml_heap << 2 = ");
+        Serial.println((val_t)heap_ptr - (val_t)ocaml_heap << 2,HEX);
+        Serial.print("0x33F << 22 = "); 
+        Serial.println( (val_t)(0x3FF << 22),HEX);
+        Serial.print("heap_ptr - ocaml_heap << 2 | (val_t)(0x3FF << 22) = ");
+        Serial.println((val_t)heap_ptr - (val_t)ocaml_heap << 2 | (val_t)(0x3FF << 22),HEX);
+        Serial.print("Val_block(heap_ptr)=");
+        Serial.println(Val_block(heap_ptr),HEX);
+#endif
         val_t new_val = Val_block(heap_ptr);
 	/* printf("The new value is 0x%04x\n", Val_block(new_val)); */
         memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
@@ -240,7 +258,10 @@ void gc_one_val(val_t* ptr, int update) {
   
         *ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
 	/* printf("The new_val is copied into the original pointer : %p \n", *ptr); */
-        /* printf("%p becomes %p",val, new_val); */
+#ifdef __AVR__
+        Serial.print("new_val = ");
+        Serial.println(new_val,HEX);
+#endif
         /* val = new_val; */
         /* il faudra faire en tailrec et avec parcours en largeur si possible */
         //                val_t * old_addr = (val_t *)new_val ;

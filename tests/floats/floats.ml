@@ -30,7 +30,7 @@ let _ =
   (* integrale poly 0.0 1.0 10.; *)
   (* force_gc(); *)
   (* Arduboy.print_float 4.5; *)
-  Arduboy.print_float (repeat 11);
+  Arduboy.print_float (repeat 3);
 
   (* let y = Arduboy.millis () - x in *)
   (* Arduboy.print_int y; *)

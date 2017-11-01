@@ -157,6 +157,7 @@ int cptinst = 0;
 #ifdef __AVR__
 
 void print_global(){
+    Serial.println("GLOBALS =");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     Serial.print(i);
     Serial.print(":");
@@ -177,17 +178,19 @@ void print_stack(){
        ptr > sp; ptr --){
     Serial.print(i);
     Serial.print(":");
-    /* float f = *(float *)&sp[i]; */
     if (Is_int(sp[i])){
       Serial.print("int/float =");
       Serial.println(Int_val(sp[i]),DEC);
     }
     else if (Is_block(sp[i])){
-      Serial.print("0x");
-      Serial.println((val_t)Block_val(sp[i]),HEX);
+      Serial.print("@(0x");
+      Serial.print((long)Block_val(sp[i]),HEX);
+      Serial.println(")");
     }
-    else
+    else {
+      Serial.print("0x");
       Serial.println((val_t)sp[i],HEX);
+    }
     i++;
   }
 }
@@ -197,6 +200,7 @@ void print_stack(){
 #ifdef __PC__
 
 void print_global(){
+
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     if (Is_block(ocaml_global_data[i])){
     printf("%d : 0x%08x\n",i, Block_val(ocaml_global_data[i]));
@@ -270,7 +274,7 @@ val_t interp(void) {
 #ifdef DEBUG
     /* debug(stack_size()); */
 #ifdef __AVR__
-    Serial.println("GLOBALS =");
+    print_heap();
     print_global();
     print_stack();
     Serial.println("\n\n");
@@ -301,6 +305,9 @@ val_t interp(void) {
       exit(1);
       #endif 
       #ifdef __AVR__
+      arduboy.print("error : pc =");
+      arduboy.println(pc);
+      arduboy.display();
       Serial.println("error : pc");
       while(1){}
       /* exit(1); */
@@ -315,8 +322,10 @@ val_t interp(void) {
 #ifdef DEBUG
     debug(pc-1);
     #ifdef __AVR__
+    Serial.print("env=0x");
+    Serial.println((val_t)Block_val(env),HEX);
     Serial.print("acc=0x");
-    Serial.print(acc,HEX);
+    Serial.print((val_t)Block_val(acc),HEX);
     Serial.println("");
     #endif
 #endif
