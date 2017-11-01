@@ -248,8 +248,6 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
-
-
   #ifdef OCAML_HEAP_INITIAL_WOSIZE
   for (ptr = ocaml_stack + OCAML_STACK_WOSIZE; ptr >= sp; ptr--) {
     gc_one_val(ptr, 1);
@@ -262,7 +260,6 @@ void gc(mlsize_t size) {
 
   /* print_stack(); */
  
-  exit(0);
   gc_one_val(&acc,1);  
   gc_one_val(&env,1);
   
