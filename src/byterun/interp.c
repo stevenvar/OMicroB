@@ -180,8 +180,6 @@ void print_stack(){
        ptr > sp; ptr --){
     Serial.print(i);
     Serial.print(":");
-    Serial.print((val_t)sp+i,HEX);
-    Serial.print(" (adresse) - ");
     if (Is_int(sp[i])){
       Serial.print("int/float =");
       Serial.print(Int_val(sp[i]),DEC);
@@ -265,21 +263,23 @@ val_t interp(void) {
     opcode_t opcode = read_opcode();
     /* sp pointe sur le dernier bloc écrit  */
 
-/* #ifdef DEBUG */
-/* #ifdef __AVR__ */
-/*     print_heap(); */
-/*     print_global(); */
-/*     print_stack(); */
-/*     Serial.println("\n\n"); */
-/*     Serial.print("pc="); */
-/*     Serial.println(pc); */
-/*     Serial.print("cpt="); */
-/*     Serial.println(cptinst); */
-/*     Serial.print("env=0x"); */
-/*     Serial.println((val_t)Block_val(env),HEX); */
-/*     Serial.print("acc=0x"); */
-/*     Serial.println((val_t)Block_val(acc),HEX); */
-/* #endif */
+#ifdef DEBUG
+#ifdef __AVR__
+    print_heap();
+    print_global();
+    print_stack();
+    Serial.println("\n\n");
+    Serial.print("pc=");
+    Serial.println(pc);
+    Serial.print("cpt=");
+    Serial.println(cptinst);
+    Serial.print("env=0x");
+    Serial.println((val_t)Block_val(env),HEX);
+    Serial.print("acc=0x");
+    Serial.print(acc,HEX);
+    Serial.print(" - ");
+    Serial.println((val_t)Block_val(acc),HEX);
+#endif
 /* #ifdef __PC__ */
 /*     print_global(); */
 /*     print_heap(); */
@@ -295,7 +295,7 @@ val_t interp(void) {
 /*     printf("extra_args=%d \n",extra_args); */
 /*     printf(" __________________ \n\n"); */
 /* #endif */
-/* #endif */
+#endif
 
 
 #ifdef DEBUG

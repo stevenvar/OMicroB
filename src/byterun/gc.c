@@ -99,7 +99,7 @@ void print_heap(){
   Serial.println("HEAP=");
  for(val_t* ptr = from ; ptr < to; ptr++){
     /* if (*ptr != 0){ */
-   Serial.print("@");
+   Serial.print("@0x");
    Serial.print((val_t)ptr,HEX);
    Serial.print(":");
       if (Is_int(*ptr)){
@@ -168,12 +168,12 @@ void gc_one_val(val_t* ptr, int update) {
  start:
   val = *ptr;
   /* printf("ocaml_heap = %p\n", ocaml_heap); */
-  printf("\t The val is : 0x%08x \n",val);
+  /* printf("\t The val is : 0x%08x \n",val); */
   if (Is_block(val)) {
-    printf("It's a pointer to %p \n", (val_t*)Block_val(val));
+    /* printf("It's a pointer to %p \n", (val_t*)Block_val(val)); */
     hd = Hd_val(val);
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
-      printf("It has already been copied \n");
+      /* printf("It has already been copied \n"); */
       /* printf("I update the ref to %p \n", Field(val,0)); */
       *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
       goto next;
@@ -234,7 +234,7 @@ void gc_one_val(val_t* ptr, int update) {
 
 void gc(mlsize_t size) {
  #ifdef __AVR__
-  Serial.println("GC");
+  Serial.println(" ====================================  GC =========================================");
 
   #endif
 #ifdef DEBUG
