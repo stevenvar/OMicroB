@@ -206,7 +206,7 @@ val_t caml_ge_float(val_t f1, val_t f2){
   alpha a1, a2;
   a1.v = f1;
   a2.v = f2;
-  if (a1.f >= a2.f) return Val_int(1);
+  if (a1.f - a2.f < 0.0001) return Val_int(1);
   return Val_int(0);
 }
 

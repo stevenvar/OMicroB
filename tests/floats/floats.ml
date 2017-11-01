@@ -19,7 +19,7 @@ let poly x = x *. x
 let repeat n =
   for i = 0 to (n-1) do
     integrale poly 0.0 1.0 10.;
-    force_gc();
+    (* force_gc(); *)
   done;
   integrale poly 0.0 1.0 10.
 

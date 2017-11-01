@@ -11,7 +11,7 @@ extern val_t *heap_end;
 
 extern void gc(mlsize_t wosize);
 extern void gc_init(int32_t heap_size);
-extern void print_heap();
+void print_heap();
 
 #ifdef DEBUG
 #define DEBUGassert(test) assert(test)

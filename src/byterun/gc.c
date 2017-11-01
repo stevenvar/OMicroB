@@ -98,8 +98,46 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
   return result;
 }
 
-#ifdef DEBUG
+#if defined(DEBUG) 
 
+void clean_heap(){
+  #ifdef __AVR__
+  arduboy.println("CLEAN");
+  arduboy.display();
+#endif
+  val_t* from = tab_heap_start[(current_heap+1)%2];
+  val_t* to = tab_heap_end[(current_heap+1)%2];
+  for(val_t* ptr = from ; ptr < to; ptr++){
+    *ptr = -1;
+  }
+
+}
+#ifdef __AVR__
+void print_heap(){
+  val_t* from = tab_heap_start[current_heap];
+  val_t* to = tab_heap_end[current_heap];
+  Serial.println("HEAP=");
+ for(val_t* ptr = from ; ptr < to; ptr++){
+    /* if (*ptr != 0){ */
+   Serial.print("@");
+   Serial.print((val_t)ptr,HEX);
+   Serial.print(":");
+      if (Is_int(*ptr)){
+	Serial.println(Int_val(*ptr));
+      }
+      else if (Is_block(*ptr)){
+	Serial.println((val_t)Block_val(*ptr),HEX);
+      }
+      else if (*ptr == 0){
+        Serial.println("_");
+      }
+ }
+ Serial.println("_____\n");
+  /* exit(0); */
+}
+#endif
+
+#if defined(__PC__)
 /* Pour debug */
 void print_heap(){
   val_t* ptr;
@@ -111,10 +149,10 @@ void print_heap(){
     float f = *(float *)ptr;
     /* if (*ptr != 0){ */
       if (Is_int(*ptr)){
-	printf("%d  @%p : %04x (int = %d / float = %f) | ",i, ptr,*ptr, Int_val(*ptr),f);
+	printf("%d  @%p : 0x%08x (int = %d / float = %f) | ",i, ptr,*ptr, Int_val(*ptr),f);
       }
       else if (Is_block(*ptr)){
-	printf("%d  @%p : @(%p) | ",i, ptr, Block_val(*ptr));
+	printf("%d  @%p : %p / @(%p) | ",i, ptr, *ptr,Block_val(*ptr));
       }
       else if (*ptr == 0){
 	printf("%d  @%p : _ | ",i, ptr);
@@ -127,8 +165,9 @@ void print_heap(){
     /* } */
     i++;
   }
-  printf("\n...\n________________________ \n");
+  printf("\n\n________________________ \n");
 }
+#endif
 #endif
 /* fonction qui traite complètement une racine
  *    c'est-à-dire effectue tous les déplacements attendus
@@ -149,18 +188,28 @@ void gc_one_val(val_t* ptr, int update) {
 
  start:
   val = *ptr;
-  /* printf("\t val = %p \n",Block_val(val)); */
+  /* printf("ocaml_heap = %p\n", ocaml_heap); */
+  #ifdef DEBUG
+  /* print_heap(); */
+#endif
+  /* printf("\t The val is : 0x%08x \n",val); */
   if (Is_block(val)) {
+    /* printf("It's a pointer to %p \n", (val_t*)Block_val(val)); */
+    /* printf("which contains 0x%08x \n", ((val_t*)Block_val(val))[0]); */
     /* tester si c'est une globale ? */
-    hd = (Hd_val(val));
+    /* hd = *((val_t*)Block_val(val)); */
+    hd = Hd_val(val);
+    /* printf("Its header is 0x%08x (= %d)", hd,hd); */
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
+      /* printf("It has already been copied \n"); */
+      /* printf("I update the ref to %p \n", Field(val,0)); */
       *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
       goto next;
     }
     else {                 /* ici il faut le copier*/
       tag = Tag_hd(hd);
       sz = Wosize_hd(hd);
-      /* printf("HD = 0x%04x, tag = 0x%04x, size = 0x%04x \n", hd, tag, sz); */
+      /* printf("HD = 0x%04x, tag = %d, size = %d \n", hd, tag, sz); */
 
       if (tag == Infix_tag) {
         val_t start = val - Infix_offset_hd(hd);
@@ -172,11 +221,12 @@ void gc_one_val(val_t* ptr, int update) {
       else { /* tag < No_scan_tag : tous les autres */
 	/* printf("I put the header in %p \n",heap_ptr); */
         *heap_ptr = hd;
+        /* heap_ptr ++; */
         /* heap_ptr += sizeof (header_t); */
 	heap_ptr ++;
 	/* printf("I moved heap_ptr to %p \n",heap_ptr); */
         val_t new_val = Val_block(heap_ptr);
-	/* printf("The new value is %p\n", Val_block(new_val)); */
+	/* printf("The new value is 0x%04x\n", Val_block(new_val)); */
         memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
 	/* printf("I put %ld bytes starting from %p in %p \n",sz * sizeof(val_t), Block_val(val),heap_ptr); */
         Field(val, 0) = new_val;
@@ -187,8 +237,11 @@ void gc_one_val(val_t* ptr, int update) {
 	/* printf("I set the original to black \n"); */
         /* Field(ptr, 0) = new_val; */
         /*       if (update) */
+  
         *ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
-	/* printf("The new_val is copied into the original (?) : %p \n", Block_val(*ptr)); */
+	/* printf("The new_val is copied into the original pointer : %p \n", *ptr); */
+        /* printf("%p becomes %p",val, new_val); */
+        /* val = new_val; */
         /* il faudra faire en tailrec et avec parcours en largeur si possible */
         //                val_t * old_addr = (val_t *)new_val ;
         //                for (int i = 0 ; i < sz; i++) { gc_one_val(old_addr,1); old_addr++;}
@@ -225,8 +278,9 @@ void gc(mlsize_t size) {
 #ifdef DEBUG
 #ifdef __PC__
   printf("GC START\n");
-  /* print_heap(); */
+  printf("heap before : \n");
 #endif
+  print_heap();
 #endif
   /* printf("******************** GC START **************************** \n"); */
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
@@ -237,32 +291,43 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
+  /* printf("GC : stack \n"); */
   #ifdef OCAML_HEAP_INITIAL_WOSIZE
-  for (ptr = ocaml_stack + OCAML_STACK_WOSIZE; ptr > sp; ptr--) {
+  for (ptr = ocaml_stack + OCAML_STACK_WOSIZE; ptr >= sp; ptr--) {
     gc_one_val(ptr, 1);
   }
   #endif
 
+  /* printf("GC : global data \n"); */
   for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
     /* printf("glob = 0x%04x\n", ptr); */
     gc_one_val(ptr, 1);  /* c'est ici que l'on pourra avoir traité les globales*/
   }
 
+  /* printf("GC : acc \n"); */
   gc_one_val(&acc,1);
+  /* printf("GC : env \n"); */
   gc_one_val(&env,1);
 
   /* il n y a pas eu assez de récupération */
   if (heap_ptr + size > heap_end) {
-    #ifdef DEBUG
-    #ifdef __PC__
-    printf("HEAP OVERFLOW\n");
+#ifdef DEBUG
+#ifdef __PC__
+    /* printf("HEAP OVERFLOW\n"); */
     debug(200);
 #endif
 #endif
     exit(200);
 }
 
-
+#ifdef DEBUG
+  clean_heap();
+#ifdef __PC__
+  /* printf("heap after : \n"); */
+  /* printf("GC END\n\n\n"); */
+#endif
+  print_heap();
+#endif
   /* printf("gc end \n"); */
 }
 
