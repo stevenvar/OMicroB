@@ -26,10 +26,10 @@ oderiv.byte: oderiv.ml
 	ocamlclean $@ -o $@
 
 oderiv.c: oderiv.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 42 -stack-size 40 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 oderiv.elf: oderiv.c
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall -DDEBUG  $^ -o $@
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wall -DDEBUG $^ -o $@
 
 ################################################################################
 

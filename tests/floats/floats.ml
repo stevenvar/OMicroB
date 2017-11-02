@@ -26,14 +26,14 @@ let repeat n =
 let _ =
   Arduboy.init() ;
   (* Arduboy.print_float (repeat 10); *)
-  (* let x = Arduboy.millis () in *)
+  let x = Arduboy.millis () in
   (* integrale poly 0.0 1.0 10.; *)
   (* force_gc(); *)
 
-  Arduboy.print_float (repeat 100);
+  repeat 100;
 
-  (* let y = Arduboy.millis () - x in *)
-  (* Arduboy.print_int y; *)
+  let y = Arduboy.millis () - x in
+  Arduboy.print_int y;
   (* Arduboy.print_float (integrale poly 0.0 1.0 10.); *)
   (* let y = fact_floats 4. in *)
   (* Arduboy.print_float (y); *)

@@ -145,7 +145,7 @@ void print_heap(){
     printf("\n");
     i++;
   }
-  printf("\n\n________________________ \n");
+  printf("\n\n\n");
 }
 
 #endif
@@ -168,8 +168,9 @@ void gc_one_val(val_t* ptr, int update) {
 
  start:
   val = *ptr;
-  /* printf("ocaml_heap = %p\n", ocaml_heap); */
-
+  #ifdef __PC__
+  printf("The val is 0x%04x \n", val);
+#endif
   if (Is_block(val)) {
     /* printf("It's a pointer to %p \n", (val_t*)Block_val(val)); */
     hd = Hd_val(val);
@@ -232,6 +233,7 @@ void gc_one_val(val_t* ptr, int update) {
   }
   ptr = ++heap_todo;
   todo--;
+  printf("ok");
   goto start;
 }
 
@@ -243,8 +245,11 @@ void gc_one_val(val_t* ptr, int update) {
  */
 
 void gc(mlsize_t size) {
-
+#ifndef NOGC
 #ifdef DEBUG
+  #ifdef __PC__
+  printf("==================================================GC=====================================\n");
+  #endif
     print_global();
     print_heap();
     print_stack();
@@ -273,7 +278,10 @@ void gc(mlsize_t size) {
 
   /* il n y a pas eu assez de récupération */
   if (heap_ptr + size > heap_end) {
+    #ifdef __PC__
+    printf("HEAP OVERFLOW");
+    #endif
     exit(200);
   }
-
+#endif
 }
