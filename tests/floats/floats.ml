@@ -24,13 +24,13 @@ let repeat n =
   integrale poly 0.0 1.0 10.
 
 let _ =
-  Arduboy.init();
+  Arduboy.init() ;
   (* Arduboy.print_float (repeat 10); *)
   (* let x = Arduboy.millis () in *)
   (* integrale poly 0.0 1.0 10.; *)
   (* force_gc(); *)
-  (* Arduboy.print_float 4.5; *)
-  Arduboy.print_float (repeat 2);
+
+  Arduboy.print_float (repeat 100);
 
   (* let y = Arduboy.millis () - x in *)
   (* Arduboy.print_int y; *)

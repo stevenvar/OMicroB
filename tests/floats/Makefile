@@ -34,7 +34,7 @@ floats.elf: floats.c
 ################################################################################
 
 floats.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) floats.c
-	$(AVR_GXX) -O2  -I$(SRC)/byterun/ -D__ARDUINO__ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall -DDEBUG $^ -o $@
+	$(AVR_GXX) -O2  -I$(SRC)/byterun/ -D__ARDUINO__ -DOMICROB_WITH_ARDUBOY $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
 floats.hex: floats.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@

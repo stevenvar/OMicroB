@@ -34,11 +34,10 @@ static uint8_t extra_args;
 
 
 void caml_raise_stack_overflow(void) {
-  #ifdef __AVR__
+#ifdef __AVR__
 #ifdef OMICROB_WITH_ARDUBOY
   arduboy.print("stack overflow");
   arduboy.display();
-  
 #endif
 #endif
 #ifdef __PC__
@@ -49,7 +48,6 @@ printf("stack overflow");
   debug(444);
   exit(0);
 #endif
-
   /* assert(0); */
   /* TODO */
 }
@@ -159,13 +157,15 @@ int cptinst = 0;
 void print_global(){
     Serial.println("GLOBALS =");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
+    Serial.print("@0x");
+    Serial.println((uval_t)ocaml_global_data+i,HEX);
     Serial.print(i);
     Serial.print(" : ");
     Serial.print(ocaml_global_data[i],HEX);
     Serial.print(" - ");
     if (Is_block(ocaml_global_data[i])){
       Serial.print("0x");
-      Serial.println((val_t)Block_val(ocaml_global_data[i]),HEX);
+      Serial.println((uval_t)Block_val(ocaml_global_data[i]),HEX);
     }
     else
       Serial.print("int / float = ");
@@ -178,8 +178,11 @@ void print_stack(){
   int i = 0;
   for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
        ptr > sp; ptr --){
+    Serial.print("@sp[");
     Serial.print(i);
-    Serial.print(":");
+    Serial.print("] = 0x");
+    Serial.print((uval_t)&sp[i],HEX);
+    Serial.print(" : ");
     if (Is_int(sp[i])){
       Serial.print("int/float =");
       Serial.print(Int_val(sp[i]),DEC);
@@ -187,8 +190,8 @@ void print_stack(){
       Serial.println(*(float *)&sp[i],5);
     }
     else if (Is_block(sp[i])){
-      Serial.print("@(0x");
-      Serial.print((long)Block_val(sp[i]),HEX);
+      Serial.print("points to (0x");
+      Serial.print((uval_t)Block_val(sp[i]),HEX);
       Serial.println(")");
     }
     else {
@@ -204,13 +207,12 @@ void print_stack(){
 #ifdef __PC__
 
 void print_global(){
-
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     if (Is_block(ocaml_global_data[i])){
-    printf("%d : 0x%08x\n",i, Block_val(ocaml_global_data[i]));
+      printf("@%p : (%d) - 0x%04x -> pointer to 0x%08x\n",ocaml_global_data, i, ocaml_global_data[i], Block_val(ocaml_global_data[i]));
     }
     else
-      printf("%d : %d\n",i, Int_val(ocaml_global_data[i]));
+      printf("@%p (%d) - 0x%04x -> int / float %d\n",ocaml_global_data+i, i, ocaml_global_data[i], Int_val(ocaml_global_data[i]));
   }
 }
 
@@ -223,14 +225,15 @@ void print_stack(){
   for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
        ptr > sp; ptr --){
     float f = *(float *)&sp[i];
+    printf("@%p", &sp[i]);
     if (Is_int(sp[i])){
-      printf("\t %d : %04x (=%d or %f) \n", i, sp[i], Int_val(sp[i]),f);
+      printf("%d : %04x -- (=%d or %f) \n", i, sp[i], Int_val(sp[i]),f);
     }
     else if (Is_block(sp[i])){
-      printf("\t %d : %p / @(%p) %f \n", i, sp[i],Block_val(sp[i]),f);
+      printf("%d : %p -- @(%p) %f \n", i, sp[i],Block_val(sp[i]),f);
     }
     else
-      printf("\t %d : ? 0x%04x (float = %f) \n", i, sp[i],f);
+      printf("%d : ? 0x%04x -- float = %f) \n", i, sp[i],f);
     i++;
   }
   printf("<size=%d>",stack_size());
@@ -265,7 +268,7 @@ val_t interp(void) {
 
 #ifdef DEBUG
 #ifdef __AVR__
-    print_heap();
+    /* print_heap(); */
     print_global();
     print_stack();
     Serial.println("\n\n");
@@ -274,27 +277,29 @@ val_t interp(void) {
     Serial.print("cpt=");
     Serial.println(cptinst);
     Serial.print("env=0x");
-    Serial.println((val_t)Block_val(env),HEX);
+    Serial.println((uval_t)Block_val(env),HEX);
+     Serial.print("@acc=0x");
+     Serial.println((uval_t)&acc,HEX);
     Serial.print("acc=0x");
     Serial.print(acc,HEX);
-    Serial.print(" - ");
-    Serial.println((val_t)Block_val(acc),HEX);
+    Serial.print(" -> points to 0x");
+    Serial.println((uval_t)Block_val(acc),HEX);
 #endif
-/* #ifdef __PC__ */
-/*     print_global(); */
-/*     print_heap(); */
-/*     print_stack(); */
-/*     float f = *(float *)&acc; */
-/*     if (Is_int(acc)) { */
-/*       printf("acc = %p, %d or %f \n", acc, Int_val(acc), f); */
-/*     } else { */
-/*       printf("acc = %p, 0x%08x or %f \n", acc, Block_val(acc),f); */
-/*     } */
-/*     printf("env = @(0x%08x) \n", Block_val(env)); */
-/*     printf("pc = %d\n", pc-1); */
-/*     printf("extra_args=%d \n",extra_args); */
-/*     printf(" __________________ \n\n"); */
-/* #endif */
+#ifdef __PC__
+    print_global();
+    print_heap();
+    print_stack();
+    float f = *(float *)&acc;
+    if (Is_int(acc)) {
+      printf("acc = %p - %d or %f \n", acc, Int_val(acc), f);
+    } else {
+      printf("acc = %p -> points to 0x%08x or %f \n", acc, Block_val(acc),f);
+    }
+    printf("env = @(0x%08x) \n", Block_val(env));
+    printf("pc = %d\n", pc-1);
+    printf("extra_args=%d \n",extra_args);
+    printf(" __________________ \n\n");
+#endif
 #endif
 
 
@@ -303,15 +308,17 @@ val_t interp(void) {
     cptinst++;
 #endif
 
-
+#ifdef DEBUG
     if(pc > OCAML_BYTECODE_BSIZE || pc <= 0){
-      printf("error : pc");
 #ifdef __AVR__
       while(1){}
 #endif
+#ifdef __PC__
+      printf("error : pc");
       exit(1);
+#endif
     }
-
+#endif
 
     switch(opcode){
 #ifdef OCAML_ACC0
@@ -671,7 +678,6 @@ val_t interp(void) {
 #endif
       extra_args = read_uint8() - 1;
       pc = Codeptr_val(*(Block_val(acc)));
-      printf("@0x%04x go to %d \n", Block_val(acc), pc);
       env = acc;
       break;
     }

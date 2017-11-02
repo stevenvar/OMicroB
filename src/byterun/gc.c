@@ -11,7 +11,7 @@ extern val_t env;
 extern val_t ocaml_stack[OCAML_STACK_WOSIZE];
 extern val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER];
 
-#ifndef NOGC
+
 
 /*
  * implantation d'un S&C
@@ -83,7 +83,7 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
   return result;
 }
 
-#if defined(DEBUG) 
+#if defined(DEBUG)
 void clean_heap(){
   val_t* from = tab_heap_start[(current_heap+1)%2];
   val_t* to = tab_heap_end[(current_heap+1)%2];
@@ -149,7 +149,8 @@ void print_heap(){
 }
 
 #endif
-#endif
+#endif /* DEBUG */
+
 /* fonction qui traite complètement une racine
  *    c'est-à-dire effectue tous les déplacements attendus
  */
@@ -168,7 +169,7 @@ void gc_one_val(val_t* ptr, int update) {
  start:
   val = *ptr;
   /* printf("ocaml_heap = %p\n", ocaml_heap); */
-  /* printf("\t The val is : 0x%08x \n",val); */
+
   if (Is_block(val)) {
     /* printf("It's a pointer to %p \n", (val_t*)Block_val(val)); */
     hd = Hd_val(val);
@@ -203,7 +204,16 @@ void gc_one_val(val_t* ptr, int update) {
 	/* printf("I move heap_ptr to %p \n",heap_ptr); */
         Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
 	/* printf("I set the original to black \n"); */
-        *ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
+	/* #ifdef __AVR__ */
+	/* Serial.print("0x"); */
+	/* Serial.print(*ptr,HEX); */
+	/* Serial.print("becomes 0x"); */
+	/* Serial.println(new_val,HEX); */
+	/* #endif */
+	/* #ifdef __PC__ */
+	/* printf("0x%04x becomes 0x%04x \n", *ptr, new_val); */
+	/* #endif */
+	*ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
       }
     }
   }
@@ -233,12 +243,11 @@ void gc_one_val(val_t* ptr, int update) {
  */
 
 void gc(mlsize_t size) {
- #ifdef __AVR__
-  Serial.println(" ====================================  GC =========================================");
 
-  #endif
 #ifdef DEBUG
-  /* print_heap(); */
+    print_global();
+    print_heap();
+    print_stack();
 #endif
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
@@ -248,73 +257,23 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
-  #ifdef OCAML_HEAP_INITIAL_WOSIZE
-  for (ptr = ocaml_stack + OCAML_STACK_WOSIZE; ptr >= sp; ptr--) {
+/* Pourquoi ce ifdef ?  */
+#ifdef OCAML_HEAP_INITIAL_WOSIZE
+  for (ptr = ocaml_stack + OCAML_STACK_WOSIZE - 1 ; ptr >= sp; ptr--) {
     gc_one_val(ptr, 1);
   }
-  #endif
+#endif
 
   for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
     gc_one_val(ptr, 1);
   }
 
-  /* print_stack(); */
- 
-  gc_one_val(&acc,1);  
+  gc_one_val(&acc,1);
   gc_one_val(&env,1);
-  
+
   /* il n y a pas eu assez de récupération */
   if (heap_ptr + size > heap_end) {
     exit(200);
   }
 
-  #ifdef DEBUG
-  clean_heap();
-  /* print_heap(); */
-  #endif
 }
-
-#else
-
-/* heap_ptr : pointeur du premier emplacement libre du tas
- * heap_end : pointeur de fin du tas courant */
-val_t *heap_ptr, *heap_end;
-#ifdef DEBUG
-void print_heap(){
-  val_t* ptr;
-  int i = 0;
-  val_t* from = ocaml_heap;
-  val_t* to = heap_end;
-  printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : (100 first blocks) \n", from , to, to-from );
-  for(ptr = from ; ptr < to; ptr++){
-    /* if (*ptr != 0){ */
-      if (Is_int(*ptr)){
-	printf("%d  @%p : int : %d | ",i, ptr, Int_val(*ptr));
-      }
-      else if (Is_block(*ptr)){
-	printf("%d  @%p : @(%p) | ",i, ptr, Block_val(*ptr));
-      }
-      else if (*ptr == 0){
-	printf("%d  @%p : _ | ",i, ptr);
-      }
-      else
-	printf("%d  @%p : 0x%08x | ",i, ptr, *ptr);
-	printf("\n");
-    i++;
-  }
-  printf("\n...\n________________________ \n");
-}
-#endif
-
-
-
-void gc_init(int32_t heap_size) {
-  #ifdef OCAML_HEAP_INITIAL_WOSIZE
-  heap_ptr = (val_t*)ocaml_heap + OCAML_HEAP_INITIAL_WOSIZE;
-  #else
-  heap_ptr = (val_t*)ocaml_heap;
-  #endif
-  heap_end = heap_ptr + (OCAML_HEAP_WOSIZE * 2);
-}
-
-#endif
