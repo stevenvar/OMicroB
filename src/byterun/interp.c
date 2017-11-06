@@ -207,6 +207,7 @@ void print_stack(){
 #ifdef __PC__
 
 void print_global(){
+  printf("GLOBAL DATA : \n");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     if (Is_block(ocaml_global_data[i])){
       printf("@%p : (%d) - 0x%04x -> pointer to 0x%08x\n",ocaml_global_data, i, ocaml_global_data[i], Block_val(ocaml_global_data[i]));

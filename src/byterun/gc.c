@@ -118,7 +118,9 @@ void print_heap(){
  Serial.println("_____\n");
 }
 #endif
-
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #if defined(__PC__)
 /* Pour debug */
 void print_heap(){
@@ -141,7 +143,7 @@ void print_heap(){
       printf("%d  @%p : _ | ",i, ptr);
     }
     else
-      printf("%d  @%p : 0x%08x (=%f) | ",i, ptr, *ptr,f);
+      printf("%d  @%p : 0x%08x (maybe %f) | ",i, ptr, *ptr,f);
     printf("\n");
     i++;
   }
@@ -172,7 +174,7 @@ void gc_one_val(val_t* ptr, int update) {
   printf("The val is 0x%04x \n", val);
 #endif
   if (Is_block(val)) {
-    /* printf("It's a pointer to %p \n", (val_t*)Block_val(val)); */
+    printf("It's a pointer to %p \n", (val_t*)Block_val(val));
     hd = Hd_val(val);
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
       /* printf("It has already been copied \n"); */
@@ -218,13 +220,20 @@ void gc_one_val(val_t* ptr, int update) {
       }
     }
   }
+  else{
+    printf("pas un block \n");
+  }
  next:
+  printf("in next (todo = %d) \n",todo);
   if (heap_todo == heap_ptr) return;
   if (todo == 0) {
     /* header_t hd_local = Hd_val(*heap_todo); */
     header_t hd_local = *heap_todo;
     /* printf("hd_local = 0x%04x \n",hd_local); */
     todo = Wosize_hd(hd_local);
+    printf("The val is 0x%04x \n", val);
+    printf("hd_local is 0x%04x\n", hd_local);
+    printf("the size is 0x%04x (=%d) \n", todo, todo);
     if (Tag_hd(hd_local) >= No_scan_tag)  {
       heap_todo += (todo + 1) ;
       todo = 0;
@@ -233,7 +242,6 @@ void gc_one_val(val_t* ptr, int update) {
   }
   ptr = ++heap_todo;
   todo--;
-  printf("ok");
   goto start;
 }
 
@@ -262,6 +270,8 @@ void gc(mlsize_t size) {
   heap_ptr = new_heap;
   heap_todo = new_heap;
 
+  printf("STACK \n");
+
 /* Pourquoi ce ifdef ?  */
 #ifdef OCAML_HEAP_INITIAL_WOSIZE
   for (ptr = ocaml_stack + OCAML_STACK_WOSIZE - 1 ; ptr >= sp; ptr--) {
@@ -269,9 +279,13 @@ void gc(mlsize_t size) {
   }
 #endif
 
+  printf("GLOBALS \n");
+
   for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
     gc_one_val(ptr, 1);
   }
+
+  printf("ACC & ENV \n");
 
   gc_one_val(&acc,1);
   gc_one_val(&env,1);

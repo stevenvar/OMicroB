@@ -123,7 +123,7 @@ typedef uint32_t code_t;
 #define Hd_val(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
-#define Make_string_data(c3, c2, c1, c0) \
+#define Make_string_data(c0, c1, c2, c3) \
   (((val_t) (c0) << 24) | ((val_t) (c1) << 16) | ((val_t) (c2) << 8) | ((val_t) (c3)))
 
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
@@ -131,7 +131,7 @@ typedef uint32_t code_t;
 /* #define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0) */
 #define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
 
-#define Make_header(wosize, tag) (((uval_t) (wosize) << (uval_t)10) | (uval_t)tag)
+#define Make_header(wosize, tag) (uval_t)(((uval_t) (wosize) << (uval_t)10) | (uval_t)tag)
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
 #define Wsize_bsize(sz) ((sz) / sizeof (val_t))
 #define Wosize_val(val) (Header(val) >> 10)
@@ -141,7 +141,7 @@ typedef uint32_t code_t;
 #define Tag_val(val) ((uval_t)(Header(val)) & (uval_t)0xFF)
 
 #define Tag_hd(hd) ((uval_t)hd & (uval_t)0xFF)
-#define Wosize_hd(hd) (hd >> 10)
+#define Wosize_hd(hd) (uval_t)((uval_t)hd >> 10)
 #define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
 
 
@@ -181,7 +181,6 @@ typedef uint32_t code_t;
 /* Infix_tag 249 */
 #define Infix_offset_hd(hd) (Bosize_hd(hd))
 #define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
-
 
 /* Forward_tag 250 */
 #define Forward_val(v) Field(v, 0)
