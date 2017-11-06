@@ -70,7 +70,7 @@ let rec iter f = function
 
 let main() =
   Arduboy.init();
-  let x = Arduboy.millis () in
+  (* let x = Arduboy.millis () in *)
   (* for i = 0 to 3 do *)
   (*   derive pol *)
   (* done; *)
@@ -79,9 +79,9 @@ let main() =
   derive pol;
   (* force_gc (); *)
   (* raise e; *)
-  let y = Arduboy.millis () in
+  (* let y = Arduboy.millis () in *)
   (* Arduboy.print_string("\n"); *)
-  Arduboy.print_int (y-x);
+  (* Arduboy.print_int (y-x); *)
   (* Arduboy.display();; *)
   (* Arduboy.print_int (length [e1;e2;e3]); *)
   Arduboy.display();;

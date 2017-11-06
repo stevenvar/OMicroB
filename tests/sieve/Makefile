@@ -26,7 +26,7 @@ sieve.byte: sieve.ml
 	ocamlclean $@ -o $@
 
 sieve.c: sieve.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 96 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 sieve.elf: sieve.c
 	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG-Wall $^ -o $@

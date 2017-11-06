@@ -123,7 +123,7 @@ typedef uint32_t code_t;
 #define Hd_val(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
-#define Make_string_data(c0, c1, c2, c3) \
+#define Make_string_data(c3, c2, c1, c0) \
   (((val_t) (c0) << 24) | ((val_t) (c1) << 16) | ((val_t) (c2) << 8) | ((val_t) (c3)))
 
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)

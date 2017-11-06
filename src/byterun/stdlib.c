@@ -271,7 +271,7 @@ val_t ocaml_arduboy_init(val_t unit) {
 }
 
 val_t ocaml_arduboy_print(val_t str) {
-  printf("%s", StringVal(str));
+  printf("=>%s\n", StringVal(str));
   return Val_unit;
 }
 
