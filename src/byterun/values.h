@@ -129,7 +129,7 @@ typedef uint32_t code_t;
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
 /* #define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0) */
-#define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
+#define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
 #define Make_header(wosize, tag) (uval_t)(((uval_t) (wosize) << (uval_t)10) | (uval_t)tag)
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
