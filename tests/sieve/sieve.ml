@@ -3,16 +3,17 @@ module Arduboy = struct
   external init    : unit   -> unit = "ocaml_arduboy_init"
   external print_int : int -> unit = "ocaml_arduboy_print_int"
   external print_string : string -> unit = "ocaml_arduboy_print"
+  external print_float : float -> unit = "ocaml_arduboy_print_float"
   external display : unit   -> unit = "ocaml_arduboy_display"
 end;;
 
-let succ x = x + 1
+(* let succ x = x + 1 *)
 (* Eratosthene's sieve *)
 
 (* interval min max = [min; min+1; ...; max-1; max] *)
 
 let rec interval min max =
-  if min > max then [] else min :: interval (succ min) max
+  if min > max then [] else min :: interval (min + 1) max
 
 (* filter p L returns the list of the elements in list L
    that satisfy predicate p *)
@@ -49,6 +50,6 @@ let _ =
   (* let (z,k) = !r in *)
   (* Arduboy.print_int z; *)
   do_list (fun n -> print_int n) (sieve 10);
+
   (* Arduboy.print_int (Arduboy.millis () -x); *)
-  Arduboy.print_string "sieve \n";
   Arduboy.display()

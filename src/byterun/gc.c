@@ -11,7 +11,7 @@ extern val_t env;
 extern val_t ocaml_stack[OCAML_STACK_WOSIZE];
 extern val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER];
 
-
+extern void print_stack();
 
 /*
  * implantation d'un S&C
@@ -137,16 +137,17 @@ void print_heap(){
       printf("======================================================\n");
     }
     if (Is_int(*ptr)){
-      printf("%d  @%p : 0x%08x (int = %d / float = %f) | ",i, ptr,*ptr, Int_val(*ptr),f);
+      printf("%d  @%p : 0x%08x (int = %d / float = %f)",i, ptr,*ptr, Int_val(*ptr),f);
     }
     else if (Is_block(*ptr)){
-      printf("%d  @%p : %p / @(%p) | ",i, ptr, *ptr,Block_val(*ptr));
+      printf("%d  @%p : %p / @(%p)",i, ptr, *ptr,Block_val(*ptr));
     }
     else if (*ptr == 0){
-      printf("%d  @%p : _ | ",i, ptr);
+      printf("%d  @%p : _",i, ptr);
     }
-    else
-      printf("%d  @%p : 0x%08x (maybe %f) | ",i, ptr, *ptr,f);
+    else{
+      printf("%d  @%p : 0x%08x (maybe %f)",i, ptr, *ptr,f);
+    }
     printf("\n");
     i++;
   }
@@ -165,25 +166,27 @@ void gc_one_val(val_t* ptr, int update) {
   header_t hd;
   tag_t tag;
   mlsize_t sz;
-  int todo = -1;
+  int todo = 0;
 
 #ifdef DEBUG
-  DEBUGassert(heap_ptr == heap_todo);
+  DEBUGassert(heap_ptr -1 == heap_todo);
 #endif
 
  start:
   val = *ptr;
+  /* printf("The address of the val is %p\n", ptr); */
   if (Is_block(val)) {
-    printf("The val is a pointer to %p \n", Block_val(val)); 
+    /* printf("The val is a pointer to %p \n", Block_val(val));  */
     hd = Hd_val(val);
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
-      printf("already copied \n");
+      /* printf("already copied \n"); */
       *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
       goto next;
     }
     else {                 /* ici il faut le copier*/
       tag = Tag_hd(hd);
       sz = Wosize_hd(hd);
+      /* printf("must copy %d blocs \n", sz); */
       if (tag == Infix_tag) {
         val_t start = val - Infix_offset_hd(hd);
         if (!(Is_black_val(start))) { /* déjà déplacé*/
@@ -203,14 +206,19 @@ void gc_one_val(val_t* ptr, int update) {
       }
     }
   }
+  else{
+    /* printf("The val is %d\n", Int_val(*ptr)); */
+  }
 
  next:
-  if (heap_todo == heap_ptr) return;
-  if (todo < 0) {
+  if (heap_todo == heap_ptr -1 ) return;
+  if (todo == 0) {
+    heap_todo++;
     header_t hd_local = *heap_todo;
     todo = Wosize_hd(hd_local);
+    /* printf("todo = %d\n", todo); */
     if (Tag_hd(hd_local) >= No_scan_tag)  {
-      heap_todo += todo + 1 ;
+      heap_todo += todo ;
       todo = 0;
       goto next;
     }
@@ -243,10 +251,8 @@ void gc(mlsize_t size) {
   heap_end = tab_heap_end[current_heap];
   new_heap = tab_heap_start[current_heap];
   heap_ptr = new_heap;
-  heap_todo = new_heap;
+  heap_todo = new_heap - 1;
 
-  /* printf("STACK \n"); */
-  /* print_heap(); */
 
 /* Pourquoi ce ifdef ?  */
 /* #ifdef OCAML_HEAP_INITIAL_WOSIZE */
@@ -255,29 +261,28 @@ void gc(mlsize_t size) {
   }
 /* #endif */
 
-  /* print_heap(); */
 
-  /* printf("GLOBALS \n"); */
+
 
   for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
     gc_one_val(ptr, 1);
   }
 
-  /* print_heap(); */
-
-  /* printf("ACC & ENV \n"); */
-
   gc_one_val(&acc,1);
   gc_one_val(&env,1);
 
 
-  /* clean_heap(); */
+#ifdef DEBUG
+  clean_heap();
+  print_heap();
+#endif
   /* il n y a pas eu assez de récupération */
   if (heap_ptr + size > heap_end) {
+    #ifdef DEBUG
     #ifdef __PC__
-    print_heap(); 
     printf("HEAP OVERFLOW (I needed %d blocks)\n",size);
     #endif
+#endif
     exit(200);
   }
 #endif

@@ -10,7 +10,7 @@ module Arduboy = struct
 end
 
 let failwith s = raise(Failure s);;
-open Arduboy;;
+
 
 let rec map f = function [] -> [] | h::t -> (f h)::(map f t);;
 
@@ -37,7 +37,7 @@ let rec derive =
   | Dexpr (D, [a1;a2])
            -> Dexpr (M, [Dexpr (D, [derive a1 ; a2]) ;
 			 Dexpr (D, [a1 ; Dexpr (T, [a2;a2;derive a2])])])
-  | _ -> failwith "no"
+  | _ -> Numb (-1)
  	    (* FORMULA IS WRONG BUT NEVER USED IN TEST *)
 
 
@@ -45,11 +45,11 @@ let rec derive =
 (*                      Dexpr (T, [Symbole "a"; Symbole "x"; Symbole "x"]) ; *)
 (*                      Dexpr (T, [Symbole "b"; Symbole "x"]) ; *)
 (*                      Numb 5]);; *)
-(* (\* let res = ref pol;; *\) *)
+(* (* let res = ref pol;; *) *)
 
 let (@) a b = Dexpr (T, [a;b])
 let (+) a b = Dexpr (P, [a;b])
-let x = (Symbole xx @ Symbole xx)
+let x = (Symbole xx @ Symbole xx) + Symbole xx
 (* x^2 + x *)
 let pol = x
 
@@ -57,13 +57,13 @@ let rec iter f = function
     [] -> ()
   | x :: xs -> (f x) ; iter f xs
 
-(* (\* let rec print_expr = function *\) *)
-(* (\*   | Numb x -> print_int x *\) *)
-(* (\*   | Symbole x -> print_string x *\) *)
-(* (\*   | Dexpr (P, lexpr) -> print_string "(+"; iter print_expr lexpr; print_string ")" *\) *)
-(* (\*   | Dexpr (M, lexpr) -> print_string "(-"; iter print_expr lexpr; print_string ")" *\) *)
-(* (\*   | Dexpr (T, lexpr) -> print_string "(\\*"; iter print_expr lexpr; print_string ")" *\) *)
-(* (\*   | Dexpr (D, lexpr) -> print_string "(/"; iter print_expr lexpr; print_string ")" *\) *)
+(* (* let rec print_expr = function *) *)
+(* (*   | Numb x -> print_int x *) *)
+(* (*   | Symbole x -> print_string x *) *)
+(* (*   | Dexpr (P, lexpr) -> print_string "(+"; iter print_expr lexpr; print_string ")" *) *)
+(* (*   | Dexpr (M, lexpr) -> print_string "(-"; iter print_expr lexpr; print_string ")" *) *)
+(* (*   | Dexpr (T, lexpr) -> print_string "(\*"; iter print_expr lexpr; print_string ")" *) *)
+(* (*   | Dexpr (D, lexpr) -> print_string "(/"; iter print_expr lexpr; print_string ")" *) *)
 
 (* let res = ref pol *)
 
@@ -71,10 +71,10 @@ let rec iter f = function
 let main() =
   Arduboy.init();
   (* let x = Arduboy.millis () in *)
-  (* for i = 0 to 3 do *)
-  (*   derive pol *)
-  (* done; *)
-  (* (\* print_expr !res; *\) *)
+  for i = 0 to 1000 do
+    derive pol
+  done;
+  (* (* print_expr !res; *) *)
   (* let e = Failure "test" in *)
   derive pol;
   (* force_gc (); *)

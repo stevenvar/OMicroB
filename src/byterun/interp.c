@@ -226,15 +226,15 @@ void print_stack(){
   for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
        ptr > sp; ptr --){
     float f = *(float *)&sp[i];
-    printf("@%p", &sp[i]);
+    printf("@%p ", &sp[i]);
     if (Is_int(sp[i])){
-      printf("%d : %04x -> %d or %f \n", i, sp[i], Int_val(sp[i]),f);
+      printf("(%d) : %04x -> %d or %f \n", i, sp[i], Int_val(sp[i]),f);
     }
     else if (Is_block(sp[i])){
-      printf("%d : %p -> pointer to %p or %f \n", i, sp[i],Block_val(sp[i]),f);
+      printf("(%d) : %p -> pointer to %p or %f \n", i, sp[i],Block_val(sp[i]),f);
     }
     else
-      printf("%d : ? 0x%04x -> %f) \n", i, sp[i],f);
+      printf("(%d) : ? 0x%04x -> %f) \n", i, sp[i],f);
     i++;
   }
   printf("<size=%d>\n",stack_size());
@@ -288,8 +288,8 @@ val_t interp(void) {
 #endif
 #ifdef __PC__
     printf("=========\n");
-    print_global();
-    print_heap();
+    /* print_global(); */
+    /* print_heap(); */
     print_stack();
     float f = *(float *)&acc;
     if (Is_int(acc)) {
@@ -1378,7 +1378,7 @@ val_t interp(void) {
 #endif
 
 #ifdef OCAML_GETFIELD2
-    case OCAML_GETFIELD2 : {
+    case OCAML_GETFIELD2 : si{
 #if defined(DEBUG) && defined (__PC__)
       printf("GETFIELD2\n");
 #endif
