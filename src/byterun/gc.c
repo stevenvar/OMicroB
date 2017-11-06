@@ -225,7 +225,7 @@ void gc_one_val(val_t* ptr, int update) {
     printf("Its an immediate \n");
   }
  next:
-  print_heap();
+  /* print_heap(); */
   printf("in next (todo = %p) \n",todo);
   printf("heap_ptr = %p \n", heap_ptr);
   printf("heap_todo = %p \n", heap_todo);
