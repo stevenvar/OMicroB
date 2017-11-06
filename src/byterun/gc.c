@@ -131,7 +131,7 @@ void print_heap(){
   /* val_t* from = ocaml_heap; */
   /* val_t* to = heap2_end; */
   printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : \n", from , to, to-from );
-  for(ptr = from ; ptr < to; ptr++){
+  for(ptr = from ; ptr < to ; ptr++){
     float f = *(float *)ptr;
     if (Is_int(*ptr)){
       printf("%d  @%p : 0x%08x (int = %d / float = %f) | ",i, ptr,*ptr, Int_val(*ptr),f);
@@ -164,9 +164,9 @@ void gc_one_val(val_t* ptr, int update) {
   mlsize_t sz;
   int todo = 0;
 
-#ifdef DEBUG
-  DEBUGassert(heap_ptr == heap_todo);
-#endif
+/* #ifdef DEBUG */
+/*   DEBUGassert(heap_ptr == heap_todo); */
+/* #endif */
 
  start:
   val = *ptr;
@@ -177,8 +177,8 @@ void gc_one_val(val_t* ptr, int update) {
     printf("It's a pointer to %p \n", (val_t*)Block_val(val));
     hd = Hd_val(val);
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
-      /* printf("It has already been copied \n"); */
-      /* printf("I update the ref to %p \n", Field(val,0)); */
+      printf("It has already been copied \n");
+      printf("I update the ref to %p \n", Field(val,0));
       *ptr = Field(val, 0);  /* on suppose qu'il y a toujours un champ (attention à [||]*/
       goto next;
     }
@@ -186,6 +186,7 @@ void gc_one_val(val_t* ptr, int update) {
       tag = Tag_hd(hd);
       sz = Wosize_hd(hd);
       if (tag == Infix_tag) {
+	printf("it is infix \n");
         val_t start = val - Infix_offset_hd(hd);
         if (!(Is_black_val(start))) { /* déjà déplacé*/
           gc_one_val(&start,1);
@@ -221,23 +222,32 @@ void gc_one_val(val_t* ptr, int update) {
     }
   }
   else{
-    printf("pas un block \n");
+    printf("Its an immediate \n");
   }
  next:
-  printf("in next (todo = %d) \n",todo);
-  if (heap_todo == heap_ptr) return;
+  print_heap();
+  printf("in next (todo = %p) \n",todo);
+  printf("heap_ptr = %p \n", heap_ptr);
+  printf("heap_todo = %p \n", heap_todo);
+  if (heap_todo == heap_ptr - 1) return;
   if (todo == 0) {
-    /* header_t hd_local = Hd_val(*heap_todo); */
+    /* header_t hd_local = Hd_val(heap_todo); */
+    heap_todo++;
     header_t hd_local = *heap_todo;
     /* printf("hd_local = 0x%04x \n",hd_local); */
     todo = Wosize_hd(hd_local);
-    printf("The val is 0x%04x \n", val);
-    printf("hd_local is 0x%04x\n", hd_local);
-    printf("the size is 0x%04x (=%d) \n", todo, todo);
+    printf(" size = %d , tag = %d \n", Wosize_hd(hd_local), Tag_hd(hd_local));
+    printf("(next)The val is 0x%04x \n", val);
+    printf("(next)hd_local is 0x%04x\n", hd_local);
+    printf("(next)the size is 0x%04x (=%d) \n", todo, todo);
+    printf("(next)the tag is %d \n", Tag_hd(hd_local));
+    printf("(next)todo = %d \n", todo);
     if (Tag_hd(hd_local) >= No_scan_tag)  {
-      heap_todo += (todo + 1) ;
+      printf("noscan\n");
+      heap_todo += todo ;
+          printf("(noscan) heap_todo = %p \n", heap_todo);
       todo = 0;
-      goto  next;
+      goto next;
     }
   }
   ptr = ++heap_todo;
@@ -268,7 +278,8 @@ void gc(mlsize_t size) {
   heap_end = tab_heap_end[current_heap];
   new_heap = tab_heap_start[current_heap];
   heap_ptr = new_heap;
-  heap_todo = new_heap;
+  /* Heap todo = derniere case traitée */
+  heap_todo = new_heap-1;
 
   printf("STACK \n");
 

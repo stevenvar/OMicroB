@@ -228,16 +228,16 @@ void print_stack(){
     float f = *(float *)&sp[i];
     printf("@%p", &sp[i]);
     if (Is_int(sp[i])){
-      printf("%d : %04x -- (=%d or %f) \n", i, sp[i], Int_val(sp[i]),f);
+      printf("%d : %04x -> %d or %f \n", i, sp[i], Int_val(sp[i]),f);
     }
     else if (Is_block(sp[i])){
-      printf("%d : %p -- @(%p) %f \n", i, sp[i],Block_val(sp[i]),f);
+      printf("%d : %p -> pointer to %p or %f \n", i, sp[i],Block_val(sp[i]),f);
     }
     else
-      printf("%d : ? 0x%04x -- float = %f) \n", i, sp[i],f);
+      printf("%d : ? 0x%04x -> %f) \n", i, sp[i],f);
     i++;
   }
-  printf("<size=%d>",stack_size());
+  printf("<size=%d>\n",stack_size());
 }
 #endif
 #endif

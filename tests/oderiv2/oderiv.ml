@@ -75,7 +75,10 @@ let main() =
   (*   derive pol *)
   (* done; *)
   (* (\* print_expr !res; *\) *)
+  (* let e = Failure "test" in *)
   derive pol;
+  (* force_gc (); *)
+  (* raise e; *)
   let y = Arduboy.millis () in
   (* Arduboy.print_string("\n"); *)
   Arduboy.print_int (y-x);
