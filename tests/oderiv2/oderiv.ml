@@ -6,12 +6,12 @@ module Arduboy = struct
   external print_int : int -> unit = "ocaml_arduboy_print_int"
   external print_string : string -> unit = "ocaml_arduboy_print"
   external display : unit   -> unit = "ocaml_arduboy_display"
-    external millis  : unit -> int = "ocaml_arduboy_millis"
+  external millis  : unit -> int = "ocaml_arduboy_millis"
 end
 
 let failwith s = raise(Failure s);;
 
-
+let rec iter f = function [] -> () | h::t -> (f h); iter f t;;
 let rec map f = function [] -> [] | h::t -> (f h)::(map f t);;
 
 type operator = P | M | T | D;;
@@ -40,6 +40,14 @@ let rec derive =
   | _ -> Numb (-1)
  	    (* FORMULA IS WRONG BUT NEVER USED IN TEST *)
 
+let rec print =
+  function
+  | Numb x -> Arduboy.print_int x
+  | Symbole z -> Arduboy.print_string z
+  | Dexpr (P,lexpr) -> Arduboy.print_string "(+ "; iter print lexpr; Arduboy.print_string ")"
+  | Dexpr (T,lexpr) -> Arduboy.print_string "(* "; iter print lexpr; Arduboy.print_string ")"
+  | Dexpr (M,lexpr) -> Arduboy.print_string "(- "; iter print lexpr; Arduboy.print_string ")"
+  | Dexpr (D,lexpr) -> Arduboy.print_string "(/ "; iter print lexpr; Arduboy.print_string ")"
 
 (* let pol = Dexpr (P, [Dexpr (T, [Numb 3; Symbole "x"; Symbole "x"]) ; *)
 (*                      Dexpr (T, [Symbole "a"; Symbole "x"; Symbole "x"]) ; *)
@@ -68,15 +76,16 @@ let rec iter f = function
 (* let res = ref pol *)
 
 
-let main() =
+let ()  =
   Arduboy.init();
   (* let x = Arduboy.millis () in *)
-  for i = 0 to 1000 do
-    derive pol
-  done;
+  (* for i = 0 to 1000 do *)
+  (*   derive pol *)
+  (* done; *)
   (* (* print_expr !res; *) *)
   (* let e = Failure "test" in *)
-  derive pol;
+  print (derive pol);
+  Arduboy.print_string "\n";
   (* force_gc (); *)
   (* raise e; *)
   (* let y = Arduboy.millis () in *)
@@ -84,6 +93,4 @@ let main() =
   (* Arduboy.print_int (y-x); *)
   (* Arduboy.display();; *)
   (* Arduboy.print_int (length [e1;e2;e3]); *)
-  Arduboy.display();;
-
-main();;
+  Arduboy.display()

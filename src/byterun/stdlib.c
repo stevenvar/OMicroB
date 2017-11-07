@@ -266,12 +266,12 @@ val_t caml_write_reg(val_t reg, val_t val){
 
 
 val_t ocaml_arduboy_init(val_t unit) {
-  printf("ocaml_arduino_init()\n");
+  printf("ocaml_arduboy_init()\n");
   return Val_unit;
 }
 
 val_t ocaml_arduboy_print(val_t str) {
-  printf("=>%s\n", StringVal(str));
+  printf("%s", StringVal(str));
   return Val_unit;
 }
 
@@ -281,7 +281,7 @@ val_t ocaml_arduboy_print_int(val_t i) {
 }
 
 val_t ocaml_arduboy_display(val_t unit) {
-  printf("\n");
+  printf("ocaml_arduboy_display()\n");
   return Val_unit;
 }
 
@@ -291,7 +291,7 @@ val_t ocaml_arduboy_millis(val_t unit){
 
 
 val_t ocaml_arduboy_clear(val_t unit){
-  printf("\n\n\n");
+  printf("ocaml_arduboy_clear()\n");
   return Val_unit;
 }
 
