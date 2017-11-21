@@ -46,10 +46,11 @@ let rec do_list f l = match l with
 let _ =
   Arduboy.init ();
   (* let r = ref (fun x -> 0) in *)
-  (* let x = Arduboy.millis () in *)
+  let x = Arduboy.millis () in
   (* let (z,k) = !r in *)
   (* Arduboy.print_int z; *)
+  (* for x = 0 to 100 do *)
   do_list (fun n -> print_int n) (sieve 10);
-
-  (* Arduboy.print_int (Arduboy.millis () -x); *)
+(* done; *)
+  Arduboy.print_int (Arduboy.millis () -x);
   Arduboy.display()

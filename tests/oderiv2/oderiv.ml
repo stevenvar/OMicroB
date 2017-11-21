@@ -40,14 +40,14 @@ let rec derive =
   | _ -> Numb (-1)
  	    (* FORMULA IS WRONG BUT NEVER USED IN TEST *)
 
-let rec print =
-  function
-  | Numb x -> Arduboy.print_int x
-  | Symbole z -> Arduboy.print_string z
-  | Dexpr (P,lexpr) -> Arduboy.print_string "(+ "; iter print lexpr; Arduboy.print_string ")"
-  | Dexpr (T,lexpr) -> Arduboy.print_string "(* "; iter print lexpr; Arduboy.print_string ")"
-  | Dexpr (M,lexpr) -> Arduboy.print_string "(- "; iter print lexpr; Arduboy.print_string ")"
-  | Dexpr (D,lexpr) -> Arduboy.print_string "(/ "; iter print lexpr; Arduboy.print_string ")"
+(* let rec print = *)
+(*   function *)
+(*   | Numb x -> Arduboy.print_int x *)
+(*   | Symbole z -> Arduboy.print_string z *)
+(*   | Dexpr (P,lexpr) -> Arduboy.print_string "(+ "; iter print lexpr; Arduboy.print_string ")" *)
+(*   | Dexpr (T,lexpr) -> Arduboy.print_string "(\* "; iter print lexpr; Arduboy.print_string ")" *)
+(*   | Dexpr (M,lexpr) -> Arduboy.print_string "(- "; iter print lexpr; Arduboy.print_string ")" *)
+(*   | Dexpr (D,lexpr) -> Arduboy.print_string "(/ "; iter print lexpr; Arduboy.print_string ")" *)
 
 (* let pol = Dexpr (P, [Dexpr (T, [Numb 3; Symbole "x"; Symbole "x"]) ; *)
 (*                      Dexpr (T, [Symbole "a"; Symbole "x"; Symbole "x"]) ; *)
@@ -55,11 +55,8 @@ let rec print =
 (*                      Numb 5]);; *)
 (* (* let res = ref pol;; *) *)
 
-let (@) a b = Dexpr (T, [a;b])
-let (+) a b = Dexpr (P, [a;b])
-let x = (Symbole xx @ Symbole xx) + Symbole xx
-(* x^2 + x *)
-let pol = x
+let pol = Dexpr (T,[Symbole xx; Symbole xx])
+(* x^2 *)
 
 let rec iter f = function
     [] -> ()
@@ -78,19 +75,18 @@ let rec iter f = function
 
 let ()  =
   Arduboy.init();
-  (* let x = Arduboy.millis () in *)
-  (* for i = 0 to 1000 do *)
-  (*   derive pol *)
-  (* done; *)
+  let x = Arduboy.millis () in
+  for i = 0 to 1000 do
+    derive pol
+  done;
   (* (* print_expr !res; *) *)
   (* let e = Failure "test" in *)
-  print (derive pol);
-  Arduboy.print_string "\n";
+  (* print (derive pol); *)
+  (* Arduboy.print_string "\n"; *)
   (* force_gc (); *)
   (* raise e; *)
-  (* let y = Arduboy.millis () in *)
-  (* Arduboy.print_string("\n"); *)
-  (* Arduboy.print_int (y-x); *)
+  (* Arduboy.print_string("NUL\n"); *)
+  Arduboy.print_int (Arduboy.millis ()-x);
   (* Arduboy.display();; *)
   (* Arduboy.print_int (length [e1;e2;e3]); *)
   Arduboy.display()

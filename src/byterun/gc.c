@@ -84,6 +84,9 @@ val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
 }
 
 #if defined(DEBUG)
+
+int cpt_gc = 0;
+
 void clean_heap(){
   val_t* from = tab_heap_start[(current_heap+1)%2];
   val_t* to = tab_heap_end[(current_heap+1)%2];
@@ -198,7 +201,13 @@ void gc_one_val(val_t* ptr, int update) {
         *heap_ptr = hd;
 	heap_ptr ++;
         val_t new_val = Val_block(heap_ptr);
-        memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
+	/* int n = sz ; */
+	/* val_t* po = heap_ptr; */
+	/* val_t* pi = (Block_val(val)); */
+	/* while (n--){ */
+	/*   *po++ = *pi++; */
+	/* } */
+	memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
         Field(val, 0) = new_val;
         heap_ptr += sz;
         Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
@@ -206,9 +215,9 @@ void gc_one_val(val_t* ptr, int update) {
       }
     }
   }
-  else{
-    /* printf("The val is %d\n", Int_val(*ptr)); */
-  }
+  /* else{ */
+  /*   /\* printf("The val is %d\n", Int_val(*ptr)); *\/ */
+  /* } */
 
  next:
   if (heap_todo == heap_ptr -1 ) return;
@@ -238,6 +247,8 @@ void gc_one_val(val_t* ptr, int update) {
 void gc(mlsize_t size) {
 #ifndef NOGC
 #ifdef DEBUG
+  cpt_gc++;
+  int size_before = heap_ptr - tab_heap_start[current_heap];
   #ifdef __PC__
   printf("==================================================GC=====================================\n");
   #endif
@@ -261,9 +272,6 @@ void gc(mlsize_t size) {
   }
 /* #endif */
 
-
-
-
   for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
     gc_one_val(ptr, 1);
   }
@@ -273,6 +281,12 @@ void gc(mlsize_t size) {
 
 
 #ifdef DEBUG
+   #ifdef __PC__
+  int size_after = heap_ptr - new_heap;
+  printf("end of GC number %d ", cpt_gc);
+  printf("liberated memory : AFTER = %d  / BEFORE = %d %d \n ", size_after, size_before, size_before-size_after  );
+
+  #endif
   clean_heap();
   print_heap();
 #endif
