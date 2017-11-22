@@ -1,13 +1,13 @@
 #define OCAML_STACK_WOSIZE             64
 #define OCAML_HEAP_WOSIZE              70
-#define OCAML_HEAP_INITIAL_WOSIZE      10
+#define OCAML_HEAP_INITIAL_WOSIZE      13
 #define OCAML_STACK_INITIAL_WOSIZE      4
-#define OCAML_GLOBDATA_NUMBER           3
-#define OCAML_BYTECODE_BSIZE          232
-#define OCAML_PRIMITIVE_NUMBER          3
+#define OCAML_GLOBDATA_NUMBER           4
+#define OCAML_BYTECODE_BSIZE          190
+#define OCAML_PRIMITIVE_NUMBER          4
 #define OCAML_VIRTUAL_ARCH             32
 
-#include </Users/steven/github/OMicroB/src/byterun/values.h>
+#include </Users/arcadium/github/OMicroB/src/byterun/values.h>
 
 #define OCAML_ACC0                      0
 #define OCAML_ACC1                      1
@@ -31,28 +31,29 @@
 #define OCAML_CLOSURE_1B               19
 #define OCAML_CLOSUREREC_1B            20
 #define OCAML_PUSHOFFSETCLOSURE0       21
-#define OCAML_PUSHGETGLOBAL_1B         22
-#define OCAML_MAKEBLOCK2               23
-#define OCAML_GETFIELD0                24
-#define OCAML_GETFIELD1                25
-#define OCAML_BRANCH_2B                26
-#define OCAML_BRANCHIF_1B              27
-#define OCAML_BRANCHIFNOT_1B           28
-#define OCAML_CHECK_SIGNALS            29
-#define OCAML_C_CALL1                  30
-#define OCAML_CONST0                   31
-#define OCAML_CONST1                   32
-#define OCAML_CONSTINT_1B              33
-#define OCAML_PUSHCONST0               34
-#define OCAML_PUSHCONST2               35
-#define OCAML_PUSHCONSTINT_1B          36
-#define OCAML_SUBINT                   37
-#define OCAML_MULINT                   38
-#define OCAML_MODINT                   39
-#define OCAML_NEQ                      40
-#define OCAML_GTINT                    41
-#define OCAML_OFFSETINT_1B             42
-#define OCAML_STOP                     43
+#define OCAML_GETGLOBAL_1B             22
+#define OCAML_PUSHGETGLOBAL_1B         23
+#define OCAML_MAKEBLOCK2               24
+#define OCAML_GETFIELD0                25
+#define OCAML_GETFIELD1                26
+#define OCAML_BRANCH_2B                27
+#define OCAML_BRANCHIF_1B              28
+#define OCAML_BRANCHIFNOT_1B           29
+#define OCAML_CHECK_SIGNALS            30
+#define OCAML_C_CALL1                  31
+#define OCAML_CONST0                   32
+#define OCAML_CONST1                   33
+#define OCAML_CONSTINT_1B              34
+#define OCAML_PUSHCONST0               35
+#define OCAML_PUSHCONST2               36
+#define OCAML_PUSHCONSTINT_1B          37
+#define OCAML_SUBINT                   38
+#define OCAML_MULINT                   39
+#define OCAML_MODINT                   40
+#define OCAML_NEQ                      41
+#define OCAML_GTINT                    42
+#define OCAML_OFFSETINT_1B             43
+#define OCAML_STOP                     44
 
 val_t ocaml_heap[OCAML_HEAP_WOSIZE * 2] = {
   /*  0 */  Make_header(1, Closure_tag),
@@ -64,13 +65,16 @@ val_t ocaml_heap[OCAML_HEAP_WOSIZE * 2] = {
   /*  6 */  Make_header(1, Closure_tag),
   /*  7 */  Val_codeptr(4),
   /*  8 */  Make_header(1, Closure_tag),
-  /*  9 */  Val_codeptr(132)
+  /*  9 */  Val_codeptr(132),
+  /* 10 */  Make_header(2, String_tag),
+  /* 11 */  Make_string_data('f', 'i', 'n', 'i'),
+  /* 12 */  Make_string_data('s', 'h', '\0', '\1')
 };
 
 const val_t* ocaml_heap1 = ocaml_heap;
 const val_t* ocaml_heap2 = ocaml_heap + OCAML_HEAP_WOSIZE;
 
-val_t acc = Val_int(115200);
+val_t acc = Val_int(57600);
 
 val_t ocaml_stack[OCAML_STACK_WOSIZE] = {
   /*  0 */  Val_int(0),
@@ -142,7 +146,8 @@ val_t ocaml_stack[OCAML_STACK_WOSIZE] = {
 val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER] = {
   /* 0 */  Init_val_block(4 * 9),
   /* 1 */  Init_val_block(4 * 7),
-  /* 2 */  Init_val_block(4 * 5)
+  /* 2 */  Init_val_block(4 * 5),
+  /* 3 */  Init_val_block(4 * 11)
 };
 
 PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
@@ -322,68 +327,27 @@ PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
   /* 173 */  -19,
   /* 174 */  OCAML_POP,
   /* 175 */  2,
-  /* 176 */  OCAML_CONST0,
-  /* 177 */  OCAML_PUSHCONSTINT_1B,
-  /* 178 */  100,
-  /* 179 */  OCAML_PUSH,
-  /* 180 */  OCAML_PUSHACC2,
-  /* 181 */  OCAML_GTINT,
-  /* 182 */  OCAML_BRANCHIF_1B,
-  /* 183 */  16,
-  /* 184 */  OCAML_CHECK_SIGNALS,
-  /* 185 */  OCAML_ACC1,
-  /* 186 */  OCAML_C_CALL1,
-  /* 187 */  2,
-  /* 188 */  OCAML_ACC1,
-  /* 189 */  OCAML_PUSH,
-  /* 190 */  OCAML_OFFSETINT_1B,
-  /* 191 */  1,
-  /* 192 */  OCAML_ASSIGN,
-  /* 193 */  2,
-  /* 194 */  OCAML_ACC1,
-  /* 195 */  OCAML_NEQ,
-  /* 196 */  OCAML_BRANCHIF_1B,
-  /* 197 */  -12,
-  /* 198 */  OCAML_POP,
-  /* 199 */  2,
-  /* 200 */  OCAML_ACC0,
-  /* 201 */  OCAML_PUSHCONST0,
-  /* 202 */  OCAML_C_CALL1,
-  /* 203 */  1,
-  /* 204 */  OCAML_SUBINT,
-  /* 205 */  OCAML_C_CALL1,
-  /* 206 */  2,
-  /* 207 */  OCAML_CONST0,
-  /* 208 */  OCAML_PUSHCONSTINT_1B,
-  /* 209 */  10,
-  /* 210 */  OCAML_PUSH,
-  /* 211 */  OCAML_PUSHACC2,
-  /* 212 */  OCAML_GTINT,
-  /* 213 */  OCAML_BRANCHIF_1B,
-  /* 214 */  16,
-  /* 215 */  OCAML_CHECK_SIGNALS,
-  /* 216 */  OCAML_ACC1,
-  /* 217 */  OCAML_C_CALL1,
-  /* 218 */  2,
-  /* 219 */  OCAML_ACC1,
-  /* 220 */  OCAML_PUSH,
-  /* 221 */  OCAML_OFFSETINT_1B,
-  /* 222 */  1,
-  /* 223 */  OCAML_ASSIGN,
-  /* 224 */  2,
-  /* 225 */  OCAML_ACC1,
-  /* 226 */  OCAML_NEQ,
-  /* 227 */  OCAML_BRANCHIF_1B,
-  /* 228 */  -12,
-  /* 229 */  OCAML_POP,
-  /* 230 */  7,
-  /* 231 */  OCAML_STOP
+  /* 176 */  OCAML_ACC0,
+  /* 177 */  OCAML_PUSHCONST0,
+  /* 178 */  OCAML_C_CALL1,
+  /* 179 */  1,
+  /* 180 */  OCAML_SUBINT,
+  /* 181 */  OCAML_C_CALL1,
+  /* 182 */  2,
+  /* 183 */  OCAML_GETGLOBAL_1B,
+  /* 184 */  3,
+  /* 185 */  OCAML_C_CALL1,
+  /* 186 */  3,
+  /* 187 */  OCAML_POP,
+  /* 188 */  5,
+  /* 189 */  OCAML_STOP
 };
 
-#include </Users/steven/github/OMicroB/src/byterun/runtime.c>
+#include </Users/arcadium/github/OMicroB/src/byterun/runtime.c>
 
 PROGMEM void * const ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {
   (void *) &ocaml_arduino_serial_begin,
   (void *) &ocaml_arduino_millis,
-  (void *) &caml_print_int
+  (void *) &caml_print_int,
+  (void *) &caml_print_string
 };

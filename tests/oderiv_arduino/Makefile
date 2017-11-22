@@ -1,45 +1,45 @@
 include ../../etc/Makefile.conf
 
 ATTY     := /dev/tty.usbmodem1421
-CFLAGS   := -mmcu=atmega328p -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
+CFLAGS   := -mmcu=atmega328p -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
-TARGETS := sieve.byte sieve.c sieve.elf sieve.avr sieve.hex
+TARGETS := oderiv.byte oderiv.c oderiv.elf oderiv.avr oderiv.hex
 
-sieve: $(TARGETS)
+oderiv: $(TARGETS)
 
-run: sieve.elf
-	./sieve.elf
+run: oderiv.elf
+	./oderiv.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
 
-.PHONY: sieve run clean flash
+.PHONY: oderiv run clean flash
 
 ################################################################################
 
-sieve.byte: sieve.ml
+oderiv.byte: oderiv.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
-sieve.c: sieve.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 70 -stack-size 64 $< -o $@
+oderiv.c: oderiv.byte $(BIN)/bc2c
+	$(BIN)/bc2c -local -arch 32 -heap-size 94 -stack-size 28 $< -o $@
 
-sieve.elf: sieve.c
+oderiv.elf: oderiv.c
 	$(GCC) -m32 -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
 
 ################################################################################
 
-sieve.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) sieve.c
+oderiv.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) oderiv.c
 	$(AVR_GXX) -O2  -I$(SRC)/byterun/ -D__ARDUINO__ $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
-sieve.hex: sieve.avr
+oderiv.hex: oderiv.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-flash: sieve.avr
+flash: oderiv.avr
 	stty -f $(ATTY) 1200
 	sleep 1
 	$(AVRDUDE) -c arduino -P $(ATTY) -p ATmega328p -b 115200 -v -D -U flash:w:$<:e

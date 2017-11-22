@@ -1,3 +1,7 @@
+module Arduino = struct
+  external serial_begin : int -> unit = "ocaml_arduino_serial_begin"
+  external millis : unit -> int = "ocaml_arduino_millis"
+end
 
 let integrale f a b n =
   let h = (b -. a) /. n in
@@ -16,4 +20,10 @@ let repeat n =
   integrale poly 0.0 1.0 10.
 
 let _ =
-  repeat 2
+  Arduino.serial_begin 57600;
+  let x = Arduino.millis () in
+  repeat 100;
+  let y = Arduino.millis () - x in
+  print_int (y -x);
+  print_string "finish"
+

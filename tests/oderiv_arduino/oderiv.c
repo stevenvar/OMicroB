@@ -1,0 +1,400 @@
+#define OCAML_STACK_WOSIZE             28
+#define OCAML_HEAP_WOSIZE              94
+#define OCAML_HEAP_INITIAL_WOSIZE      27
+#define OCAML_STACK_INITIAL_WOSIZE      4
+#define OCAML_GLOBDATA_NUMBER           6
+#define OCAML_BYTECODE_BSIZE          261
+#define OCAML_PRIMITIVE_NUMBER          4
+#define OCAML_VIRTUAL_ARCH             32
+
+#include </Users/arcadium/github/OMicroB/src/byterun/values.h>
+
+#define OCAML_ACC0                      0
+#define OCAML_ACC1                      1
+#define OCAML_ACC3                      2
+#define OCAML_PUSH                      3
+#define OCAML_PUSHACC1                  4
+#define OCAML_PUSHACC2                  5
+#define OCAML_PUSHACC3                  6
+#define OCAML_PUSHACC4                  7
+#define OCAML_PUSHACC5                  8
+#define OCAML_POP                       9
+#define OCAML_ASSIGN                   10
+#define OCAML_APPLY1                   11
+#define OCAML_APPLY2                   12
+#define OCAML_RETURN                   13
+#define OCAML_RESTART                  14
+#define OCAML_GRAB                     15
+#define OCAML_PUSHOFFSETCLOSURE0       16
+#define OCAML_GETGLOBAL_1B             17
+#define OCAML_PUSHGETGLOBAL_1B         18
+#define OCAML_MAKEBLOCK2               19
+#define OCAML_GETFIELD0                20
+#define OCAML_GETFIELD1                21
+#define OCAML_BRANCH_1B                22
+#define OCAML_BRANCH_2B                23
+#define OCAML_BRANCHIF_1B              24
+#define OCAML_BRANCHIFNOT_1B           25
+#define OCAML_SWITCH_1B                26
+#define OCAML_CHECK_SIGNALS            27
+#define OCAML_C_CALL1                  28
+#define OCAML_C_CALL2                  29
+#define OCAML_CONST0                   30
+#define OCAML_PUSHCONST0               31
+#define OCAML_PUSHCONST1               32
+#define OCAML_PUSHCONST2               33
+#define OCAML_PUSHCONST3               34
+#define OCAML_PUSHCONSTINT_1B          35
+#define OCAML_SUBINT                   36
+#define OCAML_NEQ                      37
+#define OCAML_GTINT                    38
+#define OCAML_OFFSETINT_1B             39
+#define OCAML_STOP                     40
+
+val_t ocaml_heap[OCAML_HEAP_WOSIZE * 2] = {
+  /*  0 */  Make_header(2, 2),
+  /*  1 */  Val_int(2),
+  /*  2 */  Init_val_block(4 * 4),
+  /*  3 */  Make_header(2, 0),
+  /*  4 */  Init_val_block(4 * 7),
+  /*  5 */  Init_val_block(4 * 11),
+  /*  6 */  Make_header(1, 1),
+  /*  7 */  Init_val_block(4 * 9),
+  /*  8 */  Make_header(1, String_tag),
+  /*  9 */  Make_string_data('x', '\0', '\0', '\2'),
+  /* 10 */  Make_header(2, 0),
+  /* 11 */  Init_val_block(4 * 14),
+  /* 12 */  Val_int(0),
+  /* 13 */  Make_header(1, 1),
+  /* 14 */  Init_val_block(4 * 9),
+  /* 15 */  Make_header(1, Closure_tag),
+  /* 16 */  Val_codeptr(22),
+  /* 17 */  Make_header(1, Closure_tag),
+  /* 18 */  Val_codeptr(4),
+  /* 19 */  Make_header(1, 0),
+  /* 20 */  Val_int(0),
+  /* 21 */  Make_header(1, 0),
+  /* 22 */  Val_int(1),
+  /* 23 */  Make_header(1, 0),
+  /* 24 */  Val_int(0),
+  /* 25 */  Make_header(1, 0),
+  /* 26 */  Val_int(-1)
+};
+
+const val_t* ocaml_heap1 = ocaml_heap;
+const val_t* ocaml_heap2 = ocaml_heap + OCAML_HEAP_WOSIZE;
+
+val_t acc = Val_int(57600);
+
+val_t ocaml_stack[OCAML_STACK_WOSIZE] = {
+  /*  0 */  Val_int(0),
+  /*  1 */  Val_int(0),
+  /*  2 */  Val_int(0),
+  /*  3 */  Val_int(0),
+  /*  4 */  Val_int(0),
+  /*  5 */  Val_int(0),
+  /*  6 */  Val_int(0),
+  /*  7 */  Val_int(0),
+  /*  8 */  Val_int(0),
+  /*  9 */  Val_int(0),
+  /* 10 */  Val_int(0),
+  /* 11 */  Val_int(0),
+  /* 12 */  Val_int(0),
+  /* 13 */  Val_int(0),
+  /* 14 */  Val_int(0),
+  /* 15 */  Val_int(0),
+  /* 16 */  Val_int(0),
+  /* 17 */  Val_int(0),
+  /* 18 */  Val_int(0),
+  /* 19 */  Val_int(0),
+  /* 20 */  Val_int(0),
+  /* 21 */  Val_int(0),
+  /* 22 */  Val_int(0),
+  /* 23 */  Val_int(0),
+  /* 24 */  Init_val_block(4 * 1),
+  /* 25 */  Init_val_block(4 * 16),
+  /* 26 */  Init_val_block(4 * 9),
+  /* 27 */  Init_val_block(4 * 18)
+};
+
+val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER] = {
+  /* 0 */  Init_val_block(4 * 20),
+  /* 1 */  Init_val_block(4 * 9),
+  /* 2 */  Init_val_block(4 * 22),
+  /* 3 */  Init_val_block(4 * 24),
+  /* 4 */  Init_val_block(4 * 18),
+  /* 5 */  Init_val_block(4 * 26)
+};
+
+PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
+  /*   0 */  OCAML_BRANCH_2B,
+  /*   1 */  0,
+  /*   2 */  222,
+  /*   3 */  OCAML_RESTART,
+  /*   4 */  OCAML_GRAB,
+  /*   5 */  1,
+  /*   6 */  OCAML_ACC1,
+  /*   7 */  OCAML_BRANCHIFNOT_1B,
+  /*   8 */  13,
+  /*   9 */  OCAML_ACC1,
+  /*  10 */  OCAML_GETFIELD1,
+  /*  11 */  OCAML_PUSHACC1,
+  /*  12 */  OCAML_PUSHOFFSETCLOSURE0,
+  /*  13 */  OCAML_APPLY2,
+  /*  14 */  OCAML_PUSHACC2,
+  /*  15 */  OCAML_GETFIELD0,
+  /*  16 */  OCAML_PUSHACC2,
+  /*  17 */  OCAML_APPLY1,
+  /*  18 */  OCAML_MAKEBLOCK2,
+  /*  19 */  0,
+  /*  20 */  OCAML_RETURN,
+  /*  21 */  2,
+  /*  22 */  OCAML_ACC0,
+  /*  23 */  OCAML_SWITCH_1B,
+  /*  24 */  0,
+  /*  25 */  3,
+  /*  26 */  6,
+  /*  27 */  10,
+  /*  28 */  26,
+  /*  29 */  OCAML_GETGLOBAL_1B,
+  /*  30 */  0,
+  /*  31 */  OCAML_RETURN,
+  /*  32 */  1,
+  /*  33 */  OCAML_GETGLOBAL_1B,
+  /*  34 */  1,
+  /*  35 */  OCAML_PUSHACC1,
+  /*  36 */  OCAML_GETFIELD0,
+  /*  37 */  OCAML_C_CALL2,
+  /*  38 */  0,
+  /*  39 */  OCAML_BRANCHIFNOT_1B,
+  /*  40 */  6,
+  /*  41 */  OCAML_GETGLOBAL_1B,
+  /*  42 */  2,
+  /*  43 */  OCAML_RETURN,
+  /*  44 */  1,
+  /*  45 */  OCAML_GETGLOBAL_1B,
+  /*  46 */  3,
+  /*  47 */  OCAML_RETURN,
+  /*  48 */  1,
+  /*  49 */  OCAML_ACC0,
+  /*  50 */  OCAML_GETFIELD0,
+  /*  51 */  OCAML_SWITCH_1B,
+  /*  52 */  4,
+  /*  53 */  0,
+  /*  54 */  7,
+  /*  55 */  18,
+  /*  56 */  29,
+  /*  57 */  93,
+  /*  58 */  OCAML_ACC0,
+  /*  59 */  OCAML_GETFIELD1,
+  /*  60 */  OCAML_PUSHOFFSETCLOSURE0,
+  /*  61 */  OCAML_PUSHGETGLOBAL_1B,
+  /*  62 */  4,
+  /*  63 */  OCAML_APPLY2,
+  /*  64 */  OCAML_PUSHCONST0,
+  /*  65 */  OCAML_MAKEBLOCK2,
+  /*  66 */  2,
+  /*  67 */  OCAML_RETURN,
+  /*  68 */  1,
+  /*  69 */  OCAML_ACC0,
+  /*  70 */  OCAML_GETFIELD1,
+  /*  71 */  OCAML_PUSHOFFSETCLOSURE0,
+  /*  72 */  OCAML_PUSHGETGLOBAL_1B,
+  /*  73 */  4,
+  /*  74 */  OCAML_APPLY2,
+  /*  75 */  OCAML_PUSHCONST1,
+  /*  76 */  OCAML_MAKEBLOCK2,
+  /*  77 */  2,
+  /*  78 */  OCAML_RETURN,
+  /*  79 */  1,
+  /*  80 */  OCAML_ACC0,
+  /*  81 */  OCAML_GETFIELD1,
+  /*  82 */  OCAML_PUSH,
+  /*  83 */  OCAML_BRANCHIFNOT_1B,
+  /*  84 */  57,
+  /*  85 */  OCAML_ACC0,
+  /*  86 */  OCAML_GETFIELD1,
+  /*  87 */  OCAML_PUSH,
+  /*  88 */  OCAML_BRANCHIFNOT_1B,
+  /*  89 */  48,
+  /*  90 */  OCAML_ACC0,
+  /*  91 */  OCAML_GETFIELD1,
+  /*  92 */  OCAML_BRANCHIFNOT_1B,
+  /*  93 */  6,
+  /*  94 */  OCAML_POP,
+  /*  95 */  2,
+  /*  96 */  OCAML_BRANCH_1B,
+  /*  97 */  122,
+  /*  98 */  OCAML_ACC0,
+  /*  99 */  OCAML_GETFIELD0,
+  /* 100 */  OCAML_PUSHACC2,
+  /* 101 */  OCAML_GETFIELD0,
+  /* 102 */  OCAML_PUSHCONST0,
+  /* 103 */  OCAML_PUSHCONST0,
+  /* 104 */  OCAML_PUSHACC3,
+  /* 105 */  OCAML_PUSHOFFSETCLOSURE0,
+  /* 106 */  OCAML_APPLY1,
+  /* 107 */  OCAML_MAKEBLOCK2,
+  /* 108 */  0,
+  /* 109 */  OCAML_PUSHACC2,
+  /* 110 */  OCAML_MAKEBLOCK2,
+  /* 111 */  0,
+  /* 112 */  OCAML_PUSHCONST2,
+  /* 113 */  OCAML_MAKEBLOCK2,
+  /* 114 */  2,
+  /* 115 */  OCAML_MAKEBLOCK2,
+  /* 116 */  0,
+  /* 117 */  OCAML_PUSHCONST0,
+  /* 118 */  OCAML_PUSHACC3,
+  /* 119 */  OCAML_MAKEBLOCK2,
+  /* 120 */  0,
+  /* 121 */  OCAML_PUSHACC2,
+  /* 122 */  OCAML_PUSHOFFSETCLOSURE0,
+  /* 123 */  OCAML_APPLY1,
+  /* 124 */  OCAML_MAKEBLOCK2,
+  /* 125 */  0,
+  /* 126 */  OCAML_PUSHCONST2,
+  /* 127 */  OCAML_MAKEBLOCK2,
+  /* 128 */  2,
+  /* 129 */  OCAML_MAKEBLOCK2,
+  /* 130 */  0,
+  /* 131 */  OCAML_PUSHCONST0,
+  /* 132 */  OCAML_MAKEBLOCK2,
+  /* 133 */  2,
+  /* 134 */  OCAML_RETURN,
+  /* 135 */  5,
+  /* 136 */  OCAML_POP,
+  /* 137 */  2,
+  /* 138 */  OCAML_BRANCH_1B,
+  /* 139 */  80,
+  /* 140 */  OCAML_POP,
+  /* 141 */  1,
+  /* 142 */  OCAML_BRANCH_1B,
+  /* 143 */  76,
+  /* 144 */  OCAML_ACC0,
+  /* 145 */  OCAML_GETFIELD1,
+  /* 146 */  OCAML_PUSH,
+  /* 147 */  OCAML_BRANCHIFNOT_1B,
+  /* 148 */  69,
+  /* 149 */  OCAML_ACC0,
+  /* 150 */  OCAML_GETFIELD1,
+  /* 151 */  OCAML_PUSH,
+  /* 152 */  OCAML_BRANCHIFNOT_1B,
+  /* 153 */  60,
+  /* 154 */  OCAML_ACC0,
+  /* 155 */  OCAML_GETFIELD1,
+  /* 156 */  OCAML_BRANCHIFNOT_1B,
+  /* 157 */  6,
+  /* 158 */  OCAML_POP,
+  /* 159 */  2,
+  /* 160 */  OCAML_BRANCH_1B,
+  /* 161 */  58,
+  /* 162 */  OCAML_ACC0,
+  /* 163 */  OCAML_GETFIELD0,
+  /* 164 */  OCAML_PUSHACC2,
+  /* 165 */  OCAML_GETFIELD0,
+  /* 166 */  OCAML_PUSHCONST0,
+  /* 167 */  OCAML_PUSHCONST0,
+  /* 168 */  OCAML_PUSHCONST0,
+  /* 169 */  OCAML_PUSHACC4,
+  /* 170 */  OCAML_PUSHOFFSETCLOSURE0,
+  /* 171 */  OCAML_APPLY1,
+  /* 172 */  OCAML_MAKEBLOCK2,
+  /* 173 */  0,
+  /* 174 */  OCAML_PUSHACC4,
+  /* 175 */  OCAML_MAKEBLOCK2,
+  /* 176 */  0,
+  /* 177 */  OCAML_PUSHACC4,
+  /* 178 */  OCAML_MAKEBLOCK2,
+  /* 179 */  0,
+  /* 180 */  OCAML_PUSHCONST2,
+  /* 181 */  OCAML_MAKEBLOCK2,
+  /* 182 */  2,
+  /* 183 */  OCAML_MAKEBLOCK2,
+  /* 184 */  0,
+  /* 185 */  OCAML_PUSHACC2,
+  /* 186 */  OCAML_MAKEBLOCK2,
+  /* 187 */  0,
+  /* 188 */  OCAML_PUSHCONST3,
+  /* 189 */  OCAML_MAKEBLOCK2,
+  /* 190 */  2,
+  /* 191 */  OCAML_MAKEBLOCK2,
+  /* 192 */  0,
+  /* 193 */  OCAML_PUSHCONST0,
+  /* 194 */  OCAML_PUSHACC3,
+  /* 195 */  OCAML_MAKEBLOCK2,
+  /* 196 */  0,
+  /* 197 */  OCAML_PUSHACC2,
+  /* 198 */  OCAML_PUSHOFFSETCLOSURE0,
+  /* 199 */  OCAML_APPLY1,
+  /* 200 */  OCAML_MAKEBLOCK2,
+  /* 201 */  0,
+  /* 202 */  OCAML_PUSHCONST3,
+  /* 203 */  OCAML_MAKEBLOCK2,
+  /* 204 */  2,
+  /* 205 */  OCAML_MAKEBLOCK2,
+  /* 206 */  0,
+  /* 207 */  OCAML_PUSHCONST1,
+  /* 208 */  OCAML_MAKEBLOCK2,
+  /* 209 */  2,
+  /* 210 */  OCAML_RETURN,
+  /* 211 */  5,
+  /* 212 */  OCAML_POP,
+  /* 213 */  2,
+  /* 214 */  OCAML_BRANCH_1B,
+  /* 215 */  4,
+  /* 216 */  OCAML_POP,
+  /* 217 */  1,
+  /* 218 */  OCAML_GETGLOBAL_1B,
+  /* 219 */  5,
+  /* 220 */  OCAML_RETURN,
+  /* 221 */  1,
+  /* 222 */  OCAML_C_CALL1,
+  /* 223 */  1,
+  /* 224 */  OCAML_CONST0,
+  /* 225 */  OCAML_C_CALL1,
+  /* 226 */  2,
+  /* 227 */  OCAML_PUSHCONST0,
+  /* 228 */  OCAML_PUSHCONSTINT_1B,
+  /* 229 */  100,
+  /* 230 */  OCAML_PUSH,
+  /* 231 */  OCAML_PUSHACC2,
+  /* 232 */  OCAML_GTINT,
+  /* 233 */  OCAML_BRANCHIF_1B,
+  /* 234 */  16,
+  /* 235 */  OCAML_CHECK_SIGNALS,
+  /* 236 */  OCAML_ACC3,
+  /* 237 */  OCAML_PUSHACC5,
+  /* 238 */  OCAML_APPLY1,
+  /* 239 */  OCAML_ACC1,
+  /* 240 */  OCAML_PUSH,
+  /* 241 */  OCAML_OFFSETINT_1B,
+  /* 242 */  1,
+  /* 243 */  OCAML_ASSIGN,
+  /* 244 */  2,
+  /* 245 */  OCAML_ACC1,
+  /* 246 */  OCAML_NEQ,
+  /* 247 */  OCAML_BRANCHIF_1B,
+  /* 248 */  -12,
+  /* 249 */  OCAML_POP,
+  /* 250 */  2,
+  /* 251 */  OCAML_ACC0,
+  /* 252 */  OCAML_PUSHCONST0,
+  /* 253 */  OCAML_C_CALL1,
+  /* 254 */  2,
+  /* 255 */  OCAML_SUBINT,
+  /* 256 */  OCAML_C_CALL1,
+  /* 257 */  3,
+  /* 258 */  OCAML_POP,
+  /* 259 */  5,
+  /* 260 */  OCAML_STOP
+};
+
+#include </Users/arcadium/github/OMicroB/src/byterun/runtime.c>
+
+PROGMEM void * const ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {
+  (void *) &caml_string_equal,
+  (void *) &ocaml_arduino_serial_begin,
+  (void *) &ocaml_arduino_millis,
+  (void *) &caml_print_int
+};

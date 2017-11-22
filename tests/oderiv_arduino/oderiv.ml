@@ -1,13 +1,8 @@
 
-module Arduboy = struct
-  (* external reset_cursor : unit -> unit = "ocaml_arduboy_reset_cursor" *)
-  external init    : unit   -> unit = "ocaml_arduboy_init"
-  external clear : unit -> unit = "ocaml_arduboy_clear"
-  external print_int : int -> unit = "ocaml_arduboy_print_int"
-  external print_string : string -> unit = "ocaml_arduboy_print"
-  external display : unit   -> unit = "ocaml_arduboy_display"
-  external millis  : unit -> int = "ocaml_arduboy_millis"
-end
+module Arduino = struct
+  external serial_begin : int -> unit = "ocaml_arduino_serial_begin"
+  external millis : unit -> int = "ocaml_arduino_millis"
+end;;
 
 (* let failwith s = raise(Failure s);; *)
 
@@ -74,8 +69,8 @@ let rec iter f = function
 
 
 let ()  =
-  Arduboy.init();
-  let x = Arduboy.millis () in
+    Arduino.serial_begin 57600;
+  let x = Arduino.millis () in
   for i = 0 to 100 do
     derive pol
   done;
@@ -86,7 +81,7 @@ let ()  =
   (* force_gc (); *)
   (* raise e; *)
   (* Arduboy.print_string("NUL\n"); *)
-  Arduboy.print_int (Arduboy.millis ()-x);
+  print_int (Arduino.millis ()-x);
   (* Arduboy.display();; *)
   (* Arduboy.print_int (length [e1;e2;e3]); *)
-  Arduboy.display()
+ 
