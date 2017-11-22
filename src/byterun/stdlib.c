@@ -115,7 +115,6 @@ val_t caml_print_float(val_t i){
   return Val_unit;
 }
 
-
 val_t caml_print_int(val_t i){
   Serial.print(Int_val(i));
   return Val_unit;
@@ -220,9 +219,6 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #else /* __AVR__ */
 
-#ifdef __PIC18F
-
-#else
 
 #ifdef __PC__
 #include <unistd.h>
@@ -328,7 +324,6 @@ val_t caml_print_string(val_t s){
   printf("%s",StringVal(s));
   return Val_unit;
 }
-
 
 val_t ocaml_arduino_serial_begin(val_t i){
   printf("serialbegin\n");
@@ -474,8 +469,13 @@ val_t caml_force_gc (val_t unit){
   return Val_unit;
 }
 
+val_t caml_print_string(val_t s){
+  printf("caml_print_string");
+  return Val_unit;
+}
+
 #endif /* PC */
 #endif /* PIC */
-#endif /* __AVR__ */
+/* #endif /\* __AVR__ *\/ */
 
 /******************************************************************************/

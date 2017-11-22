@@ -65,7 +65,7 @@ external incr : int ref -> unit = "%incr"
 external decr : int ref -> unit = "%decr"
 
 (* Printing *)
-external print_string : int -> unit = "caml_print_string"
+external print_string :  string -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
 external print_float : float -> unit = "caml_print_float"
 

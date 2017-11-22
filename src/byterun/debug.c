@@ -22,7 +22,7 @@ void debug_blink(int led, int n) {
 #include <Arduino.h>
 
 void debug_init(void) {
-  Serial.begin(115200);
+  Serial.begin(57600);
 }
 
 void debug(int n) {

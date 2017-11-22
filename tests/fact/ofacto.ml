@@ -10,19 +10,20 @@ module Arduboy = struct
 end
 
 let rec facto = function
-    0 -> 1 
-  | x -> facto (x-1) * x 
+    0 -> 1
+  | x -> facto (x-1) * x
 
 let _ =
   Arduboy.init ();
-  let x = Arduboy.millis () in 
-  for i = 0 to 10 do 
+  let x = Arduboy.millis () in
+  for i = 0 to 100 do
     (* Arduboy.print_int(facto i); *)
-    facto i;
+    for i = 0 to 10 do
+      facto i;
+    done;
   done;
-  let y = Arduboy.millis () in 
+  let y = Arduboy.millis () in
   Arduboy.print_string "\n";
   Arduboy.print_int (y-x);
-  
-  Arduboy.display()
 
+  Arduboy.display()

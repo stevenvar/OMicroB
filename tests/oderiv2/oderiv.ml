@@ -9,7 +9,7 @@ module Arduboy = struct
   external millis  : unit -> int = "ocaml_arduboy_millis"
 end
 
-let failwith s = raise(Failure s);;
+(* let failwith s = raise(Failure s);; *)
 
 let rec iter f = function [] -> () | h::t -> (f h); iter f t;;
 let rec map f = function [] -> [] | h::t -> (f h)::(map f t);;
@@ -76,7 +76,7 @@ let rec iter f = function
 let ()  =
   Arduboy.init();
   let x = Arduboy.millis () in
-  for i = 0 to 1000 do
+  for i = 0 to 100 do
     derive pol
   done;
   (* (* print_expr !res; *) *)

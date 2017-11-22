@@ -1,10 +1,15 @@
-module Arduboy = struct
-  external millis : unit -> int = "ocaml_arduboy_millis"
-  external init    : unit   -> unit = "ocaml_arduboy_init"
-  external print_int : int -> unit = "ocaml_arduboy_print_int"
-  external print_string : string -> unit = "ocaml_arduboy_print"
-  external print_float : float -> unit = "ocaml_arduboy_print_float"
-  external display : unit   -> unit = "ocaml_arduboy_display"
+(* module Arduboy = struct *)
+(*   external millis : unit -> int = "ocaml_arduboy_millis" *)
+(*   external init    : unit   -> unit = "ocaml_arduboy_init" *)
+(*   external print_int : int -> unit = "ocaml_arduboy_print_int" *)
+(*   external print_string : string -> unit = "ocaml_arduboy_print" *)
+(*   external print_float : float -> unit = "ocaml_arduboy_print_float" *)
+(*   external display : unit   -> unit = "ocaml_arduboy_display" *)
+(* end;; *)
+
+module Arduino = struct
+  external serial_begin : int -> unit = "ocaml_arduino_serial_begin"
+  external millis : unit -> int = "ocaml_arduino_millis"
 end;;
 
 (* let succ x = x + 1 *)
@@ -44,11 +49,17 @@ let rec do_list f l = match l with
 
 
 let _ =
-  Arduboy.init ();
   (* let r = ref (fun x -> 0) in *)
-  let x = Arduboy.millis () in
+  Arduino.serial_begin 115200;
+  let x = Arduino.millis () in
+  (* let (z,k) = !r in *)
   for x = 0 to 100 do
     do_list (fun n -> ()) (sieve 10);
   done;
-  Arduboy.print_int (Arduboy.millis () -x);
-  Arduboy.display();
+  for x = 0 to 100 do
+    print_int x;
+  done;
+    print_int (Arduino.millis () -x);
+  for x = 0 to 10 do
+    print_int x;
+  done;
