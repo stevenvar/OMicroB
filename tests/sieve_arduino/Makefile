@@ -1,7 +1,8 @@
 include ../../etc/Makefile.conf
 
 ATTY     := /dev/tty.usbmodem1421
-CFLAGS   := -mmcu=atmega328p -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
+# CFLAGS   := -mmcu=atmega2560 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
+CFLAGS   := -mmcu=atmega328p -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -g -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
