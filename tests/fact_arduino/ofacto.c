@@ -7,7 +7,7 @@
 #define OCAML_PRIMITIVE_NUMBER          4
 #define OCAML_VIRTUAL_ARCH             32
 
-#include </Users/arcadium/github/OMicroB/src/byterun/values.h>
+#include </Users/steven/github/OMicroB/src/byterun/values.h>
 
 #define OCAML_ACC0                      0
 #define OCAML_ACC1                      1
@@ -208,7 +208,7 @@ PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
   /* 82 */  OCAML_STOP
 };
 
-#include </Users/arcadium/github/OMicroB/src/byterun/runtime.c>
+#include </Users/steven/github/OMicroB/src/byterun/runtime.c>
 
 PROGMEM void * const ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {
   (void *) &ocaml_arduino_serial_begin,

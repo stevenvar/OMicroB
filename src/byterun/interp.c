@@ -62,7 +62,7 @@ void *get_primitive(uint8_t prim_ind) {
 #endif
 }
 
-static inline char read_byte(void) {
+ char read_byte(void) {
   char c;
 #ifdef __AVR__
   c = pgm_read_byte_near(ocaml_bytecode + pc);
@@ -73,29 +73,29 @@ static inline char read_byte(void) {
   return c;
 }
 
-static inline opcode_t read_opcode(void) {
+ opcode_t read_opcode(void) {
   return (opcode_t) read_byte();
 }
 
-static inline uint8_t read_uint8(void) {
+ uint8_t read_uint8(void) {
   return (uint8_t) read_byte();
 }
 
-static inline int8_t read_int8(void) {
+ int8_t read_int8(void) {
   return (int8_t) read_byte();
 }
 
-static inline uint16_t read_uint16(void) {
+ uint16_t read_uint16(void) {
   uint8_t n1 = read_uint8();
   uint8_t n0 = read_uint8();
   return ((uint16_t) n1 << 8) | n0;
 }
 
-static inline int16_t read_int16(void) {
+ int16_t read_int16(void) {
   return (int16_t) read_uint16();
 }
 
-static inline uint32_t read_uint32(void) {
+ uint32_t read_uint32(void) {
   uint8_t n3 = read_uint8();
   uint8_t n2 = read_uint8();
   uint8_t n1 = read_uint8();
@@ -103,32 +103,32 @@ static inline uint32_t read_uint32(void) {
   return ((uint32_t) n3 << 24) | ((uint32_t) n2 << 16) | ((uint32_t) n1 << 8) | n0;
 }
 
-static inline int32_t read_int32(void) {
+ int32_t read_int32(void) {
   return (int32_t) read_uint32();
 }
 
-static inline code_t read_ptr_1B(void) {
+ code_t read_ptr_1B(void) {
   int8_t ofs = read_int8();
   return pc - 2 + ofs;
 }
 
-static inline code_t read_ptr_2B(void) {
+ code_t read_ptr_2B(void) {
   int16_t ofs = read_int16();
   return pc - 3 + ofs;
 }
 
-static inline code_t read_ptr_4B(void) {
+ code_t read_ptr_4B(void) {
   int32_t ofs = read_int32();
   return pc - 5 + ofs;
 }
 
 /******************************************************************************/
 
-static inline val_t peek(int n) {
+ val_t peek(int n) {
   return sp[n];
 }
 
-static inline void push(val_t x) {
+ void push(val_t x) {
   if(sp < ocaml_stack){
     caml_raise_stack_overflow();
   }
@@ -137,11 +137,11 @@ static inline void push(val_t x) {
   }
 }
 
-static inline val_t pop(void) {
+ val_t pop(void) {
   return *(sp++);
 }
 
-static inline void pop_n(int n) {
+ void pop_n(int n) {
   sp += n;
 }
 
