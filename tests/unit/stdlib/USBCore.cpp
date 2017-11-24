@@ -1,7 +1,6 @@
 
 
-/* Copyright (c) 2010, Peter Barrett
-** Sleep/Wakeup support added by Michael Dreher
+/* Copyright (c) 2010, Peter Barrett  
 **  
 ** Permission to use, copy, modify, and/or distribute this software for  
 ** any purpose with or without fee is hereby granted, provided that the  
@@ -17,11 +16,19 @@
 ** SOFTWARE.  
 */
 
+#include "Platform.h"
 #include "USBAPI.h"
-#include "PluggableUSB.h"
-#include <stdlib.h>
+#include "USBDesc.h"
 
 #if defined(USBCON)
+
+#define EP_TYPE_CONTROL				0x00
+#define EP_TYPE_BULK_IN				0x81
+#define EP_TYPE_BULK_OUT			0x80
+#define EP_TYPE_INTERRUPT_IN		0xC1
+#define EP_TYPE_INTERRUPT_OUT		0xC0
+#define EP_TYPE_ISOCHRONOUS_IN		0x41
+#define EP_TYPE_ISOCHRONOUS_OUT		0x40
 
 /** Pulse generation counters to keep track of the number of milliseconds remaining for each pulse type */
 #define TX_RX_LED_PULSE_MS 100
@@ -32,58 +39,63 @@ volatile u8 RxLEDPulse; /**< Milliseconds remaining for data Rx LED pulse */
 //==================================================================
 
 extern const u16 STRING_LANGUAGE[] PROGMEM;
-extern const u8 STRING_PRODUCT[] PROGMEM;
-extern const u8 STRING_MANUFACTURER[] PROGMEM;
-extern const DeviceDescriptor USB_DeviceDescriptorIAD PROGMEM;
-extern bool _updatedLUFAbootloader;
+extern const u16 STRING_IPRODUCT[] PROGMEM;
+extern const u16 STRING_IMANUFACTURER[] PROGMEM;
+extern const DeviceDescriptor USB_DeviceDescriptor PROGMEM;
+extern const DeviceDescriptor USB_DeviceDescriptorA PROGMEM;
 
 const u16 STRING_LANGUAGE[2] = {
 	(3<<8) | (2+2),
 	0x0409	// English
 };
 
-#ifndef USB_PRODUCT
-// If no product is provided, use USB IO Board
-#define USB_PRODUCT     "USB IO Board"
+const u16 STRING_IPRODUCT[17] = {
+	(3<<8) | (2+2*16),
+#if USB_PID == 0x8036	
+	'A','r','d','u','i','n','o',' ','L','e','o','n','a','r','d','o'
+#elif USB_PID == 0x8037
+	'A','r','d','u','i','n','o',' ','M','i','c','r','o',' ',' ',' '
+#elif USB_PID == 0x803C
+	'A','r','d','u','i','n','o',' ','E','s','p','l','o','r','a',' '
+#elif USB_PID == 0x9208
+	'L','i','l','y','P','a','d','U','S','B',' ',' ',' ',' ',' ',' '
+#else
+	'U','S','B',' ','I','O',' ','B','o','a','r','d',' ',' ',' ',' '
 #endif
+};
 
-const u8 STRING_PRODUCT[] PROGMEM = USB_PRODUCT;
-
+const u16 STRING_IMANUFACTURER[12] = {
+	(3<<8) | (2+2*11),
 #if USB_VID == 0x2341
-#  if defined(USB_MANUFACTURER)
-#    undef USB_MANUFACTURER
-#  endif
-#  define USB_MANUFACTURER "Arduino LLC"
+	'A','r','d','u','i','n','o',' ','L','L','C'
 #elif USB_VID == 0x1b4f
-#  if defined(USB_MANUFACTURER)
-#    undef USB_MANUFACTURER
-#  endif
-#  define USB_MANUFACTURER "SparkFun"
-#elif !defined(USB_MANUFACTURER)
-// Fall through to unknown if no manufacturer name was provided in a macro
-#  define USB_MANUFACTURER "Unknown"
+	'S','p','a','r','k','F','u','n',' ',' ',' '
+#else
+	'U','n','k','n','o','w','n',' ',' ',' ',' '
 #endif
+};
 
-const u8 STRING_MANUFACTURER[] PROGMEM = USB_MANUFACTURER;
-
-
+#ifdef CDC_ENABLED
 #define DEVICE_CLASS 0x02
+#else
+#define DEVICE_CLASS 0x00
+#endif
 
 //	DEVICE DESCRIPTOR
-const DeviceDescriptor USB_DeviceDescriptorIAD =
-	D_DEVICE(0xEF,0x02,0x01,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,ISERIAL,1);
+const DeviceDescriptor USB_DeviceDescriptor =
+	D_DEVICE(0x00,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
+
+const DeviceDescriptor USB_DeviceDescriptorA =
+	D_DEVICE(DEVICE_CLASS,0x00,0x00,64,USB_VID,USB_PID,0x100,IMANUFACTURER,IPRODUCT,0,1);
 
 //==================================================================
 //==================================================================
 
 volatile u8 _usbConfiguration = 0;
-volatile u8 _usbCurrentStatus = 0; // meaning of bits see usb_20.pdf, Figure 9-4. Information Returned by a GetStatus() Request to a Device
-volatile u8 _usbSuspendState = 0; // copy of UDINT to check SUSPI and WAKEUPI bits
 
 static inline void WaitIN(void)
 {
-	while (!(UEINTX & (1<<TXINI)))
-		;
+	while (!(UEINTX & (1<<TXINI)));
 }
 
 static inline void ClearIN(void)
@@ -109,7 +121,7 @@ static inline void ClearOUT(void)
 	UEINTX = ~(1<<RXOUTI);
 }
 
-static inline void Recv(volatile u8* data, u8 count)
+void Recv(volatile u8* data, u8 count)
 {
 	while (count--)
 		*data++ = UEDATX;
@@ -252,7 +264,7 @@ u8 USB_SendSpace(u8 ep)
 	LockEP lock(ep);
 	if (!ReadWriteAllowed())
 		return 0;
-	return USB_EP_SIZE - FifoByteCount();
+	return 64 - FifoByteCount();
 }
 
 //	Blocking Send of data to an endpoint
@@ -261,17 +273,11 @@ int USB_Send(u8 ep, const void* d, int len)
 	if (!_usbConfiguration)
 		return -1;
 
-	if (_usbSuspendState & (1<<SUSPI)) {
-		//send a remote wakeup
-		UDCON |= (1 << RMWKUP);
-	}
-
 	int r = len;
 	const u8* data = (const u8*)d;
+	u8 zero = ep & TRANSFER_ZERO;
 	u8 timeout = 250;		// 250ms timeout on send? TODO
-	bool sendZlp = false;
-
-	while (len || sendZlp)
+	while (len)
 	{
 		u8 n = USB_SendSpace(ep);
 		if (n == 0)
@@ -282,17 +288,11 @@ int USB_Send(u8 ep, const void* d, int len)
 			continue;
 		}
 
-		if (n > len) {
+		if (n > len)
 			n = len;
-		}
-
+		len -= n;
 		{
 			LockEP lock(ep);
-			// Frame may have been released by the SOF interrupt handler
-			if (!ReadWriteAllowed())
-				continue;
-
-			len -= n;
 			if (ep & TRANSFER_ZERO)
 			{
 				while (n--)
@@ -308,17 +308,8 @@ int USB_Send(u8 ep, const void* d, int len)
 				while (n--)
 					Send8(*data++);
 			}
-
-			if (sendZlp) {
+			if (!ReadWriteAllowed() || ((len == 0) && (ep & TRANSFER_RELEASE)))	// Release full buffer
 				ReleaseTX();
-				sendZlp = false;
-			} else if (!ReadWriteAllowed()) { // ...release if buffer is full...
-				ReleaseTX();
-				if (len == 0) sendZlp = true;
-			} else if ((len == 0) && (ep & TRANSFER_RELEASE)) { // ...or if forced with TRANSFER_RELEASE
-				// XXX: TRANSFER_RELEASE is never used can be removed?
-				ReleaseTX();
-			}
 		}
 	}
 	TXLED1;					// light the TX LED
@@ -326,26 +317,30 @@ int USB_Send(u8 ep, const void* d, int len)
 	return r;
 }
 
-u8 _initEndpoints[USB_ENDPOINTS] =
+extern const u8 _initEndpoints[] PROGMEM;
+const u8 _initEndpoints[] = 
 {
-	0,                      // Control Endpoint
+	0,
 	
-	EP_TYPE_INTERRUPT_IN,   // CDC_ENDPOINT_ACM
-	EP_TYPE_BULK_OUT,       // CDC_ENDPOINT_OUT
-	EP_TYPE_BULK_IN,        // CDC_ENDPOINT_IN
+#ifdef CDC_ENABLED
+	EP_TYPE_INTERRUPT_IN,		// CDC_ENDPOINT_ACM
+	EP_TYPE_BULK_OUT,			// CDC_ENDPOINT_OUT
+	EP_TYPE_BULK_IN,			// CDC_ENDPOINT_IN
+#endif
 
-	// Following endpoints are automatically initialized to 0
+#ifdef HID_ENABLED
+	EP_TYPE_INTERRUPT_IN		// HID_ENDPOINT_INT
+#endif
 };
 
 #define EP_SINGLE_64 0x32	// EP0
 #define EP_DOUBLE_64 0x36	// Other endpoints
-#define EP_SINGLE_16 0x12
 
 static
 void InitEP(u8 index, u8 type, u8 size)
 {
 	UENUM = index;
-	UECONX = (1<<EPEN);
+	UECONX = 1;
 	UECFG0X = type;
 	UECFG1X = size;
 }
@@ -353,18 +348,12 @@ void InitEP(u8 index, u8 type, u8 size)
 static
 void InitEndpoints()
 {
-	for (u8 i = 1; i < sizeof(_initEndpoints) && _initEndpoints[i] != 0; i++)
+	for (u8 i = 1; i < sizeof(_initEndpoints); i++)
 	{
 		UENUM = i;
-		UECONX = (1<<EPEN);
-		UECFG0X = _initEndpoints[i];
-#if USB_EP_SIZE == 16
-		UECFG1X = EP_SINGLE_16;
-#elif USB_EP_SIZE == 64
+		UECONX = 1;
+		UECFG0X = pgm_read_byte(_initEndpoints+i);
 		UECFG1X = EP_DOUBLE_64;
-#else
-#error Unsupported value for USB_EP_SIZE
-#endif
 	}
 	UERST = 0x7E;	// And reset them
 	UERST = 0;
@@ -372,21 +361,24 @@ void InitEndpoints()
 
 //	Handle CLASS_INTERFACE requests
 static
-bool ClassInterfaceRequest(USBSetup& setup)
+bool ClassInterfaceRequest(Setup& setup)
 {
 	u8 i = setup.wIndex;
 
+#ifdef CDC_ENABLED
 	if (CDC_ACM_INTERFACE == i)
 		return CDC_Setup(setup);
+#endif
 
-#ifdef PLUGGABLE_USB_ENABLED
-	return PluggableUSB().setup(setup);
+#ifdef HID_ENABLED
+	if (HID_INTERFACE == i)
+		return HID_Setup(setup);
 #endif
 	return false;
 }
 
-static int _cmark;
-static int _cend;
+int _cmark;
+int _cend;
 void InitControl(int end)
 {
 	SetEP(0);
@@ -407,7 +399,7 @@ bool SendControl(u8 d)
 	}
 	_cmark++;
 	return true;
-}
+};
 
 //	Clipped by _cmark/_cend
 int USB_SendControl(u8 flags, const void* d, int len)
@@ -424,53 +416,28 @@ int USB_SendControl(u8 flags, const void* d, int len)
 	return sent;
 }
 
-// Send a USB descriptor string. The string is stored in PROGMEM as a
-// plain ASCII string but is sent out as UTF-16 with the correct 2-byte
-// prefix
-static bool USB_SendStringDescriptor(const u8*string_P, u8 string_len, uint8_t flags) {
-        SendControl(2 + string_len * 2);
-        SendControl(3);
-        bool pgm = flags & TRANSFER_PGM;
-        for(u8 i = 0; i < string_len; i++) {
-                bool r = SendControl(pgm ? pgm_read_byte(&string_P[i]) : string_P[i]);
-                r &= SendControl(0); // high byte
-                if(!r) {
-                        return false;
-                }
-        }
-        return true;
-}
-
 //	Does not timeout or cross fifo boundaries
+//	Will only work for transfers <= 64 bytes
+//	TODO
 int USB_RecvControl(void* d, int len)
 {
-	auto length = len;
-	while(length)
-	{
-		// Dont receive more than the USB Control EP has to offer
-		// Use fixed 64 because control EP always have 64 bytes even on 16u2.
-		auto recvLength = length;
-		if(recvLength > 64){
-			recvLength = 64;
-		}
-
-		// Write data to fit to the end (not the beginning) of the array
-		WaitOUT();
-		Recv((u8*)d + len - length, recvLength);
-		ClearOUT();
-		length -= recvLength;
-	}
+	WaitOUT();
+	Recv((u8*)d,len);
+	ClearOUT();
 	return len;
 }
 
-static u8 SendInterfaces()
+int SendInterfaces()
 {
+	int total = 0;
 	u8 interfaces = 0;
 
-	CDC_GetInterface(&interfaces);
+#ifdef CDC_ENABLED
+	total = CDC_GetInterface(&interfaces);
+#endif
 
-#ifdef PLUGGABLE_USB_ENABLED
-	PluggableUSB().getInterface(&interfaces);
+#ifdef HID_ENABLED
+	total += HID_GetInterface(&interfaces);
 #endif
 
 	return interfaces;
@@ -483,8 +450,8 @@ static
 bool SendConfiguration(int maxlen)
 {
 	//	Count and measure interfaces
-	InitControl(0);
-	u8 interfaces = SendInterfaces();
+	InitControl(0);	
+	int interfaces = SendInterfaces();
 	ConfigDescriptor config = D_CONFIG(_cmark + sizeof(ConfigDescriptor),interfaces);
 
 	//	Now send them
@@ -494,52 +461,45 @@ bool SendConfiguration(int maxlen)
 	return true;
 }
 
+u8 _cdcComposite = 0;
+
 static
-bool SendDescriptor(USBSetup& setup)
+bool SendDescriptor(Setup& setup)
 {
-	int ret;
 	u8 t = setup.wValueH;
 	if (USB_CONFIGURATION_DESCRIPTOR_TYPE == t)
 		return SendConfiguration(setup.wLength);
 
 	InitControl(setup.wLength);
-#ifdef PLUGGABLE_USB_ENABLED
-	ret = PluggableUSB().getDescriptor(setup);
-	if (ret != 0) {
-		return (ret > 0 ? true : false);
-	}
+#ifdef HID_ENABLED
+	if (HID_REPORT_DESCRIPTOR_TYPE == t)
+		return HID_GetDescriptor(t);
 #endif
 
+	u8 desc_length = 0;
 	const u8* desc_addr = 0;
 	if (USB_DEVICE_DESCRIPTOR_TYPE == t)
 	{
-		desc_addr = (const u8*)&USB_DeviceDescriptorIAD;
+		if (setup.wLength == 8)
+			_cdcComposite = 1;
+		desc_addr = _cdcComposite ?  (const u8*)&USB_DeviceDescriptorA : (const u8*)&USB_DeviceDescriptor;
 	}
 	else if (USB_STRING_DESCRIPTOR_TYPE == t)
 	{
-		if (setup.wValueL == 0) {
+		if (setup.wValueL == 0)
 			desc_addr = (const u8*)&STRING_LANGUAGE;
-		}
-		else if (setup.wValueL == IPRODUCT) {
-			return USB_SendStringDescriptor(STRING_PRODUCT, strlen(USB_PRODUCT), TRANSFER_PGM);
-		}
-		else if (setup.wValueL == IMANUFACTURER) {
-			return USB_SendStringDescriptor(STRING_MANUFACTURER, strlen(USB_MANUFACTURER), TRANSFER_PGM);
-		}
-		else if (setup.wValueL == ISERIAL) {
-#ifdef PLUGGABLE_USB_ENABLED
-			char name[ISERIAL_MAX_LEN];
-			PluggableUSB().getShortName(name);
-			return USB_SendStringDescriptor((uint8_t*)name, strlen(name), 0);
-#endif
-		}
+		else if (setup.wValueL == IPRODUCT) 
+			desc_addr = (const u8*)&STRING_IPRODUCT;
+		else if (setup.wValueL == IMANUFACTURER)
+			desc_addr = (const u8*)&STRING_IMANUFACTURER;
 		else
 			return false;
 	}
 
 	if (desc_addr == 0)
 		return false;
-	u8 desc_length = pgm_read_byte(desc_addr);
+	if (desc_length == 0)
+		desc_length = pgm_read_byte(desc_addr);
 
 	USB_SendControl(TRANSFER_PGM,desc_addr,desc_length);
 	return true;
@@ -552,7 +512,7 @@ ISR(USB_COM_vect)
 	if (!ReceivedSetupInt())
 		return;
 
-	USBSetup setup;
+	Setup setup;
 	Recv((u8*)&setup,8);
 	ClearSetupInt();
 
@@ -567,37 +527,16 @@ ISR(USB_COM_vect)
 	{
 		//	Standard Requests
 		u8 r = setup.bRequest;
-		u16 wValue = setup.wValueL | (setup.wValueH << 8);
 		if (GET_STATUS == r)
 		{
-			if (requestType == (REQUEST_DEVICETOHOST | REQUEST_STANDARD | REQUEST_DEVICE))
-			{
-				Send8(_usbCurrentStatus);
-				Send8(0);
-			}
-			else
-			{
-				// TODO: handle the HALT state of an endpoint here
-				// see "Figure 9-6. Information Returned by a GetStatus() Request to an Endpoint" in usb_20.pdf for more information
-				Send8(0);
-				Send8(0);
-			}
+			Send8(0);		// TODO
+			Send8(0);
 		}
 		else if (CLEAR_FEATURE == r)
 		{
-			if((requestType == (REQUEST_HOSTTODEVICE | REQUEST_STANDARD | REQUEST_DEVICE))
-				&& (wValue == DEVICE_REMOTE_WAKEUP))
-			{
-				_usbCurrentStatus &= ~FEATURE_REMOTE_WAKEUP_ENABLED;
-			}
 		}
 		else if (SET_FEATURE == r)
 		{
-			if((requestType == (REQUEST_HOSTTODEVICE | REQUEST_STANDARD | REQUEST_DEVICE))
-				&& (wValue == DEVICE_REMOTE_WAKEUP))
-			{
-				_usbCurrentStatus |= FEATURE_REMOTE_WAKEUP_ENABLED;
-			}
 		}
 		else if (SET_ADDRESS == r)
 		{
@@ -653,97 +592,11 @@ void USB_Flush(u8 ep)
 		ReleaseTX();
 }
 
-static inline void USB_ClockDisable()
-{
-#if defined(OTGPADE)
-	USBCON = (USBCON & ~(1<<OTGPADE)) | (1<<FRZCLK); // freeze clock and disable VBUS Pad
-#else // u2 Series
-	USBCON = (1 << FRZCLK); // freeze clock
-#endif
-	PLLCSR &= ~(1<<PLLE);  // stop PLL
-}
-
-static inline void USB_ClockEnable()
-{
-#if defined(UHWCON)
-	UHWCON |= (1<<UVREGE);			// power internal reg
-#endif
-	USBCON = (1<<USBE) | (1<<FRZCLK);	// clock frozen, usb enabled
-
-// ATmega32U4
-#if defined(PINDIV)
-#if F_CPU == 16000000UL
-	PLLCSR |= (1<<PINDIV);                   // Need 16 MHz xtal
-#elif F_CPU == 8000000UL
-	PLLCSR &= ~(1<<PINDIV);                  // Need  8 MHz xtal
-#else
-#error "Clock rate of F_CPU not supported"
-#endif
-
-#elif defined(__AVR_AT90USB82__) || defined(__AVR_AT90USB162__) || defined(__AVR_ATmega32U2__) || defined(__AVR_ATmega16U2__) || defined(__AVR_ATmega8U2__)
-	// for the u2 Series the datasheet is confusing. On page 40 its called PINDIV and on page 290 its called PLLP0
-#if F_CPU == 16000000UL
-	// Need 16 MHz xtal
-	PLLCSR |= (1 << PLLP0);
-#elif F_CPU == 8000000UL
-	// Need 8 MHz xtal
-	PLLCSR &= ~(1 << PLLP0);
-#endif
-
-// AT90USB646, AT90USB647, AT90USB1286, AT90USB1287
-#elif defined(PLLP2)
-#if F_CPU == 16000000UL
-#if defined(__AVR_AT90USB1286__) || defined(__AVR_AT90USB1287__)
-	// For Atmel AT90USB128x only. Do not use with Atmel AT90USB64x.
-	PLLCSR = (PLLCSR & ~(1<<PLLP1)) | ((1<<PLLP2) | (1<<PLLP0)); // Need 16 MHz xtal
-#elif defined(__AVR_AT90USB646__) || defined(__AVR_AT90USB647__)
-	// For AT90USB64x only. Do not use with AT90USB128x.
-	PLLCSR = (PLLCSR & ~(1<<PLLP0)) | ((1<<PLLP2) | (1<<PLLP1)); // Need 16 MHz xtal
-#else
-#error "USB Chip not supported, please defined method of USB PLL initialization"
-#endif
-#elif F_CPU == 8000000UL
-	// for Atmel AT90USB128x and AT90USB64x
-	PLLCSR = (PLLCSR & ~(1<<PLLP2)) | ((1<<PLLP1) | (1<<PLLP0)); // Need 8 MHz xtal
-#else
-#error "Clock rate of F_CPU not supported"
-#endif
-#else
-#error "USB Chip not supported, please defined method of USB PLL initialization"
-#endif
-
-	PLLCSR |= (1<<PLLE);
-	while (!(PLLCSR & (1<<PLOCK)))		// wait for lock pll
-	{
-	}
-
-	// Some tests on specific versions of macosx (10.7.3), reported some
-	// strange behaviors when the board is reset using the serial
-	// port touch at 1200 bps. This delay fixes this behavior.
-	delay(1);
-#if defined(OTGPADE)
-	USBCON = (USBCON & ~(1<<FRZCLK)) | (1<<OTGPADE);	// start USB clock, enable VBUS Pad
-#else
-	USBCON &= ~(1 << FRZCLK);	// start USB clock
-#endif
-
-#if defined(RSTCPU)
-#if defined(LSM)
-	UDCON &= ~((1<<RSTCPU) | (1<<LSM) | (1<<RMWKUP) | (1<<DETACH));	// enable attach resistor, set full speed mode
-#else // u2 Series
-	UDCON &= ~((1 << RSTCPU) | (1 << RMWKUP) | (1 << DETACH));	// enable attach resistor, set full speed mode
-#endif
-#else
-	// AT90USB64x and AT90USB128x don't have RSTCPU
-	UDCON &= ~((1<<LSM) | (1<<RMWKUP) | (1<<DETACH));	// enable attach resistor, set full speed mode
-#endif
-}
-
 //	General interrupt
 ISR(USB_GEN_vect)
 {
 	u8 udint = UDINT;
-	UDINT &= ~((1<<EORSTI) | (1<<SOFI)); // clear the IRQ flags for the IRQs which are handled here, except WAKEUPI and SUSPI (see below)
+	UDINT = 0;
 
 	//	End of Reset
 	if (udint & (1<<EORSTI))
@@ -756,37 +609,17 @@ ISR(USB_GEN_vect)
 	//	Start of Frame - happens every millisecond so we use it for TX and RX LED one-shot timing, too
 	if (udint & (1<<SOFI))
 	{
+#ifdef CDC_ENABLED
 		USB_Flush(CDC_TX);				// Send a tx frame if found
+		if (USB_Available(CDC_RX))	// Handle received bytes (if any)
+			Serial.accept();
+#endif
 		
 		// check whether the one-shot period has elapsed.  if so, turn off the LED
 		if (TxLEDPulse && !(--TxLEDPulse))
 			TXLED0;
 		if (RxLEDPulse && !(--RxLEDPulse))
 			RXLED0;
-	}
-
-	// the WAKEUPI interrupt is triggered as soon as there are non-idle patterns on the data
-	// lines. Thus, the WAKEUPI interrupt can occur even if the controller is not in the "suspend" mode.
-	// Therefore the we enable it only when USB is suspended
-	if (udint & (1<<WAKEUPI))
-	{
-		UDIEN = (UDIEN & ~(1<<WAKEUPE)) | (1<<SUSPE); // Disable interrupts for WAKEUP and enable interrupts for SUSPEND
-
-		//TODO
-		// WAKEUPI shall be cleared by software (USB clock inputs must be enabled before).
-		//USB_ClockEnable();
-		UDINT &= ~(1<<WAKEUPI);
-		_usbSuspendState = (_usbSuspendState & ~(1<<SUSPI)) | (1<<WAKEUPI);
-	}
-	else if (udint & (1<<SUSPI)) // only one of the WAKEUPI / SUSPI bits can be active at time
-	{
-		UDIEN = (UDIEN & ~(1<<SUSPE)) | (1<<WAKEUPE); // Disable interrupts for SUSPEND and enable interrupts for WAKEUP
-
-		//TODO
-		//USB_ClockDisable();
-
-		UDINT &= ~((1<<WAKEUPI) | (1<<SUSPI)); // clear any already pending WAKEUP IRQs and the SUSPI request
-		_usbSuspendState = (_usbSuspendState & ~(1<<WAKEUPI)) | (1<<SUSPI);
 	}
 }
 
@@ -811,20 +644,26 @@ USBDevice_::USBDevice_()
 void USBDevice_::attach()
 {
 	_usbConfiguration = 0;
-	_usbCurrentStatus = 0;
-	_usbSuspendState = 0;
-	USB_ClockEnable();
+	UHWCON = 0x01;						// power internal reg
+	USBCON = (1<<USBE)|(1<<FRZCLK);		// clock frozen, usb enabled
+#if F_CPU == 16000000UL
+	PLLCSR = 0x12;						// Need 16 MHz xtal
+#elif F_CPU == 8000000UL
+	PLLCSR = 0x02;						// Need 8 MHz xtal
+#endif
+	while (!(PLLCSR & (1<<PLOCK)))		// wait for lock pll
+		;
 
-	UDINT &= ~((1<<WAKEUPI) | (1<<SUSPI)); // clear already pending WAKEUP / SUSPEND requests
-	UDIEN = (1<<EORSTE) | (1<<SOFE) | (1<<SUSPE);	// Enable interrupts for EOR (End of Reset), SOF (start of frame) and SUSPEND
+	// Some tests on specific versions of macosx (10.7.3), reported some
+	// strange behaviuors when the board is reset using the serial
+	// port touch at 1200 bps. This delay fixes this behaviour.
+	delay(1);
+
+	USBCON = ((1<<USBE)|(1<<OTGPADE));	// start USB clock
+	UDIEN = (1<<EORSTE)|(1<<SOFE);		// Enable interrupts for EOR (End of Reset) and SOF (start of frame)
+	UDCON = 0;							// enable attach resistor
 	
 	TX_RX_LED_INIT;
-
-#if MAGIC_KEY_POS != (RAMEND-1)
-	if (pgm_read_word(FLASHEND - 1) == NEW_LUFA_SIGNATURE) {
-		_updatedLUFAbootloader = true;
-	}
-#endif
 }
 
 void USBDevice_::detach()
@@ -840,26 +679,6 @@ bool USBDevice_::configured()
 
 void USBDevice_::poll()
 {
-}
-
-bool USBDevice_::wakeupHost()
-{
-	// clear any previous wakeup request which might have been set but could be processed at that time
-	// e.g. because the host was not suspended at that time
-	UDCON &= ~(1 << RMWKUP);
-
-	if(!(UDCON & (1 << RMWKUP))
-	  && (_usbSuspendState & (1<<SUSPI))
-	  && (_usbCurrentStatus & FEATURE_REMOTE_WAKEUP_ENABLED))
-	{
-		// This short version will only work, when the device has not been suspended. Currently the
-		// Arduino core doesn't handle SUSPEND at all, so this is ok.
-		USB_ClockEnable();
-		UDCON |= (1 << RMWKUP); // send the wakeup request
-		return true;
-	}
-
-	return false;
 }
 
 #endif /* if defined(USBCON) */

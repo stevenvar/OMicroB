@@ -11,7 +11,7 @@ let rec facto = function
 let _ =
   Arduino.serial_begin 57600;
   let x = Arduino.millis () in
-  for i = 0 to 100 do
+  for i = 0 to 1000 do
     (* Arduboy.print_int(facto i); *)
     for i = 0 to 10 do
       facto i;

@@ -3,7 +3,7 @@
 #define OCAML_HEAP_INITIAL_WOSIZE       5
 #define OCAML_STACK_INITIAL_WOSIZE      1
 #define OCAML_GLOBDATA_NUMBER           1
-#define OCAML_BYTECODE_BSIZE           82
+#define OCAML_BYTECODE_BSIZE           83
 #define OCAML_PRIMITIVE_NUMBER          4
 #define OCAML_VIRTUAL_ARCH             32
 
@@ -30,12 +30,13 @@
 #define OCAML_CONST1                   18
 #define OCAML_PUSHCONST0               19
 #define OCAML_PUSHCONSTINT_1B          20
-#define OCAML_SUBINT                   21
-#define OCAML_MULINT                   22
-#define OCAML_NEQ                      23
-#define OCAML_GTINT                    24
-#define OCAML_OFFSETINT_1B             25
-#define OCAML_STOP                     26
+#define OCAML_PUSHCONSTINT_2B          21
+#define OCAML_SUBINT                   22
+#define OCAML_MULINT                   23
+#define OCAML_NEQ                      24
+#define OCAML_GTINT                    25
+#define OCAML_OFFSETINT_1B             26
+#define OCAML_STOP                     27
 
 val_t ocaml_heap[OCAML_HEAP_WOSIZE * 2] = {
   /* 0 */  Make_header(1, Closure_tag),
@@ -145,65 +146,66 @@ PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
   /* 20 */  OCAML_C_CALL1,
   /* 21 */  1,
   /* 22 */  OCAML_PUSHCONST0,
-  /* 23 */  OCAML_PUSHCONSTINT_1B,
-  /* 24 */  100,
-  /* 25 */  OCAML_PUSH,
-  /* 26 */  OCAML_PUSHACC2,
-  /* 27 */  OCAML_GTINT,
-  /* 28 */  OCAML_BRANCHIF_1B,
-  /* 29 */  37,
-  /* 30 */  OCAML_CHECK_SIGNALS,
-  /* 31 */  OCAML_CONST0,
-  /* 32 */  OCAML_PUSHCONSTINT_1B,
-  /* 33 */  10,
-  /* 34 */  OCAML_PUSH,
-  /* 35 */  OCAML_PUSHACC2,
-  /* 36 */  OCAML_GTINT,
-  /* 37 */  OCAML_BRANCHIF_1B,
-  /* 38 */  16,
-  /* 39 */  OCAML_CHECK_SIGNALS,
-  /* 40 */  OCAML_ACC1,
-  /* 41 */  OCAML_PUSHACC6,
-  /* 42 */  OCAML_APPLY1,
-  /* 43 */  OCAML_ACC1,
-  /* 44 */  OCAML_PUSH,
-  /* 45 */  OCAML_OFFSETINT_1B,
-  /* 46 */  1,
-  /* 47 */  OCAML_ASSIGN,
-  /* 48 */  2,
-  /* 49 */  OCAML_ACC1,
-  /* 50 */  OCAML_NEQ,
-  /* 51 */  OCAML_BRANCHIF_1B,
-  /* 52 */  -12,
-  /* 53 */  OCAML_POP,
-  /* 54 */  2,
-  /* 55 */  OCAML_ACC1,
-  /* 56 */  OCAML_PUSH,
-  /* 57 */  OCAML_OFFSETINT_1B,
-  /* 58 */  1,
-  /* 59 */  OCAML_ASSIGN,
-  /* 60 */  2,
-  /* 61 */  OCAML_ACC1,
-  /* 62 */  OCAML_NEQ,
-  /* 63 */  OCAML_BRANCHIF_1B,
-  /* 64 */  -33,
-  /* 65 */  OCAML_POP,
-  /* 66 */  2,
-  /* 67 */  OCAML_CONST0,
-  /* 68 */  OCAML_C_CALL1,
-  /* 69 */  1,
-  /* 70 */  OCAML_PUSHACC1,
+  /* 23 */  OCAML_PUSHCONSTINT_2B,
+  /* 24 */  3,
+  /* 25 */  232,
+  /* 26 */  OCAML_PUSH,
+  /* 27 */  OCAML_PUSHACC2,
+  /* 28 */  OCAML_GTINT,
+  /* 29 */  OCAML_BRANCHIF_1B,
+  /* 30 */  37,
+  /* 31 */  OCAML_CHECK_SIGNALS,
+  /* 32 */  OCAML_CONST0,
+  /* 33 */  OCAML_PUSHCONSTINT_1B,
+  /* 34 */  10,
+  /* 35 */  OCAML_PUSH,
+  /* 36 */  OCAML_PUSHACC2,
+  /* 37 */  OCAML_GTINT,
+  /* 38 */  OCAML_BRANCHIF_1B,
+  /* 39 */  16,
+  /* 40 */  OCAML_CHECK_SIGNALS,
+  /* 41 */  OCAML_ACC1,
+  /* 42 */  OCAML_PUSHACC6,
+  /* 43 */  OCAML_APPLY1,
+  /* 44 */  OCAML_ACC1,
+  /* 45 */  OCAML_PUSH,
+  /* 46 */  OCAML_OFFSETINT_1B,
+  /* 47 */  1,
+  /* 48 */  OCAML_ASSIGN,
+  /* 49 */  2,
+  /* 50 */  OCAML_ACC1,
+  /* 51 */  OCAML_NEQ,
+  /* 52 */  OCAML_BRANCHIF_1B,
+  /* 53 */  -12,
+  /* 54 */  OCAML_POP,
+  /* 55 */  2,
+  /* 56 */  OCAML_ACC1,
+  /* 57 */  OCAML_PUSH,
+  /* 58 */  OCAML_OFFSETINT_1B,
+  /* 59 */  1,
+  /* 60 */  OCAML_ASSIGN,
+  /* 61 */  2,
+  /* 62 */  OCAML_ACC1,
+  /* 63 */  OCAML_NEQ,
+  /* 64 */  OCAML_BRANCHIF_1B,
+  /* 65 */  -33,
+  /* 66 */  OCAML_POP,
+  /* 67 */  2,
+  /* 68 */  OCAML_CONST0,
+  /* 69 */  OCAML_C_CALL1,
+  /* 70 */  1,
   /* 71 */  OCAML_PUSHACC1,
-  /* 72 */  OCAML_SUBINT,
-  /* 73 */  OCAML_C_CALL1,
-  /* 74 */  2,
-  /* 75 */  OCAML_GETGLOBAL_1B,
-  /* 76 */  0,
-  /* 77 */  OCAML_C_CALL1,
-  /* 78 */  3,
-  /* 79 */  OCAML_POP,
-  /* 80 */  3,
-  /* 81 */  OCAML_STOP
+  /* 72 */  OCAML_PUSHACC1,
+  /* 73 */  OCAML_SUBINT,
+  /* 74 */  OCAML_C_CALL1,
+  /* 75 */  2,
+  /* 76 */  OCAML_GETGLOBAL_1B,
+  /* 77 */  0,
+  /* 78 */  OCAML_C_CALL1,
+  /* 79 */  3,
+  /* 80 */  OCAML_POP,
+  /* 81 */  3,
+  /* 82 */  OCAML_STOP
 };
 
 #include </Users/arcadium/github/OMicroB/src/byterun/runtime.c>

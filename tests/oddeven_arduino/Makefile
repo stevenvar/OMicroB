@@ -7,43 +7,42 @@ INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
-TARGETS := oderiv.byte oderiv.c oderiv.elf oderiv.avr oderiv.hex
+TARGETS := ofacto.byte ofacto.c ofacto.elf ofacto.avr ofacto.hex
 
-oderiv: $(TARGETS)
+ofacto: $(TARGETS)
 
-run: oderiv.elf
-	./oderiv.elf
+run: ofacto.elf
+	./ofacto.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
 
-.PHONY: oderiv run clean flash
+.PHONY: ofacto run clean flash
 
 ################################################################################
 
-oderiv.byte: oderiv.ml
+ofacto.byte: ofacto.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
-oderiv.c: oderiv.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 196 -stack-size 28 $< -o $@
+ofacto.c: ofacto.byte $(BIN)/bc2c
+	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
-oderiv.elf: oderiv.c
+ofacto.elf: ofacto.c
 	$(GCC) -m32 -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
 
 ################################################################################
 
-oderiv.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) oderiv.c
-	$(AVR_GXX) -O2  -I$(SRC)/byterun/ -D__ARDUINO__ $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
+ofacto.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) ofacto.c
+	$(AVR_GXX) -O3  -I$(SRC)/byterun/ -D__ARDUINO__ -D__OMICROB_WITH_ARDUBOY__ $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -o $@
 
-oderiv.hex: oderiv.avr
+ofacto.hex: ofacto.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-flash: oderiv.avr
+flash: ofacto.avr
 	stty -f $(ATTY) 1200
 	sleep 1
 	$(AVRDUDE) -c arduino -P $(ATTY) -p ATmega328p -b 115200 -v -D -U flash:w:$<:e
-	# $(AVRDUDE) -c stk500v2 -P $(ATTY) -p m2560 -b 115200 -v -D -U flash:w:$<:e
 
 listen:
 	stty -f $(ATTY) cs8 9600 ignbrk -brkint -icrnl -imaxbel -opost -onlcr -isig -icanon -iexten -echo -echoe -echok -echoctl -echoke noflsh -ixon -crtscts

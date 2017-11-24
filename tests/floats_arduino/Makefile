@@ -26,7 +26,7 @@ floats.byte: floats.ml
 	ocamlclean $@ -o $@
 
 floats.c: floats.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 74 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 164 -stack-size 64 $< -o $@
 
 floats.elf: floats.c
 	$(GCC) -m32 -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@

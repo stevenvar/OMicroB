@@ -17,7 +17,6 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  
  Modified 23 November 2006 by David A. Mellis
- Modified 03 August 2015 by Chuck Todd
  */
 
 #include <stdlib.h>
@@ -35,28 +34,30 @@ size_t Print::write(const uint8_t *buffer, size_t size)
 {
   size_t n = 0;
   while (size--) {
-    if (write(*buffer++)) n++;
-    else break;
+    n += write(*buffer++);
   }
   return n;
 }
 
 size_t Print::print(const __FlashStringHelper *ifsh)
 {
-  PGM_P p = reinterpret_cast<PGM_P>(ifsh);
+  const char * __attribute__((progmem)) p = (const char * ) ifsh;
   size_t n = 0;
   while (1) {
     unsigned char c = pgm_read_byte(p++);
     if (c == 0) break;
-    if (write(c)) n++;
-    else break;
+    n += write(c);
   }
   return n;
 }
 
 size_t Print::print(const String &s)
 {
-  return write(s.c_str(), s.length());
+  size_t n = 0;
+  for (uint16_t i = 0; i < s.length(); i++) {
+    n += write(s[i]);
+  }
+  return n;
 }
 
 size_t Print::print(const char str[])
@@ -125,7 +126,9 @@ size_t Print::print(const Printable& x)
 
 size_t Print::println(void)
 {
-  return write("\r\n");
+  size_t n = print('\r');
+  n += print('\n');
+  return n;
 }
 
 size_t Print::println(const String &s)
@@ -200,8 +203,7 @@ size_t Print::println(const Printable& x)
 
 // Private Methods /////////////////////////////////////////////////////////////
 
-size_t Print::printNumber(unsigned long n, uint8_t base)
-{
+size_t Print::printNumber(unsigned long n, uint8_t base) {
   char buf[8 * sizeof(long) + 1]; // Assumes 8-bit chars plus zero byte.
   char *str = &buf[sizeof(buf) - 1];
 
@@ -211,9 +213,9 @@ size_t Print::printNumber(unsigned long n, uint8_t base)
   if (base < 2) base = 10;
 
   do {
-    char c = n % base;
+    unsigned long m = n;
     n /= base;
-
+    char c = m - base * n;
     *--str = c < 10 ? c + '0' : c + 'A' - 10;
   } while(n);
 
@@ -250,14 +252,14 @@ size_t Print::printFloat(double number, uint8_t digits)
 
   // Print the decimal point, but only if there are digits beyond
   if (digits > 0) {
-    n += print('.'); 
+    n += print("."); 
   }
 
   // Extract digits from the remainder one at a time
   while (digits-- > 0)
   {
     remainder *= 10.0;
-    unsigned int toPrint = (unsigned int)(remainder);
+    int toPrint = int(remainder);
     n += print(toPrint);
     remainder -= toPrint; 
   } 

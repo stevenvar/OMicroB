@@ -1,5 +1,5 @@
 #define OCAML_STACK_WOSIZE             28
-#define OCAML_HEAP_WOSIZE              94
+#define OCAML_HEAP_WOSIZE             196
 #define OCAML_HEAP_INITIAL_WOSIZE      27
 #define OCAML_STACK_INITIAL_WOSIZE      4
 #define OCAML_GLOBDATA_NUMBER           6

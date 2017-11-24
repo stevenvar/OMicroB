@@ -26,7 +26,7 @@ extern Arduboy arduboy;
 #endif
 PROGMEM extern void * const ocaml_primitives[];
 
-static code_t pc;
+code_t pc;
 val_t env;
 val_t *sp;
 static val_t trapSp;
@@ -62,7 +62,7 @@ void *get_primitive(uint8_t prim_ind) {
 #endif
 }
 
-char read_byte(void) {
+static inline char read_byte(void) {
   char c;
 #ifdef __AVR__
   c = pgm_read_byte_near(ocaml_bytecode + pc);
@@ -73,29 +73,29 @@ char read_byte(void) {
   return c;
 }
 
- opcode_t read_opcode(void) {
+static inline opcode_t read_opcode(void) {
   return (opcode_t) read_byte();
 }
 
- uint8_t read_uint8(void) {
+static inline uint8_t read_uint8(void) {
   return (uint8_t) read_byte();
 }
 
- int8_t read_int8(void) {
+static inline int8_t read_int8(void) {
   return (int8_t) read_byte();
 }
 
- uint16_t read_uint16(void) {
+static inline uint16_t read_uint16(void) {
   uint8_t n1 = read_uint8();
   uint8_t n0 = read_uint8();
   return ((uint16_t) n1 << 8) | n0;
 }
 
- int16_t read_int16(void) {
+static inline int16_t read_int16(void) {
   return (int16_t) read_uint16();
 }
 
- uint32_t read_uint32(void) {
+static inline uint32_t read_uint32(void) {
   uint8_t n3 = read_uint8();
   uint8_t n2 = read_uint8();
   uint8_t n1 = read_uint8();
@@ -103,32 +103,32 @@ char read_byte(void) {
   return ((uint32_t) n3 << 24) | ((uint32_t) n2 << 16) | ((uint32_t) n1 << 8) | n0;
 }
 
- int32_t read_int32(void) {
+static inline int32_t read_int32(void) {
   return (int32_t) read_uint32();
 }
 
- code_t read_ptr_1B(void) {
+static inline code_t read_ptr_1B(void) {
   int8_t ofs = read_int8();
   return pc - 2 + ofs;
 }
 
- code_t read_ptr_2B(void) {
+static inline code_t read_ptr_2B(void) {
   int16_t ofs = read_int16();
   return pc - 3 + ofs;
 }
 
- code_t read_ptr_4B(void) {
+static inline code_t read_ptr_4B(void) {
   int32_t ofs = read_int32();
   return pc - 5 + ofs;
 }
 
 /******************************************************************************/
 
- val_t peek(int n) {
+static inline val_t peek(int n) {
   return sp[n];
 }
 
- void push(val_t x) {
+static inline void push(val_t x) {
   if(sp < ocaml_stack){
     caml_raise_stack_overflow();
   }
@@ -137,11 +137,11 @@ char read_byte(void) {
   }
 }
 
- val_t pop(void) {
+static inline val_t pop(void) {
   return *(sp++);
 }
 
- void pop_n(int n) {
+static inline void pop_n(int n) {
   sp += n;
 }
 
@@ -262,6 +262,7 @@ void interp_init(void) {
 /******************************************************************************/
 
 val_t interp(void) {
+
 
   while (1) {
     opcode_t opcode = read_opcode();
@@ -1378,7 +1379,7 @@ val_t interp(void) {
 #endif
 
 #ifdef OCAML_GETFIELD2
-    case OCAML_GETFIELD2 : si{
+    case OCAML_GETFIELD2 : {
 #if defined(DEBUG) && defined (__PC__)
       printf("GETFIELD2\n");
 #endif
@@ -2555,7 +2556,7 @@ void loop(void) {
 
 int main(int argc, char** argv) {
   setup();
-  /* while (1) loop(); */
+  while (1) loop();
   return 0;
 }
 

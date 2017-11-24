@@ -16,7 +16,7 @@ let rec facto = function
 let _ =
   Arduboy.init ();
   let x = Arduboy.millis () in
-  for i = 0 to 100 do
+  for i = 0 to 1000 do
     (* Arduboy.print_int(facto i); *)
     for i = 0 to 10 do
       facto i;
