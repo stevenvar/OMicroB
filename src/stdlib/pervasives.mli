@@ -18,8 +18,6 @@ type pin =
   | PIN16
   | PIN17
 type mode = INPUT | OUTPUT
-type picReg = PORTB | TRISB
-type picPin = RB1 | RB2 | RB3 | RB4
 external force_gc : unit -> unit = "caml_force_gc"
 external not : bool -> bool = "%boolnot"
 external ( & ) : bool -> bool -> bool = "%sequand"
@@ -57,9 +55,6 @@ external decr : int ref -> unit = "%decr"
 external print_string : string -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
 external print_float : float -> unit = "caml_print_float"
-external write_reg : picReg -> int -> unit = "caml_write_reg"
-external set_bit : picPin -> unit = "caml_set_bit"
-external clear_bit : picPin -> unit = "caml_clear_bit"
 external pin_mode : pin -> mode -> unit = "caml_pin_mode" [@@noalloc]
 external digital_read : pin -> bool = "caml_digital_read" [@@noalloc]
 external digital_write : pin -> bool -> unit = "caml_digital_write"

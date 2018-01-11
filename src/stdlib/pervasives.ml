@@ -9,10 +9,6 @@ type mode =
 | INPUT
 | OUTPUT
 
-(* PIC  *)
-type picReg = PORTB | TRISB
-type picPin = RB1 | RB2 | RB3 | RB4
-
 (* GC *)
 
 external force_gc : unit -> unit = "caml_force_gc"
@@ -69,11 +65,6 @@ external print_string :  string -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
 external print_float : float -> unit = "caml_print_float"
 
-(* PIC *)
-external write_reg : picReg -> int -> unit = "caml_write_reg"
-external set_bit : picPin -> unit = "caml_set_bit"
-external clear_bit : picPin -> unit = "caml_clear_bit"
-
 (* AVR *)
 external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
 external digital_read  : pin -> bool         = "caml_digital_read"  [@@noalloc]
@@ -86,7 +77,7 @@ external serial_begin : int -> unit          = "ocaml_arduino_serial_begin" [@@n
 
 external raise : exn -> 'a = "%raise"
 
-(* Listes *)
+(* Lists *)
 let rec ( @ ) l1 l2 =
   match l1 with
     [] -> l2

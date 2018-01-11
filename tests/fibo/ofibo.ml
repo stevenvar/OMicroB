@@ -19,7 +19,7 @@ let _ =
   for i = 0 to 10 do
     (* Arduboy.print_int(facto i); *)
     for i = 0 to 10 do
-      fibo i;
+      Arduboy.print_int (fibo i);
     done;
   done;
   let y = Arduboy.millis () in

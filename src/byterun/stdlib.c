@@ -9,67 +9,15 @@
 #ifdef DEBUG
 #include "debug.h"
 #endif
-#elif defined(__PIC18F__)
-/* #include "debug.h" */
-#include "gc.h"
 #elif defined(__PC__)
-/* #include "simul.h" */
 #include <stdio.h>
 #include "gc.h"
 #include "values.h"
 #else
-
 #include "simul.h"
 #endif
 
-#ifdef __PIC18F__
-
-#include <xc.h>
-
-val_t caml_force_gc (val_t unit){
-  #ifndef NOGC
-  gc(0);
-  #endif
-  return Val_unit;
-}
-
-val_t caml_write_reg (val_t pin,val_t v){
-  TRISD = 0x00;
-  return Val_unit;
-}
-
-val_t caml_set_bit(val_t pin){
-  LATD2 = 1;
-  return Val_unit;
-}
-
-val_t caml_clear_bit(val_t pin){
-  LATD2 = 0;
-  return Val_unit;
-}
-
-val_t caml_pin_mode(val_t pin, val_t mode) {
-  return Val_unit;
-}
-
-val_t caml_digital_write(val_t pin, val_t state) {
-  return Val_unit;
-}
-
-val_t caml_digital_read(val_t pin) {
-  return Val_int(0);
-}
-
-val_t caml_delay(val_t millis) {
-
-  return Val_unit;
-}
-
-val_t ocaml_arduino_millis(val_t k){
-  return Val_int(0);
-}
-
-#elif defined(__AVR__)
+#if defined(__AVR__)
 
 /******************************************************************************/
 /* Arduino specific libraries */
@@ -475,7 +423,6 @@ val_t caml_print_string(val_t s){
 }
 
 #endif /* PC */
-#endif /* PIC */
-/* #endif /\* __AVR__ *\/ */
+#endif /* __AVR__ */
 
 /******************************************************************************/

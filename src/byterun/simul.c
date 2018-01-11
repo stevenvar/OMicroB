@@ -4,10 +4,6 @@
 
 #else
 
-#ifdef __PIC18F
-
-#else
-
 #ifdef __PC__
 #include <stdio.h>
 #else
@@ -64,6 +60,5 @@ val_t caml_clear_bit(val_t pin){
 
 /******************************************************************************/
 
-#endif
 #endif
 #endif

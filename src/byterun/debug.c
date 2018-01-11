@@ -1,6 +1,6 @@
 #include "debug.h"
 
-#if !defined(__AVR__) && !defined(__PC__) && !defined(__PIC18F__)
+#if !defined(__AVR__) && !defined(__PC__)
 
 #include <stdio.h>
 #include "simul.h"
