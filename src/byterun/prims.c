@@ -278,7 +278,7 @@ val_t caml_update_dummy(val_t dummy, val_t newval)
 
   size = Wosize_val(newval);
   tag = Tag_val (newval);
-  /* Tag_val(dummy) = tag; */
+  Hd_val(dummy) = Set_tag_hd(Hd_val(dummy),tag);
   for (i = 0; i < size; i++){
     Field(dummy, i) = Field(newval, i);
   }

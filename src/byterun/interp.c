@@ -43,7 +43,7 @@ void caml_raise_stack_overflow(void) {
 #ifdef __PC__
 #include <stdio.h>
 printf("stack overflow");
- exit(0);
+ /* exit(0); */
 #endif
 #ifdef DEBUG
   debug(444);

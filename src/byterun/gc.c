@@ -248,11 +248,9 @@ void gc(mlsize_t size) {
 #ifndef NOGC
 #ifdef DEBUG
   cpt_gc++;
-  int size_before = heap_ptr - tab_heap_start[current_heap];
   #ifdef __PC__
   printf("==================================================GC=====================================\n");
   #endif
-    print_global();
     print_heap();
     print_stack();
 #endif

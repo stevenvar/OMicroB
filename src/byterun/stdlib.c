@@ -1,6 +1,7 @@
 /* Binding to arduino libraries */
 
 #ifdef  __AVR__
+#include "avr.h"
 #ifdef __ARDUINO__
 #include "gc.h"
 #include "Arduino.h"
@@ -16,11 +17,20 @@
 #else
 #include "simul.h"
 #endif
-
 #if defined(__AVR__)
 
 /******************************************************************************/
 /* Arduino specific libraries */
+
+val_t ocaml_avr_write_register(val_t reg, val_t val){
+  writeRegister((uint8_t)Int_val(reg),(uint8_t)Int_val(val));
+  return Val_unit;
+}
+
+val_t ocaml_avr_set_bit(val_t reg, val_t bit){
+  setBit(Int_val(reg),Int_val(bit));
+  return Val_unit;
+}
 
 #ifdef __ARDUINO__
 
@@ -201,6 +211,7 @@ val_t caml_force_gc (val_t unit){
 
 val_t caml_write_reg(val_t reg, val_t val){
   printf("REG n°%d = %d \n" , reg, Int_val(val));
+  return Val_unit;
 }
 
 /* val_t ocaml_arduboy_reset_cursor(val_t unit){ */
@@ -249,12 +260,12 @@ val_t caml_delay(val_t millis){
 }
 
 val_t caml_pin_mode(val_t pin, val_t mode) {
-  printf("pin_mode(%ld,%ld)\n", Val_int(pin),Val_int(mode));
+  printf("pin_mode(%d,%d)\n", Val_int(pin),Val_int(mode));
   return Val_unit;
 }
 
 val_t caml_digital_write(val_t pin, val_t state) {
-  printf("digital_write(%ld,%ld)\n", Val_int(pin),Val_int(state));
+  printf("digital_write(%d,%d)\n", Val_int(pin),Val_int(state));
   return Val_unit;
 }
 
@@ -289,6 +300,15 @@ val_t ocaml_arduboy_print_float(val_t i) {
 
 val_t caml_print_float(val_t i){
   printf("print_float(%d)",Double_val(i));
+  return Val_unit;
+}
+
+
+val_t ocaml_avr_write_register(val_t reg, val_t val){
+  return Val_unit;
+}
+
+val_t ocaml_avr_set_bit(val_t reg, val_t bit){
   return Val_unit;
 }
 
@@ -421,6 +441,16 @@ val_t caml_print_string(val_t s){
   printf("caml_print_string");
   return Val_unit;
 }
+
+
+val_t ocaml_avr_write_register(val_t reg, val_t val){
+  return Val_unit;
+}
+
+val_t ocaml_avr_set_bit(val_t reg, val_t bit){
+  return Val_unit;
+}
+
 
 #endif /* PC */
 #endif /* __AVR__ */

@@ -139,6 +139,7 @@ typedef uint32_t code_t;
 
 #define Color_val(val) ((Header(val) >> 8) & 1)
 #define Tag_val(val) ((uval_t)(Header(val)) & (uval_t)0xFF)
+#define Set_tag_hd(hd,tag) ((uval_t)hd | (uval_t) tag)
 
 #define Tag_hd(hd) ((uval_t)hd & (uval_t)0xFF)
 #define Wosize_hd(hd) (uval_t)((uval_t)hd >> 10)
