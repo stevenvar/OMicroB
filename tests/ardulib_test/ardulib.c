@@ -1,26 +1,38 @@
 #define OCAML_STACK_WOSIZE             64
 #define OCAML_HEAP_WOSIZE              64
-#define OCAML_HEAP_INITIAL_WOSIZE       0
-#define OCAML_STACK_INITIAL_WOSIZE      1
+#define OCAML_HEAP_INITIAL_WOSIZE       2
+#define OCAML_STACK_INITIAL_WOSIZE      4
 #define OCAML_GLOBDATA_NUMBER           0
-#define OCAML_BYTECODE_BSIZE           13
-#define OCAML_PRIMITIVE_NUMBER          1
+#define OCAML_BYTECODE_BSIZE           37
+#define OCAML_PRIMITIVE_NUMBER          3
 #define OCAML_VIRTUAL_ARCH             32
 
-#include </Users/steven/github/OMicroB/src/byterun/values.h>
+#include </Users/travail/github/OMicroB/src/byterun/values.h>
 
-#define OCAML_C_CALL2                   0
-#define OCAML_CONST1                    1
-#define OCAML_PUSHCONSTINT_1B           2
-#define OCAML_STOP                      3
+#define OCAML_PUSHACC1                  0
+#define OCAML_PUSHACC2                  1
+#define OCAML_PUSHACC3                  2
+#define OCAML_POP                       3
+#define OCAML_APPLY3                    4
+#define OCAML_RETURN                    5
+#define OCAML_RESTART                   6
+#define OCAML_GRAB                      7
+#define OCAML_BRANCH_1B                 8
+#define OCAML_C_CALL2                   9
+#define OCAML_CONST1                   10
+#define OCAML_CONSTINT_1B              11
+#define OCAML_PUSHCONST0               12
+#define OCAML_STOP                     13
 
 val_t ocaml_heap[OCAML_HEAP_WOSIZE * 2] = {
+  /* 0 */  Make_header(1, Closure_tag),
+  /* 1 */  Val_codeptr(3)
 };
 
 const val_t* ocaml_heap1 = ocaml_heap;
 const val_t* ocaml_heap2 = ocaml_heap + OCAML_HEAP_WOSIZE;
 
-val_t acc = Val_int(9);
+val_t acc = Init_val_block(4 * 1);
 
 val_t ocaml_stack[OCAML_STACK_WOSIZE] = {
   /*  0 */  Val_int(0),
@@ -83,33 +95,59 @@ val_t ocaml_stack[OCAML_STACK_WOSIZE] = {
   /* 57 */  Val_int(0),
   /* 58 */  Val_int(0),
   /* 59 */  Val_int(0),
-  /* 60 */  Val_int(0),
-  /* 61 */  Val_int(0),
-  /* 62 */  Val_int(0),
-  /* 63 */  Val_int(1)
+  /* 60 */  Val_int(17),
+  /* 61 */  Val_int(15),
+  /* 62 */  Val_int(16),
+  /* 63 */  Init_val_block(4 * 1)
 };
 
 val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER] = {
 };
 
 PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
-  /*  0 */  OCAML_C_CALL2,
-  /*  1 */  0,
-  /*  2 */  OCAML_CONST1,
-  /*  3 */  OCAML_PUSHCONSTINT_1B,
-  /*  4 */  10,
-  /*  5 */  OCAML_C_CALL2,
-  /*  6 */  0,
-  /*  7 */  OCAML_CONST1,
-  /*  8 */  OCAML_PUSHCONSTINT_1B,
-  /*  9 */  11,
-  /* 10 */  OCAML_C_CALL2,
-  /* 11 */  0,
-  /* 12 */  OCAML_STOP
+  /*  0 */  OCAML_BRANCH_1B,
+  /*  1 */  33,
+  /*  2 */  OCAML_RESTART,
+  /*  3 */  OCAML_GRAB,
+  /*  4 */  2,
+  /*  5 */  OCAML_CONST1,
+  /*  6 */  OCAML_PUSHACC1,
+  /*  7 */  OCAML_C_CALL2,
+  /*  8 */  0,
+  /*  9 */  OCAML_CONST1,
+  /* 10 */  OCAML_PUSHACC1,
+  /* 11 */  OCAML_C_CALL2,
+  /* 12 */  1,
+  /* 13 */  OCAML_CONSTINT_1B,
+  /* 14 */  4,
+  /* 15 */  OCAML_PUSHCONST0,
+  /* 16 */  OCAML_C_CALL2,
+  /* 17 */  2,
+  /* 18 */  OCAML_CONSTINT_1B,
+  /* 19 */  6,
+  /* 20 */  OCAML_PUSHCONST0,
+  /* 21 */  OCAML_C_CALL2,
+  /* 22 */  2,
+  /* 23 */  OCAML_CONST1,
+  /* 24 */  OCAML_PUSHACC2,
+  /* 25 */  OCAML_C_CALL2,
+  /* 26 */  1,
+  /* 27 */  OCAML_CONST1,
+  /* 28 */  OCAML_PUSHACC3,
+  /* 29 */  OCAML_C_CALL2,
+  /* 30 */  1,
+  /* 31 */  OCAML_RETURN,
+  /* 32 */  3,
+  /* 33 */  OCAML_APPLY3,
+  /* 34 */  OCAML_POP,
+  /* 35 */  1,
+  /* 36 */  OCAML_STOP
 };
 
-#include </Users/steven/github/OMicroB/src/byterun/runtime.c>
+#include </Users/travail/github/OMicroB/src/byterun/runtime.c>
 
 PROGMEM void * const ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {
-  (void *) &caml_pin_mode
+  (void *) &caml_avr_digital_write,
+  (void *) &caml_avr_port_mode,
+  (void *) &caml_avr_set_bit
 };

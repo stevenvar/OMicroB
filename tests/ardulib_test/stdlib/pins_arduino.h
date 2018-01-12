@@ -1,3 +1,41 @@
+#include <stdint.h>
+#include <avr/io.h>
+#include <avr/pgmspace.h>
+
+#define PA 1
+#define PB 2
+#define PC 3
+#define PD 4
+#define PE 5
+#define PF 6
+#define PG 7
+#define PH 8
+#define PJ 10
+#define PK 11
+#define PL 12
+
+#define NOT_A_PORT 0
+
+
+const uint16_t PROGMEM port_to_output_PGM[] = {
+	NOT_A_PORT,
+	NOT_A_PORT,
+	(uint16_t) &PORTB,
+	(uint16_t) &PORTC,
+	(uint16_t) &PORTD,
+	(uint16_t) &PORTE,
+	(uint16_t) &PORTF,
+};
+
+const uint16_t PROGMEM port_to_mode_PGM[] = {
+	NOT_A_PORT,
+	NOT_A_PORT,
+	(uint16_t) &DDRB,
+	(uint16_t) &DDRC,
+	(uint16_t) &DDRD,
+	(uint16_t) &DDRE,
+	(uint16_t) &DDRF,
+};
 
 const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
 	PD, // D0 - PD2

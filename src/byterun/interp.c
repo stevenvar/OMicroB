@@ -2515,6 +2515,9 @@ val_t interp(void) {
       debug(cptinst);
       debug(5709);
 #endif
+#ifdef __PC__
+      exit(0);
+#endif
       return acc;
     }
 #endif

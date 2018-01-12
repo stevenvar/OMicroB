@@ -70,8 +70,8 @@ external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
 external digital_read  : pin -> bool         = "caml_digital_read"  [@@noalloc]
 external digital_write : pin -> bool -> unit = "caml_digital_write" [@@noalloc]
 external delay         : int -> unit         = "caml_delay"         [@@noalloc]
-external millis        : unit -> int         = "ocaml_arduino_millis" [@@noalloc]
-external serial_begin : int -> unit          = "ocaml_arduino_serial_begin" [@@noalloc]
+external millis        : unit -> int         = "caml_avr_millis" [@@noalloc]
+external serial_begin : int -> unit          = "caml_avr_serial_begin" [@@noalloc]
 
 (* Exceptions *)
 

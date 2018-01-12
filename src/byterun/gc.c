@@ -282,8 +282,6 @@ void gc(mlsize_t size) {
    #ifdef __PC__
   int size_after = heap_ptr - new_heap;
   printf("end of GC number %d ", cpt_gc);
-  printf("liberated memory : AFTER = %d  / BEFORE = %d %d \n ", size_after, size_before, size_before-size_after  );
-
   #endif
   clean_heap();
   print_heap();
