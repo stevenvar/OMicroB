@@ -1,0 +1,39 @@
+#include <stdint.h>
+#include <avr/io.h>
+/* #include <avr/iom32u4.h> */
+
+uint8_t bits[] = {
+  0, /* PORTB0, */
+  1, /* PORTB1 */
+  2, /* PORTB2 */
+  3, /* PORTB3 */
+  4, /* PORTB4 */
+  5, /* PORTB5 */
+  6, /* PORTB6 */
+  7, /* PORTB7 */
+
+};
+
+volatile uint8_t* regs[] = {
+  &DDRB,
+  &PORTB
+};
+
+void writeRegister(uint8_t reg,uint8_t val){
+  volatile uint8_t* r = regs[reg];
+  *r = val;
+  /* DDRB = 0xFF; */
+}
+
+void setBit(uint8_t reg,uint8_t bit){
+  volatile uint8_t* r = regs[reg];
+  volatile uint8_t b = bits[bit];
+  *r |= _BV(b);
+  /* PORTB |= _BV(5); */
+}
+
+void clearBit(uint8_t reg, uint8_t bit){
+  volatile uint8_t* r = regs[reg];
+  volatile uint8_t b = bits[bit];
+  *r &= ~_BV(b);
+}

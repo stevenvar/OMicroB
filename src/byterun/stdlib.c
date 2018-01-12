@@ -32,6 +32,11 @@ val_t ocaml_avr_set_bit(val_t reg, val_t bit){
   return Val_unit;
 }
 
+val_t caml_pin_mode(val_t pin,val_t mode){
+  pinMode(Int_val(pin),Int_val(mode));
+  return Val_unit;
+}
+
 #ifdef __ARDUINO__
 
 val_t caml_force_gc (val_t unit){
