@@ -63,7 +63,7 @@ void assert_failure(void) {
 
 #endif
 
-#ifdef __PIC__
+#ifdef __PC__
 
 void debug_init(void) {}
 

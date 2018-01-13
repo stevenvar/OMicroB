@@ -14,11 +14,11 @@ let begin_spi ~ss ~sck ~mosi =
   Avr.pin_mode mosi OUTPUT
 
 
-let _ =
-  let x =moins 3 2 1 in
+let () =
+  let x = moins 3 2 1 in
   (* Avr.write_register PORTD x; *)
   Spi.begin_spi ~ss:PIN17 ~sck:PIN15 ~mosi:PIN16;
-  Oled.boot();
+  (*Oled.boot();*)
   (* Avr.write_register DDRB 0xFF; (\* output *\) *)
   (* Avr.pin_mode PIN9 OUTPUT; *)
   (* Avr.pin_mode PIN10 OUTPUT; *)

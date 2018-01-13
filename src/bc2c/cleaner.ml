@@ -220,5 +220,6 @@ let clean prims globals code =
   let sharer = Sharer.create () in
   let globals = Array.map (remap_value code_mapper sharer) globals in
   let stack = List.map (remap_value code_mapper sharer) stack in
+  let accu = remap_value code_mapper sharer accu in
 
   accu, stack, globals, code

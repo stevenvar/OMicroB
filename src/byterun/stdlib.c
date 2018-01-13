@@ -26,11 +26,11 @@ val_t array_length(val_t a) {
 /* Arduino specific libraries */
 
 #ifdef __AVR__
+/*
 val_t caml_pin_mode(val_t pin, val_t mode) {
   pinMode(Int_val(pin), Int_val(mode));
   return Val_unit;
 }
-#endif
 
 val_t caml_digital_write(val_t pin, val_t state) {
   digitalWrite(Int_val(pin), Int_val(state));
@@ -49,6 +49,8 @@ val_t caml_delay(val_t millis) {
 val_t ocaml_arduino_millis(val_t k){
   return Val_int(millis());
 }
+*/
+#endif
 
 /******************************************************************************/
 /* Arduboy specific libraries */
@@ -128,7 +130,8 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #else /* __AVR__ */
 
-
+#ifndef __PC__
+ 
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");
   return Val_unit;
@@ -190,6 +193,8 @@ val_t ocaml_arduboy_clear(val_t unit){
   printf("clear()");
   return Val_unit;
 }
+
+#endif /* __PC__ */
 
 #endif /* __AVR__ */
 
