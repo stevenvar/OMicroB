@@ -1,7 +1,9 @@
 /* Entry point including the whole runtime */
 
 #include "values.h"
+#ifdef DEBUG
 #include "debug.c"
+#endif
 #include "prims.c"
 #include "interp.c"
 #include "stdlib.c"
@@ -12,7 +14,7 @@
 /******************************************************************************/
 // GC dummy implementation, remove me later
 
-#include "debug.h"
+/* #include "debug.h" */
 
 //val_t heap_ptr;
 //val_t heap_end;

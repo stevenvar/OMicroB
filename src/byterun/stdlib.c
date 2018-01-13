@@ -1,12 +1,15 @@
 /* Binding to arduino libraries */
 
-#ifdef __AVR__
-#include <Arduino.h>
-#include "values.h"
-#include "debug.h"
+#ifdef  __AVR__
+#include "avr.h"
+#include "avrlib.c"
+#elif defined(__PC__)
+#include "pclib.c"
 #else
 #include "simul.h"
+#include "pclib.c"
 #endif
+<<<<<<< HEAD
 
 val_t array_get(val_t a, val_t i) {
   return Val_unit;
@@ -190,3 +193,5 @@ val_t ocaml_arduboy_clear(val_t unit){
 #endif /* __AVR__ */
 
 /******************************************************************************/
+=======
+>>>>>>> 7744b557ee018afae58de4af2a23ecd3d03c43c9

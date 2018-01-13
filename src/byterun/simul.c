@@ -1,6 +1,12 @@
 /* Implementation of Arduino primitives for simulation purpose on a computer */
 
-#ifndef __AVR__
+#ifdef __AVR__
+
+#else
+
+#ifdef __PC__
+#include <stdio.h>
+#else
 
 /******************************************************************************/
 
@@ -40,6 +46,19 @@ int millis(void) {
   return ru.ru_utime.tv_sec * 1000 + ru.ru_utime.tv_usec;
 }
 
+val_t caml_write_reg (val_t pin,val_t v){
+  return 0;
+}
+
+val_t caml_set_bit(val_t pin){
+  return 0;
+}
+
+val_t caml_clear_bit(val_t pin){
+  return 0;
+}
+
 /******************************************************************************/
 
+#endif
 #endif

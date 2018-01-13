@@ -1,6 +1,6 @@
 #include "debug.h"
 
-#ifndef __AVR__
+#if !defined(__AVR__) && !defined(__PC__)
 
 #include <stdio.h>
 #include "simul.h"
@@ -17,10 +17,12 @@ void debug_blink(int led, int n) {
 
 #else
 
+#ifdef __AVR__
+
 #include <Arduino.h>
 
 void debug_init(void) {
-  Serial.begin(9600);
+  Serial.begin(57600);
 }
 
 void debug(int n) {
@@ -58,5 +60,20 @@ void assert_failure(void) {
     delay(1000);
   }
 }
+
+#endif
+
+#ifdef __PIC__
+
+void debug_init(void) {}
+
+void debug(int n) {
+  printf("debug(%d)\n", n);
+}
+
+void debug_blink(int led, int n) {
+  printf("debug_blink(%d, %d)\n", led, n);
+}
+#endif
 
 #endif
