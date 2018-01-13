@@ -1,8 +1,8 @@
 
-let _ = Avr.set_bit SPCR MSTR
+(* let _ = Avr.set_bit SPCR SPE *)
 
 let moins a b c =
-  Avr.write_register PORTD a;
+  Avr.write_register PORTD 99;
   a - b - c
 
 let begin_spi ~ss ~sck ~mosi =
@@ -18,9 +18,8 @@ let _ =
   let x =moins 3 2 1 in
   (* Avr.write_register PORTD x; *)
   Spi.begin_spi ~ss:PIN17 ~sck:PIN15 ~mosi:PIN16;
-  Oled.boot_oled ();
+  Oled.boot();
   (* Avr.write_register DDRB 0xFF; (\* output *\) *)
-  (* Avr.port_mode PORTB OUTPUT; *)
   (* Avr.pin_mode PIN9 OUTPUT; *)
   (* Avr.pin_mode PIN10 OUTPUT; *)
   (* Avr.pin_mode PIN11 OUTPUT; *)
