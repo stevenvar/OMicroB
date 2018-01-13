@@ -8,6 +8,18 @@
 #include "simul.h"
 #endif
 
+val_t array_get(val_t a, val_t i) {
+  return Val_unit;
+}
+
+val_t array_set(val_t a, val_t i, val_t v) {
+  return Val_unit;
+}
+
+val_t array_length(val_t a) {
+  return Val_unit;
+}
+
 /******************************************************************************/
 /* Arduino specific libraries */
 
