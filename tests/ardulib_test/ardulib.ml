@@ -15,7 +15,7 @@ let begin_spi ~ss ~sck ~mosi =
 
 
 let () =
-  let x = moins 3 2 1 in
+  let _x = moins 3 2 1 in
   (* Avr.write_register PORTD x; *)
   Spi.begin_spi ~ss:PIN17 ~sck:PIN15 ~mosi:PIN16;
   (*Oled.boot();*)

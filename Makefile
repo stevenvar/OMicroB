@@ -58,7 +58,6 @@ tests: all
 
 clean:
 	@rm -f *~ */*~ */*/*~ */*/*/*~
-	# $(call clean, tests)
 	$(call clean, src/bc2c)
 	$(call clean, src/byterun)
 	$(call clean, src/omicrob)

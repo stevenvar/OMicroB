@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
 #include "values.h"
 #include "stop-and-copy.h"
-#include <stdio.h>
 
 extern val_t acc;
 extern val_t *sp;
@@ -77,12 +78,6 @@ void gc_init(int32_t heap_size) {
   current_heap = 0;
 }
 
-val_t Alloc_small_f (mlsize_t wosize, tag_t tag) {
-  val_t result;
-  Alloc_small(result, wosize, tag);
-  return result;
-}
-
 #if defined(DEBUG)
 
 int cpt_gc = 0;
@@ -140,16 +135,16 @@ void print_heap(){
       printf("======================================================\n");
     }
     if (Is_int(*ptr)){
-      printf("%d  @%p : 0x%08x (int = %d / float = %f)",i, ptr,*ptr, Int_val(*ptr),f);
+      printf("%d  @%p : 0x%08x (int = %d / float = %f)", i, ptr, *ptr, Int_val(*ptr), f);
     }
     else if (Is_block(*ptr)){
-      printf("%d  @%p : %p / @(%p)",i, ptr, *ptr,Block_val(*ptr));
+      printf("%d  @%p : 0x%08x / @(%p)",i, ptr, *ptr, Block_val(*ptr));
     }
     else if (*ptr == 0){
       printf("%d  @%p : _",i, ptr);
     }
     else{
-      printf("%d  @%p : 0x%08x (maybe %f)",i, ptr, *ptr,f);
+      printf("%d  @%p : 0x%08x (maybe %f)",i, ptr, *ptr, f);
     }
     printf("\n");
     i++;
@@ -170,10 +165,6 @@ void gc_one_val(val_t* ptr, int update) {
   tag_t tag;
   mlsize_t sz;
   int todo = 0;
-
-#ifdef DEBUG
-  DEBUGassert(heap_ptr -1 == heap_todo);
-#endif
 
  start:
   val = *ptr;
@@ -245,7 +236,6 @@ void gc_one_val(val_t* ptr, int update) {
  */
 
 void gc(mlsize_t size) {
-#ifndef NOGC
 #ifdef DEBUG
   cpt_gc++;
   #ifdef __PC__
@@ -295,5 +285,4 @@ void gc(mlsize_t size) {
 #endif
     exit(200);
   }
-#endif
 }

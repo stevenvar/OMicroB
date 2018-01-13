@@ -203,9 +203,6 @@ let export arch codemap accu stack data =
       ptr
 
   and export_closure { ofs; ptrs; env } =
-    Printf.printf "export_closure(ofs = %d)\n%!" ofs;
-    Array.iteri (fun i ptr -> Printf.printf "ptrs[%d] = %d (%d)\n%!" i ptr codemap.(ptr)) ptrs;
-    Printf.printf "%s\n" (Printexc.raw_backtrace_to_string (Printexc.get_callstack 1000));
     assert (Array.length ptrs > 0 && ofs < Array.length ptrs);
     match Sharer.find_closure sharer ptrs env with
     | POINTER ptr -> POINTER (ptr + 2 * ofs)

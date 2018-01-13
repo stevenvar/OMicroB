@@ -65,6 +65,8 @@ void assert_failure(void) {
 
 #ifdef __PC__
 
+#include <stdio.h>
+
 void debug_init(void) {}
 
 void debug(int n) {

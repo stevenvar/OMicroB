@@ -214,7 +214,7 @@ void print_global(){
   printf("GLOBAL DATA : \n");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     if (Is_block(ocaml_global_data[i])){
-      printf("@%p : (%d) - 0x%04x -> pointer to 0x%08x\n",ocaml_global_data, i, ocaml_global_data[i], Block_val(ocaml_global_data[i]));
+      printf("@%p : (%d) - 0x%04x -> pointer to %p\n",ocaml_global_data, i, ocaml_global_data[i], Block_val(ocaml_global_data[i]));
     }
     else
       printf("@%p (%d) - 0x%04x -> int / float %d\n",ocaml_global_data+i, i, ocaml_global_data[i], Int_val(ocaml_global_data[i]));
@@ -232,10 +232,10 @@ void print_stack(){
     float f = *(float *)&sp[i];
     printf("@%p ", &sp[i]);
     if (Is_int(sp[i])){
-      printf("(%d) : %04x -> %d or %f \n", i, sp[i], Int_val(sp[i]),f);
+      printf("(%d) : %04x -> %d or %f \n", i, sp[i], Int_val(sp[i]), f);
     }
     else if (Is_block(sp[i])){
-      printf("(%d) : %p -> pointer to %p or %f \n", i, sp[i],Block_val(sp[i]),f);
+      printf("(%d) : 0x%X -> pointer to %p or %f \n", i, sp[i], Block_val(sp[i]), f);
     }
     else
       printf("(%d) : ? 0x%04x -> %f) \n", i, sp[i],f);
@@ -298,11 +298,11 @@ val_t interp(void) {
     print_stack();
     float f = *(float *)&acc;
     if (Is_int(acc)) {
-      printf("acc = %p - %d or %f \n", acc, Int_val(acc), f);
+      printf("acc = 0x%X - %d or %f \n", acc, Int_val(acc), f);
     } else {
-      printf("acc = %p -> points to 0x%08x or %f \n", acc, Block_val(acc),f);
+      printf("acc = 0x%X -> points to %p or %f \n", acc, Block_val(acc), f);
     }
-    printf("env = @(0x%08x) \n", Block_val(env));
+    printf("env = @(%p) \n", Block_val(env));
     printf("pc = %d\n", pc-1);
     printf("extra_args=%d \n",extra_args);
 #endif
@@ -863,7 +863,7 @@ val_t interp(void) {
       if (extra_args >= n){
         extra_args -= n;
       } else {
-	Alloc_small(acc, extra_args + 3, Closure_tag);
+	OCamlAlloc(acc, extra_args + 3, Closure_tag);
         Field(acc, 1) = env;
         Code_val(acc) = Val_codeptr(pc - 3);
         for (i = 0 ; i < n; i ++) {
@@ -888,7 +888,7 @@ val_t interp(void) {
       if (n != 0){
         push(acc);
       }
-      Alloc_small(acc, n + 1, Closure_tag);
+      OCamlAlloc(acc, n + 1, Closure_tag);
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -908,7 +908,7 @@ val_t interp(void) {
       if (n != 0){
         push(acc);
       }
-      Alloc_small(acc, n + 1, Closure_tag);
+      OCamlAlloc(acc, n + 1, Closure_tag);
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -928,7 +928,7 @@ val_t interp(void) {
       if (n != 0){
         push(acc);
       }
-      Alloc_small(acc, n + 1, Closure_tag);
+      OCamlAlloc(acc, n + 1, Closure_tag);
       Code_val(acc) = Val_int(ptr);
       for (i = 0; i < n; i ++){
         Field(acc, i + 1) = pop();
@@ -955,7 +955,7 @@ val_t interp(void) {
         push(acc);
       }
       /* Alloc a closure of size blksize */
-      Alloc_small(acc, blksize, Closure_tag);
+      OCamlAlloc(acc, blksize, Closure_tag);
       /* The acc contains the offset */
       Field(acc, 0) = Val_codeptr(o);
 
@@ -988,7 +988,7 @@ val_t interp(void) {
       if (v > 0) {
         push(acc);
       }
-      Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
+      OCamlAlloc(acc, 2 * f - 1 + v, Closure_tag);
       Field(acc, 0) = Val_codeptr(o);
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
@@ -1023,7 +1023,7 @@ val_t interp(void) {
       if (v > 0) {
         push(acc);
       }
-      Alloc_small(acc, 2 * f - 1 + v, Closure_tag);
+      OCamlAlloc(acc, 2 * f - 1 + v, Closure_tag);
       Field(acc, 0) = o;
       for (i = 1; i < f; i ++) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
@@ -1293,7 +1293,7 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       uint8_t size = read_uint8();
       val_t block;
-      Alloc_small(block, size, tag);
+      OCamlAlloc(block, size, tag);
       Field(block, 0) = acc;
       for (uint8_t i = 1; i < size; i ++) Field(block, i) = pop();
       acc = block;
@@ -1309,7 +1309,7 @@ val_t interp(void) {
       tag_t tag = read_uint8();
       uint16_t size = read_uint16();
       val_t block;
-      Alloc_small(block, size, tag);
+      OCamlAlloc(block, size, tag);
       Field(block, 0) = acc;
       for (uint16_t i = 1; i < size; i ++) Field(block, i) = pop();
       acc = block;
@@ -1324,7 +1324,7 @@ val_t interp(void) {
 #endif
       tag_t tag = read_uint8();
       val_t block;
-      Alloc_small(block, 1, tag);
+      OCamlAlloc(block, 1, tag);
       Field(block, 0) = acc;
       acc = block;
       break;
@@ -1338,7 +1338,7 @@ val_t interp(void) {
 #endif
       tag_t tag = read_uint8();
       val_t block;
-      Alloc_small(block, 2, tag);
+      OCamlAlloc(block, 2, tag);
       Field(block, 0) = acc;
       Field(block, 1) = pop();
       acc = block;
@@ -1353,7 +1353,7 @@ val_t interp(void) {
 #endif
       tag_t tag = read_uint8();
       val_t block;
-      Alloc_small(block, 3, tag);
+      OCamlAlloc(block, 3, tag);
       Field(block, 0) = acc;
       Field(block, 1) = pop();
       Field(block, 2) = pop();

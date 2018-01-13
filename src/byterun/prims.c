@@ -258,7 +258,7 @@ val_t caml_string_notequal(val_t s1, val_t s2)
   val_t result;
   mlsize_t i;
 
-  Alloc_small(result,wosize,tag);
+  OCamlAlloc(result,wosize,tag);
   if (tag < No_scan_tag){
     for (i = 0; i < wosize; i++) Field (result, i) = Val_unit;
   }
@@ -312,11 +312,10 @@ val_t caml_obj_dup(val_t arg)
     return arg;
   tg = Tag_val(arg);
   if (tg >= No_scan_tag) {
-    Alloc_small(res,sz,tg);
-/* not sure ..  */
-    memcpy((char *)res, (char *)arg, sz * sizeof(val_t));
+    OCamlAlloc(res, sz, tg);
+    memcpy((char *) Block_val(res), (char *) Block_val(arg), sz * sizeof(val_t));
   } else {
-    Alloc_small(res,sz,tg);
+    OCamlAlloc(res,sz,tg);
     for (i = 0; i < sz; i++)
       Field(res, i) = Field(arg, i);
   }
