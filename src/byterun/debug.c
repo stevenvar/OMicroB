@@ -62,4 +62,18 @@ void assert_failure(void) {
 }
 
 #endif
+
+#ifdef __PIC__
+
+void debug_init(void) {}
+
+void debug(int n) {
+  printf("debug(%d)\n", n);
+}
+
+void debug_blink(int led, int n) {
+  printf("debug_blink(%d, %d)\n", led, n);
+}
+#endif
+
 #endif

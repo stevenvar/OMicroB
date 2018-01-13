@@ -6,6 +6,10 @@
 #include "values.h"
 #include "gc.h"
 
+#ifdef __PC__
+#include <stdlib.h>
+#endif
+
 /******************************************************************************/
 
 /* Registers for the abstract machine:
@@ -290,7 +294,7 @@ val_t interp(void) {
 #ifdef __PC__
     printf("=========\n");
     /* print_global(); */
-    /* print_heap(); */
+    print_heap();
     print_stack();
     float f = *(float *)&acc;
     if (Is_int(acc)) {

@@ -14,12 +14,22 @@ val_t caml_pin_mode(val_t pin, val_t mode) {
   return Val_unit;
 }
 
-val_t caml_avr_port_mode(val_t port, val_t mode){
-  portMode(Int_val(port),Int_val(mode));
+val_t caml_avr_digital_write(val_t pin, val_t val){
+  digitalWrite(Int_val(pin),Int_val(val));
   return Val_unit;
 }
 
-val_t caml_avr_digital_write(val_t port, val_t mode){
-  
+val_t caml_avr_clear_bit(val_t reg, val_t bit){
+  clearBit(Int_val(reg),Int_val(bit));
+  return Val_unit;
+}
+
+val_t caml_avr_read_bit(val_t reg, val_t bit){
+  readBit(Int_val(reg),Int_val(bit));
+  return Val_unit;
+}
+
+val_t caml_avr_read_register(val_t reg){
+  readRegister(Int_val(reg));
   return Val_unit;
 }

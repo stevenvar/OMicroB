@@ -1,5 +1,7 @@
 open Avr
 
+type direction = LSB_first | MSB_first
+
 (* Initialise SPI connection *)
 let begin_spi ~ss ~sck ~mosi =
   (* digital_write ss High; *)

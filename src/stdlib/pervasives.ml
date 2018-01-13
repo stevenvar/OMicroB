@@ -13,13 +13,26 @@ type mode =
 
 external force_gc : unit -> unit = "caml_force_gc"
 
-(* Boolean operations *)
+(* Boolean operators *)
 
 external not : bool -> bool = "%boolnot"
 external ( & ) : bool -> bool -> bool = "%sequand"
 external ( && ) : bool -> bool -> bool = "%sequand"
 external ( or ) : bool -> bool -> bool = "%sequor"
 external ( || ) : bool -> bool -> bool = "%sequor"
+
+(* Bitwise operators *)
+
+external ( land ) : int -> int -> int = "%andint"
+external ( lor ) : int -> int -> int = "%orint"
+external ( lxor ) : int -> int -> int = "%xorint"
+
+let lnot x = x lxor (-1)
+                    
+external ( lsl ) : int -> int -> int = "%lslint"
+external ( lsr ) : int -> int -> int = "%lsrint"
+external ( asr ) : int -> int -> int = "%asrint"
+
 
 (* Arithmetics *)
 

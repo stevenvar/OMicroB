@@ -23,7 +23,7 @@ let print_codegen_word_array oc ty name size data =
     match word with
     | SBYTE byte ->
       assert (byte >= -0x80 && byte < 0x80);
-      string_of_int byte;
+      "(opcode_t)"^string_of_int byte;
     | UBYTE byte ->
       assert (byte >= 0 && byte < 0x100);
       string_of_int byte;
