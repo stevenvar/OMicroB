@@ -5,6 +5,7 @@ open! Analyser
 
 let stack_size = ref 128
 let heap_size = ref 1024
+let gc = ref "MAC"
 let arch = ref Arch.A32
 let output_path = ref None
 let local = ref false
@@ -22,6 +23,8 @@ let spec = [
    Printf.sprintf "<word-nb> Set stack size (default: %d)" !stack_size);
   ("-heap-size", Arg.Set_int heap_size,
    Printf.sprintf "<word-nb> Set heap size (default: %d)" !heap_size);
+  ("-gc", Arg.Set_string gc,
+   Printf.sprintf "<gc-algo> Set garbage collector algorithm to SAC (for Stop&Copy) or MAC (for Mark&Compact) (default: %s)" !gc);
   ("-arch", Arg.Int (fun n -> arch := Arch.of_int n),
    Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %s bits)" (Arch.to_string !arch));
   ("-debug", Arg.Set debug,
@@ -110,6 +113,12 @@ let () =
   if heap_size <= 0 then usage_error (Printf.sprintf "invalid heap size: %d" heap_size);
   if stack_size <= 0 then usage_error (Printf.sprintf "invalid stack size: %d" stack_size)
 
+let gc =
+  match String.uppercase_ascii !gc with
+  | "SC" | "SAC" | "STOP_AND_COPY" | "STOP&COPY" -> `SAC
+  | "MC" | "MAC" | "MARK_AND_COMPACT" | "MARK&COMPACT" -> `MAC
+  | str -> usage_error (Printf.sprintf "invalid gc algorithm: %S" str)
+    
 let byterun_dir =
   if local then [ Config.builddir; "src"; "byterun" ] else [ Config.libdir ]
 
@@ -136,14 +145,15 @@ let () =
       if List.length heapdata > heap_size then (
         error (Printf.sprintf "too huge global data (%d words) for the defined heap size (%d words), out of memory before start" (List.length heapdata) heap_size);
       );
-      Printf.fprintf oc "#define OCAML_STACK_WOSIZE         %6d\n" stack_size;
-      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE          %6d\n" heap_size;
-      Printf.fprintf oc "#define OCAML_HEAP_INITIAL_WOSIZE  %6d\n" (List.length heapdata);
-      Printf.fprintf oc "#define OCAML_STACK_INITIAL_WOSIZE %6d\n" (List.length stack);
-      Printf.fprintf oc "#define OCAML_GLOBDATA_NUMBER      %6d\n" (List.length globdata);
-      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE       %6d\n" (List.length bytecode);
-      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER     %6d\n" (Array.length bytefile.Bytefile.prim);
-      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH         %6s\n" (Arch.to_string arch);
+      Printf.fprintf oc "#define OCAML_STACK_WOSIZE         %8d\n" stack_size;
+      Printf.fprintf oc "#define OCAML_HEAP_WOSIZE          %8d\n" heap_size;
+      Printf.fprintf oc "#define OCAML_HEAP_INITIAL_WOSIZE  %8d\n" (List.length heapdata);
+      Printf.fprintf oc "#define OCAML_STACK_INITIAL_WOSIZE %8d\n" (List.length stack);
+      Printf.fprintf oc "#define OCAML_GLOBDATA_NUMBER      %8d\n" (List.length globdata);
+      Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE       %8d\n" (List.length bytecode);
+      Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER     %8d\n" (Array.length bytefile.Bytefile.prim);
+      Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH         %8s\n" (Arch.to_string arch);
+      Printf.fprintf oc "#define OCAML_GC_ALGORITHM %16s\n" (match gc with `SAC -> "STOP_AND_COPY" | `MAC -> "MARK_AND_COMPACT");
       if debug then Printf.fprintf oc "#define OCAML_DEBUG_MODE\n";
       Printf.fprintf oc "\n";
       Printf.fprintf oc "#include <%s>\n" values_h;
