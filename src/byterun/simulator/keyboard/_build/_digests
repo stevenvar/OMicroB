@@ -1,0 +1,5 @@
+"Rule: ocaml: ml & cmi -> cmx & o (%=main )": "c\166\164\223\176\237\147\211\t\015)\201\135Ye\196"
+"Rule: ocaml: ml -> cmo & cmi (%=main )": "\160\177Ken\181Lk\239\198\245\190P\141\200*"
+"Rule: ocaml dependencies ml (%=main )": "\188!\002m\214N\152\135\026\215>\248\021\200\179\149"
+"Rule: ocaml: cmx* & o* -> native (%=main )": "\232aI\157\029\133\233\247y\154\"\018\b\1564%"
+"Resource: /Users/travail/github/ocapic/src/simulator/keyboard/main.ml": "\220\194\171+v\147\180\024\144\186\247)\181m\184\006"

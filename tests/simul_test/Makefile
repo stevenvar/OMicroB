@@ -41,6 +41,9 @@ ardulib.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*
 ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
+simul : ardulib.byte
+	./ardulib.byte ../../bin/ocapic_dip40_simulator
+
 flash: ardulib.avr
 	stty -f $(ATTY) 1200
 	sleep 3

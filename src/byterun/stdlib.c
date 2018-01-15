@@ -7,7 +7,35 @@
 #include "pclib.c"
 #else
 #include "simul.h"
-#include "pclib.c"
+
+#include "simulator/simu.h"
+
+val_t caml_avr_set_bit(val_t reg, val_t bit){
+  avr_set_bit(Int_val(reg),Int_val(bit));
+  return Val_unit;
+}
+
+val_t caml_avr_clear_bit(val_t reg, val_t bit){
+  return Val_unit;
+}
+
+val_t caml_avr_read_bit(val_t reg, val_t bit){
+  return Val_unit;
+}
+
+val_t caml_avr_read_register(val_t reg){
+  return Val_unit;
+}
+
+val_t caml_avr_write_register(val_t reg, val_t val){
+  return Val_unit;
+}
+
+val_t caml_pin_mode(val_t reg){
+  return Val_unit;
+}
+
+
 #endif
 
 val_t array_get(val_t a, val_t i) {
@@ -131,6 +159,9 @@ val_t ocaml_arduboy_clear(val_t unit){
 #else /* __AVR__ */
 
 #ifndef __PC__
+
+#include "simulator/simu.c"
+
  
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");
