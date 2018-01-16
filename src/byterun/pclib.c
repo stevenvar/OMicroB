@@ -42,7 +42,7 @@ val_t caml_avr_set_bit(val_t reg, val_t bit){
   return Val_unit;
 }
 
-val_t caml_pin_mode(val_t pin, val_t mode) {
+val_t caml_avr_pin_mode(val_t pin, val_t mode) {
   printf("caml_pin_mode(%d,%d)\n",Int_val(pin),Int_val(mode));
   return Val_unit;
 }

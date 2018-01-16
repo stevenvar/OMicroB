@@ -3,7 +3,7 @@ include ../../etc/Makefile.conf
 TARGETS := $(LIB)/libcamlrun.a
 
 simulator/%.o : simulator/%.c
-	$(MAKE) -C simulator	
+	$(MAKE) -C simulator
 
 byterun: simulator/simu.o $(TARGETS)
 

@@ -65,7 +65,7 @@ for i = 0 to 19 do
   let x1 = (62 + (254 * i) / 10) in
   let x2 = (62 + (254 * i) / 10) in
   let y1 = 38 in
-  let y2 = 560 in
+  let y2 = 570 in
   draw_rect x1 y1 12 12;
   draw_rect x2 y2 12 12;
   pins.(i) <- (x1, y1);

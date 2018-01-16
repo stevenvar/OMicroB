@@ -1,13 +1,3 @@
-/*************************************************************************/
-/*                                                                       */
-/*                                OCaPIC                                 */
-/*                                                                       */
-/*                             Benoit Vaugon                             */
-/*                                                                       */
-/*    This file is distributed under the terms of the CeCILL license.    */
-/*    See file ../../LICENSE-en.                                         */
-/*                                                                       */
-/*************************************************************************/
 
 #include <caml/mlvalues.h>
 #include <sys/time.h>
@@ -17,22 +7,50 @@
 #include "simu.h"
 
 #define NB_REG 255
-#define NB_PORT 5
+#define NB_PORT 6
 #define LOWER_PORT 0x0
 #define HIGHER_PORT (LOWER_PORT + NB_PORT - 1)
 #define LOWER_DDR (HIGHER_PORT + 1)
-#define HIGHER_DDR (LOWER_DDR + NB_PORT -1)
+#define HIGHER_DDR (LOWER_DDR + NB_PORT - 1)
 #define LOWER_PIN (HIGHER_DDR + 1)
 #define HIGHER_PIN (LOWER_PIN + NB_PORT - 1)
-#define LOWER_LAT 0x9
-#define HIGHER_LAT (LOWER_LAT + NB_PORT - 1)
-#define LOWER_TRIS 0x12
-#define HIGHER_TRIS (LOWER_TRIS + NB_PORT - 1)
-#define ADCON0 0x42
-#define ADCON1 0x41
-#define ADCON2 0x40
-#define ADRESL 0x43
-#define ADRESH 0x44
+
+#define PORTB 1
+#define PORTC 2
+#define PORTD 3
+#define PORTE 4
+#define PORTF 5
+
+#define DDRB 7
+#define DDRC 8
+#define DDRD 9
+#define DDRE 10
+#define DDRF 11
+
+/* repr =
+   NOT_A_PORT,
+   PORTB,
+   PORTC,
+   PORTD,
+   PORTE,
+   PORTF,
+   NOT_A_PORT,
+   DDRB,
+   DDRC,
+   DDRD,
+   DDRE,
+   DDRF,
+   NOT_A_PORT,
+   PINB,
+   PINC,
+   PIND,
+   PINE,
+   PINF,
+   SPCR,
+   SPSR,
+   SPDR
+*/
+
 
 static unsigned char *regs;
 static unsigned int *analogs;
@@ -42,6 +60,13 @@ static int sem_sync;
 static int sem_done;
 static int nb_proc;
 static int is_slow;
+
+#define INPUT 0x0
+#define OUTPUT 0x1
+
+/* On AVR : PORT = output / PIN = intput / DDR = data direction */
+
+/* and output = 1 / input = 0 */
 
 
 void init_regs(int n, int slow){
@@ -56,23 +81,6 @@ void init_regs(int n, int slow){
   sem_done = create_sem(0);
   nb_proc = n;
   for(i = 0 ; i < NB_REG ; i ++) regs[i] = 0x00;
-  /* regs[0x71] = 0xFF; // INTCON2 */
-  /* regs[0x70] = 0xC0; // INTCON3 */
-  /* regs[0x55] = 0xFF; // T0CON */
-  /* regs[0x53] = 0x40; // OSCCON */
-  /* regs[0x52] = 0x05; // HLVDCON */
-  /* regs[0x50] = 0x1C; // RCON */
-  /* regs[0x4B] = 0xFF; // PR2 */
-  /* regs[0x38] = 0x40; // BAUDCON */
-  /* regs[0x34] = 0x07; // CMCON */
-  /* regs[0x2C] = 0x02; // TXSTA */
-  /* regs[0x22] = 0xFF; // IPR2 */
-  /* regs[0x1F] = 0xFF; // IPR1 */
-  /* regs[0x16] = 0x0F; // TRISE */
-  /* regs[0x15] = 0xFF; // TRISD */
-  /* regs[0x14] = 0xFF; // TRISC */
-  /* regs[0x13] = 0xFF; // TRISB */
-  /* regs[0x12] = 0xFF; // TRISA */
 }
 
 void destroy_regs(void){
@@ -146,26 +154,27 @@ static void send_write_port(int port, unsigned char val){
   send_write('W', port, val);
 }
 
-static void send_write_tris(int tris, unsigned char val){
-  send_write('T', tris - LOWER_TRIS, val);
+static void send_write_ddr(int ddr, unsigned char val){
+  send_write('T', ddr - LOWER_DDR, val);
 }
 
-static void send_config_analogs(void){
-  static unsigned int old_analog_nb = 0xFFFF;
-  unsigned int analog_nb = 0;
-  if((regs[ADCON0] & 1) != 0){
-    analog_nb = 0xF - (regs[ADCON1] & 0xF);
-    if (analog_nb > 13) analog_nb = 13;
-  }
-  if (old_analog_nb != analog_nb) {
-    char buf[3];
-    old_analog_nb = analog_nb;
-    buf[0] = 'C';
-    buf[1] = hexchar_of_int(analog_nb);
-    buf[2] = '\n';
-    send_all_proc(buf, 3);
-  }
-}
+
+/* static void send_config_analogs(void){ */
+  /* static unsigned int old_analog_nb = 0xFFFF; */
+  /* unsigned int analog_nb = 0; */
+  /* if((regs[ADCON0] & 1) != 0){ */
+  /*   analog_nb = 0xF - (regs[ADCON1] & 0xF); */
+  /*   if (analog_nb > 13) analog_nb = 13; */
+  /* } */
+  /* if (old_analog_nb != analog_nb) { */
+  /*   char buf[3]; */
+  /*   old_analog_nb = analog_nb; */
+  /*   buf[0] = 'C'; */
+  /*   buf[1] = hexchar_of_int(analog_nb); */
+  /*   buf[2] = '\n'; */
+  /*   send_all_proc(buf, 3); */
+  /* } */
+/* } */
 
 static void send_set_analog(unsigned int chan, unsigned int val){
   char buf[6];
@@ -180,297 +189,6 @@ static void send_set_analog(unsigned int chan, unsigned int val){
 
 /**************/
 
-static void pic_write_reg_gen(int reg, unsigned char new_val){
-  unsigned char old_val = regs[reg];
-  if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
-    int lat = reg - LOWER_PORT + LOWER_LAT;
-    regs[lat] = new_val;
-    if(old_val != new_val){
-      int tris = reg - LOWER_PORT + LOWER_TRIS;
-      unsigned char tris_val = regs[tris];
-      if(tris_val == 0xFF){
-        char port_c = 'A' + reg - LOWER_PORT;
-        fprintf(stderr, "Warning: the pic writes PORT%c when TRIS%c=0xFF\n",
-                port_c, port_c);
-      }else{
-        int bit;
-        unsigned char new_port_val = old_val;
-        for(bit = 0 ; bit < 8 ; bit ++){
-          unsigned char mask = 1 << bit;
-          if(!(tris_val & mask)){
-            if(new_val & mask)
-              new_port_val |= mask;
-            else
-              new_port_val &= ~mask;
-          }
-        }
-        if(new_port_val != old_val){
-          regs[reg] = new_port_val;
-          send_write_port(reg, new_port_val);
-        }
-      }
-    }
-  }else if(reg >= LOWER_LAT && reg <= HIGHER_LAT){
-    if(old_val != new_val){
-      int bit;
-      int port = reg - LOWER_LAT + LOWER_PORT;
-      int tris = reg - LOWER_LAT + LOWER_TRIS;
-      unsigned char old_port_val = regs[port];
-      unsigned char new_port_val = old_port_val;
-      unsigned char tris_val = regs[tris];
-      for(bit = 0 ; bit < 8 ; bit ++){
-        unsigned char mask = 1 << bit;
-        if(!(tris_val & mask)){
-          if(new_val & mask)
-            new_port_val |= mask;
-          else
-            new_port_val &= ~mask;
-        }
-      }
-      if(old_port_val != new_port_val){
-        regs[port] = new_port_val;
-        send_write_port(port, new_port_val);
-      }
-      regs[reg] = new_val;
-    }
-  }else if(reg >= LOWER_TRIS && reg <= HIGHER_TRIS){
-    if(old_val != new_val){
-      int bit;
-      int port = reg - LOWER_TRIS + LOWER_PORT;
-      int lat = reg - LOWER_TRIS + LOWER_LAT;
-      unsigned char old_port_val = regs[port];
-      unsigned char new_port_val = old_port_val;
-      unsigned char lat_val = regs[lat];
-      for(bit = 0 ; bit < 8 ; bit ++){
-        unsigned char mask = 1 << bit;
-        if((old_val & mask) && !(new_val & mask)){
-          if(lat_val & mask)
-            new_port_val |= mask;
-          else
-            new_port_val &= ~mask;
-        }
-      }
-      if(old_port_val != new_port_val){
-        regs[port] = new_port_val;
-        send_write_port(port, new_port_val);
-      }
-      send_write_tris(reg, new_val);
-      regs[reg] = new_val;
-    }
-  }else if(reg == ADCON0){
-    unsigned int chan = (new_val >> 2) & 0xF;
-    regs[reg] = new_val;
-    send_config_analogs();
-    if((new_val & 0x3) != 0){
-      if(chan + (regs[ADCON1] & 0xF) >= 0xF || (regs[ADCON2] & (1 << 7)) == 0 || chan > 12)
-        fprintf(stderr, "Warning: invalid analog read (ADCON0=0x%02X, ADCON1=0x%02X, ADCON2=0x%02X)\n",
-                regs[ADCON0], regs[ADCON1], regs[ADCON2]);
-      regs[ADRESH] = analogs[chan] >> 8;
-      regs[ADRESL] = analogs[chan] & 0xFF;
-      regs[ADCON0] &= 0xFD;
-    }
-  }else if(reg == ADCON1 || reg == ADCON2){
-    regs[reg] = new_val;
-    send_config_analogs();
-  }else{
-    regs[reg] = new_val;
-  }
-  may_sleep();
-}
-
-/**************/
-
-void pic_write_reg(int reg, unsigned char new_val){
-  P(sem_regs);
-  pic_write_reg_gen(reg, new_val);
-  V(sem_regs);
-}
-
-void pic_clear_bit(int reg, int bit){
-  P(sem_regs);
-  {
-    unsigned char old_val = regs[reg];
-    unsigned char mask = 1 << bit;
-    unsigned char new_val = old_val & ~mask;
-    if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
-      int lat = reg - LOWER_PORT + LOWER_LAT;
-      regs[lat] &= ~mask;
-      if(old_val != new_val){
-        int tris = reg - LOWER_PORT + LOWER_TRIS;
-        unsigned char tris_val = regs[tris];
-        if(tris_val & mask){
-          char port_c = 'A' + reg - LOWER_PORT;
-          fprintf(stderr,
-                  "Warning: the pic clears PORT%c.R%c%d when TRIS%c=0x%02X\n",
-                  port_c, port_c, bit, port_c, tris_val);
-        }else{
-          regs[reg] = new_val;
-          send_write_port(reg, new_val);
-        }
-      }
-    }else if(reg >= LOWER_LAT && reg <= HIGHER_LAT){
-      if(old_val != new_val){
-        int port = reg - LOWER_LAT + LOWER_PORT;
-        int tris = reg - LOWER_LAT + LOWER_TRIS;
-        unsigned char tris_val = regs[tris];
-        regs[reg] = new_val;
-        if(!(tris_val & mask)){
-          int old_port_val = regs[port];
-          int new_port_val = old_port_val & ~mask;
-          if(old_port_val != new_port_val){
-            regs[port] = new_port_val;
-            send_write_port(port, new_port_val);
-          }
-        }
-      }
-    }else if(reg >= LOWER_TRIS && reg <= HIGHER_TRIS){
-      if(old_val != new_val){
-        int port = reg - LOWER_TRIS + LOWER_PORT;
-        int lat = reg - LOWER_TRIS + LOWER_LAT;
-        unsigned char port_val = regs[port];
-        unsigned char lat_val = regs[lat];
-        if((port_val & mask) != (lat_val & mask)){
-          if(lat_val & mask)
-            port_val |= mask;
-          else
-            port_val &= ~mask;
-          regs[port] = port_val;
-          send_write_port(port, port_val);
-        }
-        regs[reg] = new_val;
-        send_write_tris(reg, new_val);
-      }
-    }else if(reg == ADCON0 || reg == ADCON1 || reg == ADCON2){
-      regs[reg] = new_val;
-      send_config_analogs();
-    }else{
-      regs[reg] = new_val;
-    }
-  }
-  V(sem_regs);
-  may_sleep();
-}
-
-void avr_set_bit(int reg,int bit){
-  init_simulator();
-  
-  P(sem_regs);
-  unsigned char old_val = regs[reg];
-  unsigned char mask = 1 << bit;
-  unsigned char new_val = old_val | mask;
-  regs[reg] = new_val;
-  send_write_port(reg,new_val);
-  printf("set bit %d on reg %d \n", bit, reg);
-  V(sem_regs);
-}
-
-void pic_set_bit(int reg, int bit){
-  P(sem_regs);
-  {
-    unsigned char old_val = regs[reg];
-    unsigned char mask = 1 << bit;
-    unsigned char new_val = old_val | mask;
-    if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
-      int lat = reg - LOWER_PORT + LOWER_LAT;
-      regs[lat] |= mask;
-      if(old_val != new_val){
-        int tris = reg - LOWER_PORT + LOWER_TRIS;
-        unsigned char tris_val = regs[tris];
-        if(tris_val & mask){
-          char port_c = 'A' + reg - LOWER_PORT;
-          fprintf(stderr, "Warning: the pic sets PORT%c.R%c%d when TRIS%c=0x%02X\n",
-                  port_c, port_c, bit, port_c, tris_val);
-        }else{
-          regs[reg] = new_val;
-          send_write_port(reg, new_val);
-        }
-      }
-    }else if(reg >= LOWER_LAT && reg <= HIGHER_LAT){
-      if(old_val != new_val){
-        unsigned char mask = 1 << bit;
-        int port = reg - LOWER_LAT + LOWER_PORT;
-        int tris = reg - LOWER_LAT + LOWER_TRIS;
-        unsigned char tris_val = regs[tris];
-        regs[reg] = new_val;
-        if(!(tris_val & mask)){
-          int old_port_val = regs[port];
-          int new_port_val = old_port_val | mask;
-          if(old_port_val != new_port_val){
-            regs[port] = new_port_val;
-            send_write_port(port, new_port_val);
-          }
-        }
-      }
-    }else if(reg >= LOWER_TRIS && reg <= HIGHER_TRIS){
-      if(old_val != new_val){
-        regs[reg] = new_val;
-        send_write_tris(reg, new_val);
-      }
-    }else if(reg == ADCON0 && bit == 1){
-      unsigned int chan = (new_val >> 2) & 0xF;
-      regs[reg] = new_val;
-      send_config_analogs();
-      if((new_val & 0x1) != 0){
-        if(chan + (regs[ADCON1] & 0xF) >= 0xF || (regs[ADCON2] & (1 << 7)) == 0 || chan > 12)
-          fprintf(stderr, "Warning: invalid analog read (ADCON0=0x%02X, ADCON1=0x%02X, ADCON2=0x%02X)\n",
-                  regs[ADCON0], regs[ADCON1], regs[ADCON2]);
-        regs[ADRESH] = analogs[chan] >> 8;
-        regs[ADRESL] = analogs[chan] & 0xFF;
-        regs[ADCON0] &= 0xFD;
-      }
-    }else if(reg == ADCON0 || reg == ADCON1 || reg == ADCON2){
-      regs[reg] = new_val;
-      send_config_analogs();
-    }else{
-      regs[reg] = new_val;
-    }
-  }
-  V(sem_regs);
-  may_sleep();
-}
-
-/******************************/
-
-value caml_pic_write_reg(value vreg, value vval){
-  unsigned int reg = Long_val(vreg);
-  unsigned int val = Long_val(vval);
-  init_simulator();
-  pic_write_reg(reg, val);
-  return Val_unit;
-}
-
-value caml_pic_clear_bit(value vbit){
-  init_simulator();
-  P(sem_regs);
-  {
-    unsigned int reg = Long_val(vbit) & 0x7F;
-    unsigned int mask = Long_val(vbit) >> 7;
-    pic_write_reg_gen(reg, regs[reg] & ~mask);
-  }
-  V(sem_regs);
-  return Val_unit;
-}
-
-value caml_pic_set_bit(value vbit){
-  init_simulator();
-  P(sem_regs);
-  {
-    unsigned int reg = Long_val(vbit) & 0x7F;
-    unsigned int mask = Long_val(vbit) >> 7;
-    pic_write_reg_gen(reg, regs[reg] | mask);
-  }
-  V(sem_regs);
-  return Val_unit;
-}
-
-/******************************/
-
-static int is_reg_need_synchro(unsigned int reg){
-  return
-    (reg >= LOWER_PORT && reg <= HIGHER_PORT) ||
-    (reg >= LOWER_LAT  && reg <= HIGHER_LAT)  ||
-    (reg == ADCON0);
-}
 
 static void synchronize(){
   P(sem_sync);
@@ -481,20 +199,59 @@ static void synchronize(){
   may_sleep();
 }
 
-value caml_pic_read_reg(value reg){
-  unsigned int val;
-  init_simulator();
-  if (is_reg_need_synchro(Long_val(reg))) synchronize();
-  P(sem_regs);
-  val = regs[Long_val(reg)];
-  V(sem_regs);
-  may_sleep();
-  return Val_long(val);
+static int is_reg_need_synchro(unsigned int reg){
+  return
+    (reg >= LOWER_PORT && reg <= HIGHER_PORT);
 }
 
-value caml_pic_test_bit(value bit){
-  unsigned int reg = Long_val(bit) & 0x7F;
-  unsigned int mask = Long_val(bit) >> 7;
+static void avr_write_reg_gen(int reg, unsigned char new_val){
+  unsigned char old_val = regs[reg];
+  if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
+    if(old_val != new_val){
+      int ddr = reg - LOWER_PORT + LOWER_DDR;
+      unsigned char ddr_val = regs[ddr];
+      if(ddr_val == 0x00){
+        char port_c = 'A' + reg - LOWER_PORT;
+        fprintf(stderr, "Warning: the avr writes PORT%c when DDR%c=0xFF\n",
+                port_c, port_c);
+      }else{
+	regs[reg] = new_val;
+	send_write_port(reg, new_val);
+      }
+    }
+  }
+  else if(reg >= LOWER_DDR && reg <= HIGHER_DDR){
+    if(old_val != new_val){
+      send_write_ddr(reg, new_val);
+      regs[reg] = new_val;
+    }
+  }else{
+    regs[reg] = new_val;
+  }
+  may_sleep();
+}
+
+void avr_write_reg(int reg, unsigned char new_val){
+  init_simulator();
+  P(sem_regs);
+  avr_write_reg_gen(reg, new_val);
+  V(sem_regs);
+}
+
+unsigned int avr_read_reg(int reg){
+  unsigned int val;
+  init_simulator();
+  if (is_reg_need_synchro(reg)) synchronize();
+  P(sem_regs);
+  val = regs[reg];
+  V(sem_regs);
+  may_sleep();
+  return val;
+}
+
+
+unsigned int avr_test_bit(int reg, int bit){
+  unsigned int mask = 1 << bit;
   unsigned int val;
   init_simulator();
   if (is_reg_need_synchro(reg)) synchronize();
@@ -502,92 +259,171 @@ value caml_pic_test_bit(value bit){
   val = (regs[reg] & mask) != 0;
   V(sem_regs);
   may_sleep();
-  return Val_long(val);
+  return val;
+}
+
+void avr_clear_bit(int reg, int bit){
+    init_simulator();
+  P(sem_regs);
+  {
+    unsigned char old_val = regs[reg];
+    unsigned char mask = 1 << bit;
+    unsigned char new_val = old_val & ~mask;
+    if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
+      if(old_val != new_val){
+        int ddr = reg - LOWER_PORT + LOWER_DDR;
+        unsigned char ddr_val = regs[ddr];
+        if(!(ddr_val & mask)){
+          char port_c = 'A' + reg - LOWER_PORT;
+          fprintf(stderr,
+                  "Warning: the avr clears PORT%c.R%c%d when DDR%c=0x%02X\n",
+                  port_c, port_c, bit, port_c, ddr_val);
+        }else{
+          regs[reg] = new_val;
+          send_write_port(reg, new_val);
+        }
+      }
+    } else if(reg >= LOWER_DDR && reg <= HIGHER_DDR){
+      if(old_val != new_val){
+        regs[reg] = new_val;
+        send_write_ddr(reg, new_val);
+      }
+    }else{
+      regs[reg] = new_val;
+    }
+  }
+  V(sem_regs);
+  may_sleep();
+}
+
+
+void avr_set_bit(int reg,int bit){
+  init_simulator();
+  P(sem_regs);
+  unsigned char old_val = regs[reg];
+  unsigned char mask = 1 << bit;
+  unsigned char new_val = old_val | mask;
+  if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
+    if (old_val != new_val){
+      int ddr = reg - LOWER_PORT + LOWER_DDR;
+      unsigned char ddr_val = regs[ddr];
+      if(!(ddr_val & mask)){
+	char port_c = 'A' + reg - LOWER_PORT;
+	fprintf(stderr, "Warning: the avr sets PORT%c.R%c%d when DDR%c=0x%02X\n",
+		port_c, port_c, bit, port_c, ddr_val);
+      }
+      else {
+	regs[reg] = new_val;
+	send_write_port(reg,new_val);
+      }
+    }
+  }
+  else if (reg >= LOWER_DDR && reg <= HIGHER_DDR){
+    if(old_val != new_val){
+      regs[reg] = new_val;
+      send_write_ddr(reg,new_val);
+    }
+  }
+  else if (reg >= LOWER_PIN && reg <= HIGHER_PIN){
+    char port_c = 'A' + reg - LOWER_PIN;
+    fprintf(stderr, "Warning : PIN%c is only a read register, it shouldn't be written\n",
+		port_c);
+  }
+  else{
+  regs[reg] = new_val;
+  send_write_port(reg,new_val);
+  }
+  /* printf("set bit %d on reg %d \n", bit, reg); */
+  V(sem_regs);
+  may_sleep();
 }
 
 /******************************/
 
+/******************************/
+
 value caml_pic_tris_of_port(value port_or_bit){
-  unsigned int reg = Long_val(port_or_bit) & 0x7F;
-  unsigned int mask = Long_val(port_or_bit) >> 7;
-  may_sleep();
-  if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
-    return Val_long((mask << 7) | (reg + LOWER_TRIS));
-  }else if(reg >= LOWER_LAT && reg <= HIGHER_LAT){
-    return Val_long((mask << 7) | (reg - LOWER_LAT + LOWER_TRIS));
-  }else{
-    fprintf(stderr, "Error: tris_of_port(0x%0x): not a port\n", reg);
-    return Val_long(LOWER_TRIS);
-  }
+  /* unsigned int reg = Long_val(port_or_bit) & 0x7F; */
+  /* unsigned int mask = Long_val(port_or_bit) >> 7; */
+  /* may_sleep(); */
+  /* if(reg >= LOWER_PORT && reg <= HIGHER_PORT){ */
+  /*   return Val_long((mask << 7) | (reg + LOWER_TRIS)); */
+  /* }else if(reg >= LOWER_LAT && reg <= HIGHER_LAT){ */
+  /*   return Val_long((mask << 7) | (reg - LOWER_LAT + LOWER_TRIS)); */
+  /* }else{ */
+  /*   fprintf(stderr, "Error: tris_of_port(0x%0x): not a port\n", reg); */
+  /*   return Val_long(LOWER_TRIS); */
+  /* } */
+  return Val_unit;
 }
 
 /******************************/
 
 static void out_write_port(int port, unsigned char new_val){
-  P(sem_regs);
-  {
-    int tris = port - LOWER_PORT + LOWER_TRIS;
-    int tris_val = regs[tris];
-    int old_val = regs[port];
-    if((new_val & ~tris_val) != 0x00){
-      char port_c = 'A' + port - LOWER_PORT;
-      fprintf(stderr,
-              "Warning: an outside component writes PORT%c=0x%02X when TRIS%c=0x%02X\n",
-              port_c, new_val, port_c, tris_val);
-    }
-    if(new_val != old_val){
-      regs[port] = new_val;
-      send_write_port(port, new_val);
-    }
-  }
-  V(sem_regs);
-  may_sleep();
+  /* P(sem_regs); */
+  /* { */
+  /*   int tris = port - LOWER_PORT + LOWER_TRIS; */
+  /*   int tris_val = regs[tris]; */
+  /*   int old_val = regs[port]; */
+  /*   if((new_val & ~tris_val) != 0x00){ */
+  /*     char port_c = 'A' + port - LOWER_PORT; */
+  /*     fprintf(stderr, */
+  /*             "Warning: an outside component writes PORT%c=0x%02X when TRIS%c=0x%02X\n", */
+  /*             port_c, new_val, port_c, tris_val); */
+  /*   } */
+  /*   if(new_val != old_val){ */
+  /*     regs[port] = new_val; */
+  /*     send_write_port(port, new_val); */
+  /*   } */
+  /* } */
+  /* V(sem_regs); */
+  /* may_sleep(); */
 }
 
 static void out_clear_port_bit(int port, int bit){
-  P(sem_regs);
-  {
-    int mask = 1 << bit;
-    int tris = port - LOWER_PORT + LOWER_TRIS;
-    int tris_val = regs[tris];
-    int old_val = regs[port];
-    int new_val = old_val & ~mask;
-    if(!(tris_val & mask)){
-      char port_c = 'A' + port - LOWER_PORT;
-      fprintf(stderr,
-        "Warning: an outside component clears PORT%c.R%c%d when TRIS%c=0x%02X\n",
-              port_c, port_c, bit, port_c, tris_val);
-    }
-    if(old_val != new_val){
-      regs[port] = new_val;
-      send_write_port(port, new_val);
-    }
-  }
-  V(sem_regs);
-  may_sleep();
+  /* P(sem_regs); */
+  /* { */
+  /*   int mask = 1 << bit; */
+  /*   int tris = port - LOWER_PORT + LOWER_TRIS; */
+  /*   int tris_val = regs[tris]; */
+  /*   int old_val = regs[port]; */
+  /*   int new_val = old_val & ~mask; */
+  /*   if(!(tris_val & mask)){ */
+  /*     char port_c = 'A' + port - LOWER_PORT; */
+  /*     fprintf(stderr, */
+  /*       "Warning: an outside component clears PORT%c.R%c%d when TRIS%c=0x%02X\n", */
+  /*             port_c, port_c, bit, port_c, tris_val); */
+  /*   } */
+  /*   if(old_val != new_val){ */
+  /*     regs[port] = new_val; */
+  /*     send_write_port(port, new_val); */
+  /*   } */
+  /* } */
+  /* V(sem_regs); */
+  /* may_sleep(); */
 }
 
 static void out_set_port_bit(int port, int bit){
-  P(sem_regs);
-  {
-    int mask = 1 << bit;
-    int tris = port - LOWER_PORT + LOWER_TRIS;
-    int tris_val = regs[tris];
-    int old_val = regs[port];
-    int new_val = old_val | mask;
-    if(!(tris_val & mask)){
-      char port_c = 'A' + port - LOWER_PORT;
-      fprintf(stderr,
-        "Warning: an outside component sets PORT%c.R%c%d when TRIS%c=0x%02X\n",
-              port_c, port_c, bit, port_c, tris_val);
-    }
-    if(old_val != new_val){
-      regs[port] = new_val;
-      send_write_port(port, new_val);
-    }
-  }
-  V(sem_regs);
-  may_sleep();
+  /* P(sem_regs); */
+  /* { */
+  /*   int mask = 1 << bit; */
+  /*   int tris = port - LOWER_PORT + LOWER_TRIS; */
+  /*   int tris_val = regs[tris]; */
+  /*   int old_val = regs[port]; */
+  /*   int new_val = old_val | mask; */
+  /*   if(!(tris_val & mask)){ */
+  /*     char port_c = 'A' + port - LOWER_PORT; */
+  /*     fprintf(stderr, */
+  /*       "Warning: an outside component sets PORT%c.R%c%d when TRIS%c=0x%02X\n", */
+  /*             port_c, port_c, bit, port_c, tris_val); */
+  /*   } */
+  /*   if(old_val != new_val){ */
+  /*     regs[port] = new_val; */
+  /*     send_write_port(port, new_val); */
+  /*   } */
+  /* } */
+  /* V(sem_regs); */
+  /* may_sleep(); */
 }
 
 static void out_set_analog(unsigned int chan, unsigned int val){

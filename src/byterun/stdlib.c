@@ -9,35 +9,27 @@
 #include "simul.h"
 #include "simulator/simu.h"
 
-
-val_t caml_avr_digital_write(val_t pin, val_t val){
-  /* digitalWrite(Int_val(pin),Int_val(val)); */
-  return Val_unit;
-}
-
-
 val_t caml_avr_set_bit(val_t reg, val_t bit){
   avr_set_bit(Int_val(reg),Int_val(bit));
   return Val_unit;
 }
 
 val_t caml_avr_clear_bit(val_t reg, val_t bit){
+  avr_clear_bit(Int_val(reg),Int_val(bit));
   return Val_unit;
 }
 
 val_t caml_avr_read_bit(val_t reg, val_t bit){
-  return Val_unit;
+  unsigned int val = avr_test_bit(Int_val(reg),Int_val(bit));
+  return Val_int(val);
 }
 
 val_t caml_avr_read_register(val_t reg){
-  return Val_unit;
+  return Val_int(avr_read_reg(Int_val(reg)));
 }
 
 val_t caml_avr_write_register(val_t reg, val_t val){
-  return Val_unit;
-}
-
-val_t caml_pin_mode(val_t reg){
+  avr_write_reg(Int_val(reg),Int_val(val));
   return Val_unit;
 }
 
@@ -168,7 +160,7 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #include "simulator/simu.c"
 
- 
+
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");
   return Val_unit;

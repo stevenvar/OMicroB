@@ -22,7 +22,7 @@ clean:
 
 ################################################################################
 
-ardulib.byte: avr.ml spi.ml oled.ml ardulib.ml
+ardulib.byte: spi.ml oled.ml ardulib.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 

@@ -9,7 +9,7 @@
 ##                                                                       ##
 ###########################################################################
 
-include ../../../etc/Makefile.conf
+include ../../../../etc/Makefile.conf
 
 TARG = $(BIN)/ocapic_lcd_simulator
 SRCS = $(wildcard *.ml)

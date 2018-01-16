@@ -19,8 +19,7 @@ LCD = $(BIN)/ocapic_lcd_simulator
 DIP40 = $(BIN)/ocapic_dip40_simulator
 # CIRCUIT = $(BIN)/ocapic_circuit_simulator
 # KEYBOARD = $(BIN)/ocapic_keyboard_simulator
-TARGS = $(OBJS) $(DIP40) \
-	 $(KEYBOARD)
+TARGS = $(OBJS) $(DIP40) $(LCD)
 
 simulator: $(TARGS)
 

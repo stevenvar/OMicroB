@@ -1,13 +1,13 @@
 (* AVR *)
 
-type pin =
-| PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
-| PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
-| PIN15 | PIN16 | PIN17
+(* type pin =
+ * | PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
+ * | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
+ * | PIN15 | PIN16 | PIN17 *)
 
-type mode =
-| INPUT
-| OUTPUT
+(* type mode =
+ * | INPUT
+ * | OUTPUT *)
 
 (* GC *)
 
@@ -28,7 +28,7 @@ external ( lor ) : int -> int -> int = "%orint"
 external ( lxor ) : int -> int -> int = "%xorint"
 
 let lnot x = x lxor (-1)
-                    
+
 external ( lsl ) : int -> int -> int = "%lslint"
 external ( lsr ) : int -> int -> int = "%lsrint"
 external ( asr ) : int -> int -> int = "%asrint"
@@ -78,17 +78,18 @@ external print_string :  string -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
 external print_float : float -> unit = "caml_print_float"
 
-(* AVR *)
-external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
-external digital_read  : pin -> bool         = "caml_digital_read"  [@@noalloc]
-external digital_write : pin -> bool -> unit = "caml_digital_write" [@@noalloc]
-external delay         : int -> unit         = "caml_delay"         [@@noalloc]
-external millis        : unit -> int         = "caml_avr_millis" [@@noalloc]
-external serial_begin : int -> unit          = "caml_avr_serial_begin" [@@noalloc]
+(* (\* AVR *\)
+ * external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
+ * external digital_read  : pin -> bool         = "caml_digital_read"  [@@noalloc]
+ * external digital_write : pin -> bool -> unit = "caml_digital_write" [@@noalloc]
+ * external delay         : int -> unit         = "caml_delay"         [@@noalloc]
+ * external millis        : unit -> int         = "caml_avr_millis" [@@noalloc]
+ * external serial_begin : int -> unit          = "caml_avr_serial_begin" [@@noalloc] *)
 
 (* Exceptions *)
 
 external raise : exn -> 'a = "%raise"
+let failwith s = raise(Failure s)
 
 (* Lists *)
 let rec ( @ ) l1 l2 =
