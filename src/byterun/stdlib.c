@@ -33,6 +33,9 @@ val_t caml_avr_write_register(val_t reg, val_t val){
   return Val_unit;
 }
 
+val_t caml_avr_draw_pixel(val_t x, val_t y, val_t color){
+  return Val_unit;
+}
 
 #endif
 

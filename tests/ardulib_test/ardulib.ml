@@ -1,9 +1,4 @@
-
-(* let _ = Avr.set_bit SPCR SPE *)
-
-(* let moins a b c =
- *   Avr.write_register PORTD 99;
- *   a - b - c *)
+open Avr
 
 let begin_spi ~ss ~sck ~mosi =
   Avr.digital_write ss true;
@@ -24,11 +19,12 @@ let boot_pins () =
   Avr.digital_write rst false;
   Avr.digital_write rst true
 
-let () = 
+let () =
   (* Avr.write_register PORTD x; *)
-  Spi.begin_spi ~ss:PIN17 ~sck:PIN15 ~mosi:PIN16;
+  Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
-  Oled.boot();
+  Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
+  Oled.draw_pixel 10 10 Oled.ON
   (* Oled.blank(); *)
   (* Avr.write_register DDRB 0xFF; (\* output *\) *)
   (* Avr.pin_mode PIN9 OUTPUT; *)

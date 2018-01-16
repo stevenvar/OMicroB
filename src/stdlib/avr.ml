@@ -61,6 +61,10 @@ type ('a,'b) pin =
   | PIN11 : (portb_bit register, ddrb_bit register) pin
   | PIN12 : (portd_bit register, ddrd_bit register) pin
   | PIN13 : (portc_bit register, ddrc_bit register) pin
+  | MISO : (portb_bit register, ddrb_bit register) pin
+  | SCK : (portb_bit register, ddrb_bit register) pin
+  | MOSI : (portb_bit register, ddrb_bit register) pin
+  | SS : (portb_bit register, ddrb_bit register) pin
 
 type mode = INPUT | OUTPUT
 
@@ -80,7 +84,10 @@ let port_of_pin : type a b . (a register,b register) pin -> a register =
   | PIN11 -> PORTB
   | PIN12 -> PORTD
   | PIN13 -> PORTC
-
+  | MISO -> PORTB
+  | SCK -> PORTB
+  | MOSI -> PORTB
+  | SS -> PORTB
 
 let ddr_of_pin : type a b. (a register , b register) pin -> b register=
   function
@@ -98,6 +105,11 @@ let ddr_of_pin : type a b. (a register , b register) pin -> b register=
   | PIN11 -> DDRB
   | PIN12 -> DDRD
   | PIN13 -> DDRC
+  | MISO -> DDRB
+  | SCK -> DDRB
+  | MOSI -> DDRB
+  | SS -> DDRB
+
 
 let port_bit_of_pin : type a b. (a register, b register) pin -> a =
   function
@@ -115,6 +127,10 @@ let port_bit_of_pin : type a b. (a register, b register) pin -> a =
   | PIN11 -> PB7
   | PIN12 -> PD6
   | PIN13 -> PC7
+  | MISO -> PB3
+  | SCK -> PB1
+  | MOSI -> PB2
+  | SS -> PB0
 
 
 let ddr_bit_of_pin : type a b. (a register, b register) pin -> b =
@@ -133,12 +149,16 @@ let ddr_bit_of_pin : type a b. (a register, b register) pin -> b =
   | PIN11 -> DB7
   | PIN12 -> DD6
   | PIN13 -> DC7
+  | MISO -> DB3
+  | SCK -> DB1
+  | MOSI -> DB2
+  | SS -> DB0
 
-external write_register : 'a register -> int -> unit = "caml_avr_write_register"
-external read_register : 'a register -> int = "caml_avr_read_register"
-external set_bit : 'a register -> 'a -> unit = "caml_avr_set_bit"
-external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit"
-external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
+external write_register : 'a register -> int -> unit = "caml_avr_write_register" [@@noalloc]
+external read_register : 'a register -> int = "caml_avr_read_register" [@@noalloc]
+external set_bit : 'a register -> 'a -> unit = "caml_avr_set_bit" [@@noalloc]
+external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit" [@@noalloc]
+external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit" [@@noalloc]
 
 let pin_mode p m =
   let bit = ddr_bit_of_pin p in

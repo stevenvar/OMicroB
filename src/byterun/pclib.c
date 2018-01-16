@@ -95,4 +95,9 @@ val_t ocaml_arduboy_print_int(val_t i) {
 val_t ocaml_arduboy_display(val_t unit) {
   return Val_unit;
 }
+
+val_t caml_avr_draw_pixel(val_t x, val_t y, val_t color){
+  return Val_unit;
+}
+
 /* #endif */

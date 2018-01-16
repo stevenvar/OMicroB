@@ -56,16 +56,23 @@ type ('a, 'b) pin =
   | PIN11 : (portb_bit register, ddrb_bit register) pin
   | PIN12 : (portd_bit register, ddrd_bit register) pin
   | PIN13 : (portc_bit register, ddrc_bit register) pin
+  | MISO : (portb_bit register, ddrb_bit register) pin
+  | SCK : (portb_bit register, ddrb_bit register) pin
+  | MOSI : (portb_bit register, ddrb_bit register) pin
+  | SS : (portb_bit register, ddrb_bit register) pin
 type mode = INPUT | OUTPUT
 val port_of_pin : ('a register, 'b register) pin -> 'a register
 val ddr_of_pin : ('a register, 'b register) pin -> 'b register
 val port_bit_of_pin : ('a register, 'b register) pin -> 'a
 val ddr_bit_of_pin : ('a register, 'b register) pin -> 'b
 external write_register : 'a register -> int -> unit
-  = "caml_avr_write_register"
+  = "caml_avr_write_register" [@@noalloc]
 external read_register : 'a register -> int = "caml_avr_read_register"
-external set_bit : 'a register -> 'a -> unit = "caml_avr_set_bit"
+  [@@noalloc]
+external set_bit : 'a register -> 'a -> unit = "caml_avr_set_bit" [@@noalloc]
 external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit"
+  [@@noalloc]
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
+  [@@noalloc]
 val pin_mode : ('a register, 'b register) pin -> mode -> unit
 val digital_write : ('a register, 'b register) pin -> bool -> unit

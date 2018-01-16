@@ -22,12 +22,12 @@ clean:
 
 ################################################################################
 
-ardulib.byte: avr.ml spi.ml oled.ml ardulib.ml
+ardulib.byte: spi.ml oled.ml ardulib.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
 ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 84 -stack-size 64 $< -o $@
 
 ardulib.elf: ardulib.c
 	# $(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
@@ -43,7 +43,7 @@ ardulib.hex: ardulib.avr
 
 flash: ardulib.avr
 	stty -f $(ATTY) 1200
-	sleep 3
+	sleep 0
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
 
 listen:
