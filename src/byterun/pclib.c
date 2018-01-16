@@ -73,4 +73,26 @@ val_t caml_avr_read_register(val_t reg){
   return Val_int(0xFF);
 }
 
+
+val_t caml_boot_lcd(){
+  /* bootLCD(); */
+  return Val_unit;
+}
+
+
+val_t ocaml_arduboy_init(val_t unit) {
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_print(val_t str) {
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_print_int(val_t i) {
+  return Val_unit;
+}
+
+val_t ocaml_arduboy_display(val_t unit) {
+  return Val_unit;
+}
 /* #endif */

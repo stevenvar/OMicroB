@@ -4,10 +4,27 @@
 #include <avr/interrupt.h>
 
 volatile uint8_t* regs[] = {
-  &PORTD,
-  &SPCR,
-  &SPSR,
-  &SPDR
+   NOT_A_PORT, 
+   &PORTB, 
+   &PORTC, 
+   &PORTD, 
+   &PORTE, 
+   &PORTF, 
+   NOT_A_PORT,
+   &DDRB, 
+   &DDRC, 
+   &DDRD, 
+   &DDRE, 
+   &DDRF, 
+   NOT_A_PORT,
+   &PINB, 
+   &PINC, 
+   &PIND, 
+   &PINE, 
+   &PINF, 
+   &SPCR, 
+   &SPSR, 
+   &SPDR 
 };
 
 void writeRegister(uint8_t reg,uint8_t val){
@@ -20,9 +37,78 @@ uint8_t readRegister(uint8_t reg){
   return *r;
 }
 
+static const uint8_t SS   = 17;
+static const uint8_t SCK  = 15;
+static const uint8_t MOSI = 16;
+
+#define DC 4
+#define CS 12
+#define RST 6
+
+
+char transfer(char _data) {
+  SPDR = _data;
+  while (!(SPSR & _BV(SPIF)))
+    ;
+  return SPDR;
+}
+
+void begin(){
+  
+  // Set SS to high so a connected chip will be "deselected" by default
+  /* digitalWrite(SS, HIGH); */
+
+  // When the SS pin is set as OUTPUT, it can be used as
+  // a general purpose output port (it doesn't influence
+  // SPI operations).
+  /* pinMode(SS, OUTPUT); */
+
+  // Warning: if the SS pin ever becomes a LOW INPUT then SPI
+  // automatically switches to Slave, so the data direction of
+  // the SS pin MUST be kept as OUTPUT.
+  /* SPCR |= _BV(MSTR); */
+  /* SPCR |= _BV(SPE); */
+
+  // Set direction register for SCK and MOSI pin.
+  // MISO pin automatically overrides to INPUT.
+  // By doing this AFTER enabling SPI, we avoid accidentally
+  // clocking in a single bit since the lines go directly
+  // from "input" to SPI control.  
+  // http://code.google.com/p/arduino/issues/detail?id=888
+  /* pinMode(SCK, OUTPUT); */
+  /* pinMode(MOSI, OUTPUT); */
+
+  /* pinMode(DC, OUTPUT); */
+  /* pinMode(CS, OUTPUT); */
+  /* pinMode(RST, OUTPUT); */
+  /* digitalWrite(RST, HIGH); */
+  /* digitalWrite(RST, LOW);   // bring reset low */
+  /* digitalWrite(RST, HIGH);  // bring out of reset */
+
+
+  /* PORTD |= _BV(12); */
+  /* PORTD &= ~_BV(4); */
+  /* PORTD &= ~_BV(12); */
+
+  /* transfer(0x8D); */
+  /* transfer(0x14); */
+  /* transfer(0xAF); */
+  /* transfer(0xA5); */
+
+  /* PORTD |= _BV(4); */
+  /* PORTD &= ~_BV(12); */
+
+  /* for(int i = 0; i < 1024; i ++){ */
+  /*   transfer(0xFF); */
+  /* } */
+
+  
+}
+
 void setBit(uint8_t reg,uint8_t bit){
   volatile uint8_t* r = regs[reg];
   volatile uint8_t b = bit;
+  begin();
   *r |= _BV(b);
 }
 
@@ -127,6 +213,7 @@ static void turnOffPWM(uint8_t timer)
 	}
 }
 
+
 void digitalWrite(uint8_t pin, uint8_t val){
 	uint8_t timer = digitalPinToTimer(pin);
 	uint8_t bit = digitalPinToBitMask(pin);
@@ -151,5 +238,4 @@ void digitalWrite(uint8_t pin, uint8_t val){
 	}
 
 	SREG = oldSREG;
-
 }

@@ -22,13 +22,14 @@ let set_bit_order =
 
 (* Put SPI in data mode *)
 let set_data_mode mode =
-  let spi_mode_mask = 0x0C in
-  let spcr_val = read_register SPCR in
-  write_register SPCR ((spcr_val land spi_mode_mask) lor mode)
+  clear_bit SPCR CPHA;
+  clear_bit SPCR CPOL;
+  set_bit SPCR mode
+
 
 (* Slow down the serial clock *)
 let set_clock_divider rate =
-  let spi_clock_mask = 0x30 in
+  let spi_clock_mask = 0x03 in
   let spi_clock_mask2x = 0x01 in
   clear_bit SPCR SPR0;
   clear_bit SPCR SPR1;
@@ -39,5 +40,5 @@ let set_clock_divider rate =
 (* Emit data through the SPI connection *)
 let transfer data =
   write_register SPDR data;
-  while (read_bit SPSR SPIF <> false) do () done;
-  read_register SPDR
+  while (read_bit SPSR SPIF <> false) do () done
+  (* read_register SPDR *)

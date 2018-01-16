@@ -26,5 +26,5 @@ value caml_pic_read_reg(value reg);
 value caml_pic_set_bit(value bit);
 value caml_pic_clear_bit(value bit);
 value caml_pic_test_bit(value bit);
-
+void avr_set_bit(int reg,int bit);
 #endif

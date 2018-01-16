@@ -16,10 +16,11 @@ MLIS = $(wildcard *.mli)
 CMOS = $(MLS:.ml=.cmo)
 CMXS = $(MLS:.ml=.cmx)
 CMIS = $(MLIS:.mli=.cmi)
-MANS = $(foreach base, $(MLS:.ml=), $(call capitalize, $(base)).3o)
+# MANS = $(foreach base, $(MLS:.ml=), $(call capitalize, $(base)).3o)
 OBJS = $(CMOS) $(CMXS) $(CMIS)
 
-extra: $(OBJS) $(MANS)
+extra: $(OBJS)
+# $(MANS)
 
 serial.cmo: serial.ml serial.cmi
 	$(OCAMLC) -thread -c $<
@@ -39,8 +40,8 @@ simul.cmx: simul.ml simul.cmi
 simul.cmi: simul.mli
 	$(OCAMLC) -thread -c $<
 
-%.3o:
-	$(OCAMLDOC) -hide-warnings -man -man-mini $(call uncapitalize, $*).mli
+# %.3o:
+# 	$(OCAMLDOC) -hide-warnings -man -man-mini $(call uncapitalize, $*).mli
 
 clean:
 	@rm -f *~ *.cmo *.cmx *.cmi *.o *.3o

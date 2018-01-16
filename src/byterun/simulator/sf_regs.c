@@ -16,7 +16,7 @@
 #include "shared.h"
 #include "simu.h"
 
-#define NB_REG 16
+#define NB_REG 255
 #define NB_PORT 5
 #define LOWER_PORT 0x0
 #define HIGHER_PORT (LOWER_PORT + NB_PORT - 1)
@@ -42,25 +42,6 @@ static int sem_sync;
 static int sem_done;
 static int nb_proc;
 static int is_slow;
-
-/*   0x00, /\* PORTB *\/ */
-/*   0x00, /\* PORTC *\/ */
-/*   0x00, /\* PORTD *\/ */
-/*   0x00, /\* PORTE *\/ */
-/*   0x00, /\* PORTF *\/ */
-/*   0x00, /\* DDRB *\/ */
-/*   0x00, /\* DDRC *\/ */
-/*   0x00, /\* DDRD *\/ */
-/*   0x00, /\* DDRE *\/ */
-/*   0x00, /\* DDRF *\/ */
-/*   0x00, /\* PINB *\/ */
-/*   0x00, /\* PINC *\/ */
-/*   0x00, /\* PIND *\/ */
-/*   0x00, /\* PINE *\/ */
-/*   0x00, /\* PINF *\/ */
-/*   0x00, /\* SPCR *\/ */
-/*   0x00, /\* SPSR *\/ */
-/*   0x00 /\* SPDR *\/ */
 
 
 void init_regs(int n, int slow){

@@ -7,8 +7,14 @@
 #include "pclib.c"
 #else
 #include "simul.h"
-
 #include "simulator/simu.h"
+
+
+val_t caml_avr_digital_write(val_t pin, val_t val){
+  /* digitalWrite(Int_val(pin),Int_val(val)); */
+  return Val_unit;
+}
+
 
 val_t caml_avr_set_bit(val_t reg, val_t bit){
   avr_set_bit(Int_val(reg),Int_val(bit));

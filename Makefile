@@ -1,10 +1,12 @@
 include etc/Makefile.conf
 
 all: config
+	$(call compile, lib)
 	$(call compile, src/bc2c)
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
+
 
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
@@ -62,5 +64,6 @@ clean:
 	$(call clean, src/byterun)
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
+	$(call clean, lib)
 
 .PHONY: all config install uninstall tests clean

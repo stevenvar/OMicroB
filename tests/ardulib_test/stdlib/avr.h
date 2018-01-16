@@ -9,6 +9,7 @@ void clearBit(uint8_t reg, uint8_t bit);
 uint8_t readBit(uint8_t reg, uint8_t bit);
 void pinMode(uint8_t pin, uint8_t mode);
 void digitalWrite(uint8_t pin, uint8_t val);
+void bootLCD();
 
 #define INPUT 0x0
 #define OUTPUT 0x1
