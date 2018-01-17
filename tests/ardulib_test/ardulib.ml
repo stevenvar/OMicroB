@@ -1,5 +1,18 @@
 open Avr
 
+let () =
+  pin_mode PIN9 OUTPUT;
+  pin_mode PIN10 OUTPUT;
+  pin_mode PIN11 OUTPUT;
+  digital_write PIN9 true;
+  digital_write PIN10 true;
+  digital_write PIN11 true;
+  let tbl = [| 1; 2; 3 |] in
+  digital_write PIN9 false;
+  tbl.(0) <- 2;
+  digital_write PIN10 false;
+  
+  (*
 let begin_spi ~ss ~sck ~mosi =
   digital_write ss true;
   pin_mode ss OUTPUT;
@@ -69,3 +82,4 @@ let () =
   (* Oled.draw ~cs:PIN12 ~dc:PIN4 30 8; *)
   (* Oled.draw ~cs:PIN12 ~dc:PIN4 38 16; *)
  
+  *)
