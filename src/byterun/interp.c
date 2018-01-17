@@ -257,7 +257,7 @@ void caml_raise_division_by_zero(void) {
 
 void interp_init(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
-  trapSp = Val_int(0); /* -1 */
+  trapSp = Val_int(-1);
   env = Val_unit;
   extra_args = 0;
   pc = 0;
@@ -1766,6 +1766,9 @@ val_t interp(void) {
       printf("RAISE\n");
 #endif
       if (trapSp == Val_int(-1)) {
+#if defined(DEBUG) && defined (__PC__)
+        printf("Error: uncatched exception\n");
+#endif
         return Val_unit;
       } else {
         sp = ocaml_stack + Int_val(trapSp);
