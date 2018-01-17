@@ -65,7 +65,13 @@ type ('a,'b) pin =
   | SCK : (portb_bit register, ddrb_bit register) pin
   | MOSI : (portb_bit register, ddrb_bit register) pin
   | SS : (portb_bit register, ddrb_bit register) pin
-
+  | PINA0 : (portf_bit register, ddrf_bit register) pin
+  | PINA1 : (portf_bit register, ddrf_bit register) pin
+  | PINA2 : (portf_bit register, ddrf_bit register) pin
+  | PINA3 : (portf_bit register, ddrf_bit register) pin
+  | PINA4 : (portf_bit register, ddrf_bit register) pin
+  | PINA5 : (portf_bit register, ddrf_bit register) pin
+        
 type mode = INPUT | OUTPUT
 
 let port_of_pin : type a b . (a register,b register) pin -> a register =
@@ -88,6 +94,12 @@ let port_of_pin : type a b . (a register,b register) pin -> a register =
   | SCK -> PORTB
   | MOSI -> PORTB
   | SS -> PORTB
+  | PINA0 -> PORTF
+  | PINA1 -> PORTF
+  | PINA2 -> PORTF
+  | PINA3 -> PORTF
+  | PINA4 -> PORTF
+  | PINA5 -> PORTF
 
 let ddr_of_pin : type a b. (a register , b register) pin -> b register=
   function
@@ -109,8 +121,13 @@ let ddr_of_pin : type a b. (a register , b register) pin -> b register=
   | SCK -> DDRB
   | MOSI -> DDRB
   | SS -> DDRB
-
-
+  | PINA0 -> DDRF
+  | PINA1 -> DDRF
+  | PINA2 -> DDRF
+  | PINA3 -> DDRF
+  | PINA4 -> DDRF
+  | PINA5 -> DDRF
+ 
 let port_bit_of_pin : type a b. (a register, b register) pin -> a =
   function
   | PIN0 -> PD2
@@ -131,6 +148,12 @@ let port_bit_of_pin : type a b. (a register, b register) pin -> a =
   | SCK -> PB1
   | MOSI -> PB2
   | SS -> PB0
+  | PINA0 -> PF7
+  | PINA1 -> PF6
+  | PINA2 -> PF5
+  | PINA3 -> PF4
+  | PINA4 -> PF1
+  | PINA5 -> PF0
 
 
 let ddr_bit_of_pin : type a b. (a register, b register) pin -> b =
@@ -153,6 +176,13 @@ let ddr_bit_of_pin : type a b. (a register, b register) pin -> b =
   | SCK -> DB1
   | MOSI -> DB2
   | SS -> DB0
+  | PINA0 -> DF7
+  | PINA1 -> DF6
+  | PINA2 -> DF5
+  | PINA3 -> DF4
+  | PINA4 -> DF1
+  | PINA5 -> DF0
+    
 
 external write_register : 'a register -> int -> unit = "caml_avr_write_register" [@@noalloc]
 external read_register : 'a register -> int = "caml_avr_read_register" [@@noalloc]

@@ -27,16 +27,16 @@ ardulib.byte: spi.ml oled.ml ardulib.ml
 	ocamlclean $@ -o $@
 
 ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 84 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 ardulib.elf: ardulib.c
 	# $(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG $^ -o $@
 
 ################################################################################
 
 ardulib.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) ardulib.c
-	$(AVR_GXX) -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
+	$(AVR_GXX) -fpermissive -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
 
 ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@

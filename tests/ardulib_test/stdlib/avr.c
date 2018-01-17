@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <avr/io.h>
 #include "avr.h"
-#include <avr/interrupt.h>
 
 #define WIDTH 128
 #define HEIGHT 64
@@ -30,43 +29,44 @@ volatile uint8_t* regs[] = {
    &SPDR
 };
 
-unsigned char sBuffer[(HEIGHT*WIDTH)/8];
+/* unsigned char sBuffer[(HEIGHT*WIDTH)/8]; */
 
-void paintScreen(unsigned char image[])
-{
-  uint8_t c;
-  int i = 0;
+/* unsigned char sBuffer[1]; */
+/* void paintScreen(unsigned char image[]) */
+/* { */
+/*   uint8_t c; */
+/*   int i = 0; */
 
-  SPDR = image[i++]; // set the first SPI data byte to get things started
+/*   SPDR = image[i++]; // set the first SPI data byte to get things started */
 
-  // the code to iterate the loop and get the next byte from the buffer is
-  // executed while the previous byte is being sent out by the SPI controller
-  while (i < (HEIGHT * WIDTH) / 8)
-  {
-    // get the next byte. It's put in a local variable so it can be sent as
-    // as soon as possible after the sending of the previous byte has completed
-    c = image[i++];
+/*   // the code to iterate the loop and get the next byte from the buffer is */
+/*   // executed while the previous byte is being sent out by the SPI controller */
+/*   while (i < (HEIGHT * WIDTH) / 8) */
+/*   { */
+/*     // get the next byte. It's put in a local variable so it can be sent as */
+/*     // as soon as possible after the sending of the previous byte has completed */
+/*     c = image[i++]; */
 
-    while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent
+/*     while (!(SPSR & _BV(SPIF))) { } // wait for the previous byte to be sent */
 
-    // put the next byte in the SPI data register. The SPI controller will
-    // clock it out while the loop continues and gets the next byte ready
-    SPDR = c;
-  }
-  while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent
-}
+/*     // put the next byte in the SPI data register. The SPI controller will */
+/*     // clock it out while the loop continues and gets the next byte ready */
+/*     SPDR = c; */
+/*   } */
+/*   while (!(SPSR & _BV(SPIF))) { } // wait for the last byte to be sent */
+/* } */
 
 void drawPixel(uint8_t x,uint8_t y,uint8_t color){
-  uint8_t row = (uint8_t)y / 8;
-  if (color)
-  {
-    sBuffer[(row*WIDTH) + (uint8_t)x] |=   _BV((uint8_t)y % 8);
-  }
-  else
-  {
-    sBuffer[(row*WIDTH) + (uint8_t)x] &= ~ _BV((uint8_t)y % 8);
-  }
-  paintScreen(sBuffer);
+  /* uint8_t row = (uint8_t)y / 8; */
+  /* if (color) */
+  /* { */
+  /*   sBuffer[(row*WIDTH) + (uint8_t)x] |=   _BV((uint8_t)y % 8); */
+  /* } */
+  /* else */
+  /* { */
+  /*   sBuffer[(row*WIDTH) + (uint8_t)x] &= ~ _BV((uint8_t)y % 8); */
+  /* } */
+  /* paintScreen(sBuffer); */
 }
 
 void writeRegister(uint8_t reg,uint8_t val){
@@ -79,9 +79,9 @@ uint8_t readRegister(uint8_t reg){
   return *r;
 }
 
-static const uint8_t SS   = 17;
-static const uint8_t SCK  = 15;
-static const uint8_t MOSI = 16;
+/* static const uint8_t SS   = 17; */
+/* static const uint8_t SCK  = 15; */
+/* static const uint8_t MOSI = 16; */
 
 #define DC 4
 #define CS 12
@@ -95,62 +95,9 @@ char transfer(char _data) {
   return SPDR;
 }
 
-void begin(){
-
-  // Set SS to high so a connected chip will be "deselected" by default
-  /* digitalWrite(SS, HIGH); */
-
-  // When the SS pin is set as OUTPUT, it can be used as
-  // a general purpose output port (it doesn't influence
-  // SPI operations).
-  /* pinMode(SS, OUTPUT); */
-
-  // Warning: if the SS pin ever becomes a LOW INPUT then SPI
-  // automatically switches to Slave, so the data direction of
-  // the SS pin MUST be kept as OUTPUT.
-  /* SPCR |= _BV(MSTR); */
-  /* SPCR |= _BV(SPE); */
-
-  // Set direction register for SCK and MOSI pin.
-  // MISO pin automatically overrides to INPUT.
-  // By doing this AFTER enabling SPI, we avoid accidentally
-  // clocking in a single bit since the lines go directly
-  // from "input" to SPI control.
-  // http://code.google.com/p/arduino/issues/detail?id=888
-  /* pinMode(SCK, OUTPUT); */
-  /* pinMode(MOSI, OUTPUT); */
-
-  /* pinMode(DC, OUTPUT); */
-  /* pinMode(CS, OUTPUT); */
-  /* pinMode(RST, OUTPUT); */
-  /* digitalWrite(RST, HIGH); */
-  /* digitalWrite(RST, LOW);   // bring reset low */
-  /* digitalWrite(RST, HIGH);  // bring out of reset */
-
-
-  /* PORTD |= _BV(12); */
-  /* PORTD &= ~_BV(4); */
-  /* PORTD &= ~_BV(12); */
-
-  /* transfer(0x8D); */
-  /* transfer(0x14); */
-  /* transfer(0xAF); */
-  /* transfer(0xA5); */
-
-  /* PORTD |= _BV(4); */
-  /* PORTD &= ~_BV(12); */
-
-  /* for(int i = 0; i < 1024; i ++){ */
-  /*   transfer(0xFF); */
-  /* } */
-
-
-}
-
 void setBit(uint8_t reg,uint8_t bit){
   volatile uint8_t* r = regs[reg];
   volatile uint8_t b = bit;
-  begin();
   *r |= _BV(b);
 }
 

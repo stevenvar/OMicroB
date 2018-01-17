@@ -60,6 +60,12 @@ type ('a, 'b) pin =
   | SCK : (portb_bit register, ddrb_bit register) pin
   | MOSI : (portb_bit register, ddrb_bit register) pin
   | SS : (portb_bit register, ddrb_bit register) pin
+  | PINA0 : (portf_bit register, ddrf_bit register) pin
+  | PINA1 : (portf_bit register, ddrf_bit register) pin
+  | PINA2 : (portf_bit register, ddrf_bit register) pin
+  | PINA3 : (portf_bit register, ddrf_bit register) pin
+  | PINA4 : (portf_bit register, ddrf_bit register) pin
+  | PINA5 : (portf_bit register, ddrf_bit register) pin
 type mode = INPUT | OUTPUT
 val port_of_pin : ('a register, 'b register) pin -> 'a register
 val ddr_of_pin : ('a register, 'b register) pin -> 'b register

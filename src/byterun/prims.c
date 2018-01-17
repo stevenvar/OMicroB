@@ -62,7 +62,7 @@ extern void *caml_sys_const_ostype_win32;
 extern void *caml_sys_const_ostype_cygwin;
 extern void *caml_sys_const_max_wosize;
 extern void *caml_output_val_t_to_buffer;
-extern void *caml_array_unsafe_get;
+/* extern void *caml_array_unsafe_get; */
 extern void *caml_array_unsafe_set;
 /* extern void *caml_make_vect; */
 extern void *caml_array_blit;

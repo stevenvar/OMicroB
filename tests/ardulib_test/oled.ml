@@ -3,28 +3,40 @@ open Avr
 
 type color = OFF | ON
 
-module List = struct
-  let rec iter f = function
-      [] -> ()
-    | x::xs -> (f x); iter f xs
-end
-
 external draw_pixel : int -> int -> color -> unit = "caml_avr_draw_pixel"
 
-let boot_program =
-  [
-    0xD5 ; 0xF0 ; (* Set display clock divisor = 0xF0 *)
-    0x8D ; 0x14; (* Enable charge Pump *)
-    0xA1 ; (* Set segment re-map *)
-    0xC8 ; (* Set COM Output scan direction *)
-    0x81; 0xCF; (* Set contrast = 0xCF *)
-    0xD9; 0xF1; (* Set precharge = 0xF1 *)
-    0xAF; (* Display ON *)
-    0x20; 0x00 (* Set display mode = horizontal addressing mode *)
-  ]
+(* let boot_program =
+ *   [|
+ *     0xD5 ; 0xF0 ; (\* Set display clock divisor = 0xF0 *\)
+ *     0x8D ; 0x14; (\* Enable charge Pump *\)
+ *     0xA1 ; (\* Set segment re-map *\)
+ *     0xC8 ; (\* Set COM Output scan direction *\)
+ *     0x81; 0xCF; (\* Set contrast = 0xCF *\)
+ *     0xD9; 0xF1; (\* Set precharge = 0xF1 *\)
+ *     0xAF; (\* Display ON *\)
+ *     0x20; 0x00 (\* Set display mode = horizontal addressing mode *\)
+ *   |]
+ * 
+ * let transfer_program prog =
+ *   Array.iter Spi.transfer prog *)
+
+let boot_program () =
+  Spi.transfer(0xD5); (* Set display clock divisor = 0xF0 *)
+  Spi.transfer(0xF0);
+  Spi.transfer(0x8D); (* Enable charge Pump *)
+  Spi.transfer(0x14); 
+  Spi.transfer(0xA1); (* Set segment re-map *)
+  Spi.transfer(0xC8); (* Set COM Output scan direction *)
+  Spi.transfer(0x81); (* Set contrast = 0xCF *)
+  Spi.transfer(0xCF);
+  Spi.transfer(0xD9); (* Set precharge = 0xF1 *)
+  Spi.transfer(0xF1); 
+  Spi.transfer(0xAF); (* Display ON *)
+  Spi.transfer(0x20);
+  Spi.transfer(0x00) (* Set display mode = horizontal addressing mode *)
 
 let transfer_program prog =
-  List.iter Spi.transfer prog
+  prog ()
 
 (* Put the display in command mode *)
 let command_mode cs dc =
@@ -44,14 +56,31 @@ let send_lcd_command cs dc com =
 
 let blank() =
  for i = 0 to 1023 do
-   Spi.transfer(0x88)
+   Spi.transfer(0x00)
  done
+
+let draw ~cs ~dc x y =
+  command_mode cs dc;
+  Spi.transfer (0x21); (* column *)
+  Spi.transfer (x);
+  Spi.transfer (x+8);
+  Spi.transfer (0x22); (* page *)
+  Spi.transfer (y/8);
+  Spi.transfer (y/8);
+  (* let shift = y mod 8 in *)
+  (* Spi.transfer(0x40 + shift); *)
+  data_mode cs dc;
+  for i = 0 to 7 do
+  Spi.transfer(0xFF)
+  done
 
 (* Booting sequence *)
 let boot ~cs ~dc ~rst =
-  let spi_clock_div2 = 0x04 in
+   let spi_clock_div2 = 0x04 in
   (* Spi.set_clock_divider spi_clock_div2; *)
   command_mode cs dc;
   transfer_program boot_program;
   data_mode cs dc;
-  blank()
+  blank();
+  (* moveto cs dc 10 10; *)
+
