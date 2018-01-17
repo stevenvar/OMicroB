@@ -1,4 +1,7 @@
 external force_gc : unit -> unit = "caml_force_gc"
+external ignore : 'a -> unit = "%ignore"
+external fst : 'a * 'b -> 'a = "%field0"
+external snd : 'a * 'b -> 'b = "%field1"
 external not : bool -> bool = "%boolnot"
 external ( & ) : bool -> bool -> bool = "%sequand"
 external ( && ) : bool -> bool -> bool = "%sequand"
@@ -45,6 +48,6 @@ external print_string : string -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
 external print_float : float -> unit = "caml_print_float"
 external raise : exn -> 'a = "%raise"
+external raise_notrace : exn -> 'a = "%raise_notrace"
 val failwith : string -> 'a
 val invalid_arg : string -> 'a
-val ( @ ) : 'a list -> 'a list -> 'a list

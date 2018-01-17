@@ -56,11 +56,6 @@ typedef uint32_t mlsize_t;
 typedef int32_t header_t;
 typedef uint8_t tag_t;
 typedef uint8_t opcode_t;
-/* for floats  */
-typedef union alpha{
-  val_t v;
-  float f;
-} alpha;
 
 
 #if OCAML_BYTECODE_BSIZE < 256
@@ -98,8 +93,8 @@ typedef uint32_t code_t;
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
 
-#define Val_float(x) ((float) x != (float) x ? Val_nan : ((union { float x; val_t n; }) (float) (x)).n)
-#define Float_val(v) (((union { float x; val_t n; }) (val_t) (v)).x)
+/* #define Val_float(x) ((float) x != (float) x ? Val_nan : ((union { float f; val_t v; }) (float) (x)).v) */
+/* #define Float_val(v) (((union { float f; val_t v; }) (val_t) (v)).f) */
 
 #define Val_codeptr(x) Val_int(x)
 #define Codeptr_val(x) Int_val(x)
@@ -116,8 +111,8 @@ typedef uint32_t code_t;
 /* Blocks */
 
 #define Field(val, i) (    ((val_t*)(Block_val(val)))   [i]  )
-#define StringVal(val) ((char *) Block_val(val))
-#define StringField(val, i) ( StringVal(val)[i])
+#define String_val(val) ((char *) Block_val(val))
+#define StringField(val, i) ( String_val(val)[i])
 
 #define Header(val) Field(val, -1)
 #define Hd_val(val) Field(val, -1)
@@ -128,13 +123,12 @@ typedef uint32_t code_t;
 
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
-/* #define Make_float(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0) */
 #define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
 
 #define Make_header(wosize, tag) (uval_t)(((uval_t) (wosize) << (uval_t)10) | (uval_t)tag)
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
 #define Wsize_bsize(sz) ((sz) / sizeof (val_t))
-#define Wosize_val(val) (Header(val) >> 10)
+#define Wosize_val(val) ((uval_t)Header(val) >> 10)
 #define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
 
 #define Color_val(val) ((Header(val) >> 8) & 1)

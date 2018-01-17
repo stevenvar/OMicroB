@@ -1,6 +1,11 @@
 
 (* List operations *)
 
+let rec ( @ ) l1 l2 =
+  match l1 with
+    [] -> l2
+  | hd :: tl -> hd :: (tl @ l2)
+
 let rec length_aux len = function
     [] -> len
   | _::l -> length_aux (len + 1) l
