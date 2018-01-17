@@ -53,6 +53,7 @@ let () = write_register PORTD 0xFF
 let () =
 
   let l = [| 1 ; 6 ; 3 ; 9 ; 5 |] in
+  let l = Array.init 10 (fun i -> 2 * i + 3) in
   write_register PORTD (Array.length l);
   Array.iter (write_register PORTD) l;
   

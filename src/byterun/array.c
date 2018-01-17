@@ -18,13 +18,13 @@ val_t caml_make_vect(val_t len, val_t init) {
 
 val_t caml_array_get_addr(val_t array, val_t index) {
   val_t idx = Int_val(index);
-  /* if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error(); */
+  if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error();
   return Field(array, idx);
 }
 
 val_t caml_array_set_addr(val_t array, val_t index, val_t newval) {
   val_t idx = Int_val(index);
-  /* if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error(); */
+  if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error();
   Field(array, idx) =  newval;
   return Val_unit;
 }
@@ -33,4 +33,10 @@ val_t caml_array_unsafe_get(val_t array, val_t index)
 {
   /* CAMLassert (Tag_val(array) != Double_array_tag); */
   return Field(array, Int_val(index));
+}
+
+val_t caml_array_unsafe_set(val_t array, val_t index, val_t val)
+{
+  Field(array, Int_val(index)) = val;
+  return Val_unit;
 }
