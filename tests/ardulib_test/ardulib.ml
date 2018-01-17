@@ -1,16 +1,28 @@
 open Avr
 
+
+(* let print x = write_register PORTB x (\* eheheh *\)  *)
+
 let () =
-  pin_mode PIN9 OUTPUT;
-  pin_mode PIN10 OUTPUT;
-  pin_mode PIN11 OUTPUT;
-  digital_write PIN9 true;
-  digital_write PIN10 true;
-  digital_write PIN11 true;
-  let tbl = [| 1; 2; 3 |] in
-  digital_write PIN9 false;
-  tbl.(0) <- 2;
-  digital_write PIN10 false;
+  (* pin_mode PIN9 OUTPUT; *)
+  (* pin_mode PIN10 OUTPUT; *)
+  (* pin_mode PIN11 OUTPUT; *)
+  (* digital_write PIN9 true; *)
+  (* digital_write PIN10 true; *)
+  (* digital_write PIN11 true; *)
+  (* let tbl = [| 1; 2; 3 |] in *)
+  (* digital_write PIN9 false; *)
+  (* tbl.(0) <- 2; *)
+  (* digital_write PIN10 false; *)
+  let l = [ "oui" ] in
+  let ll = [ "oui" ] in
+  write_register PIND 0xFF;
+  if [ 14 ] > [ 9 ] then 
+    write_register PINB 0xFF
+  else
+    write_register PINB 0x00;
+  
+  ()
   
   (*
 let begin_spi ~ss ~sck ~mosi =
@@ -21,7 +33,7 @@ let begin_spi ~ss ~sck ~mosi =
   pin_mode sck OUTPUT;
   pin_mode mosi OUTPUT
 
-let init_rgb r g b =
+let init_rgb r g b 
   digital_write r true;
   digital_write g true;
   digital_write b true
