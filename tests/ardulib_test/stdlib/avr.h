@@ -9,7 +9,6 @@ void clearBit(uint8_t reg, uint8_t bit);
 uint8_t readBit(uint8_t reg, uint8_t bit);
 void pinMode(uint8_t pin, uint8_t mode);
 void digitalWrite(uint8_t pin, uint8_t val);
-void bootLCD();
 void drawPixel(uint8_t x, uint8_t y, uint8_t color);
 
 #define NOT_A_PORT 0x0

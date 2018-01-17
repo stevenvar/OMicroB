@@ -82,7 +82,7 @@ typedef uint32_t code_t;
 /******************************************************************************/
 /* Conversions */
 
-#define Val_int(x) (((val_t) (x) << 1) + 1)
+#define Val_int(x) ((val_t)(((uval_t) (x) << 1) | 1))
 #define Int_val(x) ((val_t) (x) >> 1)
 
 /* #define Init_val_block(x) ((val_t) ( (x) << 2) | ((val_t) 0x3FF << 22)) */

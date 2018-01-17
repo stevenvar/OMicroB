@@ -26,3 +26,9 @@ val_t caml_array_set_addr(val_t array, val_t index, val_t newval) {
   Field(array, idx) =  newval;
   return Val_unit;
 }
+
+val_t caml_array_unsafe_get(val_t array, val_t index)
+{
+  /* CAMLassert (Tag_val(array) != Double_array_tag); */
+  return Field(array, Int_val(index));
+}

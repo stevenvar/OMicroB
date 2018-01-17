@@ -1,41 +1,55 @@
 open Avr
 
 let begin_spi ~ss ~sck ~mosi =
-  Avr.digital_write ss true;
-  Avr.pin_mode ss OUTPUT;
-  Avr.set_bit SPCR MSTR;
-  Avr.set_bit SPCR SPE;
-  Avr.pin_mode sck OUTPUT;
-  Avr.pin_mode mosi OUTPUT
+  digital_write ss true;
+  pin_mode ss OUTPUT;
+  set_bit SPCR MSTR;
+  set_bit SPCR SPE;
+  pin_mode sck OUTPUT;
+  pin_mode mosi OUTPUT
+
+let init_rgb r g b =
+  digital_write r true;
+  digital_write g true;
+  digital_write b true
+  
 
 let boot_pins () =
   let cs = PIN12 in
   let dc = PIN4 in
   let rst = PIN6 in
-  Avr.pin_mode cs OUTPUT;
-  Avr.pin_mode dc OUTPUT;
-  Avr.pin_mode rst OUTPUT;
-  Avr.digital_write rst true;
-  Avr.digital_write rst false;
-  Avr.digital_write rst true
+  let pin_left = PINA2 in
+  let pin_right = PINA1 in
+  let pin_down = PINA3 in
+  let pin_up = PINA0 in
+  let button_a = PIN7 in
+  let button_b = PIN8 in
+  let r = PIN9 in
+  let g = PIN10 in
+  let b = PIN11 in 
+  pin_mode pin_left INPUT;
+  pin_mode pin_right INPUT;
+  pin_mode pin_down INPUT;
+  pin_mode pin_up INPUT;
+  (* pin_mode r OUTPUT; *)
+  (* pin_mode g OUTPUT; *)
+  (* pin_mode b OUTPUT; *)
+  pin_mode button_a INPUT;
+  pin_mode button_b INPUT;
+  pin_mode cs OUTPUT;
+  pin_mode dc OUTPUT;
+  pin_mode rst OUTPUT;
+  (* init_rgb r g b; *)
+  digital_write rst true;
+  digital_write rst false;
+  digital_write rst true
 
 let () =
-  (* Avr.write_register PORTD x; *)
+  (* write_register PORTD x; *)
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
+  failwith "test";
   boot_pins ();
   Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
-  Oled.draw_pixel 10 10 Oled.ON
-  (* Oled.blank(); *)
-  (* Avr.write_register DDRB 0xFF; (\* output *\) *)
-  (* Avr.pin_mode PIN9 OUTPUT; *)
-  (* Avr.pin_mode PIN10 OUTPUT; *)
-  (* Avr.pin_mode PIN11 OUTPUT; *)
-  (* Avr.digital_write PIN9 true; *)
-  (* Avr.digital_write PIN10 true; *)
-  (* Avr.write_register DDRB 0xFF; (\* output *\) *)
-  (* Avr.write_register PORTB 0x00; (\* off *\) *)
-  (* let r = PB6 in
-   * let g = PB7 in
-   * let b = PB5 in
-   * offled g;
-   * offled r *)
+  Oled.draw ~cs:PIN12 ~dc:PIN4 30 8;
+  Oled.draw ~cs:PIN12 ~dc:PIN4 38 16;
+ 

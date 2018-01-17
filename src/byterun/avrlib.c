@@ -25,7 +25,7 @@ val_t caml_avr_clear_bit(val_t reg, val_t bit){
 }
 
 val_t caml_avr_draw_pixel(val_t x, val_t y, val_t color){
-  drawPixel(Int_val(x),Int_val(y),Int_val(color));
+  /* drawPixel(Int_val(x),Int_val(y),Int_val(color)); */
   return Val_unit;
 }
 
