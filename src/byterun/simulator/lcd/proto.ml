@@ -1,13 +1,4 @@
-(*************************************************************************)
-(*                                                                       *)
-(*                                OCaPIC                                 *)
-(*                                                                       *)
-(*                             Benoit Vaugon                             *)
-(*                                                                       *)
-(*    This file is distributed under the terms of the CeCILL license.    *)
-(*    See file ../../../LICENSE-en.                                      *)
-(*                                                                       *)
-(*************************************************************************)
+
 
 open Printf
 open Types

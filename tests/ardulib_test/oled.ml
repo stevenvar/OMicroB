@@ -40,7 +40,7 @@ let transfer_program prog =
 
 (* Put the display in command mode *)
 let command_mode cs dc =
-  digital_write cs true;
+  (* digital_write cs true; *)
   digital_write dc false;
   digital_write cs false
 

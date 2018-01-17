@@ -1,37 +1,6 @@
 open Avr
 
-
-(* let print x = write_register PORTB x (\* eheheh *\)  *)
-
-let () =
-  (* pin_mode PIN9 OUTPUT; *)
-  (* pin_mode PIN10 OUTPUT; *)
-  (* pin_mode PIN11 OUTPUT; *)
-  (* digital_write PIN9 true; *)
-  (* digital_write PIN10 true; *)
-  (* digital_write PIN11 true; *)
-  (* let tbl = [| 1; 2; 3 |] in *)
-  (* digital_write PIN9 false; *)
-  (* tbl.(0) <- 2; *)
-  digital_write PIN10 false;
-  let l = [ "oui" ] in
-  let ll = [ "oui" ] in
-  if l > ll then
-    write_register PINB 0xFF
-  else
-    write_register PINB 0x00;
-  ()
-  
-  (*
-let begin_spi ~ss ~sck ~mosi =
-  digital_write ss true;
-  pin_mode ss OUTPUT;
-  set_bit SPCR MSTR;
-  set_bit SPCR SPE;
-  pin_mode sck OUTPUT;
-  pin_mode mosi OUTPUT
-
-let init_rgb r g b 
+let init_rgb r g b = 
   digital_write r true;
   digital_write g true;
   digital_write b true
@@ -67,29 +36,8 @@ let boot_pins () =
   digital_write rst false;
   digital_write rst true
 
-external magic : 'a -> 'b = "%identity"
-
-
-let () = write_register PORTD 0xFF
-
-
 let () =
-
-  let l = [| 1 ; 6 ; 3 ; 9 ; 5 |] in
-  let l = Array.init 10 (fun i -> 2 * i + 3) in
-  write_register PORTD (Array.length l);
-  Array.iter (write_register PORTD) l;
-  
-  ()
-  (* List.iter (fun x -> x + 1) l ; *)
-  (* let k = [| 1 ; 2 ; 3 |] in *)
-  (* Array.iter (fun x -> (x+1) ) k; *)
-  (* () *)
-  (* Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI; *)
-  (* failwith "test"; *)
-  (* boot_pins (); *)
-  (* Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6; *)
-  (* Oled.draw ~cs:PIN12 ~dc:PIN4 30 8; *)
-  (* Oled.draw ~cs:PIN12 ~dc:PIN4 38 16; *)
- 
-  *)
+  Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
+  boot_pins ();
+  Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
+  Oled.draw ~cs:PIN12 ~dc:PIN4 30 8
