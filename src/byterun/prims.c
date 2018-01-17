@@ -1,4 +1,3 @@
-/* #include "values.h" */
 #include "gc.h"
 #include <string.h>
 #include "array.c"
@@ -40,16 +39,13 @@ extern void *caml_ml_open_descriptor_out;
 extern void *caml_format_float;
 extern void *caml_string_get;
 extern void *caml_format_int;
-/* extern void *caml_string_notequal; */
 extern void *caml_blit_string;
 extern void *caml_greaterequal;
 extern void *caml_lessequal;
 extern void *caml_register_named_val_t;
-/* extern void *caml_fresh_oo_id; */
 extern void *caml_compare;
 extern void *caml_ml_bytes_length;
 extern void *caml_fill_bytes;
-/* extern void *caml_string_equal; */
 extern void *caml_string_compare;
 extern void *caml_sys_get_argv;
 extern void *caml_sys_get_config;
@@ -62,9 +58,6 @@ extern void *caml_sys_const_ostype_win32;
 extern void *caml_sys_const_ostype_cygwin;
 extern void *caml_sys_const_max_wosize;
 extern void *caml_output_val_t_to_buffer;
-/* extern void *caml_array_unsafe_get; */
-extern void *caml_array_unsafe_set;
-/* extern void *caml_make_vect; */
 extern void *caml_array_blit;
 extern void *caml_array_sub;
 extern void *caml_array_append;
@@ -75,8 +68,6 @@ extern void *caml_int64_add;
 extern void *caml_nativeint_format;
 extern void *caml_nativeint_add;
 extern void *caml_bytes_get;
-/* extern void *caml_array_get_addr; */
-/* extern void *caml_array_set_addr; */
 extern void *caml_new_lex_engine;
 extern void *caml_lex_engine;
 extern void *caml_notequal;
@@ -107,10 +98,7 @@ extern void *caml_int64_shift_left;
 extern void *caml_int64_or;
 extern void *caml_int64_mod;
 extern void *caml_int64_sub;
-/* extern void *caml_mul_float; */
 extern void *caml_float_of_int;
-/* extern void *caml_div_float; */
-/* extern void *caml_add_float; */
 extern void *caml_int64_of_nativeint;
 extern void *caml_int64_to_nativeint;
 extern void *caml_nativeint_to_int32;
@@ -136,7 +124,6 @@ extern void *caml_sys_file_exists;
 extern void *caml_sys_remove;
 extern void *caml_eq_float;
 extern void *caml_int_of_float;
-/* extern void *caml_sub_float; */
 extern void *caml_sys_time;
 extern void *caml_float_compare;
 extern void *caml_sys_system_command;
@@ -145,11 +132,9 @@ extern void *caml_sys_getcwd;
 extern void *caml_terminfo_backup;
 extern void *caml_terminfo_standout;
 extern void *caml_terminfo_resume;
-/* extern void *caml_obj_dup; */
 extern void *caml_string_lessthan;
 extern void *caml_int_compare;
 extern void *caml_array_set;
-/* extern void *caml_ge_float; */
 extern void *caml_dynlink_get_current_libs;
 extern void *caml_dynlink_add_primitive;
 extern void *caml_dynlink_lookup_symbol;
