@@ -954,6 +954,7 @@ val_t interp(void) {
       }
       /* Alloc a closure of size blksize */
       OCamlAlloc(acc, blksize, Closure_tag);
+
       /* The acc contains the offset */
       Field(acc, 0) = Val_codeptr(o);
 
@@ -1470,7 +1471,7 @@ val_t interp(void) {
 #if defined(DEBUG) && defined (__PC__)
       printf("VECTLENGTH\n");
 #endif
-      acc = Wosize_val(acc);
+      acc = Val_int(Wosize_val(acc));
       break;
     }
 #endif

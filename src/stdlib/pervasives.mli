@@ -26,6 +26,8 @@ external ( +. ) : float -> float -> float = "%addfloat"
 external ( -. ) : float -> float -> float = "%subfloat"
 external ( *. ) : float -> float -> float = "%mulfloat"
 external ( /. ) : float -> float -> float = "%divfloat"
+external ( == ) : 'a -> 'a -> bool = "%eq"
+external ( != ) : 'a -> 'a -> bool = "%noteq"
 external ( = ) : 'a -> 'a -> bool = "%equal"
 external ( <> ) : 'a -> 'a -> bool = "%notequal"
 external ( < ) : 'a -> 'a -> bool = "%lessthan"
@@ -44,4 +46,5 @@ external print_int : int -> unit = "caml_print_int"
 external print_float : float -> unit = "caml_print_float"
 external raise : exn -> 'a = "%raise"
 val failwith : string -> 'a
+val invalid_arg : string -> 'a
 val ( @ ) : 'a list -> 'a list -> 'a list

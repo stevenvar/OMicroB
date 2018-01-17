@@ -57,13 +57,28 @@ let boot_pins () =
   digital_write rst false;
   digital_write rst true
 
+external magic : 'a -> 'b = "%identity"
+
+
+let () = write_register PORTD 0xFF
+
+
 let () =
-  (* write_register PORTD x; *)
-  Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
-  failwith "test";
-  boot_pins ();
-  Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
-  Oled.draw ~cs:PIN12 ~dc:PIN4 30 8;
-  Oled.draw ~cs:PIN12 ~dc:PIN4 38 16;
+
+  let l = [| 1 ; 6 ; 3 ; 9 ; 5 |] in
+  write_register PORTD (Array.length l);
+  Array.iter (write_register PORTD) l;
+  
+  ()
+  (* List.iter (fun x -> x + 1) l ; *)
+  (* let k = [| 1 ; 2 ; 3 |] in *)
+  (* Array.iter (fun x -> (x+1) ) k; *)
+  (* () *)
+  (* Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI; *)
+  (* failwith "test"; *)
+  (* boot_pins (); *)
+  (* Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6; *)
+  (* Oled.draw ~cs:PIN12 ~dc:PIN4 30 8; *)
+  (* Oled.draw ~cs:PIN12 ~dc:PIN4 38 16; *)
  
   *)
