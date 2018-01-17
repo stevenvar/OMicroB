@@ -40,4 +40,8 @@ let () =
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
   Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
-  Oled.draw ~cs:PIN12 ~dc:PIN4 30 8
+  for i = 0 to 10 do 
+    Oled.draw ~cs:PIN12 ~dc:PIN4 30 i;
+    for i = 0 to 100 do () done;
+    Oled.clear_zone ~cs:PIN12 ~dc:PIN4 30 i;
+  done

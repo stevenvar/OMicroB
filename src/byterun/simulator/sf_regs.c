@@ -7,7 +7,7 @@
 #include "simu.h"
 
 #define NB_REG 255
-#define NB_PORT 6
+#define NB_PORT 5
 #define LOWER_PORT 0x0
 #define HIGHER_PORT (LOWER_PORT + NB_PORT - 1)
 #define LOWER_DDR (HIGHER_PORT + 1)
@@ -15,41 +15,18 @@
 #define LOWER_PIN (HIGHER_DDR + 1)
 #define HIGHER_PIN (LOWER_PIN + NB_PORT - 1)
 
-#define PORTB 1
-#define PORTC 2
-#define PORTD 3
-#define PORTE 4
-#define PORTF 5
+#define PORTB 0
+#define PORTC 1
+#define PORTD 2
+#define PORTE 3
+#define PORTF 4
 
-#define DDRB 7
-#define DDRC 8
-#define DDRD 9
-#define DDRE 10
-#define DDRF 11
+#define DDRB 5
+#define DDRC 6
+#define DDRD 7
+#define DDRE 8
+#define DDRF 9
 
-/* repr =
-   NOT_A_PORT,
-   PORTB,
-   PORTC,
-   PORTD,
-   PORTE,
-   PORTF,
-   NOT_A_PORT,
-   DDRB,
-   DDRC,
-   DDRD,
-   DDRE,
-   DDRF,
-   NOT_A_PORT,
-   PINB,
-   PINC,
-   PIND,
-   PINE,
-   PINF,
-   SPCR,
-   SPSR,
-   SPDR
-*/
 
 
 static unsigned char *regs;
@@ -93,7 +70,7 @@ void dump_regs(void){
   int i, j;
   P(sem_regs);
   for(i = LOWER_PORT ; i <= HIGHER_PORT ; i ++){
-    printf("%c: 0b", 'A' + i);
+    printf("%c: 0b", 'B' + i);
     for(j = 7 ; j >= 0 ; j --) printf("%d", (regs[i] & (1 << j)) != 0);
     printf("  = %3d  = 0x%02x\n", regs[i], regs[i]);
   }
@@ -143,7 +120,7 @@ static void may_sleep(){
 static void send_write(char cmnd, int port, unsigned char val){
   char buf[5];
   buf[0] = cmnd;
-  buf[1] = port + 'A';
+  buf[1] = port + 'B';
   buf[2] = hexchar_of_int((val >> 4) & 0x0F);
   buf[3] = hexchar_of_int(val & 0x0F);
   buf[4] = '\n';
@@ -211,7 +188,7 @@ static void avr_write_reg_gen(int reg, unsigned char new_val){
       int ddr = reg - LOWER_PORT + LOWER_DDR;
       unsigned char ddr_val = regs[ddr];
       if(ddr_val == 0x00){
-        char port_c = 'A' + reg - LOWER_PORT;
+        char port_c = 'B' + reg - LOWER_PORT;
         fprintf(stderr, "Warning: the avr writes PORT%c when DDR%c=0xFF\n",
                 port_c, port_c);
       }else{
@@ -274,7 +251,7 @@ void avr_clear_bit(int reg, int bit){
         int ddr = reg - LOWER_PORT + LOWER_DDR;
         unsigned char ddr_val = regs[ddr];
         if(!(ddr_val & mask)){
-          char port_c = 'A' + reg - LOWER_PORT;
+          char port_c = 'B' + reg - LOWER_PORT;
           fprintf(stderr,
                   "Warning: the avr clears PORT%c.R%c%d when DDR%c=0x%02X\n",
                   port_c, port_c, bit, port_c, ddr_val);
@@ -308,7 +285,7 @@ void avr_set_bit(int reg,int bit){
       int ddr = reg - LOWER_PORT + LOWER_DDR;
       unsigned char ddr_val = regs[ddr];
       if(!(ddr_val & mask)){
-	char port_c = 'A' + reg - LOWER_PORT;
+	char port_c = 'B' + reg - LOWER_PORT;
 	fprintf(stderr, "Warning: the avr sets PORT%c.R%c%d when DDR%c=0x%02X\n",
 		port_c, port_c, bit, port_c, ddr_val);
       }
@@ -325,7 +302,7 @@ void avr_set_bit(int reg,int bit){
     }
   }
   else if (reg >= LOWER_PIN && reg <= HIGHER_PIN){
-    char port_c = 'A' + reg - LOWER_PIN;
+    char port_c = 'B' + reg - LOWER_PIN;
     fprintf(stderr, "Warning : PIN%c is only a read register, it shouldn't be written\n",
 		port_c);
   }
@@ -474,10 +451,10 @@ void exec_instr(char *instr, int size){
     out_set_analog(chan, val);
   }else{
     int port;
-    if(instr[1] >= 'A' && instr[1] <= ('A' + HIGHER_PORT - LOWER_PORT)){
-      port = instr[1] - 'A' + LOWER_PORT;
-    }else if(instr[1] >= 'a' && instr[1] <= ('a' + HIGHER_PORT - LOWER_PORT)){
-      port = instr[1] - 'a' + LOWER_PORT;
+    if(instr[1] >= 'B' && instr[1] <= ('B' + HIGHER_PORT - LOWER_PORT)){
+      port = instr[1] - 'B' + LOWER_PORT;
+    }else if(instr[1] >= 'b' && instr[1] <= ('b' + HIGHER_PORT - LOWER_PORT)){
+      port = instr[1] - 'b' + LOWER_PORT;
     }else{
       invalid_instr(instr);
       return;

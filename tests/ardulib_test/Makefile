@@ -4,7 +4,7 @@ ATTY     := /dev/tty.usbmodem14331
 # CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 CFLAGS   := -mmcu=atmega32u4
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
-INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
+INCLUDES := -I$(SRC)/stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
@@ -17,6 +17,7 @@ run: ardulib.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
+	@rm -rf *.elf.dSYM
 
 .PHONY: ardulib run clean flash
 
@@ -35,7 +36,7 @@ ardulib.elf: ardulib.c
 
 ################################################################################
 
-ardulib.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) ardulib.c
+ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) ardulib.c
 	$(AVR_GXX) -fpermissive -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
 
 ardulib.hex: ardulib.avr

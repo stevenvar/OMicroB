@@ -4,7 +4,7 @@ ATTY     := /dev/tty.usbmodem14331
 # CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 CFLAGS   := -mmcu=atmega32u4
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
-INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
+INCLUDES := -I$(SRC)/stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
@@ -30,12 +30,11 @@ ardulib.c: ardulib.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 ardulib.elf: ardulib.c
-	# $(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) $(INCLUDES) -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
 
 ################################################################################
 
-ardulib.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) ardulib.c
+ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) ardulib.c
 	$(AVR_GXX) -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
 
 ardulib.hex: ardulib.avr
