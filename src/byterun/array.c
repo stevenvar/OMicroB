@@ -1,13 +1,15 @@
+extern val_t atom0_header;
+
 val_t caml_make_vect(val_t len, val_t init) {
   val_t res;
   mlsize_t size, i;
   size = Int_val(len);
   if (size == 0) {
-    res = Val_unit; 
+    res = Val_block(&atom0_header + 1);
     /* Atom(0); */
   } else {
     OCamlAlloc(res, size, 0);
-    for (i = 0; i < size; i++) 
+    for (i = 0; i < size; i++)
       Field(res, i) =  init;
     /* res = caml_check_urgent_gc (res); */
   }
