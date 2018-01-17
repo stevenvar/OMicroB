@@ -1,5 +1,3 @@
-
-
 #include <stdint.h>
 
 #include "debug.h"
@@ -1766,8 +1764,18 @@ val_t interp(void) {
       printf("RAISE\n");
 #endif
       if (trapSp == Val_int(-1)) {
-#if defined(DEBUG) && defined (__PC__)
+#if defined (__PC__)
         printf("Error: uncatched exception\n");
+#endif
+#if defined __AVR__
+        DDRB |= _BV(6);
+        while (1) {
+          unsigned int i, j;
+          PORTB ^= _BV(6);
+          for (i = 0; i < 1000; i ++) {
+            for (j = 0; j < 1000; j ++);
+          }
+        }
 #endif
         return Val_unit;
       } else {
@@ -2557,7 +2565,6 @@ void setup(void) {
 }
 
 void loop(void) {
-
 }
 
 /******************************************************************************/
@@ -2566,7 +2573,9 @@ void loop(void) {
 
 int main(int argc, char** argv) {
   setup();
-  while (1) loop();
+#ifdef __AVR__
+  while(1) loop();
+#endif
   return 0;
 }
 
