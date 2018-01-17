@@ -17,6 +17,7 @@ run: ardulib.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
+	@rm -r *.elf.dSYM
 
 .PHONY: ardulib run clean flash
 
