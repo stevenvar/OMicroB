@@ -1,7 +1,7 @@
 val int_of_hex1 : char -> int
 val int_of_hex2 : char -> char -> int
 val int_of_hex3 : char -> char -> char -> int
-type port = PORTA | PORTB | PORTC | PORTD | PORTE | PORTF
+type port = PORTB | PORTC | PORTD | PORTE | PORTF
 val string_of_port : port -> string
 val port_of_string : string -> port
 val char_of_port : port -> char
@@ -9,15 +9,7 @@ val port_of_char : char -> port
 val index_of_port : port -> int
 val port_of_index : int -> port
 type pin =
-    RA0
-  | RA1
-  | RA2
-  | RA3
-  | RA4
-  | RA5
-  | RA6
-  | RA7
-  | RB0
+    RB0
   | RB1
   | RB2
   | RB3

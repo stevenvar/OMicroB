@@ -42,7 +42,7 @@ ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 simul : ardulib.byte
-	./ardulib.byte ../../bin/ocapic_dip40_simulator
+	./ardulib.byte ../../bin/omicrob_pin_simulator
 
 flash: ardulib.avr
 	stty -f $(ATTY) 1200

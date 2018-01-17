@@ -13,15 +13,13 @@ let () =
   (* let tbl = [| 1; 2; 3 |] in *)
   (* digital_write PIN9 false; *)
   (* tbl.(0) <- 2; *)
-  (* digital_write PIN10 false; *)
+  digital_write PIN10 false;
   let l = [ "oui" ] in
   let ll = [ "oui" ] in
-  write_register PIND 0xFF;
-  if [ 14 ] > [ 9 ] then 
+  if l > ll then
     write_register PINB 0xFF
   else
     write_register PINB 0x00;
-  
   ()
   
   (*
