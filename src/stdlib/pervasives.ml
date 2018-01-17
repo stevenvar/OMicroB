@@ -56,6 +56,10 @@ external ( *. ) : float -> float -> float = "%mulfloat"
 external ( /. ) : float -> float -> float = "%divfloat"
 
 (* Comparisons *)
+  
+external ( == ) : 'a -> 'a -> bool = "%eq"
+external ( != ) : 'a -> 'a -> bool = "%noteq"
+  
 external ( = ) : 'a -> 'a -> bool = "%equal"
 external ( <> ) : 'a -> 'a -> bool = "%notequal"
 external ( < ) : 'a -> 'a -> bool = "%lessthan"
@@ -90,6 +94,7 @@ external print_float : float -> unit = "caml_print_float"
 
 external raise : exn -> 'a = "%raise"
 let failwith s = raise(Failure s)
+let invalid_arg s = raise(Invalid_argument s)
 
 (* Lists *)
 let rec ( @ ) l1 l2 =

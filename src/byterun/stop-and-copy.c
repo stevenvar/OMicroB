@@ -149,6 +149,7 @@ void print_heap(){
     printf("\n");
     i++;
   }
+  printf("heap_ptr = %p", heap_ptr);
   printf("\n\n\n");
 }
 

@@ -31,7 +31,7 @@ ardulib.c: ardulib.byte $(BIN)/bc2c
 
 ardulib.elf: ardulib.c
 	# $(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG $^ -o $@
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 $(OPT) -D_POSIX_C_SOURCE=199309L $^ -o $@
 
 ################################################################################
 

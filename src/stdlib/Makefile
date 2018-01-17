@@ -1,11 +1,11 @@
 include ../../etc/Makefile.conf
 
-MLS  := $(wildcard *.ml)
-MLIS := $(wildcard *.mli)
-CMOS := $(MLS:.ml=.cmo)
-CMIS := $(MLIS:.mli=.cmi)
+MODULES := std_exit pervasives list array avr
+CMOS := $(MODULES:=.cmo)
+CMIS := $(MODULES:=.cmi)
 
-TARGETS := $(LIB)/stdlib.cma $(LIB)/std_exit.cmo $(foreach cmi,$(CMIS),$(LIB)/$(cmi))
+
+TARGETS :=  $(LIB)/stdlib.cma $(LIB)/std_exit.cmo  $(foreach cmi,$(CMIS),$(LIB)/$(cmi))
 
 stdlib: $(TARGETS)
 

@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 val_t caml_avr_write_register(val_t reg, val_t val){
   writeRegister((uint8_t)Int_val(reg),(uint8_t)Int_val(val));
   return Val_unit;
