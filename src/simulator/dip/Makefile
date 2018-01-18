@@ -1,5 +1,5 @@
 
-include ../../../../etc/Makefile.conf
+include ../../../etc/Makefile.conf
 
 TARG = $(BIN)/omicrob_pin_simulator
 
