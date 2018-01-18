@@ -9,7 +9,7 @@
 ##                                                                       ##
 ###########################################################################
 
-include ../../../etc/Makefile.conf
+include ../../etc/Makefile.conf
 
 SRCS = shared.c sf_regs.c simu.c cserial.c ceeprom.c stds.c
 OBJS = $(SRCS:.c=.o)

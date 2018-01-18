@@ -7,7 +7,7 @@
 #include "pclib.c"
 #else
 #include "simul.h"
-#include "simulator/simu.h"
+#include "../simulator/simu.h"
 
 val_t caml_avr_set_bit(val_t reg, val_t bit){
   avr_set_bit(Int_val(reg),Int_val(bit));
@@ -161,7 +161,7 @@ val_t ocaml_arduboy_clear(val_t unit){
 
 #ifndef __PC__
 
-#include "simulator/simu.c"
+#include "../simulator/simu.c"
 
 
 val_t ocaml_arduboy_init(val_t unit) {
