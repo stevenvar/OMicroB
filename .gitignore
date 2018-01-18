@@ -9,3 +9,5 @@
 **/*.elf
 **/*.avr
 **/*.hex
+.build/
+config.ml

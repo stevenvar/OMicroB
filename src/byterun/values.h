@@ -57,7 +57,6 @@ typedef int32_t header_t;
 typedef uint8_t tag_t;
 typedef uint8_t opcode_t;
 
-
 #if OCAML_BYTECODE_BSIZE < 256
 typedef uint8_t code_t;
 #elif OCAML_BYTECODE_BSIZE < 65536
@@ -66,7 +65,6 @@ typedef uint16_t code_t;
 typedef uint32_t code_t;
 #endif
 #endif
-
 
 /******************************************************************************/
 /* Value classification */
@@ -80,15 +78,9 @@ typedef uint32_t code_t;
 #define Val_int(x) ((val_t)(((uval_t) (x) << 1) | 1))
 #define Int_val(x) ((val_t) (x) >> 1)
 
-/* #define Init_val_block(x) ((val_t) ( (x) << 2) | ((val_t) 0x3FF << 22)) */
-/* #define Val_block(x) ((val_t) ( ((x) - (int) ocaml_heap)) << 2 | ((val_t) 0x3FF << 22)) */
-/* #define Block_val(x) (ocaml_heap + (((x) ^ ((val_t) 0x3FF << 22)) >> 2)) */
-/* #define Val_block(x) (val_t)( (((val_t)x - (val_t)ocaml_heap) << 2) | ((val_t)0x3FF << 22) ) */
-/* #define Block_val(x)  (val_t*)((intptr_t)ocaml_heap + ((intptr_t)(x ^ ((val_t)0x3FF << 22) ) >> 2)) */
-
-#define Init_val_block(x) (val_t)((uval_t) ((x) << 1) | (uval_t) 0xFFC00000)
-#define Val_block(x) (val_t)( (((uval_t) ((intptr_t)x - (intptr_t)ocaml_heap)) << 1) | 0xFFC00000)
-#define Block_val(x)  (val_t*)((intptr_t) ocaml_heap + ((intptr_t) ((uval_t) x ^ 0xFFC00000) >> 1))
+#define Init_val_block(x) (val_t) ((uval_t) ((x) << 1) | (uval_t) 0xFFC00000)
+#define Val_block(x) (val_t) ((((uval_t) ((intptr_t) (x) - (intptr_t) ocaml_heap)) << 1) | 0xFFC00000)
+#define Block_val(x)  (val_t *) ((intptr_t) ocaml_heap + ((intptr_t) ((uval_t) (x) ^ 0xFFC00000) >> 1))
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
@@ -110,9 +102,9 @@ typedef uint32_t code_t;
 /******************************************************************************/
 /* Blocks */
 
-#define Field(val, i) (    ((val_t*)(Block_val(val)))   [i]  )
+#define Field(val, i) (((val_t*) Block_val(val))[i])
 #define String_val(val) ((char *) Block_val(val))
-#define StringField(val, i) ( String_val(val)[i])
+#define StringField(val, i) String_val(val)[i]
 
 #define Header(val) Field(val, -1)
 #define Hd_val(val) Field(val, -1)
@@ -125,29 +117,29 @@ typedef uint32_t code_t;
 
 #define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
 
-#define Make_header(wosize, tag) (uval_t)(((uval_t) (wosize) << (uval_t)10) | (uval_t)tag)
+#define Make_header(wosize, tag) (uval_t)(((uval_t) (wosize) << (uval_t) 10) | (uval_t) tag)
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
 #define Wsize_bsize(sz) ((sz) / sizeof (val_t))
-#define Wosize_val(val) ((uval_t)Header(val) >> 10)
-#define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
+#define Wosize_val(val) ((uval_t) Header(val) >> 10)
+#define Bosize_val(val) (Bsize_wsize (Wosize_val(val)))
 
 #define Color_val(val) ((Header(val) >> 8) & 1)
-#define Tag_val(val) ((uval_t)(Header(val)) & (uval_t)0xFF)
-#define Set_tag_hd(hd,tag) ((uval_t)hd | (uval_t) tag)
+#define Tag_val(val) ((uval_t) Header(val) & (uval_t) 0xFF)
+#define Set_tag_hd(hd,tag) ((uval_t) hd | (uval_t) tag)
 #define Set
 
-#define Tag_hd(hd) ((uval_t)hd & (uval_t)0xFF)
-#define Wosize_hd(hd) (uval_t)((uval_t)hd >> 10)
-#define Bosize_hd(hd) (Bsize_wsize (Wosize_hd (hd)))
+#define Tag_hd(hd) ((uval_t) hd & (uval_t) 0xFF)
+#define Wosize_hd(hd) ((uval_t) ((uval_t) hd >> 10))
+#define Bosize_hd(hd) Bsize_wsize(Wosize_hd(hd))
 
 
 #define Color_white 0
 #define Color_black 1
 
-#define Is_black_val(val) (((uval_t)Header(val) >> 8) & Color_black)
-#define Is_black_hd(hd) ((((uval_t)hd) >> 8) & Color_black)
+#define Is_black_val(val) (((uval_t) Header(val) >> 8) & Color_black)
+#define Is_black_hd(hd) ((((uval_t) hd) >> 8) & Color_black)
 
-#define Set_black_hd(hd) ( (uval_t)hd | (uval_t)256)
+#define Set_black_hd(hd) ((uval_t) hd | (uval_t) 0x100)
 
 #define Val_double(x) (x)
 #define Double_val(x) (x)
@@ -171,18 +163,18 @@ typedef uint32_t code_t;
 //#define Code_val(val) (((code_t *) (val)) [0])
 
 /* Object_tag 248 */
-#define Class_val(val) Field((val), 0)
-#define Oid_val(val) Int_val(Field((val), 1))
+#define Class_val(val) Field(val, 0)
+#define Oid_val(val) Int_val(Field(val, 1))
 
 /* Infix_tag 249 */
-#define Infix_offset_hd(hd) (Bosize_hd(hd))
+#define Infix_offset_hd(hd) Bosize_hd(hd)
 #define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
 
 /* Forward_tag 250 */
 #define Forward_val(v) Field(v, 0)
 
 /* Custom_tag 255 */
-#define Data_custom_val(v) ((void *) &Field((v), 1))
+#define Data_custom_val(v) ((void *) &Field(v, 1))
 
 /******************************************************************************/
 /* Custom operations */

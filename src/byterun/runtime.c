@@ -1,5 +1,9 @@
 /* Entry point including the whole runtime */
 
+#ifdef __PC__
+#include <stdio.h>
+#endif
+
 #include "values.h"
 #ifdef DEBUG
 #include "debug.c"
