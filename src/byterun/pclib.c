@@ -100,4 +100,16 @@ val_t caml_avr_draw_pixel(val_t x, val_t y, val_t color){
   return Val_unit;
 }
 
+val_t caml_buffer_write(val_t x, val_t y, val_t color){
+  return Val_unit;
+}
+
+val_t caml_buffer_read(val_t x, val_t y){
+  return Val_unit;
+}
+
+val_t caml_buffer_get_byte(val_t x){
+  return Val_unit;
+}
+
 /* #endif */
