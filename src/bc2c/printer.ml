@@ -1,6 +1,6 @@
 open T
 
-let print_c_array oc ty name size data pp =
+let print_c_array oc ty name size data pp nl =
   let len = List.length data in
   let padding =
     let pad = ref 1 and bound = ref 10 in
@@ -11,8 +11,12 @@ let print_c_array oc ty name size data pp =
     !pad in
   Printf.fprintf oc "%s %s[%s] = {\n" ty name size;
   List.iteri (fun ind x ->
-    if ind > 0 then Printf.fprintf oc ",\n";
-    Printf.fprintf oc "  /* %*d */  " padding ind;
+    if nl x then (
+      if ind > 0 then Printf.fprintf oc ",\n";
+      Printf.fprintf oc "  /* %*d */  " padding ind;
+    ) else if ind > 0 then (
+      Printf.fprintf oc ", ";
+    );
     Printf.fprintf oc "%s" (pp x);
   ) data;
   if len > 0 then Printf.fprintf oc "\n";
@@ -23,14 +27,18 @@ let print_codegen_word_array oc ty name size data =
     match word with
     | SBYTE byte ->
       assert (byte >= -0x80 && byte < 0x80);
-      "(opcode_t)"^string_of_int byte;
+      if byte < 0 then "(opcode_t) "^ string_of_int byte
+      else string_of_int byte;
     | UBYTE byte ->
       assert (byte >= 0 && byte < 0x100);
       string_of_int byte;
     | OPCODE opcode ->
       "OCAML_" ^ Opcode.to_string opcode
-  in
-  print_c_array oc ty name size data pp
+  and nl word =
+    match word with
+    | SBYTE _ | UBYTE _ -> false
+    | OPCODE _ -> true in
+  print_c_array oc ty name size data pp nl
 
 let string_of_dword arch dword =
   let bprint_char buf c =
@@ -81,7 +89,7 @@ let string_of_dword arch dword =
   | CODEPTR ptr        -> Printf.sprintf "Val_codeptr(%d)" ptr
 
 let print_datagen_word_array oc arch ty name size data =
-  print_c_array oc ty name size data (string_of_dword arch)
+  print_c_array oc ty name size data (string_of_dword arch) (fun _ -> true)
 
 let print_opcodes oc opcodes =
   List.iteri (fun i opcode ->

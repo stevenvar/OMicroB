@@ -41,6 +41,6 @@ let data_mode cs dc =
 let boot () =
   (* let spi_clock_div2 = 0x04 in *)
   (* Spi.set_clock_divider spi_clock_div2; *)
-  command_mode PORTD PORTD;
+  command_mode Avr.PORTD Avr.PORTD;
   transfer_program boot_program;
-  (* data_mode PORTD PORTD *)
+  (* data_mode Avr.PORTD Avr.PORTD *)

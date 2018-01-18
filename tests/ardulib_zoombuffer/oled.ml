@@ -5,7 +5,6 @@ open Avr
 external write_buffer : int -> int -> bool -> unit = "caml_buffer_write"
 external read_buffer : int -> int -> bool = "caml_buffer_read"
 external get_byte_buffer : int -> int = "caml_buffer_get_byte"
-(* external init_buffer : unit -> unit = "caml_init_buffer" *)
 
 let boot_program =
   [|

@@ -142,9 +142,19 @@ let () =
       let bytecode, opcodes, codemap = Codegen.export code in
       let accudata, stackdata, globdata, heapdata = Datagen.export arch codemap accu stack globals in
       let stackdata = Datagen.reverse_stack stack_size stackdata in
-      if List.length heapdata > heap_size then (
-        error (Printf.sprintf "too huge global data (%d words) for the defined heap size (%d words), out of memory before start" (List.length heapdata) heap_size);
+
+      let heap_available_size =
+        match gc with
+        | `SAC ->
+          if heap_size mod 2 <> 0 then error (Printf.sprintf "heap size should be even when using a Stop&Copy GC algorithm");
+          heap_size / 2
+        | `MAC ->
+          heap_size in
+      if List.length heapdata > heap_available_size then (
+        error (Printf.sprintf "too huge global data (%d words) for the defined heap size (%d words), out of memory before start" (List.length heapdata) heap_available_size);
       );
+
+      (* Defined Constants *)
       Printf.fprintf oc "#define OCAML_STACK_WOSIZE         %8d\n" stack_size;
       Printf.fprintf oc "#define OCAML_HEAP_WOSIZE          %8d\n" heap_size;
       Printf.fprintf oc "#define OCAML_HEAP_INITIAL_WOSIZE  %8d\n" (List.length heapdata);
@@ -153,17 +163,21 @@ let () =
       Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE       %8d\n" (List.length bytecode);
       Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER     %8d\n" (Array.length bytefile.Bytefile.prim);
       Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH         %8s\n" (Arch.to_string arch);
-      Printf.fprintf oc "#define OCAML_GC_ALGORITHM %16s\n" (match gc with `SAC -> "STOP_AND_COPY" | `MAC -> "MARK_AND_COMPACT");
+      Printf.fprintf oc "\n";
+
+      (* Defined Variables *)
+      Printf.fprintf oc "#define %s\n" (match gc with `SAC -> "OCAML_GC_STOP_AND_COPY" | `MAC -> "OCAML_GC_MARK_AND_COMPACT");
       if debug then Printf.fprintf oc "#define OCAML_DEBUG_MODE\n";
       Printf.fprintf oc "\n";
+
+      (* Include values.h *)
       Printf.fprintf oc "#include <%s>\n" values_h;
       Printf.fprintf oc "\n";
+
+      (* Define heap, acc, stack, global_data, bytecode *)
       Printer.print_opcodes oc opcodes;
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc arch "val_t" "ocaml_heap" "OCAML_HEAP_WOSIZE * 2" heapdata;
-      Printf.fprintf oc "\n";
-      Printf.fprintf oc "const val_t* ocaml_heap1 = ocaml_heap;\n";
-      Printf.fprintf oc "const val_t* ocaml_heap2 = ocaml_heap + OCAML_HEAP_WOSIZE;\n";
+      Printer.print_datagen_word_array oc arch "val_t" "ocaml_heap" "OCAML_HEAP_WOSIZE" heapdata;
       Printf.fprintf oc "\n";
       Printf.fprintf oc "val_t acc = %s;\n" (Printer.string_of_dword arch accudata);
       Printf.fprintf oc "\n";
@@ -173,8 +187,12 @@ let () =
       Printf.fprintf oc "\n";
       Printer.print_codegen_word_array oc "PROGMEM opcode_t" "const ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
       Printf.fprintf oc "\n";
+
+      (* Include runtime.c *)
       Printf.fprintf oc "#include <%s>\n" runtime_c;
       Printf.fprintf oc "\n";
+
+      (* Define primitive table *)
       Printer.print_prim oc bytefile.Bytefile.prim;
     )
   with

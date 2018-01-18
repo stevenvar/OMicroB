@@ -1,87 +1,41 @@
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 /* Binding to arduino libraries */
 
-#ifdef  __AVR__
+#include "values.h"
 #include "avr.h"
-#include "avrlib.c"
-#elif defined(__PC__)
-#include "pclib.c"
-#else
-#include "simul.h"
-#include "../simulator/simu.h"
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
 val_t caml_avr_set_bit(val_t reg, val_t bit){
-  avr_set_bit(Int_val(reg),Int_val(bit));
+  avr_set_bit(Int_val(reg), Int_val(bit));
   return Val_unit;
 }
 
 val_t caml_avr_clear_bit(val_t reg, val_t bit){
-  avr_clear_bit(Int_val(reg),Int_val(bit));
+  avr_clear_bit(Int_val(reg), Int_val(bit));
   return Val_unit;
 }
 
 val_t caml_avr_read_bit(val_t reg, val_t bit){
-  unsigned int val = avr_test_bit(Int_val(reg),Int_val(bit));
-  return Val_int(val);
+  return Val_int(avr_read_bit(Int_val(reg), Int_val(bit)));
 }
 
 val_t caml_avr_read_register(val_t reg){
-  return Val_int(avr_read_reg(Int_val(reg)));
+  return Val_int(avr_read_register(Int_val(reg)));
 }
 
 val_t caml_avr_write_register(val_t reg, val_t val){
-  avr_write_reg(Int_val(reg),Int_val(val));
-  return Val_unit;
-}
-
-val_t caml_avr_draw_pixel(val_t x, val_t y, val_t color){
-  return Val_unit;
-}
-
-#endif
-
-val_t array_get(val_t a, val_t i) {
-  return Val_unit;
-}
-
-val_t array_set(val_t a, val_t i, val_t v) {
-  return Val_unit;
-}
-
-val_t array_length(val_t a) {
+  avr_write_register(Int_val(reg), Int_val(val));
   return Val_unit;
 }
 
 /******************************************************************************/
-/* Arduino specific libraries */
-
-#ifdef __AVR__
-/*
-val_t caml_pin_mode(val_t pin, val_t mode) {
-  pinMode(Int_val(pin), Int_val(mode));
-  return Val_unit;
-}
-
-val_t caml_digital_write(val_t pin, val_t state) {
-  digitalWrite(Int_val(pin), Int_val(state));
-  return Val_unit;
-}
-
-val_t caml_digital_read(val_t pin) {
-  return Val_int(digitalRead(Int_val(pin)));
-}
-
-val_t caml_delay(val_t millis) {
-  delay(Int_val(millis));
-  return Val_unit;
-}
-
-val_t ocaml_arduino_millis(val_t k){
-  return Val_int(millis());
-}
-*/
-#endif
-
 /******************************************************************************/
+<<<<<<< HEAD
 /* Arduboy specific libraries */
 
 #ifdef __AVR__
@@ -248,4 +202,6 @@ val_t caml_init_buffer(val_t x){
 
 #endif /* __AVR__ */
 
+=======
+>>>>>>> 273ad3b4f8621aaca6d544c3f98fc9d11751ef11
 /******************************************************************************/
