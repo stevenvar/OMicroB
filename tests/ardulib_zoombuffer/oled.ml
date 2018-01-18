@@ -5,6 +5,7 @@ open Avr
 external write_buffer : int -> int -> bool -> unit = "caml_buffer_write"
 external read_buffer : int -> int -> bool = "caml_buffer_read"
 external get_byte_buffer : int -> int = "caml_buffer_get_byte"
+(* external init_buffer : unit -> unit = "caml_init_buffer" *)
 
 let boot_program =
   [|
@@ -39,14 +40,13 @@ let send_lcd_command cs dc com =
 
 let display () =
   for i = 0 to 1023 do
-    (* Spi.transfer(0xFF); *)
     let b = get_byte_buffer i in
     Spi.transfer(b);
   done
 
 let draw x y color =
   write_buffer x y color
-  
+
 let clear() =
  for i = 0 to 1023 do
    Spi.transfer(0x00)
@@ -64,7 +64,7 @@ let clear() =
  *   Spi.transfer (page);
  *   data_mode cs dc;
  *   Spi.transfer (0x00)
- *   
+ *
  * let draw ~cs ~dc x y =
  *   let page = y / 8 in
  *   let shift = y mod 8 in
@@ -85,6 +85,6 @@ let boot ~cs ~dc ~rst =
   command_mode cs dc;
   transfer_program boot_program;
   data_mode cs dc;
+  (* init_buffer(); *)
   clear();
   (* moveto cs dc 10 10; *)
-

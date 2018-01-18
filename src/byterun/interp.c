@@ -937,7 +937,6 @@ val_t interp(void) {
       code_t o = read_ptr_1B() -2 ;
       int blksize = f * 2 - 1 + v;
       int i;
-      val_t * p;
       if (v > 0) {
         push(acc);
       }

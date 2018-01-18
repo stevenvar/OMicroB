@@ -19,6 +19,11 @@ val_t caml_buffer_get_byte(val_t x){
   return Val_int(v);
 }
 
+val_t caml_init_buffer(val_t x){
+  init_display();
+  return Val_unit;
+}
+
 
 #endif
 

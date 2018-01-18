@@ -53,7 +53,7 @@ let clear_zone ~cs ~dc x y =
   Spi.transfer (page);
   data_mode cs dc;
   Spi.transfer (0x00)
-  
+
 let draw ~cs ~dc x y =
   let page = y / 8 in
   let shift = y mod 8 in
@@ -76,4 +76,3 @@ let boot ~cs ~dc ~rst =
   data_mode cs dc;
   clear();
   (* moveto cs dc 10 10; *)
-

@@ -24,12 +24,12 @@ clean:
 ################################################################################
 
 
-ardulib.byte: spi.ml oled.ml ardulib.ml 
+ardulib.byte: spi.ml oled.ml ardulib.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun  $^ -o $@
 	ocamlclean $@ -o $@
 
 ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 32 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 128 $< -o $@
 
 ardulib.elf: ardulib.c
 	# $(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@

@@ -1,10 +1,10 @@
 open Avr
 
-let init_rgb r g b = 
+let init_rgb r g b =
   digital_write r true;
   digital_write g true;
   digital_write b true
-  
+
 
 let boot_pins () =
   let cs = PIN12 in
@@ -18,7 +18,7 @@ let boot_pins () =
   let button_b = PIN8 in
   let r = PIN9 in
   let g = PIN10 in
-  let b = PIN11 in 
+  let b = PIN11 in
   pin_mode pin_left INPUT;
   pin_mode pin_right INPUT;
   pin_mode pin_down INPUT;
@@ -40,7 +40,7 @@ let () =
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
   Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
-  for i = 0 to 10 do 
+  for i = 0 to 10 do
     Oled.draw ~cs:PIN12 ~dc:PIN4 30 i;
     for i = 0 to 100 do () done;
     Oled.clear_zone ~cs:PIN12 ~dc:PIN4 30 i;

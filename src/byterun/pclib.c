@@ -80,4 +80,9 @@ val_t caml_buffer_get_byte(val_t x){
   return Val_unit;
 }
 
+val_t caml_init_buffer(val_t x){
+  return Val_unit;
+}
+
+
 /* #endif */
