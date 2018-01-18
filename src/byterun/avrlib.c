@@ -3,7 +3,7 @@
 
 /******************************************************************************/
 
-uint8_t *get_reg_addr(uint8_t reg) {
+volatile uint8_t *get_reg_addr(uint8_t reg) {
   if (reg ==  0) return &PORTB;
   if (reg ==  1) return &PORTC;
   if (reg ==  2) return &PORTD;

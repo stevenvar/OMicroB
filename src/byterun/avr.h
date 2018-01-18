@@ -1,4 +1,4 @@
-/* C-interface for the two implementations: avrlib.c and pclib.c */
+/* C-interface for the two implementations: avrlib.c and sf_regs.c */
 
 #include <stdbool.h>
 #include <stdint.h>

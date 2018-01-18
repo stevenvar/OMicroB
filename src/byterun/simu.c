@@ -1,20 +1,10 @@
-/*************************************************************************/
-/*                                                                       */
-/*                                OCaPIC                                 */
-/*                                                                       */
-/*                             Benoit Vaugon                             */
-/*                                                                       */
-/*    This file is distributed under the terms of the CeCILL license.    */
-/*    See file ../../LICENSE-en.                                         */
-/*                                                                       */
-/*************************************************************************/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h>
+
 #include "sf_regs.h"
 #include "shared.h"
 
@@ -151,7 +141,8 @@ void send_all_proc(const char *instr, int size){
   V(sem_outs);
 }
 
-CAMLprim value caml_sys_get_argv(value unit);
+static const char *global_argv_tbl[] = { "<unknown>", NULL };
+const char **global_argv = global_argv_tbl;
 
 void init_simulator(void){
   int i, j;
@@ -163,8 +154,9 @@ void init_simulator(void){
   if(test_reinit) return;
   test_reinit = 1;
 
-  argv = ((const char ***) caml_sys_get_argv(Val_unit))[1];
-  argc = Wosize_val((value) argv);
+  argv = global_argv;
+  argc = 0;
+  while (argv[argc] != NULL) argc ++;
 
   nb_proc = argc - 1;
 

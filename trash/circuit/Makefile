@@ -9,7 +9,7 @@
 ##                                                                       ##
 ###########################################################################
 
-include ../../etc/Makefile.conf
+include ../../../etc/Makefile.conf
 
 TARG = $(BIN)/ocapic_circuit_simulator
 SRCS = $(wildcard *.ml *.mli *.mll *.mly)

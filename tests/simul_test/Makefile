@@ -1,10 +1,10 @@
 include ../../etc/Makefile.conf
 
-ATTY     := /dev/tty.usbmodem14331
-# CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
-CFLAGS   := -mmcu=atmega32u4
-LFLAGS   := -Wl,-Os -Wl,--gc-sections
-INCLUDES := -I$(SRC)/stdlib/ -I$(SRC)/byterun/
+ATTY      := /dev/tty.usbmodem14331
+# CFLAGS  := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
+CFLAGS    := -mmcu=atmega32u4
+LFLAGS    := -Wl,-Os -Wl,--gc-sections
+INCLUDES  := -I$(SRC)/stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
@@ -31,7 +31,7 @@ ardulib.c: ardulib.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 ardulib.elf: ardulib.c
-	$(GCC) -I $(OCAMLWHERE) $(INCLUDES) -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
+	$(GCC) -I $(OCAMLWHERE) $(INCLUDES) -g $^ -o $@
 
 ################################################################################
 
@@ -42,7 +42,7 @@ ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 simul : ardulib.byte
-	./ardulib.byte ../../bin/omicrob_pin_simulator
+	./ardulib.elf ../../bin/omicrob_pin_simulator
 
 flash: ardulib.avr
 	stty -f $(ATTY) 1200

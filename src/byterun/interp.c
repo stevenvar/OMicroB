@@ -2572,16 +2572,19 @@ void loop(void) {
 
 /******************************************************************************/
 
-#ifndef __ARDUINO__
+#ifdef __PC__
+extern const char **global_argv;
+#endif
 
-int main(int argc, char** argv) {
+int main(int argc, const char **argv) {
+#ifdef __PC__
+  global_argv = argv;
+#endif
   setup();
 #ifdef __AVR__
   while(1) loop();
 #endif
   return 0;
 }
-
-#endif
 
 /******************************************************************************/

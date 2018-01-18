@@ -3,7 +3,8 @@ include etc/Makefile.conf
 all: config
 	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
-	$(call compile, src/simulator)
+	$(call compile, src/simulator/lcd)
+	$(call compile, src/simulator/dip)
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
@@ -63,7 +64,8 @@ clean:
 	@rm -f *~ */*~ */*/*~ */*/*/*~
 	$(call clean, src/bc2c)
 	$(call clean, src/byterun)
-	$(call clean, src/simulator)
+	$(call clean, src/simulator/dip)
+	$(call clean, src/simulator/lcd)
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)

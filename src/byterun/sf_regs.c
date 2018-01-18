@@ -1,6 +1,6 @@
-
-#include <caml/mlvalues.h>
 #include <sys/time.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
 #include "shared.h"
@@ -176,17 +176,17 @@ static void synchronize(){
   may_sleep();
 }
 
-static int is_reg_need_synchro(unsigned int reg){
+static int is_reg_need_synchro(uint8_t reg){
   return
     (reg >= LOWER_PORT && reg <= HIGHER_PORT);
 }
 
-static void avr_write_reg_gen(int reg, unsigned char new_val){
-  unsigned char old_val = regs[reg];
+static void avr_write_register_gen(int reg, uint8_t new_val){
+  uint8_t old_val = regs[reg];
   if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
     if(old_val != new_val){
       int ddr = reg - LOWER_PORT + LOWER_DDR;
-      unsigned char ddr_val = regs[ddr];
+      uint8_t ddr_val = regs[ddr];
       if(ddr_val == 0x00){
         char port_c = 'B' + reg - LOWER_PORT;
         fprintf(stderr, "Warning: the avr writes PORT%c when DDR%c=0xFF\n",
@@ -208,15 +208,17 @@ static void avr_write_reg_gen(int reg, unsigned char new_val){
   may_sleep();
 }
 
-void avr_write_reg(int reg, unsigned char new_val){
+void avr_write_register(uint8_t reg, uint8_t new_val){
+  printf("avr_write_register(%d, %d)\n", (int) reg, (int) new_val);
   init_simulator();
   P(sem_regs);
-  avr_write_reg_gen(reg, new_val);
+  avr_write_register_gen(reg, new_val);
   V(sem_regs);
 }
 
-unsigned int avr_read_reg(int reg){
-  unsigned int val;
+uint8_t avr_read_register(uint8_t reg){
+  printf("avr_read_register(%d)\n", (int) reg);
+  uint8_t val;
   init_simulator();
   if (is_reg_need_synchro(reg)) synchronize();
   P(sem_regs);
@@ -226,10 +228,10 @@ unsigned int avr_read_reg(int reg){
   return val;
 }
 
-
-unsigned int avr_test_bit(int reg, int bit){
-  unsigned int mask = 1 << bit;
-  unsigned int val;
+bool avr_read_bit(uint8_t reg, uint8_t bit){
+  printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit);
+  uint8_t mask = 1 << bit;
+  uint8_t val;
   init_simulator();
   if (is_reg_need_synchro(reg)) synchronize();
   P(sem_regs);
@@ -239,17 +241,18 @@ unsigned int avr_test_bit(int reg, int bit){
   return val;
 }
 
-void avr_clear_bit(int reg, int bit){
-    init_simulator();
+void avr_clear_bit(uint8_t reg, uint8_t bit){
+  printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit);
+  init_simulator();
   P(sem_regs);
   {
-    unsigned char old_val = regs[reg];
-    unsigned char mask = 1 << bit;
-    unsigned char new_val = old_val & ~mask;
+    uint8_t old_val = regs[reg];
+    uint8_t mask = 1 << bit;
+    uint8_t new_val = old_val & ~mask;
     if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
       if(old_val != new_val){
         int ddr = reg - LOWER_PORT + LOWER_DDR;
-        unsigned char ddr_val = regs[ddr];
+        uint8_t ddr_val = regs[ddr];
         if(!(ddr_val & mask)){
           char port_c = 'B' + reg - LOWER_PORT;
           fprintf(stderr,
@@ -274,16 +277,17 @@ void avr_clear_bit(int reg, int bit){
 }
 
 
-void avr_set_bit(int reg,int bit){
+void avr_set_bit(uint8_t reg, uint8_t bit){
+  printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit);
   init_simulator();
   P(sem_regs);
-  unsigned char old_val = regs[reg];
-  unsigned char mask = 1 << bit;
-  unsigned char new_val = old_val | mask;
+  uint8_t old_val = regs[reg];
+  uint8_t mask = 1 << bit;
+  uint8_t new_val = old_val | mask;
   if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
     if (old_val != new_val){
       int ddr = reg - LOWER_PORT + LOWER_DDR;
-      unsigned char ddr_val = regs[ddr];
+      uint8_t ddr_val = regs[ddr];
       if(!(ddr_val & mask)){
 	char port_c = 'B' + reg - LOWER_PORT;
 	fprintf(stderr, "Warning: the avr sets PORT%c.R%c%d when DDR%c=0x%02X\n",
@@ -319,7 +323,7 @@ void avr_set_bit(int reg,int bit){
 
 /******************************/
 
-value caml_pic_tris_of_port(value port_or_bit){
+int pic_tris_of_port(int port_or_bit){
   /* unsigned int reg = Long_val(port_or_bit) & 0x7F; */
   /* unsigned int mask = Long_val(port_or_bit) >> 7; */
   /* may_sleep(); */
@@ -331,7 +335,7 @@ value caml_pic_tris_of_port(value port_or_bit){
   /*   fprintf(stderr, "Error: tris_of_port(0x%0x): not a port\n", reg); */
   /*   return Val_long(LOWER_TRIS); */
   /* } */
-  return Val_unit;
+  return 1;
 }
 
 /******************************/

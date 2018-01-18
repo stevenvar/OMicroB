@@ -14,5 +14,7 @@
 #ifdef __AVR__
 #include "avrlib.c"
 #else
-#include "pclib.c"
+#include "simu.c"
+#include "shared.c"
+#include "sf_regs.c"
 #endif

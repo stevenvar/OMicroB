@@ -3,15 +3,14 @@ include ../../etc/Makefile.conf
 HEADERS := $(wildcard *.h)
 TARGETS := $(LIB)/libcamlrun.a
 
-OBJECTS :=                   \
-  debug.o                    \
-  prims.o                    \
-  stdlib.o                   \
-  pclib.o                    \
-  gc.o                       \
-  $(SRC)/simulator/simu.o    \
-  $(SRC)/simulator/shared.o  \
-  $(SRC)/simulator/sf_regs.o
+OBJECTS :=  \
+  debug.o   \
+  prims.o   \
+  stdlib.o  \
+  gc.o      \
+  simu.o    \
+  shared.o  \
+  sf_regs.o
 
 CONSTANTS :=                          \
  -ccopt -DOCAML_VIRTUAL_ARCH=32       \
@@ -21,7 +20,7 @@ CONSTANTS :=                          \
  -ccopt -DOCAML_GLOBDATA_NUMBER=1     \
  -ccopt -DDEBUG
 
-byterun: $(SRC)/simulator/simu.o $(TARGETS)
+byterun: $(TARGETS)
 
 $(LIB)/libcamlrun.a: $(OBJECTS)
 	@rm -f $@
