@@ -41,7 +41,7 @@ ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) ardulib.c
 ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-simul : ardulib.byte
+simul : ardulib.elf
 	./ardulib.elf ../../bin/omicrob_pin_simulator
 
 flash: ardulib.avr
