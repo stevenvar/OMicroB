@@ -15,6 +15,10 @@ ardulib: $(TARGETS)
 run: ardulib.elf
 	./ardulib.elf
 
+
+simul : ardulib.byte
+	./ardulib.elf ../../bin/omicrob_pin_simulator
+
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
 	@rm -r *.elf.dSYM
