@@ -1,7 +1,7 @@
 include etc/Makefile.conf
 
 all: config
-	$(call compile, lib)
+	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
 	$(call compile, src/simulator)
 	$(call compile, src/byterun)
@@ -66,6 +66,6 @@ clean:
 	$(call clean, src/simulator)
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
-	$(call clean, lib)
+	$(call clean, lib/extra)
 
 .PHONY: all config install uninstall tests clean

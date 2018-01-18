@@ -143,11 +143,11 @@ LIB         := $ROOT/lib
 ETC         := $ROOT/etc
 
 define compile
-        @make --no-print-directory -q -C \$1 && make --no-print-directory -C \$1 || make -C \$1
+        @\$(MAKE) --no-print-directory -q -C \$1 && \$(MAKE) --no-print-directory -C \$1 || \$(MAKE) -C \$1
 endef
 
 define clean
-        @make --no-print-directory -C \$1 clean > /dev/null
+        @\$(MAKE) --no-print-directory -C \$1 clean > /dev/null
 endef
 " > etc/Makefile.conf
 
