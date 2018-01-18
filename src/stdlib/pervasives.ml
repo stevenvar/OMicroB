@@ -1,17 +1,18 @@
-(* AVR *)
 
-(* type pin =
- * | PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
- * | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
- * | PIN15 | PIN16 | PIN17 *)
-
-(* type mode =
- * | INPUT
- * | OUTPUT *)
 
 (* GC *)
 
 external force_gc : unit -> unit = "caml_force_gc"
+
+(* Unit *)
+
+external ignore : 'a -> unit = "%ignore"
+
+(* Pair operations *)
+
+external fst : 'a * 'b -> 'a = "%field0"
+external snd : 'a * 'b -> 'b = "%field1"
+
 
 (* Boolean operators *)
 
@@ -82,22 +83,11 @@ external print_string :  string -> unit = "caml_print_string"
 external print_int : int -> unit = "caml_print_int"
 external print_float : float -> unit = "caml_print_float"
 
-(* (\* AVR *\)
- * external pin_mode      : pin -> mode -> unit = "caml_pin_mode"      [@@noalloc]
- * external digital_read  : pin -> bool         = "caml_digital_read"  [@@noalloc]
- * external digital_write : pin -> bool -> unit = "caml_digital_write" [@@noalloc]
- * external delay         : int -> unit         = "caml_delay"         [@@noalloc]
- * external millis        : unit -> int         = "caml_avr_millis" [@@noalloc]
- * external serial_begin : int -> unit          = "caml_avr_serial_begin" [@@noalloc] *)
-
 (* Exceptions *)
 
 external raise : exn -> 'a = "%raise"
+external raise_notrace : exn -> 'a = "%raise_notrace"
+
 let failwith s = raise(Failure s)
 let invalid_arg s = raise(Invalid_argument s)
 
-(* Lists *)
-let rec ( @ ) l1 l2 =
-  match l1 with
-    [] -> l2
-  | hd :: tl -> hd :: (tl @ l2)

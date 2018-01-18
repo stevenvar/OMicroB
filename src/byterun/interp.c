@@ -20,12 +20,7 @@
 */
 
 val_t atom0_header = Make_header(0, 0);
-#ifdef __AVR__
-#ifdef OMICROB_WITH_ARDUBOY
-#include "Arduboy.h"
-extern Arduboy arduboy;
-#endif
-#endif
+
 PROGMEM extern void * const ocaml_primitives[];
 
 code_t pc;
@@ -36,12 +31,6 @@ static uint8_t extra_args;
 
 
 void caml_raise_stack_overflow(void) {
-#ifdef __AVR__
-#ifdef OMICROB_WITH_ARDUBOY
-  arduboy.print("stack overflow");
-  arduboy.display();
-#endif
-#endif
 #ifdef __PC__
 #include <stdio.h>
 printf("stack overflow");
@@ -157,7 +146,7 @@ int cptinst = 0;
 #ifdef __AVR__
 
 void print_global(){
-    Serial.println("GLOBALS =");
+  Serial.println("GLOBALS =");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     Serial.print("@0x");
     Serial.println((uval_t)ocaml_global_data+i,HEX);
@@ -993,19 +982,14 @@ val_t interp(void) {
         Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
         Field(acc, 2 * i) = Val_codeptr(read_ptr_2B() - 2 * i - 2);
       }
-      /* printf("f = %d , v = %d , o = %d \n",f,v,o); */
       /* pop v elems into the closure */
       for (; i < v ; i ++) {
         Field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
       for (i = 1; i < f ; i ++){
-        /* printf("push(%d)",Field(acc,2*i)); */
         push(Field(acc,2*i));
       }
-      /* for (i = 1; i < f; i++){ */
-      /*   push(Field(o,i)); */
-      /* } */
        break;
     }
 #endif
@@ -1033,7 +1017,6 @@ val_t interp(void) {
       }
       push(acc);
       for (i = 1; i < f ; i ++){
-        /* printf("push(%d)",Field(acc,2*i)); */
         push(Field(acc,2*i));
       }
       break;
@@ -2067,7 +2050,6 @@ val_t interp(void) {
         caml_raise_division_by_zero();
       }
       acc = Val_int(Int_val(acc) % divisor);
-      /* TODO MACRO */
       break;
     }
 #endif
@@ -2540,9 +2522,8 @@ val_t interp(void) {
 
     default :
 #ifdef DEBUG
-      /* printf("OPCODE = %d\n", opcode); */
+      printf("OPCODE = %d\n", opcode);
 #endif
-      /* assert(0); */
       break;
     }
   }
@@ -2553,10 +2534,6 @@ val_t interp(void) {
 
 
 void setup(void) {
-  /* arduboy.begin(); */
-  /* arduboy.clear(); */
-  /* arduboy.print("ok\n"); */
-  /* arduboy.display(); */
   #ifdef DEBUG
   debug_init();
   #endif
@@ -2566,6 +2543,7 @@ void setup(void) {
 }
 
 void loop(void) {
+  // Here we should wait for the serial port (in order to easily flash the uC)
 }
 
 /******************************************************************************/

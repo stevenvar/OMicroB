@@ -2,23 +2,17 @@
 #include <avr/io.h>
 #include "avr.h"
 
-#define WIDTH 128
-#define HEIGHT 64
-
 volatile uint8_t* regs[] = {
-   NOT_A_PORT,
    &PORTB,
    &PORTC,
    &PORTD,
    &PORTE,
    &PORTF,
-   NOT_A_PORT,
    &DDRB,
    &DDRC,
    &DDRD,
    &DDRE,
    &DDRF,
-   NOT_A_PORT,
    &PINB,
    &PINC,
    &PIND,

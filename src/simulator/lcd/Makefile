@@ -1,17 +1,7 @@
-###########################################################################
-##                                                                       ##
-##                                OCaPIC                                 ##
-##                                                                       ##
-##                             Benoit Vaugon                             ##
-##                                                                       ##
-##    This file is distributed under the terms of the CeCILL license.    ##
-##    See file ../../../LICENSE-en.                                      ##
-##                                                                       ##
-###########################################################################
 
 include ../../../etc/Makefile.conf
 
-TARG = $(BIN)/ocapic_lcd_simulator
+TARG = $(BIN)/omicrob_lcd_simulator
 SRCS = $(wildcard *.ml)
 BUILD = main.native
 EXTRA = $(LIB)/extra

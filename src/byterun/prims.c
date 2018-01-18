@@ -1,6 +1,10 @@
 #include "gc.h"
 #include <string.h>
+#include "fail.c"
+#include "str.c"
+#include "float.c"
 #include "array.c"
+#include "compare.c"
 
 /******************************************************************************/
 
@@ -40,10 +44,7 @@ extern void *caml_format_float;
 extern void *caml_string_get;
 extern void *caml_format_int;
 extern void *caml_blit_string;
-extern void *caml_greaterequal;
-extern void *caml_lessequal;
 extern void *caml_register_named_val_t;
-extern void *caml_compare;
 extern void *caml_ml_bytes_length;
 extern void *caml_fill_bytes;
 extern void *caml_string_compare;
@@ -70,7 +71,7 @@ extern void *caml_nativeint_add;
 extern void *caml_bytes_get;
 extern void *caml_new_lex_engine;
 extern void *caml_lex_engine;
-extern void *caml_notequal;
+/* extern void *caml_notequal; */
 extern void *caml_array_get;
 extern void *caml_parse_engine;
 extern void *caml_obj_tag;
@@ -78,9 +79,9 @@ extern void *caml_obj_set_tag;
 extern void *caml_int_of_string;
 extern void *caml_hexstring_of_float;
 extern void *caml_classify_float;
-extern void *caml_lt_float;
+/* extern void *caml_lt_float; */
 extern void *caml_bytes_set;
-extern void *caml_equal;
+/* extern void *caml_equal; */
 extern void *caml_float_of_string;
 extern void *caml_get_exception_raw_backtrace;
 extern void *caml_convert_raw_backtrace;
@@ -92,7 +93,6 @@ extern void *caml_int32_shift_left;
 extern void *caml_int32_or;
 extern void *caml_int32_mod;
 extern void *caml_int32_sub;
-extern void *caml_greaterthan;
 extern void *caml_int64_of_int;
 extern void *caml_int64_shift_left;
 extern void *caml_int64_or;
@@ -110,7 +110,6 @@ extern void *caml_sys_getenv;
 extern void *caml_weak_create;
 extern void *caml_weak_set;
 extern void *caml_weak_get;
-extern void *caml_lessthan;
 extern void *caml_ensure_stack_capacity;
 extern void *caml_int64_of_string;
 extern void *caml_int32_of_string;
@@ -122,7 +121,7 @@ extern void *caml_int64_neg;
 extern void *caml_int32_neg;
 extern void *caml_sys_file_exists;
 extern void *caml_sys_remove;
-extern void *caml_eq_float;
+/* extern void *caml_eq_float; */
 extern void *caml_int_of_float;
 extern void *caml_sys_time;
 extern void *caml_float_compare;
@@ -156,76 +155,6 @@ void *caml_names_of_builtin_cprim;
 extern val_t ocaml_heap[];
 static val_t oo_last_id = Val_int(0);
 
-val_t caml_add_float(val_t f1, val_t f2){
-  alpha a1, a2, a3;
-  a1.v = f1;
-  a2.v = f2;
-  a3.f = a1.f + a2.f ;
-  return a3.v;
-}
-
-val_t caml_mul_float(val_t f1, val_t f2){
-  alpha a1, a2, a3;
-  a1.v = f1;
-  a2.v = f2;
-  a3.f = a1.f * a2.f ;
-  return a3.v;
-}
-val_t caml_div_float(val_t f1, val_t f2){
-  alpha a1, a2, a3;
-  a1.v = f1;
-  a2.v = f2;
-  a3.f = a1.f / a2.f ;
-  return a3.v;
-}
-
-val_t caml_sub_float(val_t f1, val_t f2){
-  alpha a1, a2, a3;
-  a1.v = f1;
-  a2.v = f2;
-  a3.f = a1.f - a2.f ;
-  return a3.v;
-}
-
-val_t caml_ge_float(val_t f1, val_t f2){
-  alpha a1, a2;
-  a1.v = f1;
-  a2.v = f2;
-  if (a1.f >= a2.f) return Val_int(1);
-  return Val_int(0);
-}
-
-
-/*   #ifdef __AVR__ */
-/* #include "Arduboy.h" */
-/*   extern Arduboy arduboy; */
-/* #endif */
-val_t caml_string_equal(val_t s1, val_t s2)
-{
-  mlsize_t sz1, sz2;
-  /* val_t * p1, * p2; */
-/* #ifdef __AVR__ */
-/*   arduboy.print(Val_int(-4)); */
-/*   arduboy.print("\n"); */
-/*   arduboy.display(); */
-/*   /\* arduboy.print(s1); *\/ */
-/*   /\* arduboy.print("\n"); *\/ */
-/*   /\* arduboy.print(s2); *\/ */
-/*   /\* arduboy.display(); *\/ */
-/*   #endif */
-/*   #ifdef __PC__ */
-/*   printf("%d", Val_int(-4)); */
-/*   #endif */
-
-  if (s1 == s2) return Val_true;
-  sz1 = Wosize_val(s1);
-  sz2 = Wosize_val(s2);
-  if (sz1 != sz2) return Val_false;
-  /* for(p1 = (val_t *)(s1), p2 = (val_t *)(s2); sz1 > 0; sz1--, p1++, p2++) */
-    /* if (*p1 != *p2) return Val_false; */
-  /* return Val_true; */
-  return Val_false;
-}
 
  val_t caml_bytes_equal(val_t s1, val_t s2)
 {

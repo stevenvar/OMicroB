@@ -28,48 +28,47 @@ let int_of_hex3 c2 c1 c0 =
 
 (***)
 
-type port = PORTA | PORTB | PORTC | PORTD | PORTE | PORTF
+type port = PORTB | PORTC | PORTD | PORTE | PORTF
 
 let string_of_port port =
   match port with
-    | PORTA -> "PORTA" | PORTB -> "PORTB" | PORTC -> "PORTC"
+    | PORTB -> "PORTB" | PORTC -> "PORTC"
     | PORTD -> "PORTD" | PORTE -> "PORTE" | PORTF -> "PORTF"
 ;;
 
 let port_of_string s =
   match String.uppercase_ascii s with
-    | "PORTA" -> PORTA | "PORTB" -> PORTB | "PORTC" -> PORTC
-    | "PORTD" -> PORTD | "PORTE" -> PORTE | "PORTF" -> PORTF
-    | _ -> invalid_arg "Simul.port_of_string"
+  | "PORTB" -> PORTB | "PORTC" -> PORTC
+  | "PORTD" -> PORTD | "PORTE" -> PORTE | "PORTF" -> PORTF
+  | _ -> invalid_arg "Simul.port_of_string"
 ;;
 
 let char_of_port port =
   match port with
-    | PORTA -> 'A' | PORTB -> 'B' | PORTC -> 'C' | PORTD -> 'D' | PORTE -> 'E' | PORTF -> 'F'
+    | PORTB -> 'B' | PORTC -> 'C' | PORTD -> 'D' | PORTE -> 'E' | PORTF -> 'F'
 ;;
 
 let port_of_char c =
   match c with
-    | 'A' | 'a' -> PORTA | 'B' | 'b' -> PORTB | 'C' | 'c' -> PORTC
+    | 'B' | 'b' -> PORTB | 'C' | 'c' -> PORTC
     | 'D' | 'd' -> PORTD | 'E' | 'e' -> PORTE | 'F' | 'f' -> PORTF
     | _ -> invalid_arg "Simul.port_of_char"
 ;;
 
 let index_of_port port =
   match port with
-    | PORTA -> 0 | PORTB -> 1 | PORTC -> 2 | PORTD -> 3 | PORTE -> 4 | PORTF -> 5
+    |  PORTB -> 1 | PORTC -> 2 | PORTD -> 3 | PORTE -> 4 | PORTF -> 5
 ;;
 
 let port_of_index ind =
   match ind with
-    | 0 -> PORTA | 1 -> PORTB | 2 -> PORTC | 3 -> PORTD | 4 -> PORTE | 5 -> PORTF
+    | 1 -> PORTB | 2 -> PORTC | 3 -> PORTD | 4 -> PORTE | 5 -> PORTF
     | _ -> invalid_arg "Simul.port_of_index"
 ;;
 
 (***)
 
 type pin =
-  | RA0 | RA1 | RA2 | RA3 | RA4 | RA5 | RA6 | RA7
   | RB0 | RB1 | RB2 | RB3 | RB4 | RB5 | RB6 | RB7
   | RC0 | RC1 | RC2 | RC3 | RC4 | RC5 | RC6 | RC7
   | RD0 | RD1 | RD2 | RD3 | RD4 | RD5 | RD6 | RD7
@@ -79,8 +78,6 @@ type pin =
 
 let string_of_pin pin =
   match pin with
-    | RA0 -> "RA0" | RA1 -> "RA1" | RA2 -> "RA2" | RA3 -> "RA3"
-    | RA4 -> "RA4" | RA5 -> "RA5" | RA6 -> "RA6" | RA7 -> "RA7"
     | RB0 -> "RB0" | RB1 -> "RB1" | RB2 -> "RB2" | RB3 -> "RB3"
     | RB4 -> "RB4" | RB5 -> "RB5" | RB6 -> "RB6" | RB7 -> "RB7"
     | RC0 -> "RC0" | RC1 -> "RC1" | RC2 -> "RC2" | RC3 -> "RC3"
@@ -95,7 +92,6 @@ let string_of_pin pin =
 
 let port_of_pin pin =
   match pin with
-    | RA0 | RA1 | RA2 | RA3 | RA4 | RA5 | RA6 | RA7 -> PORTA
     | RB0 | RB1 | RB2 | RB3 | RB4 | RB5 | RB6 | RB7 -> PORTB
     | RC0 | RC1 | RC2 | RC3 | RC4 | RC5 | RC6 | RC7 -> PORTC
     | RD0 | RD1 | RD2 | RD3 | RD4 | RD5 | RD6 | RD7 -> PORTD
@@ -106,24 +102,19 @@ let port_of_pin pin =
 
 let index_of_pin pin =
   match pin with
-    | RA0 | RB0 | RC0 | RD0 | RE0 | RF0 -> 0
-    | RA1 | RB1 | RC1 | RD1 | RE1 | RF1 -> 1
-    | RA2 | RB2 | RC2 | RD2 | RE2 | RF2 -> 2
-    | RA3 | RB3 | RC3 | RD3 | RE3 | RF3 -> 3
-    | RA4 | RB4 | RC4 | RD4 | RE4 | RF4 -> 4
-    | RA5 | RB5 | RC5 | RD5 | RE5 | RF5 -> 5
-    | RA6 | RB6 | RC6 | RD6 | RE6 | RF6 -> 6
-    | RA7 | RB7 | RC7 | RD7 | RE7 | RF7 -> 7
+     RB0 | RC0 | RD0 | RE0 | RF0 -> 0
+    | RB1 | RC1 | RD1 | RE1 | RF1 -> 1
+    | RB2 | RC2 | RD2 | RE2 | RF2 -> 2
+    | RB3 | RC3 | RD3 | RE3 | RF3 -> 3
+    | RB4 | RC4 | RD4 | RE4 | RF4 -> 4
+    | RB5 | RC5 | RD5 | RE5 | RF5 -> 5
+    | RB6 | RC6 | RD6 | RE6 | RF6 -> 6
+    | RB7 | RC7 | RD7 | RE7 | RF7 -> 7
 ;;
 
 let pin_of_port_index port index =
   let error () = invalid_arg "Simul.pin_of_port_index" in
   match port with
-    | PORTA ->
-      begin match index with
-        | 0 -> RA0 | 1 -> RA1 | 2 -> RA2 | 3 -> RA3 | 4 -> RA4 | 5 -> RA5
-        | 6 -> RA6 | 7 -> RA7 | _ -> error ()
-      end
     | PORTB ->
       begin match index with
         | 0 -> RB0 | 1 -> RB1 | 2 -> RB2 | 3 -> RB3 | 4 -> RB4 | 5 -> RB5

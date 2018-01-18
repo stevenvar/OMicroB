@@ -1,50 +1,50 @@
 include ../../etc/Makefile.conf
 
-ATTY     := /dev/tty.usbmodem14331
+ATTY     := /dev/tty.usbmodem14611
 # CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 CFLAGS   := -mmcu=atmega32u4
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
-INCLUDES := -I$(SRC)/stdlib/ -I$(SRC)/byterun/
+INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
-TARGETS := ardulib.byte ardulib.c ardulib.elf ardulib.avr ardulib.hex
+TARGETS := solilet_simul.byte solilet_simul.c solilet_simul.elf solilet_simul.avr solilet_simul.hex
 
-ardulib: $(TARGETS)
+solilet_simul: $(TARGETS)
 
-run: ardulib.elf
-	./ardulib.elf
+run: solilet_simul.elf
+	./solilet_simul.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
-	@rm -r *.elf.dSYM
 
-.PHONY: ardulib run clean flash
+.PHONY: solilet_simul run clean flash
 
 ################################################################################
 
-ardulib.byte: spi.ml oled.ml ardulib.ml
+solilet_simul.byte: spi.ml oled.ml solilet_simul.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
-ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
+solilet_simul.c: solilet_simul.byte $(BIN)/bc2c
+	$(BIN)/bc2c -local -arch 32 -heap-size 164 -stack-size 164 $< -o $@
 
-ardulib.elf: ardulib.c
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) $(INCLUDES) -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
+solilet_simul.elf: solilet_simul.c
+	# $(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
+	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
 
 ################################################################################
 
-ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) ardulib.c
+solilet_simul.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) solilet_simul.c
 	$(AVR_GXX) -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
 
-ardulib.hex: ardulib.avr
+solilet_simul.hex: solilet_simul.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-simul : ardulib.byte
-	./ardulib.byte ../../bin/omicrob_pin_simulator
+simul : solilet_simul.byte
+	./solilet_simul.byte ../../bin/ocapic_dip40_simulator
 
-flash: ardulib.avr
+flash: solilet_simul.avr
 	stty -f $(ATTY) 1200
 	sleep 3
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e

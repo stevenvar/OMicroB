@@ -99,7 +99,7 @@ val_t ocaml_arduboy_init(val_t unit) {
 }
 
 val_t ocaml_arduboy_print(val_t str) {
-  arduboy.print(StringVal(str));
+  arduboy.print(String_val(str));
   return Val_unit;
 }
 
