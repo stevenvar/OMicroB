@@ -36,10 +36,10 @@ $(KEYBOARD): keyboard/*.ml
 
 clean:
 	@rm -f *~ *.o *.a $(TARGS)
-	# $(call clean, lcd)
-	# $(call clean, goblet)
+	$(call clean, lcd)
+#	$(call clean, goblet)
 	$(call clean, dip)
-	# $(call clean, circuit)
-	# $(call clean, keyboard)
+#	$(call clean, circuit)
+#	$(call clean, keyboard)
 
 .PHONY: simulator clean
