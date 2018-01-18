@@ -35,10 +35,27 @@ val_t caml_avr_write_register(val_t reg, val_t val){
 
 /******************************************************************************/
 /******************************************************************************/
-<<<<<<< HEAD
+
 /* Arduboy specific libraries */
 
 #ifdef __AVR__
+
+
+val_t caml_buffer_write(val_t x, val_t y, val_t color){
+  return Val_unit;
+}
+
+val_t caml_buffer_read(val_t x, val_t y){
+  return Val_unit;
+}
+
+val_t caml_buffer_get_byte(val_t x){
+  return Val_unit;
+}
+
+val_t caml_init_buffer(val_t x){
+  return Val_unit;
+}
 
 #ifdef OMICROB_WITH_ARDUBOY
 
@@ -108,6 +125,7 @@ val_t ocaml_arduboy_clear(val_t unit){
   arduboy.clear();
   return Val_unit;
 }
+
 
 #endif /* OMICROB_USE_ARDUBOY */
 
@@ -196,12 +214,6 @@ val_t caml_init_buffer(val_t x){
   return Val_unit;
 }
 
-
-
 #endif /* __PC__ */
 
 #endif /* __AVR__ */
-
-=======
->>>>>>> 273ad3b4f8621aaca6d544c3f98fc9d11751ef11
-/******************************************************************************/

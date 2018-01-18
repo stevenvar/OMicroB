@@ -31,6 +31,10 @@ void avr_set_bit(uint8_t reg, uint8_t bit) {
   *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
 }
 
+void avr_clear_bit(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr(reg)) &= ~((uint8_t) 1 << bit);
+}
+
 bool avr_read_bit(uint8_t reg, uint8_t bit) {
   return *(get_reg_addr(reg)) & ((uint8_t) 1 << bit);
 }

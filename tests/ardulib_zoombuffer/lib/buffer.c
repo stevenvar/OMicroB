@@ -41,7 +41,7 @@ int col = 0;
 int mode = UP;
 int total = 0;
 
-uint8_t buffer_get_byte(int x){
+uint8_t buffer_get_byte(){
   char b1, b2, b3, b4;
   uint8_t val = *ptr;
   uint8_t out = 0x00;

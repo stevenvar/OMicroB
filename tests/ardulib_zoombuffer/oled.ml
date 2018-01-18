@@ -4,7 +4,7 @@ open Avr
 
 external write_buffer : int -> int -> bool -> unit = "caml_buffer_write"
 external read_buffer : int -> int -> bool = "caml_buffer_read"
-external get_byte_buffer : int -> int = "caml_buffer_get_byte"
+external get_byte_buffer : unit -> int = "caml_buffer_get_byte"
 
 let boot_program =
   [|
@@ -39,7 +39,7 @@ let send_lcd_command cs dc com =
 
 let display () =
   for i = 0 to 1023 do
-    let b = get_byte_buffer i in
+    let b = get_byte_buffer () in
     Spi.transfer(b);
   done
 
@@ -79,7 +79,7 @@ let clear() =
 
 (* Booting sequence *)
 let boot ~cs ~dc ~rst =
-   let spi_clock_div2 = 0x04 in
+   (* let spi_clock_div2 = 0x04 in *)
   (* Spi.set_clock_divider spi_clock_div2; *)
   command_mode cs dc;
   transfer_program boot_program;
