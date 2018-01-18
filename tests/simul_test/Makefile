@@ -17,7 +17,7 @@ run: ardulib.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
-	@rm -r *.elf.dSYM
+	@rm -rf *.elf.dSYM
 
 .PHONY: ardulib run clean flash
 
@@ -31,7 +31,7 @@ ardulib.c: ardulib.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
 
 ardulib.elf: ardulib.c
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) $(INCLUDES) -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
+	$(GCC) -I $(OCAMLWHERE) $(INCLUDES) -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
 
 ################################################################################
 

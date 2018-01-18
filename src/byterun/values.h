@@ -3,6 +3,7 @@
 #ifdef __AVR__
 #include <avr/pgmspace.h>
 #else
+#define __PC__
 #define PROGMEM
 #endif
 
@@ -15,9 +16,6 @@
 /*
   Version 16 bits
 */
-
-
-/******************************************************************************/
 
 
 /******************************************************************************/
@@ -66,6 +64,8 @@ typedef uint32_t code_t;
 #endif
 #endif
 
+extern val_t ocaml_heap[OCAML_HEAP_WOSIZE];
+
 /******************************************************************************/
 /* Value classification */
 
@@ -75,12 +75,18 @@ typedef uint32_t code_t;
 /******************************************************************************/
 /* Conversions */
 
-#define Val_int(x) ((val_t)(((uval_t) (x) << 1) | 1))
+#define Val_int(x) ((val_t) (((uval_t) (x) << 1) | 1))
 #define Int_val(x) ((val_t) (x) >> 1)
 
-#define Init_val_block(x) (val_t) ((uval_t) ((x) << 1) | (uval_t) 0xFFC00000)
-#define Val_block(x) (val_t) ((((uval_t) ((intptr_t) (x) - (intptr_t) ocaml_heap)) << 1) | 0xFFC00000)
-#define Block_val(x)  (val_t *) ((intptr_t) ocaml_heap + ((intptr_t) ((uval_t) (x) ^ 0xFFC00000) >> 1))
+#ifdef __AVR__
+#define Init_val_block(x) ((val_t) (x) ^ (val_t) 0xFFC00000)
+#define Val_block(x) ((val_t) ((intptr_t) (x)) ^ (val_t) 0xFFC00000)
+#define Block_val(x) ((val_t *) ((intptr_t) ((x) ^ (val_t) 0xFFC00000)))
+#else
+#define Init_val_block(x) ((val_t) ((uval_t) ((x) << 1) | (uval_t) 0xFFC00000))
+#define Val_block(x) ((val_t) ((((uval_t) ((intptr_t) (x) - (intptr_t) ocaml_heap)) << 1) | 0xFFC00000))
+#define Block_val(x) ((val_t *) ((intptr_t) ocaml_heap + ((intptr_t) ((uval_t) (x) ^ 0xFFC00000) >> 1)))
+#endif
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
@@ -102,7 +108,7 @@ typedef uint32_t code_t;
 /******************************************************************************/
 /* Blocks */
 
-#define Field(val, i) (((val_t*) Block_val(val))[i])
+#define Field(val, i) (((val_t *) Block_val(val))[i])
 #define String_val(val) ((char *) Block_val(val))
 #define StringField(val, i) String_val(val)[i]
 
@@ -110,26 +116,25 @@ typedef uint32_t code_t;
 #define Hd_val(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
-#define Make_string_data(c3, c2, c1, c0) \
-  (((val_t) (c0) << 24) | ((val_t) (c1) << 16) | ((val_t) (c2) << 8) | ((val_t) (c3)))
+#define Make_string_data(c3, c2, c1, c0) (((val_t) (c0) << 24) | ((val_t) (c1) << 16) | ((val_t) (c2) << 8) | ((val_t) (c3)))
 
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
 #define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
 
-#define Make_header(wosize, tag) (uval_t)(((uval_t) (wosize) << (uval_t) 10) | (uval_t) tag)
+#define Make_header(wosize, tag) (uval_t)(((uval_t) (wosize) << (uval_t) 10) | (uval_t) (tag))
 #define Bsize_wsize(sz) ((sz) * sizeof (val_t))
 #define Wsize_bsize(sz) ((sz) / sizeof (val_t))
 #define Wosize_val(val) ((uval_t) Header(val) >> 10)
-#define Bosize_val(val) (Bsize_wsize (Wosize_val(val)))
+#define Bosize_val(val) Bsize_wsize(Wosize_val(val))
 
 #define Color_val(val) ((Header(val) >> 8) & 1)
 #define Tag_val(val) ((uval_t) Header(val) & (uval_t) 0xFF)
-#define Set_tag_hd(hd,tag) ((uval_t) hd | (uval_t) tag)
+#define Set_tag_hd(hd,tag) ((uval_t) (hd) | (uval_t) (tag))
 #define Set
 
-#define Tag_hd(hd) ((uval_t) hd & (uval_t) 0xFF)
-#define Wosize_hd(hd) ((uval_t) ((uval_t) hd >> 10))
+#define Tag_hd(hd) ((uval_t) (hd) & (uval_t) 0xFF)
+#define Wosize_hd(hd) ((uval_t) ((uval_t) (hd) >> 10))
 #define Bosize_hd(hd) Bsize_wsize(Wosize_hd(hd))
 
 
@@ -137,9 +142,9 @@ typedef uint32_t code_t;
 #define Color_black 1
 
 #define Is_black_val(val) (((uval_t) Header(val) >> 8) & Color_black)
-#define Is_black_hd(hd) ((((uval_t) hd) >> 8) & Color_black)
+#define Is_black_hd(hd) ((((uval_t) (hd)) >> 8) & Color_black)
 
-#define Set_black_hd(hd) ((uval_t) hd | (uval_t) 0x100)
+#define Set_black_hd(hd) ((uval_t) (hd) | (uval_t) 0x100)
 
 #define Val_double(x) (x)
 #define Double_val(x) (x)

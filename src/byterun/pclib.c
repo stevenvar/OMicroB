@@ -1,83 +1,31 @@
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
-val_t caml_avr_write_register(val_t reg, val_t val){
-  printf("caml_avr_write_register(%d,%d)\n",Int_val(reg),Int_val(val));
-  return Val_unit;
+/******************************************************************************/
+
+void avr_set_bit(uint8_t reg, uint8_t bit) {
+  printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit);
 }
 
-val_t caml_avr_set_bit(val_t reg, val_t bit){
-  printf("caml_avr_set_bit(%d,%d)\n",Int_val(reg),Int_val(bit));
-  return Val_unit;
+void avr_clear_bit(uint8_t reg, uint8_t bit) {
+  printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit);
 }
 
-val_t caml_avr_pin_mode(val_t pin, val_t mode) {
-  printf("caml_pin_mode(%d,%d)\n",Int_val(pin),Int_val(mode));
-  return Val_unit;
+bool avr_read_bit(uint8_t reg, uint8_t bit) {
+  printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit);
+  return false;
 }
 
-val_t caml_avr_port_mode(val_t port, val_t mode){
-  printf("caml_port_mode(%d,%d)\n",Int_val(port),Int_val(mode));
-  return Val_unit;
+/******************************************************************************/
+
+void avr_write_register(uint8_t reg, uint8_t val) {
+  printf("avr_write_register(%d, %d)\n", (int) reg, (int) val);
 }
 
-val_t caml_avr_digital_write(val_t port, val_t mode){
-  printf("caml_avr_digital_write(%d,%d)\n",Int_val(port),Int_val(mode));
-  return Val_unit;
+uint8_t avr_read_register(uint8_t reg) {
+  printf("avr_read_register(%d)\n", (int) reg);
+  return 0;
 }
 
-val_t caml_avr_clear_bit(val_t reg, val_t bit){
-  printf("caml_avr_clear_bit(%d,%d)\n",Int_val(reg),Int_val(bit));
-  return Val_unit;
-}
-
-
-val_t caml_avr_read_bit(val_t reg, val_t bit){
-  printf("caml_avr_read_bit(%d,%d)\n",Int_val(reg),Int_val(bit));
-  return Val_int(0);
-}
-
-val_t caml_avr_read_register(val_t reg){
-  printf("caml_avr_read_register(%d)\n",Int_val(reg));
-  return Val_int(0xFF);
-}
-
-
-val_t caml_boot_lcd(){
-  /* bootLCD(); */
-  return Val_unit;
-}
-
-
-val_t ocaml_arduboy_init(val_t unit) {
-  return Val_unit;
-}
-
-val_t ocaml_arduboy_print(val_t str) {
-  return Val_unit;
-}
-
-val_t ocaml_arduboy_print_int(val_t i) {
-  return Val_unit;
-}
-
-val_t ocaml_arduboy_display(val_t unit) {
-  return Val_unit;
-}
-
-val_t caml_avr_draw_pixel(val_t x, val_t y, val_t color){
-  return Val_unit;
-}
-
-val_t caml_buffer_write(val_t x, val_t y, val_t color){
-  return Val_unit;
-}
-
-val_t caml_buffer_read(val_t x, val_t y){
-  return Val_unit;
-}
-
-val_t caml_buffer_get_byte(val_t x){
-  return Val_unit;
-}
-
-/* #endif */
+/******************************************************************************/

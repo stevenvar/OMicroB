@@ -29,7 +29,7 @@ queens.c: queens.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 58 -stack-size 80 $< -o $@
 
 queens.elf: queens.c
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@
+	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@
 
 ################################################################################
 

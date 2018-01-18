@@ -1,48 +1,46 @@
 include ../../etc/Makefile.conf
 
 ATTY     := /dev/tty.usbmodem14331
-# CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 CFLAGS   := -mmcu=atmega32u4
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I$(SRC)/stdlib/ -I$(SRC)/byterun/
 
 ################################################################################
 
-TARGETS := ardulib.byte ardulib.c ardulib.elf ardulib.avr ardulib.hex
+TARGETS := test.byte test.c test.elf test.avr test.hex
 
-ardulib: $(TARGETS)
+test: $(TARGETS)
 
-run: ardulib.elf
-	./ardulib.elf
+run: test.elf
+	./test.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
-	@rm -r *.elf.dSYM
+	@rm -rf *.elf.dSYM
 
-.PHONY: ardulib run clean flash
+.PHONY: test run clean flash
 
 ################################################################################
 
-ardulib.byte: spi.ml oled.ml ardulib.ml
+test.byte: test.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
 	ocamlclean $@ -o $@
 
-ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 64 -stack-size 64 $< -o $@
+test.c: test.byte $(BIN)/bc2c
+	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 64 $< -o $@
 
-ardulib.elf: ardulib.c
-	# $(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
-	$(GCC) -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 $(OPT) -D_POSIX_C_SOURCE=199309L $^ -o $@
+test.elf: test.c
+	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 $(OPT) -D_POSIX_C_SOURCE=199309L $^ -o $@
 
 ################################################################################
 
-ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) ardulib.c
-	$(AVR_GXX) -fpermissive -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
+test.avr: $(wildcard $(SRC)/stdlib/*.c) test.c
+	$(AVR_GXX) -fpermissive -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall $^ -Wnarrowing -o $@
 
-ardulib.hex: ardulib.avr
+test.hex: test.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
-flash: ardulib.avr
+flash: test.avr
 	stty -f $(ATTY) 1200
 	sleep 0
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e

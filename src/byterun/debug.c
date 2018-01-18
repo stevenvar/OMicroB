@@ -1,81 +1,64 @@
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
 #include "debug.h"
+#include "values.h"
+#include "gc.h"
 
-#if !defined(__AVR__) && !defined(__PC__)
-
+#ifdef __PC__
 #include <stdio.h>
-#include "simul.h"
-
-void debug_init(void) {}
-
-void debug(int n) {
-  printf("debug(%d)\n", n);
-}
-
-void debug_blink(int led, int n) {
-  printf("debug_blink(%d, %d)\n", led, n);
-}
-
-#else
-
-#ifdef __AVR__
-
-#include <Arduino.h>
-
-void debug_init(void) {
-  Serial.begin(57600);
-}
-
-void debug(int n) {
-  Serial.print("debug(");
-  Serial.print(n);
-  Serial.println(")");
-}
-
-void debug_blink(int led, int n) {
-  int i;
-  pinMode(led, OUTPUT);
-  digitalWrite(led, HIGH);
-  delay(1000);
-  for (i = 0; i < n; i ++) {
-    digitalWrite(led, LOW);
-    delay(300);
-    digitalWrite(led, HIGH);
-    delay(300);
-  }
-  delay(1000);
-}
-
-void assert_failure(void) {
-  int i, led = 17;
-  while (1) {
-    pinMode(led, OUTPUT);
-    digitalWrite(led, LOW);
-    delay(1000);
-    for (i = 0; i < 3; i ++) {
-      digitalWrite(led, HIGH);
-      delay(200);
-      digitalWrite(led, LOW);
-      delay(200);
-    }
-    delay(1000);
-  }
-}
-
 #endif
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
 #ifdef __PC__
 
-#include <stdio.h>
+void print_heap() {
+  val_t *ptr;
+  int i = 0;
 
-void debug_init(void) {}
+  printf("HEAP (starts at %p, ends at %p, size = %d words) : \n", ocaml_heap, ocaml_heap + OCAML_HEAP_WOSIZE, OCAML_HEAP_WOSIZE);
 
-void debug(int n) {
-  printf("debug(%d)\n", n);
+  for(ptr = ocaml_heap; ptr < ocaml_heap + OCAML_HEAP_WOSIZE; ptr ++){
+    float f = *((float *) ptr);
+#ifdef OCAML_GC_STOP_AND_COPY
+    if (ptr == ocaml_heap + OCAML_HEAP_WOSIZE / 2) {
+      printf("======================================================\n");
+    }
+#endif
+    if (Is_int(*ptr)){
+      printf("%d  @%p : 0x%08x (int = %d / float = %f)", i, ptr, *ptr, Int_val(*ptr), f);
+    } else if (Is_block(*ptr)) {
+      printf("%d  @%p : 0x%08x / @(%p)",i, ptr, *ptr, Block_val(*ptr));
+    } else if (*ptr == 0) {
+      printf("%d  @%p : _",i, ptr);
+    } else {
+      printf("%d  @%p : 0x%08x (maybe %f)", i, ptr, *ptr, f);
+    }
+    printf("\n");
+    i ++;
+  }
+  printf("heap_ptr = %p", heap_ptr);
+  printf("\n\n\n");
 }
 
-void debug_blink(int led, int n) {
-  printf("debug_blink(%d, %d)\n", led, n);
-}
 #endif
 
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+#ifdef __AVR__
+
+void print_heap(void) {
+}
+
 #endif
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+

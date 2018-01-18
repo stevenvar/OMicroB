@@ -3,7 +3,8 @@
 #include <stdio.h>
 
 #include "values.h"
-#include "stop-and-copy.h"
+#include "debug.h"
+#include "gc.h"
 
 extern val_t acc;
 extern val_t *sp;
@@ -31,13 +32,11 @@ extern void print_stack();
  * sinon il faut connaitre la fin des globales
  */
 
-
 /* heap1_start et heap2_start : le pointeur de début de chaque tas
  * heap1_end et heap2_end : le pointeur de fin de chaque tas
  * current_heap : 1 ou 2 selon le tas actif
  * les appels d'allocations mémoires ne savent pas dans quel tas seront placé les données.
  */
-extern const val_t *ocaml_heap1, *ocaml_heap2;
 const val_t *heap1_start, *heap2_start;
 const val_t *heap1_end, *heap2_end;
 int current_heap;
@@ -60,21 +59,17 @@ val_t* tab_heap_end[2];
  *   à voir dans startup.c
  * heap_size : la taille du tas utile. Au final 2 zones de cette taille seront allouées.
  */
-void gc_init(int32_t heap_size) {
-  heap1_start = ocaml_heap1;
-  heap1_end = heap1_start + heap_size;
-  tab_heap_start[0] = (val_t*)heap1_start;
-  tab_heap_end[0] = (val_t*)heap1_end;
-  heap2_start = ocaml_heap2;
-  heap2_end = heap2_start + heap_size;
-  tab_heap_start[1] = (val_t*)heap2_start;
-  tab_heap_end[1] = (val_t*)heap2_end;
-  #ifdef OCAML_HEAP_INITIAL_WOSIZE
-  heap_ptr = (val_t*)heap1_start + OCAML_HEAP_INITIAL_WOSIZE;
-  #else
-  heap_ptr = (val_t*)heap1_start;
-  #endif
-  heap_end = (val_t *)heap1_start + heap_size;
+void gc_init(void) {
+  heap1_start = ocaml_heap;
+  heap1_end = heap1_start + OCAML_HEAP_WOSIZE / 2;
+  tab_heap_start[0] = (val_t *) heap1_start;
+  tab_heap_end[0] = (val_t *) heap1_end;
+  heap2_start = ocaml_heap + OCAML_HEAP_WOSIZE / 2;
+  heap2_end = heap2_start + OCAML_HEAP_WOSIZE / 2;
+  tab_heap_start[1] = (val_t *) heap2_start;
+  tab_heap_end[1] = (val_t *) heap2_end;
+  heap_ptr = (val_t *) heap1_start + OCAML_HEAP_INITIAL_WOSIZE;
+  heap_end = (val_t *) heap1_start + OCAML_HEAP_WOSIZE / 2;
   current_heap = 0;
 }
 
@@ -90,32 +85,6 @@ void clean_heap(){
   }
 }
 
-#ifdef __AVR__
-void print_heap(){
-  val_t* from = tab_heap_start[current_heap];
-  val_t* to = tab_heap_end[current_heap];
-  Serial.println("HEAP=");
- for(val_t* ptr = from ; ptr < to; ptr++){
-    /* if (*ptr != 0){ */
-   Serial.print("@0x");
-   Serial.print((val_t)ptr,HEX);
-   Serial.print(":");
-      if (Is_int(*ptr)){
-	Serial.println(Int_val(*ptr),DEC);
-      }
-      else if (Is_block(*ptr)){
-	Serial.println((val_t)Block_val(*ptr),HEX);
-      }
-      else if (*ptr == 0){
-        Serial.println("_");
-      }
-      else{
-        Serial.println(*(float *)ptr,5);
-      }
- }
- Serial.println("_____\n");
-}
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -270,8 +239,7 @@ void gc(mlsize_t size) {
 
 
 #ifdef DEBUG
-   #ifdef __PC__
-  int size_after = heap_ptr - new_heap;
+  #ifdef __PC__
   printf("end of GC number %d ", cpt_gc);
   #endif
   clean_heap();

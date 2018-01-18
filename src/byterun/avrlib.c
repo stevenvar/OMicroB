@@ -1,48 +1,52 @@
-#include <stdio.h>
+#include <stdbool.h>
+#include <avr/io.h>
 
-#ifdef BUFFER
+/******************************************************************************/
 
-#include "buffer.h"
-
-val_t caml_buffer_write(val_t x, val_t y, val_t color){
-  buffer_write(Int_val(x),Int_val(y),Int_val(color));
-  return Val_unit;
+uint8_t *get_reg_addr(uint8_t reg) {
+  if (reg ==  0) return &PORTB;
+  if (reg ==  1) return &PORTC;
+  if (reg ==  2) return &PORTD;
+  if (reg ==  3) return &PORTE;
+  if (reg ==  4) return &PORTF;
+  if (reg ==  5) return &DDRB;
+  if (reg ==  6) return &DDRC;
+  if (reg ==  7) return &DDRD;
+  if (reg ==  8) return &DDRE;
+  if (reg ==  9) return &DDRF;
+  if (reg == 10) return &PINB;
+  if (reg == 11) return &PINC;
+  if (reg == 12) return &PIND;
+  if (reg == 13) return &PINE;
+  if (reg == 14) return &PINF;
+  if (reg == 15) return &SPCR;
+  if (reg == 16) return &SPSR;
+  if (reg == 17) return &SPDR;
+  return NULL;
 }
 
-val_t caml_buffer_read(val_t x, val_t y){
-  uint8_t v = buffer_read(Int_val(x),Int_val(y));
-  return Val_int(v);
+/******************************************************************************/
+
+void avr_set_bit(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
 }
 
-val_t caml_buffer_get_byte(val_t x){
-  uint8_t v = buffer_get_byte(Int_val(x));
-  return Val_int(v);
+void avr_clear_bit(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr(reg)) &= ~((uint8_t) 1 << bit);
 }
 
-
-#endif
-
-val_t caml_avr_write_register(val_t reg, val_t val){
-  writeRegister((uint8_t)Int_val(reg),(uint8_t)Int_val(val));
-  return Val_unit;
+bool avr_read_bit(uint8_t reg, uint8_t bit) {
+  return *(get_reg_addr(reg)) & ((uint8_t) 1 << bit);
 }
 
-val_t caml_avr_set_bit(val_t reg, val_t bit){
-  setBit(Int_val(reg),Int_val(bit));
-  return Val_unit;
+/******************************************************************************/
+
+void avr_write_register(uint8_t reg, uint8_t val) {
+  *(get_reg_addr(reg)) = val;
 }
 
-val_t caml_avr_clear_bit(val_t reg, val_t bit){
-  clearBit(Int_val(reg),Int_val(bit));
-  return Val_unit;
+uint8_t avr_read_register(uint8_t reg) {
+  return *(get_reg_addr(reg));
 }
 
-val_t caml_avr_read_bit(val_t reg, val_t bit){
-  readBit(Int_val(reg),Int_val(bit));
-  return Val_unit;
-}
-
-val_t caml_avr_read_register(val_t reg){
-  readRegister(Int_val(reg));
-  return Val_unit;
-}
+/******************************************************************************/

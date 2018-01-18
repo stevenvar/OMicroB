@@ -29,7 +29,7 @@ oderiv.c: oderiv.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 196 -stack-size 28 $< -o $@
 
 oderiv.elf: oderiv.c
-	$(GCC) -m32 -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
+	$(GCC) -m32 -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
 
 ################################################################################
 

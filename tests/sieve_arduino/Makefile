@@ -30,7 +30,7 @@ sieve.c: sieve.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 164 -stack-size 64 $< -o $@
 
 sieve.elf: sieve.c
-	$(GCC) -m32 -D__PC__ -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
+	$(GCC) -m32 -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
 
 ################################################################################
 

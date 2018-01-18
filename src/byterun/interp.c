@@ -242,6 +242,27 @@ void caml_raise_division_by_zero(void) {
 
 /******************************************************************************/
 
+void init_heap_pointer(val_t *ptr) {
+  val_t old_v = *ptr;
+  if (Is_block(old_v)) {
+    *ptr = Val_block((char *) ocaml_heap + (int) old_v);
+  }
+}
+
+/******************************************************************************/
+
+void init_heap_pointers(void) {
+  int i;
+  for (i = 0; i < OCAML_HEAP_INITIAL_WOSIZE; i ++) {
+    init_heap_pointer(&ocaml_heap[i]);
+  }
+  for (i = 0; i < OCAML_GLOBDATA_NUMBER; i ++) {
+    init_heap_pointer(&ocaml_global_data[i]);
+  }
+}
+
+/******************************************************************************/
+
 void interp_init(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
   trapSp = Val_int(-1);
@@ -2537,8 +2558,11 @@ void setup(void) {
   #ifdef DEBUG
   debug_init();
   #endif
+  #ifdef __AVR__
+  init_heap_pointers();
+  #endif
   interp_init();
-  gc_init(OCAML_HEAP_WOSIZE);
+  gc_init();
   interp();
 }
 

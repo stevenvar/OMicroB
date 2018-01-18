@@ -72,7 +72,6 @@ extern void *caml_bytes_get;
 extern void *caml_new_lex_engine;
 extern void *caml_lex_engine;
 /* extern void *caml_notequal; */
-extern void *caml_array_get;
 extern void *caml_parse_engine;
 extern void *caml_obj_tag;
 extern void *caml_obj_set_tag;
