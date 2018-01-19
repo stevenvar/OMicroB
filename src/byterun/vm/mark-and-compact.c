@@ -1,174 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <string.h>
-#include <assert.h>
+#include "values.h"
+#include "fail.h"
+#include "gc.h"
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-/* Some size definitions (testing purpose) */
+/* Initalization of heap pointers */
 
-#define HEAP_WOSIZE  1024
-#define STACK_WOSIZE 1024
+val_t *heap_ptr;
+val_t *heap_end;
 
-/******************************************************************************/
-/* Basic types */
-
-typedef int32_t val_t;
-typedef uint8_t tag_t;
-typedef uint32_t sz_t;
-typedef uint8_t color_t;
-typedef uint32_t header_t;
-
-/******************************************************************************/
-/* Block managment macros */
-
-#define Block(p) ((val_t) (p))
-#define Ptr(v) ((val_t *) (v))
-
-#define Field(v, i) (Ptr(v)[i])
-#define Header(v) (Field(v, -1))
-
-#define Make_header(tag, size, color) ((((int32_t) (tag)) << 24) | (((int32_t) (size)) << 2) | ((int32_t) (color)))
-
-#define Tag_header(h) ((tag_t) ((header_t) (h) >> 24))
-#define Size_header(h) ((sz_t) (((header_t) (h) >> 2) & 0x3FFFFF))
-#define Color_header(h) ((color_t) ((header_t) (h) & 0x3))
-
-#define Tag_val(v) Tag_header(Header(v))
-#define Size_val(v) Size_header(Header(v))
-#define Color_val(v) Color_header(Header(v))
-
-#define Val_int(n) ((val_t) ((n << 1) | 1))
-#define Int_val(v) ((int) (v >> 1))
-
-#define Is_int(v) ((v) & 1)
-#define Is_ptr(v) (!((v) & 3))
-#define Is_in_heap(v) (Is_ptr(v) && Ptr(v) >= heap && Ptr(v) < heap + HEAP_WOSIZE)
-
-#define White 0  /* At runtime: color of all blocks, after marking: color of dead blocks, after updating pointers: color of alive blocks */
-#define Red   1  /* Color of infix headers at any time, even when moved at marking stage                                                 */
-#define Black 2  /* After marking: color of alive blocks, after updating pointers: color of dead blocks                                  */
-#define Brown 3  /* During marking stage: color of block headers moved at an infix location                                              */
-                 /* (-: Red paint + Black paint -> Brown paint :-)                                                                       */
-
-#define Closure_tag 247
-#define Infix_tag   249
-#define No_scan_tag 251
-#define String_tag  252
-
-/******************************************************************************/
-/* Heap and stack declaration */
-
-val_t heap[HEAP_WOSIZE];
-val_t *heap_pos = heap;
-
-val_t stack[STACK_WOSIZE];
-val_t *stack_pos = stack;
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
-/* Printing tools (testing purpose) */
-
-static void pprint_value(val_t v) {
-  if (Is_int(v)) {
-    printf("%d", Int_val(v));
-  } else if (Is_in_heap(v)) {
-    printf("@%d", Ptr(v) - heap);
-  } else {
-    printf("!0x%X", v);
-  }
-}
-
-/***/
-
-static void pprint_stack(void) {
-  val_t *p;
-  printf("==== STACK ====\n");
-  for (p = stack; p < stack_pos; p ++) {
-    printf("stack[%d] = ", p - stack);
-    pprint_value(*p);
-    printf("\n");
-  }
-  printf("\n");
-}
-
-/***/
-
-static void pprint_heap(void) {
-  val_t *p = heap;
-  printf("==== HEAP ====\n");
-  while (p < heap_pos) {
-    header_t h = *p;
-    int i;
-    const char *color =
-      Color_header(h) == White ? "White" :
-      Color_header(h) == Red   ? "Red  " :
-      Color_header(h) == Black ? "Black" :
-      Color_header(h) == Brown ? "Brown" : "?????";
-    printf("@%-4d tag:%-4d size:%-2d color:%s  |  ", p - heap + 1, Tag_header(h), Size_header(h), color);
-    if (Tag_header(h) == String_tag) {
-      for (i = 0; i < Size_header(h) * sizeof(val_t); i ++) {
-        if (i > 0) printf(" ");
-        printf("%02X", ((unsigned char *) p)[i + sizeof(val_t)]);
-      }
-    } else {
-      for (i = 0; i < Size_header(h); i ++) {
-        if (i > 0) printf(", ");
-        pprint_value(Field(p + 1, i));
-      }
-    }
-    printf("\n");
-    p = p + Size_header(h) + 1;
-  }
-  printf("\n");
-}
-
-/***/
-
-void pprint(void) {
-  pprint_stack();
-  pprint_heap();
-  printf("\n");
-}
-
-/******************************************************************************/
-/* Dumping tools (debugging purpose) */
-
-static void dump_stack(void) {
-  val_t *p;
-  printf("==== STACK ====\n");
-  for (p = stack; p < stack_pos; p ++) {
-    printf("stack[0] = %08X\n", *p);
-  }
-  printf("\n");
-}
-
-/***/
-
-static void dump_heap(void) {
-  val_t *p;
-  printf("==== HEAP ====\n");
-  for (p = heap; p < heap_pos; p ++) {
-    if (((p - heap) & 7) == 0) {
-      if (p > heap) printf("\n");
-      printf("[%08X]   ", (unsigned int) p);
-    } else {
-      printf(" ");
-    }
-    printf("%08X", *p);
-  }
-  printf("\n");
-}
-
-/***/
-
-void dump(void) {
-  dump_stack();
-  dump_heap();
-  printf("\n");
+void gc_init(void) {
+  heap_ptr = ocaml_heap + OCAML_HEAP_INITIAL_WOSIZE;
+  heap_end = ocaml_heap + OCAML_HEAP_WOSIZE;
 }
 
 /******************************************************************************/
@@ -182,47 +27,47 @@ void dump(void) {
 /* The entire header of the block should be the value heap+2.   */
 static void mark_block(val_t *p) {
   val_t v = *p;
-  while (v != Black) {                               /* Did go back to the root block header?   */
-    if (Color_header(v) == Black) {                  /* Did go back to another block header?    */
-      val_t *old_p = Ptr(v ^ Black);
+  while (v != Color_black) {                           /* Did go back to the root block header?   */
+    if (Color_hd(v) == Color_black) {                  /* Did go back to another block header?    */
+      val_t *old_p = Block_val(v ^ Color_black);
       header_t old_h = *old_p;
-      if (Color_header(old_h) == Red) {
-        val_t *inf_p = p + Size_header(old_h);       /* Pointer to infix header location        */
-        *p = *inf_p ^ Red;                           /* Restore the (blacken) header of block   */
-        *inf_p = old_h;                              /* Restore the infix header                */
-        *old_p = Block(inf_p + 1);                   /* Restore the forward pointer             */
-        p = old_p - 1;                               /* Return to the backward block            */
+      if (Color_hd(old_h) == Color_red) {
+        val_t *inf_p = p + Wosize_hd(old_h);           /* Pointer to infix header location        */
+        *p = *inf_p ^ Color_red;                       /* Restore the (blacken) header of block   */
+        *inf_p = old_h;                                /* Restore the infix header                */
+        *old_p = Val_block(inf_p + 1);                 /* Restore the forward pointer             */
+        p = old_p - 1;                                 /* Return to the backward block            */
       } else {
-        *p = old_h;                                  /* Restore the header                      */
-        *old_p = Block(p + 1);                       /* Restore the forward pointer             */
-        p = old_p - 1;                               /* Return to the backward block            */
+        *p = old_h;                                    /* Restore the header                      */
+        *old_p = Val_block(p + 1);                     /* Restore the forward pointer             */
+        p = old_p - 1;                                 /* Return to the backward block            */
       }
       
     } else if (Is_in_heap(v)) {
-      header_t h = Header(v);
-      tag_t tag = Tag_header(h);
-      if (tag == Infix_tag) {                        /* Is infix?                               */
-        val_t *pstart = Ptr(v) - Size_header(h) - 1; /* Pointer to the beginning of the block   */
-        header_t hstart = *pstart;                   /* Main header of the block                */
-        if (Color_header(hstart) == White) {         /* Not already marked as alive?            */
-          *p = h;                                    /* Store the (red) infix header            */
-          Header(v) = hstart | Brown;                /* Store the (brown) header of block       */
-          *pstart = Block(p) | Black;                /* Store the (blacken) back pointer        */
-          p = pstart + Size_header(hstart);          /* Jump to the end of the block            */
+      header_t h = Hd_val(v);
+      tag_t tag = Tag_hd(h);
+      if (tag == Infix_tag) {                          /* Is infix?                               */
+        val_t *pstart = Block_val(v)-Wosize_hd(h)-1;   /* Pointer to the beginning of the block   */
+        header_t hstart = *pstart;                     /* Main header of the block                */
+        if (Color_hd(hstart) == Color_white) {         /* Not already marked as alive?            */
+          *p = h;                                      /* Store the (red) infix header            */
+          Hd_val(v) = hstart | Color_brown;            /* Store the (brown) header of block       */
+          *pstart = Val_block(p) | Color_black;        /* Store the (blacken) back pointer        */
+          p = pstart + Wosize_hd(hstart);              /* Jump to the end of the block            */
         } else {
-          p --;                                      /* Already marked -> go back one field     */
+          p --;                                        /* Already marked -> go back one field     */
         }
-      } else if (tag < No_scan_tag &&                /* Is this block scannable?                */
-                 Color_header(h) == White) {         /* Is this block non-already scanned?      */
-        *p = h | Black;                              /* Store the (blacken) header              */
-        Header(v) = Block(p) | Black;                /* Store the (blacken) backward pointer    */
-        p = &Field(v, Size_header(h) - 1);           /* Go to the forward block                 */
+      } else if (tag < No_scan_tag &&                  /* Is this block scannable?                */
+                 Color_hd(h) == Color_white) {         /* Is this block non-already scanned?      */
+        *p = h | Color_black;                          /* Store the (blacken) header              */
+        Hd_val(v) = Val_block(p) | Color_black;        /* Store the (blacken) backward pointer    */
+        p = &Field(v, Wosize_hd(h) - 1);               /* Go to the forward block                 */
       } else {
-        p --;                                        /* Go back one field in the current block  */
+        p --;                                          /* Go back one field in the current block  */
       }
 
     } else {
-      p --;                                          /* Go back one field in the current block  */
+      p --;                                            /* Go back one field in the current block  */
     }
 
     v = *p;
@@ -234,13 +79,13 @@ static void mark_block(val_t *p) {
 /* Mark as alive all blocks reachable (directly or indirectly) from the given root. */
 static void mark_root(val_t v) {
   if (Is_in_heap(v)) {
-    header_t h = Header(v);
-    if (Color_header(h) == White) {        /* Is this block not already scanned?                        */
-      if (Tag_header(h) < No_scan_tag) {   /* Is this block scannable?                                  */
-        Header(v) = Black;                 /* Set root header to a unique unaligned value               */
-        mark_block(&Field(v, Size_header(h) - 1));
+    header_t h = Hd_val(v);
+    if (Color_hd(h) == Color_white) {                   /* Is this block not already scanned?                        */
+      if (Tag_hd(h) < No_scan_tag) {                    /* Is this block scannable?                                  */
+        Hd_val(v) = Color_black;                        /* Set root header to a unique unaligned value               */
+        mark_block(&Field(v, Wosize_hd(h) - 1));
       }
-      Header(v) = h | Black;               /* Restore the (blacken) root header                         */
+      Hd_val(v) = h | Color_black;                      /* Restore the (blacken) root header                         */
     }
   }
 }
@@ -249,8 +94,14 @@ static void mark_root(val_t v) {
 
 /* Mark all living blocks reachable from roots. */
 static void mark_roots(void) {
-  val_t *p;
-  for (p = stack; p < stack_pos; p ++) {
+  val_t *p, *end;
+  mark_root(acc);
+  end = ocaml_stack + OCAML_STACK_WOSIZE;
+  for (p = sp; p < end; p ++) {
+    mark_root(*p);
+  }
+  end = ocaml_global_data + OCAML_GLOBDATA_NUMBER;
+  for (p = ocaml_global_data; p < end; p ++) {
     mark_root(*p);
   }
 }
@@ -262,24 +113,20 @@ static void mark_roots(void) {
 /* Merge consecutive dead blocks in a unique White string.   */
 /* Switch color of living blocks to White.                   */
 static void wipe_dead_blocks() {
-  val_t *p = heap;
+  val_t *p = ocaml_heap;
   header_t h = *p;
-  while (p < heap_pos) {                 /* Loop over the whole heap in block order */
-    if (Color_header(h) == White) {      /* Is this block dead?                     */
-      sz_t size = Size_header(h);        /* Stringify, whiten and merge dead blocks */
+  while (p < heap_ptr) {                           /* Loop over the whole heap in block order */
+    if (Color_hd(h) == Color_white) {              /* Is this block dead?                     */
+      mlsize_t size = Wosize_hd(h);                /* Stringify, whiten and merge dead blocks */
       val_t *start = p;
       p += size + 1;
-      while (p < heap_pos && Color_header((h = *p)) == White) {
-        p += Size_header(h) + 1;         /* Skip the dead block                     */
-        if (p - start - 1 >= 1 << 22) {  /* Check size overflow                     */
-          p -= Size_header(h) + 1;       /* Backtrack one block                     */
-          break;
-        }
+      while (p < heap_ptr && Color_hd((h = *p)) == Color_white) {
+        p += Wosize_hd(h) + 1;                     /* Skip the dead block                     */
       }
-      *start = Make_header(String_tag, p - start - 1, White);
+      *start = Make_header(p - start - 1, String_tag, Color_white);
     } else {
-      *p = h ^ Black;                    /* Switch color to White                   */
-      p += Size_header(h) + 1;           /* Jump to the next block                  */
+      *p = h ^ Color_black;                        /* Switch color to White                   */
+      p += Wosize_hd(h) + 1;                       /* Jump to the next block                  */
       h = *p;
     }
   }
@@ -287,13 +134,13 @@ static void wipe_dead_blocks() {
 
 /***/
 
-/* If (*p) is a pointer to a block, permute (*p) and (Header_val(*p)) */
+/* If (*p) is a pointer to a block, permute (*p) and (Hd_val_val(*p)) */
 /* Redden the moved header and blacken the written header.            */
 static void reverse_pointer(val_t *p) {
   val_t v = *p;
-  if (Is_in_heap(v)) {            /* Is v point to heap?    */
-    *p = Header(v) | Red;         /* Yes -> reverse pointer */
-    Header(v) = Block(p) | Black;
+  if (Is_in_heap(v)) {                       /* Is v point to heap?    */
+    *p = Hd_val(v) | Color_red;              /* Yes -> reverse pointer */
+    Hd_val(v) = Val_block(p) | Color_black;
   }
 }
 
@@ -301,8 +148,14 @@ static void reverse_pointer(val_t *p) {
 
 /* Reverse all roots that are pointers to blocks. */
 static void reverse_root_pointers(void) {
-  val_t *p;
-  for (p = stack; p < stack_pos; p ++) {  /* Loop over roots and reverse pointers */
+  val_t *p, *end;
+  reverse_pointer(&acc);
+  end = ocaml_stack + OCAML_STACK_WOSIZE;
+  for (p = sp; p < end; p ++) {
+    reverse_pointer(p);
+  }
+  end = ocaml_global_data + OCAML_GLOBDATA_NUMBER;
+  for (p = ocaml_global_data; p < end; p ++) {
     reverse_pointer(p);
   }
 }
@@ -311,19 +164,19 @@ static void reverse_root_pointers(void) {
 
 /* Reverse all fields of living blocks that are pointers to other blocks. */
 static void reverse_heap_pointers(void) {
-  val_t *p = heap;
-  while (p < heap_pos) {                         /* Loop over the whole heap in block order                   */
+  val_t *p = ocaml_heap;
+  while (p < heap_ptr) {                                 /* Loop over the whole heap in block order                   */
     header_t h = *p;
-    while ((Color_header(h) & Black) == Black) { /* Skip the reverse pointer list to find the original header */
-      h = *Ptr(h & ~Brown);
+    while ((Color_hd(h) & Color_black) == Color_black) { /* Skip the reverse pointer list to find the original header */
+      h = *Block_val(h & ~Color_brown);
     }
-    if (Tag_header(h) < No_scan_tag) {           /* Should this block be scanned?                             */
-      val_t *end = p + Size_header(h) + 1;
-      for (p ++; p < end; p ++) {                /* Yes -> loop over the block in field order                 */
-        reverse_pointer(p);                      /* Reverse field (if pointer to heap)                        */
+    if (Tag_hd(h) < No_scan_tag) {                       /* Should this block be scanned?                             */
+      val_t *end = p + Wosize_hd(h) + 1;
+      for (p ++; p < end; p ++) {                        /* Yes -> loop over the block in field order                 */
+        reverse_pointer(p);                              /* Reverse field (if pointer to heap)                        */
       }
     } else {
-      p += Size_header(h) + 1;                   /* No -> jump to the next block                              */
+      p += Wosize_hd(h) + 1;                             /* No -> jump to the next block                              */
     }
   }
 }
@@ -335,41 +188,41 @@ static void reverse_heap_pointers(void) {
 /* Update by the way roots with new addresses.        */
 /* Restore headers of living blocks.                  */
 static void update_pointers(void) {
-  val_t *p = heap;
-  val_t *alloc_pos = heap;                      /* Initialize a "virtual allocation pointer"                                       */
-  while (p < heap_pos) {                        /* Loop over the whole heap in block order                                         */
+  val_t *p = ocaml_heap;
+  val_t *alloc_pos = ocaml_heap;                  /* Initialize a "virtual allocation pointer"                                       */
+  while (p < heap_ptr) {                          /* Loop over the whole heap in block order                                         */
     val_t v = *p;
-    if (Color_header(v) == Black) {             /* Is the header contains a reversed pointer (equivalent to "is the block alive")? */
-      do {                                      /* Loop over the reversed pointer list                                             */
-        v ^= Black;
-        val_t next = *Ptr(v) & ~Red;
-        *Ptr(v) = Block(alloc_pos + 1);         /* Write the pointer to the destination of the block                               */
+    if (Color_hd(v) == Color_black) {             /* Is the header contains a reversed pointer (equivalent to "is the block alive")? */
+      do {                                        /* Loop over the reversed pointer list                                             */
+        v ^= Color_black;
+        val_t next = *Block_val(v) & ~Color_red;
+        *Block_val(v) = Val_block(alloc_pos + 1); /* Write the pointer to the destination of the block                               */
         v = next;
-      } while (Color_header(v) == Black);
-      *p = v;                                   /* Restore the White original header                                               */
-      sz_t size = Size_header(v) + 1;
-      if (Tag_header(v) == Closure_tag) {       /* Is this block a closure?                                                        */
+      } while (Color_hd(v) == Color_black);
+      *p = v;                                     /* Restore the White original header                                               */
+      mlsize_t size = Wosize_hd(v) + 1;
+      if (Tag_hd(v) == Closure_tag) {             /* Is this block a closure?                                                        */
         val_t *end = p + size;
-        sz_t i = 2;
-        for (p ++; p < end; p ++, i ++) {       /* Loop over fields and restore pointers to destination infix sub-block            */
+        mlsize_t i = 2;
+        for (p ++; p < end; p ++, i ++) {         /* Loop over fields and restore pointers to destination infix sub-block            */
           val_t v = *p;
-          if (Color_header(v) == Black) {       /* Is an infix location?                                                           */
-            do {                                /* Loop over the reversed pointer list                                             */
-              v ^= Black;                       /* Restore pointers to this infix block                                            */
-              val_t next = *Ptr(v) & ~Red;
-              *Ptr(v) = Block(alloc_pos + i);
+          if (Color_hd(v) == Color_black) {       /* Is an infix location?                                                           */
+            do {                                  /* Loop over the reversed pointer list                                             */
+              v ^= Color_black;                   /* Restore pointers to this infix block                                            */
+              val_t next = *Block_val(v) & ~Color_red;
+              *Block_val(v) = Val_block(alloc_pos + i);
               v = next;
-            } while (Color_header(v) == Black);
-            *p = v | Red;                       /* Restore the Red original infix header                                           */
+            } while (Color_hd(v) == Color_black);
+            *p = v | Color_red;                   /* Restore the Red original infix header                                           */
           }
         }
       } else {
-        p += size;                              /* Jump to the next block                                                          */
+        p += size;                                /* Jump to the next block                                                          */
       }
-      alloc_pos += size;                        /* Update the virtual allocation pointer                                           */
+      alloc_pos += size;                          /* Update the virtual allocation pointer                                           */
     } else {
-      *p = v | Black;
-      p += Size_header(v) + 1;                  /* Jump to the next block                                                          */
+      *p = v | Color_black;
+      p += Wosize_hd(v) + 1;                      /* Jump to the next block                                                          */
     }
   }
 }
@@ -378,18 +231,18 @@ static void update_pointers(void) {
 
 /* Compact living blocks to the begining of the heap. */
 static void compact_blocks(void) {
-  val_t *p = heap;
-  val_t *alloc_pos = heap;                          /* Initialize an "allocation pointer"      */
-  while (p < heap_pos) {                            /* Loop over the whole heap in block order */
+  val_t *p = ocaml_heap;
+  val_t *alloc_pos = ocaml_heap;                    /* Initialize an "allocation pointer"      */
+  while (p < heap_ptr) {                            /* Loop over the whole heap in block order */
     header_t h = *p;
-    sz_t size = Size_header(h) + 1;
-    if (Color_header(h) == White) {                 /* Is this block alive?                    */
+    mlsize_t size = Wosize_hd(h) + 1;
+    if (Color_hd(h) == Color_white) {               /* Is this block alive?                    */
       memmove(alloc_pos, p, size * sizeof(val_t));  /* Move block                              */
       alloc_pos += size;                            /* Update the allocation pointer           */
     }
     p += size;                                      /* Jump to the next block                  */
   }
-  heap_pos = alloc_pos;                             /* Update heap_pos                         */
+  heap_ptr = alloc_pos;                             /* Update heap_ptr                         */
 }
 
 /******************************************************************************/
@@ -402,6 +255,16 @@ void mark_and_compact(void) {
   reverse_heap_pointers();
   update_pointers();
   compact_blocks();
+}
+
+void gc(mlsize_t wosize) {
+#if defined(__PC__) && defined(DEBUG)
+  printf("#################### MARK & COMPACT ####################\n");
+#endif
+  mark_and_compact();
+  if (heap_ptr + (wosize + 1) > heap_end) {
+    caml_out_of_memory();
+  }
 }
 
 /******************************************************************************/

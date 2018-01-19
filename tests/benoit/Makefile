@@ -27,7 +27,7 @@ test.byte: test.ml
 	ocamlclean $@ -o $@
 
 test.c: test.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 512 -stack-size 64 $< -o $@
 
 test.elf: test.c
 	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $(OPT) $^ -o $@

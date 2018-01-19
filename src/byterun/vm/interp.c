@@ -19,7 +19,7 @@
    extra_args  number of extra arguments provided by the caller
 */
 
-val_t atom0_header = Make_header(0, 0);
+val_t atom0_header = Make_header(0, 0, Color_white);
 
 PROGMEM extern void * const ocaml_primitives[];
 
@@ -965,7 +965,7 @@ val_t interp(void) {
 
       /* Create f functions in the closure */
       for (i = 1; i < f; i ++) {
-        Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
+        Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_white);
         Field(acc, 2 * i) = Val_codeptr(read_ptr_1B() - i - 2);
       }
         /* pop what should be elems of the closure */
@@ -995,7 +995,7 @@ val_t interp(void) {
       OCamlAlloc(acc, 2 * f - 1 + v, Closure_tag);
       Field(acc, 0) = Val_codeptr(o);
       for (i = 1; i < f; i ++) {
-        Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
+        Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_white);
         Field(acc, 2 * i) = Val_codeptr(read_ptr_2B() - 2 * i - 2);
       }
       /* pop v elems into the closure */
@@ -1025,7 +1025,7 @@ val_t interp(void) {
       OCamlAlloc(acc, 2 * f - 1 + v, Closure_tag);
       Field(acc, 0) = o;
       for (i = 1; i < f; i ++) {
-        Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag);
+        Field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_white);
         Field(acc, 2 * i) = Val_codeptr(read_ptr_4B() - 4 * i - 2);
       }
       for (; i < v ; i ++) {

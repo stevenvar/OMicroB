@@ -29,10 +29,7 @@ static uint8_t buffer_read(int x, int y) {
 }
 
 static uint8_t buffer_get_byte(int x, int y) {
-  int xx = x / 2;
-  int yy = y / 2;
-  uint8_t row = yy / 8;
-  return sBuffer[row * WIDTH + xx];
+  return sBuffer[0];
 }
 
 /******************************************************************************/
