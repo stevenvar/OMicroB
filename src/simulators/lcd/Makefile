@@ -11,12 +11,12 @@ OPTIONS = -cflags $(CFLAGS) -lflags $(LFLAGS)
 
 simu_lcd: $(TARG)
 
-$(TARG): _build/$(BUILD)
+$(TARG): .build/$(BUILD)
 	cp $< $@
 
-_build/$(BUILD): $(SRCS) config.ml $(EXTRA)/simul.ml $(EXTRA)/simul.mli
+.build/$(BUILD): $(SRCS) config.ml $(EXTRA)/simul.ml $(EXTRA)/simul.mli
 	$(OCAMLBUILD) $(OPTIONS) $(BUILD)
-	@touch $@
+	# @touch $@
 
 config.ml: $(ETC)/config.ml
 	cp $< $@
