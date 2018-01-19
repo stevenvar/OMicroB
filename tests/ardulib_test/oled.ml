@@ -18,19 +18,7 @@ let boot_program =
   |]
 
 let transfer_program prog =
-  Spi.transfer(0xD5);
-  Spi.transfer(0xF0);
-  Spi.transfer(0x8D);
-  Spi.transfer(0x14);
-  Spi.transfer(0xC8);
-  Spi.transfer(0x81);
-  Spi.transfer(0xCF);
-  Spi.transfer(0xD9);
-  Spi.transfer(0xF1);
-  Spi.transfer(0xAF);
-  Spi.transfer(0x20);
-  Spi.transfer(0x00)
-  (* Array.iter Spi.transfer prog *)
+  Array.iter Spi.transfer prog
 
 (* Put the display in command mode *)
 let command_mode cs dc =

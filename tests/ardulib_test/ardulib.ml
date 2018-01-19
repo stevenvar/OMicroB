@@ -23,9 +23,9 @@ let boot_pins () =
   pin_mode pin_right INPUT;
   pin_mode pin_down INPUT;
   pin_mode pin_up INPUT;
-  pin_mode r OUTPUT;
-  pin_mode g OUTPUT;
-  pin_mode b OUTPUT;
+  (* pin_mode r OUTPUT; *)
+  (* pin_mode g OUTPUT; *)
+  (* pin_mode b OUTPUT; *)
   pin_mode button_a INPUT;
   pin_mode button_b INPUT;
   pin_mode cs OUTPUT;
@@ -37,7 +37,8 @@ let boot_pins () =
   digital_write rst true
 
 
-let () =  
+let () =
+  
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
   Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
