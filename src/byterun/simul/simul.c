@@ -5,7 +5,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#include "sf_regs.h"
+#include "sf-regs.h"
 #include "shared.h"
 
 static int is_parent = 0;
@@ -195,13 +195,18 @@ void init_simulator(void){
   {
     pid_t pid = fork();
     if(pid < 0) error("fork()");
-    if(pid){
+    if(pid) {
       is_parent = 1;
       parent_pid = pid;
       signals();
       wait(NULL);
-      fprintf(stderr, "Program terminated, press enter to exit!\n");
-      fgetc(stdin);
+      if (nb_proc > 0) {
+        usleep(100000);
+        fprintf(stderr, "Program terminated, press enter to exit!\n");
+        fgetc(stdin);
+      } else {
+        fprintf(stderr, "Program terminated!\n");
+      }
       destroy();
       exit(0);
     }

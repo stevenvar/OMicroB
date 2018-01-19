@@ -17,28 +17,27 @@ run: ardulib.elf
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
-	@rm -r *.elf.dSYM
+	@rm -Rf *.elf.dSYM
 
 .PHONY: ardulib run clean flash
 
 ################################################################################
 
 
-ardulib.byte: spi.ml oled.ml ardulib.ml
-	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun  $^ -o $@
+ardulib.byte: buffer.c spi.ml oled.ml ardulib.ml
+	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun -ccopt -D__OCAML__  $^ -o $@
 	ocamlclean $@ -o $@
 
 ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 128 $< -o $@
+	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 128 -stack-size 128 $< -o $@
 
 ardulib.elf: ardulib.c
-#	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
-	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 $(OPT) -DBUFFER -D_POSIX_C_SOURCE=199309L $^ -o $@
+	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $(OPT) $^ -o $@
 
 ################################################################################
 
 ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) lib/buffer.c ardulib.c
-	$(AVR_GXX) -fpermissive -O2 $(INCLUDES) -I lib $(CFLAGS) $(LFLAGS) -Wall -DBUFFER  $^  -Wnarrowing -o $@
+	$(AVR_GXX) -fpermissive -O2 $(INCLUDES) -I lib $(CFLAGS) $(LFLAGS) -Wall  $^ -Wnarrowing -o $@
 
 ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
