@@ -53,6 +53,7 @@ val string_of_pin : pin -> string
 val port_of_pin : pin -> port
 val index_of_pin : pin -> int
 val pin_of_port_index : port -> int -> pin
+val pin_of_number : string -> pin
 val pin_of_string : string -> pin
 type an =
     AN0

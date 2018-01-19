@@ -142,6 +142,13 @@ let pin_of_port_index port index =
       end
 ;;
 
+let pin_of_number s =
+  match s with
+  | "PIN4" -> RD4
+  | "PIN12" -> RD6
+  | "PIN8" -> RB4
+  | _ -> raise (Invalid_argument ("PIN"^s));;
+
 let pin_of_string s =
   let error () = invalid_arg "Simul.pin_of_string" in
   if String.length s <> 3 || (s.[0] <> 'R' && s.[0] <> 'r') then error ();

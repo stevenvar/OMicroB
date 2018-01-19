@@ -50,12 +50,13 @@ for i = 1 to nb_arg - 1 do
   let arg = Sys.argv.(i) in
   try
     let len = String.length arg in
-    if check_prefix "dc=r" arg && len = 5 then
-      set "dc" dc (Simul.pin_of_string (String.sub arg 2 3))
-    else if check_prefix "cs=r" arg && len = 6 then
-      set "cs" cs (Simul.pin_of_string (String.sub arg 3 3))
-    else if check_prefix "rst=r" arg && len = 6 then
-      set "rst" rst (Simul.pin_of_string (String.sub arg 3 3))
+    (* TODO change these *)
+    if check_prefix "dc=PIN" arg && len = 5 then
+      set "dc" dc (Simul.pin_of_number (String.sub arg 2 3))
+    else if check_prefix "cs=PIN" arg && len = 6 then
+      set "cs" cs (Simul.pin_of_number (String.sub arg 3 3))
+    else if check_prefix "rst=PIN" arg && len = 6 then
+      set "rst" rst (Simul.pin_of_number (String.sub arg 3 3))
     else
       set "size" size (parse_size arg);
   with Failure _ ->
