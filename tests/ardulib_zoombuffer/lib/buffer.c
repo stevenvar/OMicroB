@@ -65,7 +65,6 @@ uint8_t buffer_get_byte(){
   if (col % 2 == 1){
     ptr++; // ptr increases only every 2 calls
   }
-  /* ptr++; */
 
   col++;
   if(col/2 >= (WIDTH)){

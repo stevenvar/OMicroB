@@ -263,6 +263,9 @@ void gc(mlsize_t wosize) {
 #endif
   mark_and_compact();
   if (heap_ptr + (wosize + 1) > heap_end) {
+    #ifdef __PC__
+    printf("HEAP OVERFLOW\n");
+    #endif 
     caml_out_of_memory();
   }
 }

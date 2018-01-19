@@ -33,8 +33,8 @@ static uint8_t extra_args;
 void caml_raise_stack_overflow(void) {
 #ifdef __PC__
 #include <stdio.h>
-printf("stack overflow");
- /* exit(0); */
+printf("stack overflow\n");
+ exit(0);
 #endif
   /* assert(0); */
   /* TODO */
