@@ -2549,7 +2549,7 @@ extern "C" {
 
 void setup(void) {
   #ifdef __AVR__
-  init_heap_pointers();
+  /* init_heap_pointers(); */
   #endif
   interp_init();
   gc_init();

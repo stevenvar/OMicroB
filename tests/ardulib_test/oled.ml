@@ -18,11 +18,23 @@ let boot_program =
   |]
 
 let transfer_program prog =
-  Array.iter Spi.transfer prog
+  Spi.transfer(0xD5);
+  Spi.transfer(0xF0);
+  Spi.transfer(0x8D);
+  Spi.transfer(0x14);
+  Spi.transfer(0xC8);
+  Spi.transfer(0x81);
+  Spi.transfer(0xCF);
+  Spi.transfer(0xD9);
+  Spi.transfer(0xF1);
+  Spi.transfer(0xAF);
+  Spi.transfer(0x20);
+  Spi.transfer(0x00)
+  (* Array.iter Spi.transfer prog *)
 
 (* Put the display in command mode *)
 let command_mode cs dc =
-  (* digital_write cs true; *)
+  digital_write cs true;
   digital_write dc false;
   digital_write cs false
 
@@ -38,7 +50,7 @@ let send_lcd_command cs dc com =
 
 let clear() =
  for i = 0 to 1023 do
-   Spi.transfer(0x00)
+   Spi.transfer(0xFF)
  done
 
 let clear_zone ~cs ~dc x y =
@@ -68,8 +80,8 @@ let draw ~cs ~dc x y =
   Spi.transfer(0x01 lsl shift)
 
 (* Booting sequence *)
-let boot ~cs ~dc ~rst =
-   let spi_clock_div2 = 0x04 in
+let boot ~cs ~dc ~rst = 
+   (* let spi_clock_div2 = 0x04 in *)
   (* Spi.set_clock_divider spi_clock_div2; *)
   command_mode cs dc;
   transfer_program boot_program;
