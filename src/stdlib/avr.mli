@@ -35,36 +35,38 @@ type 'a register =
   | SPCR : spcr_bit register
   | SPSR : spsr_bit register
   | SPDR : spsr_bit register
-type ('a, 'b) pin =
-    PIN0 : (portd_bit register, ddrd_bit register) pin
-  | PIN1 : (portd_bit register, ddrd_bit register) pin
-  | PIN2 : (portd_bit register, ddrd_bit register) pin
-  | PIN3 : (portd_bit register, ddrd_bit register) pin
-  | PIN4 : (portd_bit register, ddrd_bit register) pin
-  | PIN5 : (portc_bit register, ddrc_bit register) pin
-  | PIN6 : (portd_bit register, ddrd_bit register) pin
-  | PIN7 : (porte_bit register, ddre_bit register) pin
-  | PIN8 : (portb_bit register, ddrb_bit register) pin
-  | PIN9 : (portb_bit register, ddrb_bit register) pin
-  | PIN10 : (portb_bit register, ddrb_bit register) pin
-  | PIN11 : (portb_bit register, ddrb_bit register) pin
-  | PIN12 : (portd_bit register, ddrd_bit register) pin
-  | PIN13 : (portc_bit register, ddrc_bit register) pin
-  | MISO : (portb_bit register, ddrb_bit register) pin
-  | SCK : (portb_bit register, ddrb_bit register) pin
-  | MOSI : (portb_bit register, ddrb_bit register) pin
-  | SS : (portb_bit register, ddrb_bit register) pin
-  | PINA0 : (portf_bit register, ddrf_bit register) pin
-  | PINA1 : (portf_bit register, ddrf_bit register) pin
-  | PINA2 : (portf_bit register, ddrf_bit register) pin
-  | PINA3 : (portf_bit register, ddrf_bit register) pin
-  | PINA4 : (portf_bit register, ddrf_bit register) pin
-  | PINA5 : (portf_bit register, ddrf_bit register) pin
-type mode = INPUT | OUTPUT
-val port_of_pin : ('a register, 'b register) pin -> 'a register
-val ddr_of_pin : ('a register, 'b register) pin -> 'b register
-val port_bit_of_pin : ('a register, 'b register) pin -> 'a
-val ddr_bit_of_pin : ('a register, 'b register) pin -> 'b
+type ('a, 'b, 'c) pin =
+    PIN0 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN1 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN2 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN3 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN4 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN5 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
+  | PIN6 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN7 : (porte_bit register, ddre_bit register, pine_bit register) pin
+  | PIN8 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN9 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN10 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN11 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN12 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN13 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
+  | MISO : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | SCK : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | MOSI : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | SS : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PINA0 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA1 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA2 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA3 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA4 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA5 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+type mode = INPUT | OUTPUT | INPUT_PULLUP
+val port_of_pin : ('a register, 'b register, 'c register) pin -> 'a register
+val ddr_of_pin : ('a register, 'b register, 'c register) pin -> 'b register
+val input_of_pin : ('a register, 'b register, 'c register) pin -> 'c register
+val port_bit_of_pin : ('a register, 'b register, 'c register) pin -> 'a
+val ddr_bit_of_pin : ('a register, 'b register, 'c register) pin -> 'b
+val input_bit_of_pin : ('a register, 'b register, 'c register) pin -> 'c
 external write_register : 'a register -> int -> unit
   = "caml_avr_write_register" [@@noalloc]
 external read_register : 'a register -> int = "caml_avr_read_register"
@@ -74,5 +76,7 @@ external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit"
   [@@noalloc]
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
   [@@noalloc]
-val pin_mode : ('a register, 'b register) pin -> mode -> unit
-val digital_write : ('a register, 'b register) pin -> bool -> unit
+val pin_mode : ('a register, 'b register, 'c register) pin -> mode -> unit
+val digital_write :
+  ('a register, 'b register, 'c register) pin -> bool -> unit
+val digital_read : ('a register, 'b register, 'c register) pin -> bool

@@ -40,14 +40,14 @@ ardulib.elf: ardulib.c
 ################################################################################
 
 ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) ardulib.c
-	$(AVR_GXX) -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
+	$(AVR_GXX) -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^ -o $@
 
 ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 flash: ardulib.avr
 	stty -f $(ATTY) 1200
-	sleep 0
+	sleep 1
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
 
 listen:

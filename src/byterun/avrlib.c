@@ -3,6 +3,28 @@
 
 /******************************************************************************/
 
+
+volatile uint8_t* regs[] = {
+   &PORTB,
+   &PORTC,
+   &PORTD,
+   &PORTE,
+   &PORTF,
+   &DDRB,
+   &DDRC,
+   &DDRD,
+   &DDRE,
+   &DDRF,
+   &PINB,
+   &PINC,
+   &PIND,
+   &PINE,
+   &PINF,
+   &SPCR,
+   &SPSR,
+   &SPDR
+};
+
 volatile uint8_t *get_reg_addr(uint8_t reg) {
   if (reg ==  0) return &PORTB;
   if (reg ==  1) return &PORTC;
@@ -27,26 +49,37 @@ volatile uint8_t *get_reg_addr(uint8_t reg) {
 
 /******************************************************************************/
 
-void avr_set_bit(uint8_t reg, uint8_t bit) {
-  *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
+void avr_set_bit(uint8_t reg,uint8_t bit){
+  volatile uint8_t* r = regs[reg];
+  volatile uint8_t b = bit;
+  *r |= _BV(b);
 }
 
-void avr_clear_bit(uint8_t reg, uint8_t bit) {
-  *(get_reg_addr(reg)) &= ~((uint8_t) 1 << bit);
+void avr_clear_bit(uint8_t reg, uint8_t bit){
+  volatile uint8_t* r = regs[reg];
+  volatile uint8_t b = bit;
+  *r &= ~_BV(b);
 }
 
-bool avr_read_bit(uint8_t reg, uint8_t bit) {
-  return *(get_reg_addr(reg)) & ((uint8_t) 1 << bit);
+bool avr_read_bit(uint8_t reg, uint8_t bit){
+  volatile uint8_t* r = regs[reg];
+  volatile uint8_t b = bit;
+  return (*r & _BV(b));
 }
+
+
 
 /******************************************************************************/
 
-void avr_write_register(uint8_t reg, uint8_t val) {
-  *(get_reg_addr(reg)) = val;
+void avr_write_register(uint8_t reg,uint8_t val){
+  volatile uint8_t* r = regs[reg];
+  *r = val;
 }
 
-uint8_t avr_read_register(uint8_t reg) {
-  return *(get_reg_addr(reg));
+uint8_t avr_read_register(uint8_t reg){
+  volatile uint8_t* r = regs[reg];
+  return *r;
 }
+
 
 /******************************************************************************/

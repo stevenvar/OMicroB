@@ -40,35 +40,35 @@ type 'a register =
   | SPSR : spsr_bit register
   | SPDR : spsr_bit register
 
-type ('a,'b) pin =
-  | PIN0 : (portd_bit register, ddrd_bit register) pin
-  | PIN1 : (portd_bit register, ddrd_bit register) pin
-  | PIN2 : (portd_bit register, ddrd_bit register) pin
-  | PIN3 : (portd_bit register, ddrd_bit register) pin
-  | PIN4 : (portd_bit register, ddrd_bit register) pin
-  | PIN5 : (portc_bit register, ddrc_bit register) pin
-  | PIN6 : (portd_bit register, ddrd_bit register) pin
-  | PIN7 : (porte_bit register, ddre_bit register) pin
-  | PIN8 : (portb_bit register, ddrb_bit register) pin
-  | PIN9 : (portb_bit register, ddrb_bit register) pin
-  | PIN10 : (portb_bit register, ddrb_bit register) pin
-  | PIN11 : (portb_bit register, ddrb_bit register) pin
-  | PIN12 : (portd_bit register, ddrd_bit register) pin
-  | PIN13 : (portc_bit register, ddrc_bit register) pin
-  | MISO : (portb_bit register, ddrb_bit register) pin
-  | SCK : (portb_bit register, ddrb_bit register) pin
-  | MOSI : (portb_bit register, ddrb_bit register) pin
-  | SS : (portb_bit register, ddrb_bit register) pin
-  | PINA0 : (portf_bit register, ddrf_bit register) pin
-  | PINA1 : (portf_bit register, ddrf_bit register) pin
-  | PINA2 : (portf_bit register, ddrf_bit register) pin
-  | PINA3 : (portf_bit register, ddrf_bit register) pin
-  | PINA4 : (portf_bit register, ddrf_bit register) pin
-  | PINA5 : (portf_bit register, ddrf_bit register) pin
+type ('a,'b,'c) pin =
+  | PIN0  : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN1  : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN2  : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN3  : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN4  : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN5  : (portc_bit register, ddrc_bit register, pinc_bit register) pin
+  | PIN6  : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN7  : (porte_bit register, ddre_bit register, pine_bit register) pin
+  | PIN8  : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN9  : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN10 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN11 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PIN12 : (portd_bit register, ddrd_bit register, pind_bit register) pin
+  | PIN13 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
+  | MISO  : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | SCK   : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | MOSI  : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | SS    : (portb_bit register, ddrb_bit register, pinb_bit register) pin
+  | PINA0 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA1 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA2 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA3 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA4 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
+  | PINA5 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
         
-type mode = INPUT | OUTPUT
+type mode = INPUT | OUTPUT | INPUT_PULLUP
 
-let port_of_pin : type a b . (a register,b register) pin -> a register =
+let port_of_pin : type a b c . (a register,b register, c register) pin -> a register =
   function
   | PIN0 -> PORTD
   | PIN1 -> PORTD
@@ -95,7 +95,7 @@ let port_of_pin : type a b . (a register,b register) pin -> a register =
   | PINA4 -> PORTF
   | PINA5 -> PORTF
 
-let ddr_of_pin : type a b. (a register , b register) pin -> b register=
+let ddr_of_pin : type a b c. (a register , b register, c register) pin -> b register=
   function
   | PIN0 -> DDRD
   | PIN1 -> DDRD
@@ -121,8 +121,36 @@ let ddr_of_pin : type a b. (a register , b register) pin -> b register=
   | PINA3 -> DDRF
   | PINA4 -> DDRF
   | PINA5 -> DDRF
+
+
+let input_of_pin : type a b c. (a register , b register, c register) pin -> c register=
+  function
+  | PIN0 -> PIND
+  | PIN1 -> PIND
+  | PIN2 -> PIND
+  | PIN3 -> PIND
+  | PIN4 -> PIND
+  | PIN5 -> PINC
+  | PIN6 -> PIND
+  | PIN7 -> PINE
+  | PIN8 -> PINB
+  | PIN9 -> PINB
+  | PIN10 -> PINB
+  | PIN11 -> PINB
+  | PIN12 -> PIND
+  | PIN13 -> PINC
+  | MISO -> PINB
+  | SCK -> PINB
+  | MOSI -> PINB
+  | SS -> PINB
+  | PINA0 -> PINF
+  | PINA1 -> PINF
+  | PINA2 -> PINF
+  | PINA3 -> PINF
+  | PINA4 -> PINF
+  | PINA5 -> PINF
  
-let port_bit_of_pin : type a b. (a register, b register) pin -> a =
+let port_bit_of_pin : type a b c. (a register, b register, c register) pin -> a =
   function
   | PIN0 -> PD2
   | PIN1 -> PD3
@@ -150,7 +178,7 @@ let port_bit_of_pin : type a b. (a register, b register) pin -> a =
   | PINA5 -> PF0
 
 
-let ddr_bit_of_pin : type a b. (a register, b register) pin -> b =
+let ddr_bit_of_pin : type a b c. (a register, b register, c register) pin -> b =
   function
   | PIN0 -> DD2
   | PIN1 -> DD3
@@ -176,6 +204,34 @@ let ddr_bit_of_pin : type a b. (a register, b register) pin -> b =
   | PINA3 -> DF4
   | PINA4 -> DF1
   | PINA5 -> DF0
+
+
+let input_bit_of_pin : type a b c. (a register, b register, c register) pin -> c =
+  function
+  | PIN0 -> ID2
+  | PIN1 -> ID3
+  | PIN2 -> ID1
+  | PIN3 -> ID0
+  | PIN4 -> ID4
+  | PIN5 -> IC6
+  | PIN6 -> ID7
+  | PIN7 -> IE6
+  | PIN8 -> IB4
+  | PIN9 -> IB5
+  | PIN10 -> IB6
+  | PIN11 -> IB7
+  | PIN12 -> ID6
+  | PIN13 -> IC7
+  | MISO -> IB3
+  | SCK -> IB1
+  | MOSI -> IB2
+  | SS -> IB0
+  | PINA0 -> IF7
+  | PINA1 -> IF6
+  | PINA2 -> IF5
+  | PINA3 -> IF4
+  | PINA4 -> IF1
+  | PINA5 -> IF0
     
 
 external write_register : 'a register -> int -> unit = "caml_avr_write_register" [@@noalloc]
@@ -185,11 +241,19 @@ external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit" [@@noalloc
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit" [@@noalloc]
 
 let pin_mode p m =
-  let bit = ddr_bit_of_pin p in
+  let port = port_of_pin p in
+  let bit = port_bit_of_pin p in 
+  let ddr_bit = ddr_bit_of_pin p in
   let ddr = ddr_of_pin p in
   match m with
-  | OUTPUT -> set_bit ddr bit
-  | INPUT -> clear_bit ddr bit
+  | OUTPUT ->
+    set_bit ddr ddr_bit
+  | INPUT ->
+    clear_bit ddr ddr_bit;
+    clear_bit port bit
+  | INPUT_PULLUP ->
+    clear_bit ddr ddr_bit;
+    set_bit port bit
 
 let digital_write p b =
   let port = port_of_pin p in
@@ -197,3 +261,8 @@ let digital_write p b =
   match b with
   | true -> set_bit port bit
   | false -> clear_bit port bit
+
+let digital_read p =
+  let input = input_of_pin p in
+  let ibit = input_bit_of_pin p in
+  read_bit input ibit

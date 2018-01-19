@@ -12,7 +12,7 @@ TARGETS := test.byte test.c test.elf test.avr test.hex
 test: $(TARGETS)
 
 run: test.elf
-	./test.elf
+	./test.elf ../../bin/omicrob_pin_simulator
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)

@@ -23,25 +23,25 @@ let boot_pins () =
   pin_mode pin_right INPUT;
   pin_mode pin_down INPUT;
   pin_mode pin_up INPUT;
-  (* pin_mode r OUTPUT; *)
-  (* pin_mode g OUTPUT; *)
-  (* pin_mode b OUTPUT; *)
+  pin_mode r OUTPUT;
+  pin_mode g OUTPUT;
+  pin_mode b OUTPUT;
   pin_mode button_a INPUT;
   pin_mode button_b INPUT;
   pin_mode cs OUTPUT;
   pin_mode dc OUTPUT;
   pin_mode rst OUTPUT;
-  (* init_rgb r g b; *)
+  init_rgb r g b;
   digital_write rst true;
   digital_write rst false;
   digital_write rst true
 
-let () =
+let () =  
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
-  Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
-  for i = 0 to 10 do
-    Oled.draw ~cs:PIN12 ~dc:PIN4 30 i;
-    for i = 0 to 100 do () done;
-    Oled.clear_zone ~cs:PIN12 ~dc:PIN4 30 i;
-  done
+  (* Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6; *)
+  (* for i = 0 to 10 do *)
+    (* Oled.draw ~cs:PIN12 ~dc:PIN4 30 i; *)
+    (* for i = 0 to 100 do () done; *)
+    (* Oled.clear_zone ~cs:PIN12 ~dc:PIN4 30 i; *)
+  (* done *)

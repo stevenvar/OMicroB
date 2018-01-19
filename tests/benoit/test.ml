@@ -8,4 +8,3 @@ let () =
     Array.iter (fun i -> let _ = i in ()) tbl;
   done;
   digital_write PIN9 true;
-  
