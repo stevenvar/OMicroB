@@ -15,7 +15,7 @@ void gc(mlsize_t wosize);
 #define OCamlAlloc(result, wosize, tag)                                \
   do {                                                                 \
     if (heap_ptr + (wosize + 1) > heap_end) gc(wosize);                \
-    *heap_ptr = Make_header((wosize), (tag));                          \
+    *heap_ptr = Make_header((wosize), (tag), Color_white);             \
     heap_ptr ++;                                                       \
     result = Val_block(heap_ptr);                                      \
     heap_ptr += wosize;                                                \

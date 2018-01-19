@@ -13,6 +13,10 @@ extern val_t env;
 extern val_t ocaml_stack[OCAML_STACK_WOSIZE];
 extern val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER];
 
+#define Is_black_hd(hd) ((hd) & Color_black)
+#define Is_black_val(val) Is_black_hd(Hd_val(val))
+#define Set_black_hd(hd) ((hd) | Color_black)
+
 extern void print_stack();
 
 /*
@@ -170,11 +174,11 @@ void gc_one_val(val_t* ptr, int update) {
 void gc(mlsize_t size) {
 #ifdef DEBUG
   cpt_gc++;
-  #ifdef __PC__
+#ifdef __PC__
   printf("==================================================GC=====================================\n");
-  #endif
-    print_heap();
-    print_stack();
+#endif
+  print_heap();
+  print_stack();
 #endif
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];

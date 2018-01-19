@@ -9,11 +9,18 @@
 #include "debug.c"
 #include "fail.c"
 #include "float.c"
-#include "gc.c"
 #include "interp.c"
 #include "obj.c"
 #include "oo.c"
 #include "str.c"
+
+#if defined(OCAML_GC_MARK_AND_COMPACT)
+#include "mark-and-compact.c"
+#elif defined(OCAML_GC_STOP_AND_COPY)
+#include "stop-and-copy.c"
+#else
+#error "Unknown garbage collector to use, please define OCAML_GC_MARK_AND_COMPACT or OCAML_GC_STOP_AND_COPY"
+#endif
 
 #include "../prims/prims.h"
 #include "../prims/omc-bindings.c"

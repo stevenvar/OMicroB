@@ -1,3 +1,4 @@
+#include <string.h>
 #include "values.h"
 #include "gc.h"
 #include "obj.h"

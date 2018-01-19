@@ -18,7 +18,6 @@ val_t caml_buffer_read(val_t x, val_t y) {
 
 val_t caml_buffer_get_byte(val_t x, val_t y) {
   return 0;
-}
 
 #else
 
