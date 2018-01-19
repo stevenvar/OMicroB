@@ -1,7 +1,6 @@
 open Avr
 
 let f () = write_register DDRB 0xFF
-
 let () =
   (* pin_mode PIN8 OUTPUT; *)
   (* write_register DDRB 0xFF; *)

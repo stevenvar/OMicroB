@@ -1,13 +1,3 @@
-(*************************************************************************)
-(*                                                                       *)
-(*                                OCaPIC                                 *)
-(*                                                                       *)
-(*                             Benoit Vaugon                             *)
-(*                                                                       *)
-(*    This file is distributed under the terms of the CeCILL license.    *)
-(*    See file ../../../LICENSE-en.                                      *)
-(*                                                                       *)
-(*************************************************************************)
 
 open Graphics;;
 open Simul;;
@@ -54,29 +44,79 @@ let pin_of_num num =
   | 8 -> (PORTB,1)
   | 9 -> (PORTB,2)
   | 10 -> (PORTB,3)
-  | 11 -> (PORTB, 7) 
-  | 17 -> (PORTD, 0) 
-  | 18 -> (PORTD, 1) 
-  | 19 -> (PORTD, 2) 
-  | 20 -> (PORTD, 3) 
+  | 11 -> (PORTB, 7)
+  | 17 -> (PORTD, 0)
+  | 18 -> (PORTD, 1)
+  | 19 -> (PORTD, 2)
+  | 20 -> (PORTD, 3)
   | 21 -> (PORTD, 5)
-  | 24 -> (PORTD, 4) 
+  | 24 -> (PORTD, 4)
   | 25 -> (PORTD, 6)
   | 26 -> (PORTD, 7)
-  | 27 -> (PORTB, 4) 
-  | 28 -> (PORTB, 5) 
-  | 29 -> (PORTB, 6) 
-  | 30 -> (PORTC, 6) 
-  | 31 -> (PORTC, 7) 
+  | 27 -> (PORTB, 4)
+  | 28 -> (PORTB, 5)
+  | 29 -> (PORTB, 6)
+  | 30 -> (PORTC, 6)
+  | 31 -> (PORTC, 7)
   | 32 -> (PORTE, 2)
-  | 35 -> (PORTF, 7) 
-  | 36 -> (PORTF, 6) 
-  | 37 -> (PORTF, 5) 
-  | 38 -> (PORTF, 4) 
-  | 39 -> (PORTF, 1) 
-  | 40 -> (PORTF, 0) 
+  | 35 -> (PORTF, 7)
+  | 36 -> (PORTF, 6)
+  | 37 -> (PORTF, 5)
+  | 38 -> (PORTF, 4)
+  | 39 -> (PORTF, 1)
+  | 40 -> (PORTF, 0)
   | _ -> raise Error
 ;;
+
+let name_of_num num =
+  match num with
+    0 -> "PIN17"
+  | 1 -> "UVcc"
+  | 2 -> "RD-"
+  | 3 -> "RD+"
+  | 4 -> "UGND"
+  | 5 -> "UCAP"
+  | 6 -> "VUSB"
+  | 7 -> "RXLED"
+  | 8 -> "SCK"
+  | 9 -> "MOSI"
+  | 10 -> "MISO"
+  | 11 -> "PIN11"
+  | 12 -> "RESET"
+  | 13 -> "VCC"
+  | 14 -> "GND"
+  | 15 -> "XTAL2"
+  | 16 -> "XTAL1"
+  | 17 -> "PIN3"
+  | 18 -> "PIN2"
+  | 19 -> "PIN0"
+  | 20 -> "PIN1"
+  | 21 -> "TXLED"
+  | 22 -> "GND"
+  | 23 -> "AVCC"
+  | 24 -> "PIN4"
+  | 25 -> "PIN12"
+  | 26 -> "PIN6"
+  | 27 -> "PIN8"
+  | 28 -> "PIN9"
+  | 29 -> "PIN10"
+  | 30 -> "PIN5"
+  | 31 -> "PIN13"
+  | 32 -> "HWB"
+  | 33 -> "VCC"
+  | 34 -> "GND"
+  | 35 -> "AN0"
+  | 36 -> "AN1"
+  | 37 -> "AN2"
+  | 38 -> "AN3"
+  | 39 -> "AN4"
+  | 40 -> "AN5"
+  | 41 -> "AREF"
+  | 42 -> "AGND"
+  | 43 -> "AVCC"
+  | _ -> raise Error
+;;
+
 
 let pin_of_an an = match an with
   | 5 -> (PORTE, 0) |  6 -> (PORTE, 1) |  7 -> (PORTE, 2)
@@ -91,18 +131,18 @@ let vals = Array.make 44 false;;
 let mem_vals = Array.make 44 true;;
 
 let grew = rgb 200 200 200;;
-open_graph " 430x430";;
+open_graph " 800x800";;
 set_window_title "pin simulator";;
 display_mode false;;
 set_color grew;
-fill_rect 0 0 430 430;;
+fill_rect 0 0 820 820;;
 set_color black;;
-fill_rect 50 50 320 320;;
+fill_rect 50 50 690 690;;
 for i = 0 to 10 do
-  let x1 = (78 + (254 * i) / 10) in
-  let x2 = (78 + (254 * i) / 10) in
+  let x1 = (156 + (508 * i) / 10) in
+  let x2 = (156 + (508 * i) / 10) in
   let y1 = 38 in
-  let y2 = 370 in
+  let y2 = 740 in
   draw_rect x1 y1 12 12;
   draw_rect x2 y2 12 12;
   pins.(i) <- (x1, y1);
@@ -110,14 +150,14 @@ for i = 0 to 10 do
 done;;
 for i = 0 to 10 do
   let x2 = 38 in
-  let x1 = 370 in
-  let y1 = (78 + (254 * i) / 10) in
-  let y2 = (78 + (254 * i) / 10) in
+  let x1 = 740 in
+  let y1 = (156 + (508 * i) / 10) in
+  let y2 = (156 + (508 * i) / 10) in
   draw_rect x1 y1 12 12;
   draw_rect x2 y2 12 12;
   pins.(i+11) <- (x1, y1);
   pins.(43-i) <- (x2, y2);
-  
+
 done;;
   (* pins.(39-i) <- (x2, y2); *)
 (* done;; *)
@@ -126,10 +166,10 @@ fill_circle 85 85 8;;
 (* draw_circle 68 74 4;; *)
 (* fill_circle 49 115 8;; *)
 set_color white;;
-moveto 180 210;
+moveto 370 400;
 draw_string (Printf.sprintf "ATmega32U4");
 for i = 0 to 43 do
-  try
+  (try
     let (x, y) = pins.(i) in
     let (port, bit) = pin_of_num i in
     let c = char_of_port port in
@@ -137,9 +177,19 @@ for i = 0 to 43 do
     if i < 22 then moveto (x-17) y else
     if i < 33 then  moveto (x+1) (y - 16) else
       moveto (x+16) (y+1);
-     
     draw_string (Printf.sprintf "%c%d" c bit);
-  with Error -> ()
+  with Error -> ());
+    try
+      let (x, y) = pins.(i) in
+      let name = name_of_num i in
+      set_color green;
+    if i < 11 then moveto (x-1) (y + 32) else
+    if i < 22 then moveto (x-62) y else
+    if i < 33 then  moveto (x-1) (y - 32) else
+      moveto (x+32) (y+1);
+      draw_string (Printf.sprintf "%s" name);
+      set_color white;
+    with Error -> () ;
 done;;
 
 let draw_plus pin dv dh =
@@ -195,7 +245,7 @@ let draw_arrow pin isin =
   else if pin < 22 then
     (if not isin then l else r) (px + 15) (py + 6)
   else if pin < 33 then
-    (if not isin then b else t) (px + 6) (py + 16) 
+    (if not isin then b else t) (px + 6) (py + 16)
   else
     (if not isin then r else l) (px - 15) (py + 6)
 ;;
