@@ -147,15 +147,20 @@ extern void *caml_register_code_fragment;
 extern void *caml_add_debug_info;
 extern void *caml_reify_bytecode;
 
+extern val_t ocaml_arduboy_init(val_t unit);
+extern val_t ocaml_arduboy_print_int(val_t i);
+extern val_t ocaml_arduboy_display(val_t unit);
+
 void *caml_builtin_cprim;
 void *caml_names_of_builtin_cprim;
 
 /******************************************************************************/
+
 extern val_t ocaml_heap[];
 static val_t oo_last_id = Val_int(0);
 
 
- val_t caml_bytes_equal(val_t s1, val_t s2)
+val_t caml_bytes_equal(val_t s1, val_t s2)
 {
   return caml_string_equal(s1,s2);
 }

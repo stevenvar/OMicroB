@@ -3,6 +3,10 @@
 /******************************************************************************/
 /* Binding to arduino libraries */
 
+#ifndef __AVR__
+#include <stdio.h>
+#endif
+
 #include "values.h"
 #include "avr.h"
 
@@ -39,7 +43,6 @@ val_t caml_avr_write_register(val_t reg, val_t val){
 /* Arduboy specific libraries */
 
 #ifdef __AVR__
-
 
 val_t caml_buffer_write(val_t x, val_t y, val_t color){
   return Val_unit;
@@ -126,15 +129,9 @@ val_t ocaml_arduboy_clear(val_t unit){
   return Val_unit;
 }
 
-
 #endif /* OMICROB_USE_ARDUBOY */
 
 #else /* __AVR__ */
-
-#ifndef __PC__
-
-#include "../simulator/simu.c"
-
 
 val_t ocaml_arduboy_init(val_t unit) {
   printf("ocaml_arduino_init()\n");
@@ -142,7 +139,7 @@ val_t ocaml_arduboy_init(val_t unit) {
 }
 
 val_t ocaml_arduboy_print(val_t str) {
-  printf("ocaml_arduino_print(\"%s\")\n", String_val(str));
+  printf("ocaml_arduino_print(\"...\")\n");
   return Val_unit;
 }
 
@@ -155,7 +152,6 @@ val_t ocaml_arduboy_display(val_t unit) {
   printf("ocaml_arduino_print()\n");
   return Val_unit;
 }
-
 
 val_t ocaml_arduboy_draw_rect(val_t x, val_t y, val_t w, val_t h, val_t color) {
   printf("drawRect(%d,%d,%d,%d,%d)", (int)Int_val(x), (int)Int_val(y),(int)Int_val(w),(int)Int_val(h),(int)Int_val(color));
@@ -187,33 +183,34 @@ val_t ocaml_arduboy_fill_circle(val_t x0, val_t y0, val_t r, val_t color) {
   return Val_unit;
 }
 
-val_t ocaml_arduboy_pressed(val_t button){
+val_t ocaml_arduboy_pressed(val_t button) {
   printf("pressed(%d)",(int)Int_val(button));
   return Val_unit;
 }
 
-
-val_t ocaml_arduboy_clear(val_t unit){
+val_t ocaml_arduboy_clear(val_t unit) {
   printf("clear()");
   return Val_unit;
 }
 
-val_t caml_buffer_write(val_t x, val_t y, val_t color){
+val_t caml_buffer_write(val_t x, val_t y, val_t color) {
+  printf("caml_buffer_write()");
   return Val_unit;
 }
 
-val_t caml_buffer_read(val_t x, val_t y){
+val_t caml_buffer_read(val_t x, val_t y) {
+  printf("caml_buffer_read()");
   return Val_unit;
 }
 
-val_t caml_buffer_get_byte(val_t x){
+val_t caml_buffer_get_byte(val_t x) {
+  printf("caml_buffer_get_byte()");
   return Val_unit;
 }
 
-val_t caml_init_buffer(val_t x){
+val_t caml_init_buffer(val_t x) {
+  printf("caml_init_buffer()");
   return Val_unit;
 }
-
-#endif /* __PC__ */
 
 #endif /* __AVR__ */

@@ -85,44 +85,6 @@ void clean_heap(){
   }
 }
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#if defined(__PC__)
-/* Pour debug */
-void print_heap(){
-  val_t* ptr;
-  int i = 0;
-  val_t* from = tab_heap_start[current_heap];
-  val_t* to = tab_heap_end[current_heap];
-  /* val_t* from = ocaml_heap; */
-  /* val_t* to = heap2_end; */
-  printf("HEAP ( starts at %p , ends at %p (size = %ld) ) : \n", from , to, to-from );
-  for(ptr = ocaml_heap ; ptr < heap2_end ; ptr++){
-    float f = *(float *)ptr;
-    if (ptr == heap1_end){
-      printf("======================================================\n");
-    }
-    if (Is_int(*ptr)){
-      printf("%d  @%p : 0x%08x (int = %d / float = %f)", i, ptr, *ptr, Int_val(*ptr), f);
-    }
-    else if (Is_block(*ptr)){
-      printf("%d  @%p : 0x%08x / @(%p)",i, ptr, *ptr, Block_val(*ptr));
-    }
-    else if (*ptr == 0){
-      printf("%d  @%p : _",i, ptr);
-    }
-    else{
-      printf("%d  @%p : 0x%08x (maybe %f)",i, ptr, *ptr, f);
-    }
-    printf("\n");
-    i++;
-  }
-  printf("heap_ptr = %p", heap_ptr);
-  printf("\n\n\n");
-}
-
-#endif
 #endif /* DEBUG */
 
 /* fonction qui traite complètement une racine

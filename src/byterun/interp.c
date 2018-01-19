@@ -36,9 +36,6 @@ void caml_raise_stack_overflow(void) {
 printf("stack overflow");
  /* exit(0); */
 #endif
-#ifdef DEBUG
-  debug(444);
-#endif
   /* assert(0); */
   /* TODO */
 }
@@ -318,7 +315,6 @@ val_t interp(void) {
 
 
 #ifdef DEBUG
-    debug(pc-1);
     cptinst++;
 #endif
 
@@ -2528,11 +2524,6 @@ val_t interp(void) {
 #if defined(DEBUG) && defined (__PC__)
       printf("STOP\n");
 #endif
-#ifdef DEBUG
-      debug(5709);
-      debug(cptinst);
-      debug(5709);
-#endif
 #ifdef __PC__
       exit(0);
 #endif
@@ -2552,11 +2543,11 @@ val_t interp(void) {
 
 /******************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void setup(void) {
-  #ifdef DEBUG
-  debug_init();
-  #endif
   #ifdef __AVR__
   init_heap_pointers();
   #endif
@@ -2568,6 +2559,10 @@ void setup(void) {
 void loop(void) {
   // Here we should wait for the serial port (in order to easily flash the uC)
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 /******************************************************************************/
 
