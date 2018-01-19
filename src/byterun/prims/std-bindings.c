@@ -30,6 +30,18 @@ value caml_avr_read_register(value reg) {
   return Val_int(avr_read_register(Int_val(reg)));
 }
 
+/* value caml_buffer_write(int x, int y, int color){ */
+/*   return Val_unit; */
+/* } */
+
+/* value caml_buffer_read(int x, int y){ */
+/*   return Val_int(0); */
+/* } */
+
+/* value caml_buffer_get_byte(){ */
+/*   return Val_unit; */
+/* } */
+
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/

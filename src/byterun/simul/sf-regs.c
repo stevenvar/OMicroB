@@ -312,7 +312,7 @@ void avr_set_bit(uint8_t reg, uint8_t bit){
   }
   else{
   regs[reg] = new_val;
-  send_write_port(reg,new_val);
+  /* send_write_port(reg,new_val); */ // don't send internal modifications
   }
   /* printf("set bit %d on reg %d \n", bit, reg); */
   V(sem_regs);

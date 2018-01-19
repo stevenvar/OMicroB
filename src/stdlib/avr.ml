@@ -9,7 +9,7 @@ type ddrc_bit = DC0 | DC1 | DC2 | DC3 | DC4 | DC5 | DC6 | DC7
 type ddrd_bit = DD0 | DD1 | DD2 | DD3 | DD4 | DD5 | DD6 | DD7
 type ddre_bit = DE0 | DE1 | DE2 | DE3 | DE4 | DE5 | DE6 | DE7
 type ddrf_bit = DF0 | DF1 | DF2 | DF3 | DF4 | DF5 | DF6 | DF7
-                
+
 type pinb_bit = IB0 | IB1 | IB2 | IB3 | IB4 | IB5 | IB6 | IB7
 type pinc_bit = IC0 | IC1 | IC2 | IC3 | IC4 | IC5 | IC6 | IC7
 type pind_bit = ID0 | ID1 | ID2 | ID3 | ID4 | ID5 | ID6 | ID7
@@ -65,7 +65,7 @@ type ('a,'b,'c) pin =
   | PINA3 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
   | PINA4 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
   | PINA5 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-        
+
 type mode = INPUT | OUTPUT | INPUT_PULLUP
 
 let port_of_pin : type a b c . (a register,b register, c register) pin -> a register =
@@ -149,7 +149,7 @@ let input_of_pin : type a b c. (a register , b register, c register) pin -> c re
   | PINA3 -> PINF
   | PINA4 -> PINF
   | PINA5 -> PINF
- 
+
 let port_bit_of_pin : type a b c. (a register, b register, c register) pin -> a =
   function
   | PIN0 -> PD2
@@ -232,7 +232,7 @@ let input_bit_of_pin : type a b c. (a register, b register, c register) pin -> c
   | PINA3 -> IF4
   | PINA4 -> IF1
   | PINA5 -> IF0
-    
+
 
 external write_register : 'a register -> int -> unit = "caml_avr_write_register" [@@noalloc]
 external read_register : 'a register -> int = "caml_avr_read_register" [@@noalloc]
@@ -242,7 +242,7 @@ external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit" [@@noalloc]
 
 let pin_mode p m =
   let port = port_of_pin p in
-  let bit = port_bit_of_pin p in 
+  let bit = port_bit_of_pin p in
   let ddr_bit = ddr_bit_of_pin p in
   let ddr = ddr_of_pin p in
   match m with

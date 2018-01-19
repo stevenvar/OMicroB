@@ -51,39 +51,11 @@ let clear() =
    Spi.transfer(0x00)
  done
 
-(* let clear_zone ~cs ~dc x y =
- *   let page = y / 8 in
- *   let shift = y mod 8 in
- *   command_mode cs dc;
- *   Spi.transfer (0x21); (\* column *\)
- *   Spi.transfer (x);
- *   Spi.transfer (x);
- *   Spi.transfer (0x22); (\* page *\)
- *   Spi.transfer (page);
- *   Spi.transfer (page);
- *   data_mode cs dc;
- *   Spi.transfer (0x00)
- *
- * let draw ~cs ~dc x y =
- *   let page = y / 8 in
- *   let shift = y mod 8 in
- *   command_mode cs dc;
- *   Spi.transfer (0x21); (\* column *\)
- *   Spi.transfer (x);
- *   Spi.transfer (x);
- *   Spi.transfer (0x22); (\* page *\)
- *   Spi.transfer (page);
- *   Spi.transfer (page);
- *   data_mode cs dc;
- *   Spi.transfer(0x01 lsl shift) *)
-
-(* Booting sequence *)
 let boot ~cs ~dc ~rst =
    (* let spi_clock_div2 = 0x04 in *)
   (* Spi.set_clock_divider spi_clock_div2; *)
   command_mode cs dc;
   transfer_program boot_program;
   data_mode cs dc;
-  (* init_buffer(); *)
   clear();
   (* moveto cs dc 10 10; *)

@@ -1,16 +1,6 @@
-(*************************************************************************)
-(*                                                                       *)
-(*                                OCaPIC                                 *)
-(*                                                                       *)
-(*                             Benoit Vaugon                             *)
-(*                                                                       *)
-(*    This file is distributed under the terms of the CeCILL license.    *)
-(*    See file ../../../LICENSE-en.                                      *)
-(*                                                                       *)
-(*************************************************************************)
 
 let usage () =
-  Printf.eprintf "Usage: %s [COLxLIN] [e=RXX] [rs=RXX] [rw=RXX] [bus=PORTX]\n%!"
+  Printf.eprintf "Usage: %s [COLxLIN] [dc=RXX] [cs=RXX] [rst=RXX] \n%!"
     Sys.argv.(0);
   exit 1;
 ;;
@@ -37,12 +27,13 @@ let parse_size str =
     failwith "invalid size"
 ;;
 
-let e = ref None in
-let rs = ref None in
-let rw = ref None in
-let bus = ref None in
+let dc = ref None in
+let cs = ref None in
+let rst = ref None in
 let size = ref None in
+
 let nb_arg = Array.length Sys.argv in
+
 let set n x v =
   match !x with
     | None -> x := Some v
@@ -53,33 +44,33 @@ let get n x =
     | None -> failwith (Printf.sprintf "%s undefined" n)
     | Some v -> v
 in
+
+Printf.printf "HELLO\n";
 for i = 1 to nb_arg - 1 do
   let arg = Sys.argv.(i) in
   try
     let len = String.length arg in
-    if check_prefix "e=r" arg && len = 5 then
-      set "e" e (Simul.pin_of_string (String.sub arg 2 3))
-    else if check_prefix "rs=r" arg && len = 6 then
-      set "rs" rs (Simul.pin_of_string (String.sub arg 3 3))
-    else if check_prefix "rw=r" arg && len = 6 then
-      set "rw" rw (Simul.pin_of_string (String.sub arg 3 3))
-    else if check_prefix "bus=port" arg && len = 9 then
-      set "bus" bus (Simul.port_of_char arg.[8])
+    if check_prefix "dc=r" arg && len = 5 then
+      set "dc" dc (Simul.pin_of_string (String.sub arg 2 3))
+    else if check_prefix "cs=r" arg && len = 6 then
+      set "cs" cs (Simul.pin_of_string (String.sub arg 3 3))
+    else if check_prefix "rst=r" arg && len = 6 then
+      set "rst" rst (Simul.pin_of_string (String.sub arg 3 3))
     else
       set "size" size (parse_size arg);
   with Failure _ ->
     Printf.eprintf "Error: don't know what to do with: '%s'\n%!" arg;
     usage ();
 done;
-let e = get "e" e in
-let rs = get "rs" rs in
-let rw = get "rw" rw in
-let bus = get "bus" bus in
+
+let cs = get "cs" cs in
+let dc = get "dc" dc in
+let rst = get "rst" rst in
 let size = get "size" size in
 let column_nb = fst size in
 let line_nb = snd size in
 try
-  let display = Display.create_display 0 0 e rs rw bus column_nb line_nb in
+  let display = Display.create_display 0 0 cs dc rst column_nb line_nb in
   Display.init_graphics display;
   Proto.register display;
   Simul.start ();

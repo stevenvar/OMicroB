@@ -23,6 +23,8 @@ clean:
 
 ################################################################################
 
+simul : ardulib.elf
+	./ardulib.elf '../../bin/omicrob_lcd_simulator 128x64 dc=PIN4 cs=PIN12 rst=PIN6'
 
 ardulib.byte: buffer.c spi.ml oled.ml ardulib.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun -ccopt -D__OCAML__  $^ -o $@

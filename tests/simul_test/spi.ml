@@ -40,4 +40,5 @@ let set_clock_divider rate =
 let transfer data =
   write_register SPDR data;
   while (read_bit SPSR SPIF <> false) do () done;
-  read_register SPDR
+  (* read_register SPDR *)
+  ()
