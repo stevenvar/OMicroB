@@ -4,7 +4,11 @@
 #include <stdio.h>
 #include <time.h>
 #include "shared.h"
-#include "simu.h"
+#include "simul.h"
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
 #define NB_REG 255
 #define NB_PORT 5
@@ -27,8 +31,6 @@
 #define DDRE 8
 #define DDRF 9
 
-
-
 static unsigned char *regs;
 static unsigned int *analogs;
 static int *sync_counter;
@@ -42,9 +44,7 @@ static int is_slow;
 #define OUTPUT 0x1
 
 /* On AVR : PORT = output / PIN = intput / DDR = data direction */
-
 /* and output = 1 / input = 0 */
-
 
 void init_regs(int n, int slow){
   int i;
@@ -321,8 +321,6 @@ void avr_set_bit(uint8_t reg, uint8_t bit){
 
 /******************************/
 
-/******************************/
-
 int pic_tris_of_port(int port_or_bit){
   /* unsigned int reg = Long_val(port_or_bit) & 0x7F; */
   /* unsigned int mask = Long_val(port_or_bit) >> 7; */
@@ -496,3 +494,7 @@ void exec_instr(char *instr, int size){
     }
   }
 }
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/

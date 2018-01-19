@@ -12,6 +12,8 @@ let local = ref false
 let debug = ref false
 let verbose = ref false
 let bytecode_path = ref None
+let lincludes = ref []
+let gincludes = ref []
 let rusage = ref (fun () -> assert false)
 
 (******************************************************************************)
@@ -19,6 +21,10 @@ let rusage = ref (fun () -> assert false)
 let spec = [
   ("-o", Arg.String (fun o -> output_path := Some o),
    "<file.c> Set output file (default: <bytecode>.c)");
+  ("-i", Arg.String (fun path -> lincludes := path :: !lincludes),
+   "<file.c> Include this local file into the generated file (with #include \"...\"");
+  ("-I", Arg.String (fun path -> gincludes := path :: !gincludes),
+   "<file.c> Include this global file into the generated file (with #include <...>)");
   ("-stack-size", Arg.Set_int stack_size,
    Printf.sprintf "<word-nb> Set stack size (default: %d)" !stack_size);
   ("-heap-size", Arg.Set_int heap_size,
@@ -119,11 +125,10 @@ let gc =
   | "MC" | "MAC" | "MARK_AND_COMPACT" | "MARK&COMPACT" -> `MAC
   | str -> usage_error (Printf.sprintf "invalid gc algorithm: %S" str)
     
-let byterun_dir =
-  if local then [ Config.builddir; "src"; "byterun" ] else [ Config.libdir ]
+let lib_dir = if local then [ Config.builddir; "src"; "byterun"; "vm" ] else [ Config.libdir ]
 
-let values_h  = List.fold_right Filename.concat byterun_dir "values.h"
-let runtime_c = List.fold_right Filename.concat byterun_dir "runtime.c"
+let values_h  = List.fold_right Filename.concat lib_dir "values.h"
+let runtime_c = List.fold_right Filename.concat lib_dir "runtime.c"
 
 (******************************************************************************)
 
@@ -188,8 +193,10 @@ let () =
       Printer.print_codegen_word_array oc "PROGMEM opcode_t" "const ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
       Printf.fprintf oc "\n";
 
-      (* Include runtime.c *)
+      (* Include runtime.c and extern files *)
       Printf.fprintf oc "#include <%s>\n" runtime_c;
+      List.iter (Printf.fprintf oc "#include <%s>\n") !gincludes;
+      List.iter (Printf.fprintf oc "#include \"%s\"\n") !lincludes;
       Printf.fprintf oc "\n";
 
       (* Define primitive table *)

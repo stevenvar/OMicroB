@@ -1,0 +1,45 @@
+########################################################################################################################
+Description of byterun/ directories:
+
+avr/:
+ * AVR specific library.
+ * Implementation of micro-controller primitives from prims/prims.h for AVR.
+ * No dependency to any representation of OCaml values.
+
+prims/:
+ * Abstract interface to micro-controller primitives (prims/prims.h)
+ * Concrete interface between OCaml externals and C primitives from prims/prims.h:
+   - following the standard OCaml representation of values (prims/std-bindings.c).
+   - following the OMicroB representation of values (prims/omc-bindings.c)
+
+simul/:
+ * Simulation code for host.
+ * Linked with the main program in simulation mode.
+ * Implementation of micro-controller primitives from prims/prims.h for simulation.
+ * No dependancy to any representation of OCaml values.
+
+vm/:
+ * Implementation of the OCaml Virtual Machine for micro-controllers.
+ * To be compiled for micro-controller with the __AVR__ constant defined.
+ * To be compiled for simulation/debugging purpose without the __AVR__ constant defined.
+
+
+########################################################################################################################
+Used C sources in different running modes:
+
+SIMUL1 (running the .byte file):
+  * simul/*
+  * prims/std-bindings.c
+
+SIMUL2 (running the .elf file):
+  * simul/*
+  * prims/omc-bindings.c
+  * vm/*
+
+AVR (running the micro-controller):
+  * avr/*
+  * prims/omc-bindings.c
+  * vm/*
+
+
+########################################################################################################################

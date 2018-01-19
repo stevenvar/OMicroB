@@ -4,7 +4,7 @@ ATTY     := /dev/tty.usbmodem14611
 # CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
 CFLAGS   := -mmcu=atmega32u4
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
-INCLUDES := -I./stdlib/ -I$(SRC)/byterun/
+INCLUDES := -I$(SRC)/byterun/
 
 ################################################################################
 
@@ -27,15 +27,14 @@ solilet_simul.byte: spi.ml oled.ml solilet_simul.ml
 	ocamlclean $@ -o $@
 
 solilet_simul.c: solilet_simul.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 164 -stack-size 164 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 328 -stack-size 164 $< -o $@
 
 solilet_simul.elf: solilet_simul.c
-#	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -Wnarrowing -DDEBUG $^ -o $@
-	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L $^ -o $@
+	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $^ -o $@
 
 ################################################################################
 
-solilet_simul.avr: $(wildcard stdlib/*.c) $(wildcard stdlib/*.cpp) $(wildcard stdlib/*/*.cpp) solilet_simul.c
+solilet_simul.avr: solilet_simul.c
 	$(AVR_GXX) -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^  -Wnarrowing -o $@
 
 solilet_simul.hex: solilet_simul.avr

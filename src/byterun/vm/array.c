@@ -1,3 +1,5 @@
+#include "gc.h"
+
 extern val_t atom0_header;
 
 val_t caml_make_vect(val_t len, val_t init) {
