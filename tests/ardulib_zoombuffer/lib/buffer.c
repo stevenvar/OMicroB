@@ -1,4 +1,8 @@
+#ifdef __AVR__
+
 #include <avr/io.h>
+
+#endif
 #include <stdint.h>
 #include "buffer.h"
 

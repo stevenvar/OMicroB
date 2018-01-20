@@ -44,27 +44,17 @@ let get n x =
 
 
 let _ =
-  let display = Display.create_display 0 0 Simul.RB0 Simul.RB1 Simul.RB2 128 8 in
-  for _ = 0 to 1023 do
-  Ddram.write 0b10101010 display;
-done;
-  Ddram.to_matrix display;
-  Display.init_graphics display;
-
-  Display.show display;
-  let _ = read_line () in
   let nb_arg = Array.length Sys.argv in
   for i = 1 to nb_arg - 1 do
     let arg = Sys.argv.(i) in
     try
       let len = String.length arg in
-      (* TODO change these *)
-      if check_prefix "dc=PIN" arg && len = 5 then
-        set "dc" dc (Simul.pin_of_number (String.sub arg 2 3))
-      else if check_prefix "cs=PIN" arg && len = 6 then
-        set "cs" cs (Simul.pin_of_number (String.sub arg 3 3))
-      else if check_prefix "rst=PIN" arg && len = 6 then
-        set "rst" rst (Simul.pin_of_number (String.sub arg 3 3))
+      if check_prefix "dc=PIN" arg then
+        set "dc" dc (Simul.pin_of_number (String.sub arg 3 (len-3)))
+      else if check_prefix "cs=PIN" arg then
+        set "cs" cs (Simul.pin_of_number (String.sub arg 3 (len-3)))
+      else if check_prefix "rst=PIN" arg then
+        set "rst" rst (Simul.pin_of_number (String.sub arg 4 (len-4)))
       else
         set "size" size (parse_size arg);
     with Failure _ ->
@@ -82,7 +72,7 @@ done;
     Display.init_graphics display;
     Proto.register display;
     Simul.start ();
-    Simul.join ();
+    Simul.join ()
   with Failure msg ->
     Printf.eprintf "Error: %s\n%!" msg;
     usage () )

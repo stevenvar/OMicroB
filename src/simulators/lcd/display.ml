@@ -13,6 +13,9 @@
 open Graphics
 open Types
 
+
+
+
 let green = rgb 0 200 50
 let blue = rgb 0 50 200
 
@@ -23,12 +26,14 @@ let create_display x y cs dc rst column_nb line_nb =
     cs = cs;
     dc = dc;
     rst = rst;
+    port = Simul.SPDR;
     column_nb = column_nb;
     line_nb = line_nb;
     width = column_nb;
     height = 8 * line_nb;
     matrix = Array.make_matrix 128 64 false;
     ddram = Ddram.create ();
+    mode = Data
   }
 
 
@@ -65,12 +70,13 @@ let init_graphics display =
 
 
 let set_pixel x y =
-  let y = 64 - y in (* must invert because of Graphics y positions ... *)
-  set_color black;
+  let y = 63 - y in (* must invert because of Graphics y positions ... *)
+  (* in the physical screen, pixels are white when on *)
+  set_color white;
   fill_rect (x*4) (y*4) 4 4
 
 let clear_pixel _x _y =
-  set_color white; ()
+  set_color black; ()
   (* fill_rect (x+4*x) (y+4*(7-y)) 2 2 *)
 
 let show display =
@@ -78,14 +84,19 @@ let show display =
   let matrix = display.matrix in
   let height = display.height in
   let width = display.width in
+  set_color black;
+  Graphics.fill_rect 0 0 (width*4) (height*4);
   let disp i j v =
     match v with
-    | true -> clear_pixel i j (* invert to have the same behaviour as the physical screen *)
-    | false -> set_pixel i j
+    | true -> set_pixel i j
+    | false -> ()
   in
-  for i = 0 to width - 1 do
-    for j = 0 to height - 1 do
-      disp i j matrix.(i).(j)
-    done
-  done;
+  begin try
+    for i = 0 to width - 1 do
+      for j = 0 to height - 1 do
+        disp i j matrix.(i).(j)
+      done
+    done;
+    with _ -> failwith "show"
+  end;
   sync_display ()

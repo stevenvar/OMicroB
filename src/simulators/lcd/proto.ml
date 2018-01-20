@@ -1,13 +1,3 @@
-(*************************************************************************)
-(*                                                                       *)
-(*                                OCaPIC                                 *)
-(*                                                                       *)
-(*                             Benoit Vaugon                             *)
-(*                                                                       *)
-(*    This file is distributed under the terms of the CeCILL license.    *)
-(*    See file ../../../LICENSE-en.                                      *)
-(*                                                                       *)
-(*************************************************************************)
 
 open Printf
 open Types
@@ -132,7 +122,7 @@ let write_data_to_ram data display =
   print (sprintf "write_data_to_ram(%C)" (char_of_int data));
   (* match display.selected_ram with *)
     (* | DDRam -> *)
-      Ddram.write data display;
+  Ddram.write data display;
       (* cursor_or_display_shift display.shift_display *)
         (* (display.entry_mode_incr = Right) display; *)
     (* | CGRam -> *)
@@ -148,11 +138,12 @@ let write_data_to_ram data display =
  *       send bus_low bus_port (Cgram.read display) display;
  * ;; *)
 
-let exec cs dc rst display =
-  if rst then clear display;
+let exec cs dc _rst display =
+  (* if rst then clear display; *)
   match (cs,dc) with
-    (true,true) -> write_data_to_ram 1 display
-  | (true,false) -> write_data_to_ram 0 display
+    (false,false) -> display.mode <- Command
+
+  | (false,true) -> display.mode <- Data
   | _ -> ()
 
 (* let exec_8bit rs rw bus bus_port display =
@@ -205,6 +196,7 @@ let exec cs dc rst display =
  *     )
  * ;; *)
 
+
 let register display =
   let handler () =
     let cs_val = Simul.test_pin display.cs in
@@ -215,5 +207,17 @@ let register display =
       (* | Eight -> exec_8bit rs_val rw_val bus_val display.bus display; *)
       (* | Four -> exec_4bit rs_val rw_val bus_val display.bus display; *)
   in
-  Simul.add_handler (Simul.Set_pin_handler (display.cs, handler));
-;;
+  let write_handler =
+    let cpt = ref 0 in
+    fun i ->
+    (* Printf.printf "cpt = %d New val = %d\n" !cpt i; *)
+    match display.mode with
+    | Data -> write_data_to_ram i display;
+      if !cpt = 1023 then (refresh display);
+      incr cpt;
+      cpt := !cpt mod 1024
+    | Command -> ()
+  in
+  Simul.add_handler (Simul.Clear_pin_handler (display.cs, handler));
+  Simul.add_handler (Simul.Set_pin_handler (display.dc, handler));
+  Simul.add_handler (Simul.Write_port_handler (display.port, write_handler))

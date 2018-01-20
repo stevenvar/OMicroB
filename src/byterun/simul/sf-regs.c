@@ -31,6 +31,8 @@
 #define DDRE 8
 #define DDRF 9
 
+#define SPDR 17
+
 static unsigned char *regs;
 static unsigned int *analogs;
 static int *sync_counter;
@@ -202,7 +204,12 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
       send_write_ddr(reg, new_val);
       regs[reg] = new_val;
     }
-  }else{
+  }
+  else if(reg == SPDR){
+    regs[reg] = new_val;
+    send_write_port('G'-'B',new_val);
+  }
+  else{
     regs[reg] = new_val;
   }
   may_sleep();

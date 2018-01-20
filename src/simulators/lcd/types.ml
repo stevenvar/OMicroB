@@ -1,9 +1,8 @@
 
-type display_mode = On | Off
-
 type ddram = int array
 type matrix = bool array array
 
+type mode = Data | Command
 
 type display = {
   x : int;
@@ -11,12 +10,14 @@ type display = {
   cs : Simul.pin;
   dc : Simul.pin;
   rst : Simul.pin;
+  port : Simul.port;
   column_nb : int;
   line_nb : int;
   width : int;
   height : int;
   matrix : matrix;
   ddram : ddram;
+  mutable mode : mode;
   (* cgram : cgram; *)
   (* mutable ram_addr : int;
    * mutable selected_ram : ram;

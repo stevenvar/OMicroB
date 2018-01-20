@@ -28,41 +28,44 @@ let int_of_hex3 c2 c1 c0 =
 
 (***)
 
-type port = PORTB | PORTC | PORTD | PORTE | PORTF
+type port = PORTB | PORTC | PORTD | PORTE | PORTF | SPDR
 
 let string_of_port port =
   match port with
     | PORTB -> "PORTB" | PORTC -> "PORTC"
     | PORTD -> "PORTD" | PORTE -> "PORTE" | PORTF -> "PORTF"
+    | SPDR -> "SPDR"
 ;;
 
 let port_of_string s =
   match String.uppercase_ascii s with
   | "PORTB" -> PORTB | "PORTC" -> PORTC
   | "PORTD" -> PORTD | "PORTE" -> PORTE | "PORTF" -> PORTF
+  | "SPDR" -> SPDR
   | _ -> invalid_arg "Simul.port_of_string"
 ;;
 
 let char_of_port port =
   match port with
-    | PORTB -> 'B' | PORTC -> 'C' | PORTD -> 'D' | PORTE -> 'E' | PORTF -> 'F'
+    | PORTB -> 'B' | PORTC -> 'C' | PORTD -> 'D' | PORTE -> 'E' | PORTF -> 'F' | SPDR -> 'G'
 ;;
 
 let port_of_char c =
   match c with
     | 'B' | 'b' -> PORTB | 'C' | 'c' -> PORTC
     | 'D' | 'd' -> PORTD | 'E' | 'e' -> PORTE | 'F' | 'f' -> PORTF
+    | 'G' | 'g' -> SPDR
     | _ -> invalid_arg "Simul.port_of_char"
 ;;
 
 let index_of_port port =
   match port with
-    |  PORTB -> 1 | PORTC -> 2 | PORTD -> 3 | PORTE -> 4 | PORTF -> 5
+    |  PORTB -> 1 | PORTC -> 2 | PORTD -> 3 | PORTE -> 4 | PORTF -> 5 | SPDR -> 6
 ;;
 
 let port_of_index ind =
   match ind with
-    | 1 -> PORTB | 2 -> PORTC | 3 -> PORTD | 4 -> PORTE | 5 -> PORTF
+    | 1 -> PORTB | 2 -> PORTC | 3 -> PORTD | 4 -> PORTE | 5 -> PORTF | 6 -> SPDR
     | _ -> invalid_arg "Simul.port_of_index"
 ;;
 
@@ -74,6 +77,7 @@ type pin =
   | RD0 | RD1 | RD2 | RD3 | RD4 | RD5 | RD6 | RD7
   | RE0 | RE1 | RE2 | RE3 | RE4 | RE5 | RE6 | RE7
   | RF0 | RF1 | RF2 | RF3 | RF4 | RF5 | RF6 | RF7
+  | SPDR0 | SPDR1 | SPDR2 | SPDR3 | SPDR4 | SPDR5 | SPDR6 | SPDR7
 ;;
 
 let string_of_pin pin =
@@ -88,6 +92,14 @@ let string_of_pin pin =
     | RE4 -> "RE4" | RE5 -> "RE5" | RE6 -> "RE6" | RE7 -> "RE7"
     | RF0 -> "RF0" | RF1 -> "RF1" | RF2 -> "RF2" | RF3 -> "RF3"
     | RF4 -> "RF4" | RF5 -> "RF5" | RF6 -> "RF6" | RF7 -> "RF7"
+    | SPDR0 -> "SPDR0"
+    | SPDR1 -> "SPDR1"
+    | SPDR2 -> "SPDR2"
+    | SPDR3 -> "SPDR3"
+    | SPDR4 -> "SPDR4"
+    | SPDR5 -> "SPDR5"
+    | SPDR6 -> "SPDR6"
+    | SPDR7 -> "SPDR7"
 ;;
 
 let port_of_pin pin =
@@ -97,19 +109,21 @@ let port_of_pin pin =
     | RD0 | RD1 | RD2 | RD3 | RD4 | RD5 | RD6 | RD7 -> PORTD
     | RE0 | RE1 | RE2 | RE3 | RE4 | RE5 | RE6 | RE7 -> PORTE
     | RF0 | RF1 | RF2 | RF3 | RF4 | RF5 | RF6 | RF7 -> PORTF
+    | SPDR0 | SPDR1 | SPDR2 | SPDR3 | SPDR4 | SPDR5 | SPDR6 | SPDR7 -> SPDR
 
 ;;
 
 let index_of_pin pin =
   match pin with
-     RB0 | RC0 | RD0 | RE0 | RF0 -> 0
-    | RB1 | RC1 | RD1 | RE1 | RF1 -> 1
-    | RB2 | RC2 | RD2 | RE2 | RF2 -> 2
-    | RB3 | RC3 | RD3 | RE3 | RF3 -> 3
-    | RB4 | RC4 | RD4 | RE4 | RF4 -> 4
-    | RB5 | RC5 | RD5 | RE5 | RF5 -> 5
-    | RB6 | RC6 | RD6 | RE6 | RF6 -> 6
-    | RB7 | RC7 | RD7 | RE7 | RF7 -> 7
+     RB0 | RC0 | RD0 | RE0 | RF0 | SPDR0 -> 0
+    | RB1 | RC1 | RD1 | RE1 | RF1 | SPDR1 -> 1
+    | RB2 | RC2 | RD2 | RE2 | RF2 | SPDR2 -> 2
+    | RB3 | RC3 | RD3 | RE3 | RF3 | SPDR3 -> 3
+    | RB4 | RC4 | RD4 | RE4 | RF4 | SPDR4 -> 4
+    | RB5 | RC5 | RD5 | RE5 | RF5 | SPDR5 -> 5
+    | RB6 | RC6 | RD6 | RE6 | RF6 | SPDR6 -> 6
+    | RB7 | RC7 | RD7 | RE7 | RF7 | SPDR7 -> 7
+
 ;;
 
 let pin_of_port_index port index =
@@ -140,13 +154,25 @@ let pin_of_port_index port index =
         | 0 -> RF0 | 1 -> RF1 | 2 -> RF2 | 3 -> RF3 | 4 -> RF4 | 5 -> RF5
         | 6 -> RF6 | 7 -> RF7 | _ -> error ()
       end
+    | SPDR ->
+      begin match index with
+        | 0 -> SPDR0
+        | 1 ->  SPDR1
+        | 2 ->  SPDR2
+        | 3 -> SPDR3
+        | 4 -> SPDR4
+        | 5 ->  SPDR5
+        | 6 ->  SPDR6
+        | 7 -> SPDR7
+        | _ -> error ()
+        end
 ;;
 
 let pin_of_number s =
   match s with
   | "PIN4" -> RD4
   | "PIN12" -> RD6
-  | "PIN8" -> RB4
+  | "PIN6" -> RD7
   | _ -> raise (Invalid_argument ("PIN"^s));;
 
 let pin_of_string s =
@@ -308,7 +334,7 @@ let remove_handler handler =
 
 (***)
 
-let ports = Array.make 5 0;;
+let ports = Array.make 7 0;; (* we count SPDR as a port *)
 let triss = Array.make 5 0xFF;;
 let analogs = Array.make 13 0;;
 let analog_cnt = ref 0;;

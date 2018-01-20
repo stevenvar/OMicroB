@@ -44,16 +44,16 @@ let sleep x =
 
 
 let () =
-  let snake = Array.make 100 (10,10)  in
+  (* let snake = Array.make 100 (10,10)  in *)
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
   Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
-   for i = 0 to 9 do
-     let x,y = snake.(i) in
-     Oled.draw x y true
-   done;
-  pin_mode PIN9 OUTPUT;
-  
+
+     (* let x,y = snake.(i) in *)
+     (* Oled.draw x y true *)
+   (* done; *)
+  (* pin_mode PIN9 OUTPUT; *)
+
   (* for i = 0 to 10 do  *)
   (* Oled.draw 30 i ON; *)
   (* Oled.draw 0 0 true; *)
@@ -66,20 +66,23 @@ let () =
   (* Oled.draw 8 4 true; *)
   (* Oled.draw 8 6 true; *)
   (* Oled.draw 8 8 true; *)
+  for i = 0 to 63 do
+    Oled.draw i 0 true;
+    Oled.draw i 31 true
+  done;
   for i = 0 to 31 do
     Oled.draw 0 i true;
     Oled.draw 63 i true;
   done;
-  for i = 0 to 63 do
-    Oled.draw i 0 true;
-    Oled.draw i 31 true;
+
+  for i = 0 to 20 do
+    Oled.draw i i true;
   done;
-  (* for i = 0 to 30 do *)
-    (* Oled.draw i i true; *)
-    (* Oled.display(); *)
-    (* sleep 100; *)
-  (* done; *)
+
   Oled.display();
+  while true do
+    ()
+  done
     (* for i = 0 to 100 do () done; *)
     (* Oled.clear_zone ~cs:PIN12 ~dc:PIN4 30 i; *)
   (* done *)
