@@ -10,11 +10,11 @@
 (*************************************************************************)
 
 (* open Printf;; *)
-open Graphics;;
-open Types;;
+open Graphics
+open Types
 
-let green = rgb 0 200 50;;
-let blue = rgb 0 50 200;;
+let green = rgb 0 200 50
+let blue = rgb 0 50 200
 
 let create_display x y cs dc rst column_nb line_nb =
   {
@@ -25,12 +25,12 @@ let create_display x y cs dc rst column_nb line_nb =
     rst = rst;
     column_nb = column_nb;
     line_nb = line_nb;
-    width = 65 + 23 * column_nb;
-    height = 65 + 34 * line_nb;
+    width = column_nb;
+    height = 8 * line_nb;
     matrix = Array.make_matrix 128 64 false;
     ddram = Ddram.create ();
   }
-;;
+
 
 let sync_display =
   let sync_mutex = Mutex.create () in
@@ -52,91 +52,40 @@ let sync_display =
   fun () ->
     Mutex.lock sync_mutex;
     sync_check := true;
-    Mutex.unlock sync_mutex;
-;;
+    Mutex.unlock sync_mutex
 
-(* let display_border display =
- *   let x = display.x in
- *   let y = display.y in
- *   let width = display.width in
- *   let height = display.height in
- *   set_color green;
- *   fill_rect x y width height;
- *   set_color black;
- *   fill_rect (x + 10) (y + 10) (width - 20) (height - 20);
- *   draw_rect (x-1) (y-1) (width+1) (height+1);
- *   set_color blue;
- *   fill_rect (x + 20) (y + 20) (width - 40) (height - 40);
- * ;; *)
 
 let init_graphics display =
-  let config = Printf.sprintf " %dx%d" display.width display.height in
+  let config = Printf.sprintf " %dx%d" (display.width*4) (display.height*4) in
   open_graph config;
   set_window_title "LCD display";
   (* display_mode false; *)
   (* display_border display; *)
-  sync_display ();
-;;
+  sync_display ()
 
-(* let display_char x y =
- *   let disp i j c =
- *     set_color (if c then white else blue);
- *     fill_rect (x + 4 * i) (y + 4 * (7 - j)) 2 2;
- *   in
- *   Array.iteri (fun j -> Array.iteri (fun i c -> disp i j c));
- * ;; *)
 
 let set_pixel x y =
+  let y = 64 - y in (* must invert because of Graphics y positions ... *)
   set_color black;
-  fill_rect (x+4*x) (y+4*(7-y)) 2 2
+  fill_rect (x*4) (y*4) 4 4
 
-let clear_pixel x y =
-  set_color white;
-  fill_rect (x+4*x) (y+4*(7-y)) 2 2
+let clear_pixel _x _y =
+  set_color white; ()
+  (* fill_rect (x+4*x) (y+4*(7-y)) 2 2 *)
 
 let show display =
+  Graphics.clear_graph ();
   let matrix = display.matrix in
   let height = display.height in
   let width = display.width in
   let disp i j v =
     match v with
-    | true -> set_pixel i j
-    | false -> clear_pixel i j
+    | true -> clear_pixel i j (* invert to have the same behaviour as the physical screen *)
+    | false -> set_pixel i j
   in
   for i = 0 to width - 1 do
     for j = 0 to height - 1 do
       disp i j matrix.(i).(j)
     done
   done;
-  sync_display ();;
-
-(* let show display =
- *   let matrix = display.matrix in
- *   let height = display.height in
- *   let line_nb = display.line_nb in
- *   let column_nb = display.column_nb in
- *   let disp i j c =
- *     display_char (display.x + 36 + 23 * i) (display.y + height - 65 - 34 * j) c
- *   in
- *   display_border display;
- *   begin match line_nb with
- *     | 1 ->
- *       for i = 0 to pred column_nb do
- *         disp i 0 matrix.(i).(0)
- *       done
- *     | 2 ->
- *       for i = 0 to pred column_nb do
- *         disp i 0 matrix.(i).(0);
- *         disp i 1 matrix.(i).(1);
- *       done
- *     | 4 ->
- *       for i = 0 to pred column_nb do
- *         disp i 0 matrix.(i).(0);
- *         disp i 1 matrix.(i).(1);
- *         disp i 2 matrix.(i + 20).(0);
- *         disp i 3 matrix.(i + 20).(1);
- *       done
- *     | _ -> ()
- *   end;
- *   sync_display ();
- * ;; *)
+  sync_display ()
