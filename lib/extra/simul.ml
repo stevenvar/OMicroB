@@ -170,9 +170,20 @@ let pin_of_port_index port index =
 
 let pin_of_number s =
   match s with
+  | "PIN0" -> RD2
+  | "PIN1" -> RD3
+  | "PIN2" -> RD1
+  | "PIN3" -> RD0
   | "PIN4" -> RD4
-  | "PIN12" -> RD6
+  | "PIN5" -> RC6
   | "PIN6" -> RD7
+  | "PIN7" -> RE6
+  | "PIN8" -> RB4
+  | "PIN9" -> RB5
+  | "PIN10" -> RB6
+  | "PIN11" -> RB7
+  | "PIN12" -> RD6
+  | "PIN13" -> RC7
   | _ -> raise (Invalid_argument ("PIN"^s));;
 
 let pin_of_string s =
