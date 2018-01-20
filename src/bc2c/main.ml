@@ -30,9 +30,9 @@ let spec = [
   ("-heap-size", Arg.Set_int heap_size,
    Printf.sprintf "<word-nb> Set heap size (default: %d)" !heap_size);
   ("-gc", Arg.Set_string gc,
-   Printf.sprintf "<gc-algo> Set garbage collector algorithm to SAC (for Stop&Copy) or MAC (for Mark&Compact) (default: %s)" !gc);
+   Printf.sprintf "<gc-algo> Set garbage collector algorithm Stop&Copy or Mark&Compact (default: %s)" !gc);
   ("-arch", Arg.Int (fun n -> arch := Arch.of_int n),
-   Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %s bits)" (Arch.to_string !arch));
+   Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %s)" (Arch.to_string !arch));
   ("-debug", Arg.Set debug,
    " Generate code in debug mode");
   ("-verbose", Arg.Set verbose,
@@ -47,7 +47,7 @@ let spec = [
 
 let spec =
   if not (Sys.file_exists Config.builddir) then spec
-  else spec @ [ ("-local", Arg.Set local, " Link with OMicroB build directory instead of installation directory") ]
+  else spec @ [ ("-local", Arg.Set local, " Use the OMicroB build directory instead of installation directory") ]
 
 let spec = Arg.align spec
 

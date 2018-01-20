@@ -3,7 +3,7 @@ include ../../../etc/Makefile.conf
 
 TARG = $(BIN)/omicrob_pin_simulator
 
-all: $(TARG)
+dip: $(TARG)
 
 $(TARG): main.ml
 	$(OCAMLOPT) -thread unix.cmxa threads.cmxa graphics.cmxa -I $(LIB)/extra simul.cmx $< -o $@
@@ -11,4 +11,4 @@ $(TARG): main.ml
 clean:
 	@rm -f *~ *.o *.cmi *.cmx $(TARG)
 
-.PHONY: all clean
+.PHONY: dip clean

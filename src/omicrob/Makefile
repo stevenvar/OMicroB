@@ -1,5 +1,16 @@
-omicrob:
+include ../../etc/Makefile.conf
+
+TARGETS := $(BIN)/omicrob
+
+omicrob: $(TARGETS)
+
+$(BIN)/omicrob: config.ml omicrob.ml
+	$(OCAMLOPT) -w @a -safe-string -strict-formats -strict-sequence $^ -o $@
+
+config.ml: $(ETC)/config.ml
+	cp $< $@
 
 clean:
+	@rm -f *.cmo *.cmi *.cmx *~ 
 
 .PHONY: omicrob clean

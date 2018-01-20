@@ -154,12 +154,17 @@ endef
 ################################################################################
 
 echo -n "\
-let builddir   = \"$ROOT\"
-let libdir     = \"$LIBDIR\"
-let ocaml      = \"$OCAML\"
-let ocamlc     = \"$OCAMLC\"
-let ocamlclean = \"$OCAMLCLEAN\"
-let version    = \"$VERSION\"
+let builddir    = \"$ROOT\"
+let libdir      = \"$LIBDIR\"
+let bindir      = \"$BINDIR\"
+let ocaml       = \"$OCAML\"
+let ocamlc      = \"$OCAMLC\"
+let ocamlclean  = \"$OCAMLCLEAN\"
+let cc          = \"$GCC\"
+let avr_cxx     = \"$AVR_GXX\"
+let avr_objcopy = \"$AVR_OBJCOPY\"
+let avrdude     = \"$AVRDUDE\"
+let version     = \"$VERSION\"
 " > etc/config.ml
 
 ################################################################################

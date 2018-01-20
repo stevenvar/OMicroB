@@ -10,25 +10,23 @@ OBJECTS :=              \
   .build/shared.o       \
   .build/simul.o
 
-all: $(TARGETS)
+byterun: $(TARGETS)
 
 $(LIB)/libcamlrun.a: $(OBJECTS)
 	@rm -f $@
 	cp $(OCAMLWHERE)/libcamlrun.a $@
 	ar rs $@ $(OBJECTS)
 
-.build/%.o: prims/%.c .build/ $(HEADERS)
+.build/%.o: prims/%.c $(HEADERS)
+	mkdir -p .build/
 	ocamlc -c -ccopt -Wall $<
 	mv $*.o .build/
 
-.build/%.o: simul/%.c .build/ $(HEADERS)
+.build/%.o: simul/%.c $(HEADERS)
 	ocamlc -c -ccopt -Wall $<
 	mv $*.o .build/
-
-.build/:
-	mkdir .build/
 
 clean:
 	@rm -Rf .build/ $(TARGETS)
 
-.PHONY: all clean
+.PHONY: byterun clean

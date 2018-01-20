@@ -23,7 +23,7 @@ clean:
 ################################################################################
 
 test.byte: test.ml
-	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
+	CAMLLIB=$(LIB) ocamlc -custom $^ -o $@
 	ocamlclean $@ -o $@
 
 test.c: test.byte $(BIN)/bc2c
