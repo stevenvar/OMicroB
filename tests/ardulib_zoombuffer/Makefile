@@ -27,11 +27,11 @@ simul : ardulib.elf
 	./ardulib.elf '../../bin/omicrob_lcd_simulator 128x64 dc=PIN4 cs=PIN12 rst=PIN6'
 
 ardulib.byte: buffer.c spi.ml oled.ml ardulib.ml
-	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun -ccopt -D__OCAML__  $^ -o $@
+	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun -ccopt -D__OCAML__ $^ -o $@
 	ocamlclean $@ -o $@
 
 ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 128 -stack-size 128 $< -o $@
+	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 400 -stack-size 30 $< -o $@
 
 ardulib.elf: ardulib.c
 	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $(OPT) $^ -o $@
