@@ -31,6 +31,13 @@
 #define DDRE 8
 #define DDRF 9
 
+#define PINB 10
+#define PINC 11
+#define PIND 12
+#define PINE 13
+#define PINF 14
+
+
 #define SPDR 17
 
 static unsigned char *regs;
@@ -216,7 +223,7 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
 }
 
 void avr_write_register(uint8_t reg, uint8_t new_val){
-  printf("avr_write_register(%d, %d)\n", (int) reg, (int) new_val);
+  /* printf("avr_write_register(%d, %d)\n", (int) reg, (int) new_val); */
   init_simulator();
   P(sem_regs);
   avr_write_register_gen(reg, new_val);
@@ -224,7 +231,7 @@ void avr_write_register(uint8_t reg, uint8_t new_val){
 }
 
 uint8_t avr_read_register(uint8_t reg){
-  printf("avr_read_register(%d)\n", (int) reg);
+  /* printf("avr_read_register(%d)\n", (int) reg); */
   uint8_t val;
   init_simulator();
   if (is_reg_need_synchro(reg)) synchronize();
@@ -236,20 +243,21 @@ uint8_t avr_read_register(uint8_t reg){
 }
 
 bool avr_read_bit(uint8_t reg, uint8_t bit){
-  printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit);
+  /* printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit); */
   uint8_t mask = 1 << bit;
   uint8_t val;
   init_simulator();
   if (is_reg_need_synchro(reg)) synchronize();
   P(sem_regs);
-  val = (regs[reg] & mask) != 0;
+  /* the simulator doesnt change PINs, only PORTs ...  */
+  val = (regs[reg-LOWER_PIN] & mask) != 0;
   V(sem_regs);
   may_sleep();
   return val;
 }
 
 void avr_clear_bit(uint8_t reg, uint8_t bit){
-  printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit);
+  /* printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit); */
   init_simulator();
   P(sem_regs);
   {
@@ -285,7 +293,7 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
 
 
 void avr_set_bit(uint8_t reg, uint8_t bit){
-  printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit);
+  /* printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit); */
   init_simulator();
   P(sem_regs);
   uint8_t old_val = regs[reg];
@@ -323,7 +331,7 @@ void avr_set_bit(uint8_t reg, uint8_t bit){
   }
   /* printf("set bit %d on reg %d \n", bit, reg); */
   V(sem_regs);
-  may_sleep();
+  may_sleep(); 
 }
 
 /******************************/
@@ -346,70 +354,70 @@ int pic_tris_of_port(int port_or_bit){
 /******************************/
 
 static void out_write_port(int port, unsigned char new_val){
-  /* P(sem_regs); */
-  /* { */
-  /*   int tris = port - LOWER_PORT + LOWER_TRIS; */
-  /*   int tris_val = regs[tris]; */
-  /*   int old_val = regs[port]; */
-  /*   if((new_val & ~tris_val) != 0x00){ */
-  /*     char port_c = 'A' + port - LOWER_PORT; */
-  /*     fprintf(stderr, */
-  /*             "Warning: an outside component writes PORT%c=0x%02X when TRIS%c=0x%02X\n", */
-  /*             port_c, new_val, port_c, tris_val); */
-  /*   } */
-  /*   if(new_val != old_val){ */
-  /*     regs[port] = new_val; */
-  /*     send_write_port(port, new_val); */
-  /*   } */
-  /* } */
-  /* V(sem_regs); */
-  /* may_sleep(); */
+  P(sem_regs);
+  {
+    int ddr = port - LOWER_PORT + LOWER_DDR;
+    int ddr_val = regs[ddr];
+    int old_val = regs[port];
+    if((new_val & ~ddr_val) != 0xFF){
+      char port_c = 'A' + port - LOWER_PORT;
+      fprintf(stderr,
+              "Warning: an outside component writes PORT%c=0x%02X when TRIS%c=0x%02X\n",
+              port_c, new_val, port_c, ddr_val);
+    }
+    if(new_val != old_val){
+      regs[port] = new_val;
+      send_write_port(port, new_val);
+    }
+  }
+  V(sem_regs);
+  may_sleep();
 }
 
 static void out_clear_port_bit(int port, int bit){
-  /* P(sem_regs); */
-  /* { */
-  /*   int mask = 1 << bit; */
-  /*   int tris = port - LOWER_PORT + LOWER_TRIS; */
-  /*   int tris_val = regs[tris]; */
-  /*   int old_val = regs[port]; */
-  /*   int new_val = old_val & ~mask; */
-  /*   if(!(tris_val & mask)){ */
-  /*     char port_c = 'A' + port - LOWER_PORT; */
-  /*     fprintf(stderr, */
-  /*       "Warning: an outside component clears PORT%c.R%c%d when TRIS%c=0x%02X\n", */
-  /*             port_c, port_c, bit, port_c, tris_val); */
-  /*   } */
-  /*   if(old_val != new_val){ */
-  /*     regs[port] = new_val; */
-  /*     send_write_port(port, new_val); */
-  /*   } */
-  /* } */
-  /* V(sem_regs); */
-  /* may_sleep(); */
+  P(sem_regs);
+  {
+    int mask = 1 << bit;
+    int ddr = port - LOWER_PORT + LOWER_DDR;
+    int ddr_val = regs[ddr];
+    int old_val = regs[port];
+    int new_val = old_val & ~mask;
+    if(ddr_val & mask){
+      char port_c = 'B' + port - LOWER_PORT;
+      fprintf(stderr,
+        "Warning: an outside component clears PORT%c.R%c%d when TRIS%c=0x%02X\n",
+              port_c, port_c, bit, port_c, ddr_val);
+    }
+    if(old_val != new_val){
+      regs[port] = new_val;
+      send_write_port(port, new_val);
+    }
+  }
+  V(sem_regs);
+  may_sleep();
 }
 
 static void out_set_port_bit(int port, int bit){
-  /* P(sem_regs); */
-  /* { */
-  /*   int mask = 1 << bit; */
-  /*   int tris = port - LOWER_PORT + LOWER_TRIS; */
-  /*   int tris_val = regs[tris]; */
-  /*   int old_val = regs[port]; */
-  /*   int new_val = old_val | mask; */
-  /*   if(!(tris_val & mask)){ */
-  /*     char port_c = 'A' + port - LOWER_PORT; */
-  /*     fprintf(stderr, */
-  /*       "Warning: an outside component sets PORT%c.R%c%d when TRIS%c=0x%02X\n", */
-  /*             port_c, port_c, bit, port_c, tris_val); */
-  /*   } */
-  /*   if(old_val != new_val){ */
-  /*     regs[port] = new_val; */
-  /*     send_write_port(port, new_val); */
-  /*   } */
-  /* } */
-  /* V(sem_regs); */
-  /* may_sleep(); */
+  P(sem_regs);
+  {
+    int mask = 1 << bit;
+    int ddr = port - LOWER_PORT + LOWER_DDR;
+    int ddr_val = regs[ddr];
+    int old_val = regs[port];
+    int new_val = old_val | mask;
+    if(ddr_val & mask){
+      char port_c = 'B' + port - LOWER_PORT;
+      fprintf(stderr,
+        "Warning: an outside component sets PORT%c.R%c%d when DDR%c=0x%02X\n",
+              port_c, port_c, bit, port_c, ddr_val);
+    }
+    if(old_val != new_val){
+      regs[port] = new_val;
+      send_write_port(port, new_val);
+    }
+  }
+  V(sem_regs);
+  may_sleep();
 }
 
 static void out_set_analog(unsigned int chan, unsigned int val){
@@ -445,7 +453,7 @@ void exec_instr(char *instr, int size){
   }else if(size == 5 && instr[0] == 'A'){
     int chan, h2, h1, h0, val;
     chan = int_of_hexchar(instr[1]);
-    if(chan == -1 || chan > 12){
+    if(chan == -1 || chan > 14){
       invalid_instr(instr);
       return;
     }

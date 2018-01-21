@@ -1,13 +1,3 @@
-(*************************************************************************)
-(*                                                                       *)
-(*                                OCaPIC                                 *)
-(*                                                                       *)
-(*                             Benoit Vaugon                             *)
-(*                                                                       *)
-(*    This file is distributed under the terms of the CeCILL license.    *)
-(*    See file ../../LICENSE-en.                                         *)
-(*                                                                       *)
-(*************************************************************************)
 
 (* Tools *)
 
@@ -184,10 +174,16 @@ let pin_of_number s =
   | "PIN11" -> RB7
   | "PIN12" -> RD6
   | "PIN13" -> RC7
+  | "PINA0" -> RF7
+  | "PINA1" -> RF6
+  | "PINA2" -> RF5
+  | "PINA3" -> RF4
+  | "PINA4" -> RF1
+  | "PINA5" -> RF0
   | _ -> raise (Invalid_argument ("PIN"^s));;
 
 let pin_of_string s =
-  let error () = invalid_arg "Simul.pin_of_string" in
+  let error () = invalid_arg ("Simul.pin_of_string : "^s) in
   if String.length s <> 3 || (s.[0] <> 'R' && s.[0] <> 'r') then error ();
   try
     let port = port_of_char s.[1] in
