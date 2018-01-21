@@ -1,47 +1,42 @@
 #include <stdint.h>
 
+#ifdef __PC__
+#include <stdlib.h>
+#endif
+
+#ifdef __AVR__
+#include <util/delay.h>
+#endif
+
 #include "debug.h"
 #include "values.h"
 #include "fail.h"
 #include "gc.h"
 
-#ifdef __PC__
-#include <stdlib.h>
-#endif
-
 /******************************************************************************/
 
-/* Registers for the abstract machine:
-   pc          the code pointer
-   sp          the stack pointer (grows downward)
-   acc         the accumulator
-   env         heap-allocated environment
-   trapSp      pointer to the current trap frame
-   extra_args  number of extra arguments provided by the caller
+/*
+  Registers for the abstract machine:
+    * pc          the code pointer
+    * sp          the stack pointer (grows downward)
+    * acc         the accumulator (defined and intialized in the generated file)
+    * env         heap-allocated environment
+    * trapSp      pointer to the current trap frame
+    * extra_args  number of extra arguments provided by the caller
 */
+
+code_t pc;
+val_t *sp;
+val_t env;
+val_t trapSp;
+uint8_t extra_args;
 
 val_t atom0_header = Make_header(0, 0, Color_white);
 
 PROGMEM extern void * const ocaml_primitives[];
 
-code_t pc;
-val_t env;
-val_t *sp;
-static val_t trapSp;
-static uint8_t extra_args;
-
-
-void caml_raise_stack_overflow(void) {
-#ifdef __PC__
-#include <stdio.h>
-printf("stack overflow\n");
- exit(0);
-#endif
-  /* assert(0); */
-  /* TODO */
-}
-
 /******************************************************************************/
+/* Read tools for program memory */
 
 void *get_primitive(uint8_t prim_ind) {
 #ifdef __AVR__
@@ -112,6 +107,7 @@ code_t read_ptr_4B(void) {
 }
 
 /******************************************************************************/
+/* Stack tools */
 
 val_t peek(int n) {
   return sp[n];
@@ -135,6 +131,7 @@ void pop_n(int n) {
 }
 
 /******************************************************************************/
+/* Initialization */
 
 void interp_init(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
@@ -145,6 +142,7 @@ void interp_init(void) {
 }
 
 /******************************************************************************/
+/* Interpretation */
 
 void interp(void) {
   while (1) {
@@ -2132,38 +2130,25 @@ void interp(void) {
 }
 
 /******************************************************************************/
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void setup(void) {
-  interp_init();
-  gc_init();
-  interp();
-}
-
-void loop(void) {
-}
-
-#ifdef __cplusplus
-}
-#endif
-
-/******************************************************************************/
+/* Main function */
 
 #ifdef __PC__
-extern const char **global_argv;
+extern const char **global_argv; // used by simulator
 #endif
 
 int main(int argc, const char **argv) {
 #ifdef __PC__
   global_argv = argv;
 #endif
-  setup();
+
+  interp_init();
+  gc_init();
+  interp();
+
 #ifdef __AVR__
-  while(1) loop();
+  while(1) _delay_ms(10);
 #endif
+
   return 0;
 }
 

@@ -32,3 +32,7 @@ void caml_out_of_memory(void) {
 void caml_raise_division_by_zero(void) {
   // TODO
 }
+
+void caml_raise_stack_overflow(void) {
+  // TODO
+}
