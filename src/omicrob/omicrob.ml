@@ -58,6 +58,7 @@ let compile_only = ref false
 let infer_interf = ref false
 let just_print   = ref false
 let debug        = ref false
+let sudo         = ref false
 let simul        = ref false
 let flash        = ref false
 let verbose      = ref false
@@ -101,10 +102,12 @@ let spec =
   ) @ [
     ("-debug", Arg.Set debug,
      " Activate debugging, print informations about execution at runtime");
+    ("-sudo", Arg.Set sudo,
+     " Use sudo when flashing the micro-controller with avrdude");
     ("-simul", Arg.Set simul,
      " Execute the program in simulation mode on the computer");
     ("-flash", Arg.Set flash,
-     " Transfer the program to the micro-controller\n");
+     " Transfer the program to the micro-controller with avrdude\n");
 
     ("-stack-size", Arg.Int (fun sz -> stack_size := Some sz),
      Printf.sprintf "<word-nb> Set stack size (default: %d)" default_stack_size);
@@ -268,6 +271,7 @@ let compile_only = !compile_only
 let infer_interf = !infer_interf
 let just_print   = !just_print
 let debug        = !debug
+let sudo         = !sudo
 let simul        = !simul
 let flash        = !flash
 let local        = !local
@@ -308,6 +312,9 @@ let libdir =
 let bc2c =
   if local then Filename.concat (Filename.concat Config.builddir "bin") "bc2c"
   else Filename.concat Config.bindir "bc2c"
+
+let () =
+  if sudo && not flash then error "the option -sudo is meaningless without -flash"
   
 (******************************************************************************)
 (******************************************************************************)
@@ -758,7 +765,8 @@ let () =
           exit 1;
         | [ tty ] -> tty in
 
-    let cmd = [ "sudo"; Config.avrdude ] in
+    let cmd = if sudo then [ "sudo" ] else [] in
+    let cmd = cmd @ [ Config.avrdude ] in
     let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; default_avr ] in
     let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
     let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; default_mmcu ] in
