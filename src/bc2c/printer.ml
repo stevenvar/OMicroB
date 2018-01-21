@@ -40,7 +40,7 @@ let print_codegen_word_array oc ty name size data =
     | OPCODE _ -> true in
   print_c_array oc ty name size data pp nl
 
-let string_of_dword arch dword =
+let string_of_dword dword =
   let bprint_char buf c =
     match c with
     | '\\' -> Printf.bprintf buf "'\\\\'"
@@ -85,11 +85,11 @@ let string_of_dword arch dword =
   | BYTES bytes        -> print_bytes "Make_custom_data" bytes
   | CUSTOM name        -> Printf.sprintf "(val_t) &%s_custom_operations" name
   | HEADER (tag, size) -> Printf.sprintf "Make_header(%d, %s, Color_white)" size (print_tag tag)
-  | POINTER ind        -> Printf.sprintf "Init_val_block(%d * %d)" (Arch.byte_count arch) ind
+  | POINTER ind        -> Printf.sprintf "Val_block(&ocaml_heap[%d])" ind
   | CODEPTR ptr        -> Printf.sprintf "Val_codeptr(%d)" ptr
 
-let print_datagen_word_array oc arch ty name size data =
-  print_c_array oc ty name size data (string_of_dword arch) (fun _ -> true)
+let print_datagen_word_array oc ty name size data =
+  print_c_array oc ty name size data string_of_dword (fun _ -> true)
 
 let print_opcodes oc opcodes =
   List.iteri (fun i opcode ->

@@ -25,7 +25,13 @@ let () =
   while true do
     List.iter (fun pin ->
       digital_write pin false;
-      for _i = 1 to 20_000 do () done;
+      for _i = 1 to 1_000 do () done;
       digital_write pin true;
     ) pins;
   done
+
+(*
+let () =
+  pin_mode PIN9 OUTPUT;
+  digital_write PIN9 false;
+*)

@@ -58,15 +58,13 @@ extern val_t ocaml_heap[OCAML_HEAP_WOSIZE];
 #define Val_int(x) ((val_t) (((uval_t) (x) << 1) | 1))
 #define Int_val(x) ((val_t) (x) >> 1)
 
-/* #ifdef __AVR__ */
-/* #define Init_val_block(x) ((val_t) (x) ^ (val_t) 0xFFC00000) */
-/* #define Val_block(x) ((val_t) ((intptr_t) (x)) ^ (val_t) 0xFFC00000) */
-/* #define Block_val(x) ((val_t *) ((intptr_t) ((x) ^ (val_t) 0xFFC00000))) */
-/* #else */
-#define Init_val_block(x) ((val_t) ((uval_t) ((x) << 1) | (uval_t) 0xFFC00000))
-#define Val_block(x) ((val_t) ((((uval_t) ((intptr_t) (x) - (intptr_t) ocaml_heap)) << 1) | 0xFFC00000))
-#define Block_val(x) ((val_t *) ((intptr_t) ocaml_heap + ((intptr_t) ((uval_t) (x) ^ 0xFFC00000) >> 1)))
-/* #endif */
+#ifdef __AVR__
+#define Val_block(x) ((val_t) (intptr_t) (val_t *) (x) | (val_t) 0xFFC00000)
+#define Block_val(x) ((val_t *) (intptr_t) (val_t) (x))
+#else
+#define Val_block(x) ((val_t) (intptr_t) (val_t *) (x) | (val_t) 0xFFC00000)
+#define Block_val(x) ((val_t *) (((((intptr_t) (uval_t) (x) & 0x003FFFFF) - ((intptr_t) ocaml_heap & 0x003FFFFF)) & 0x003FFFFF) + (intptr_t) ocaml_heap))
+#endif
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)

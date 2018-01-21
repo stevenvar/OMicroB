@@ -42,13 +42,15 @@ void error(const char *msg){
 }
 
 void signal_handler(int signum){
+  fprintf(stderr, "%s!\n", strsignal(signum));
   terminate();
 }
 
 void signals(){
-  signal(SIGINT, signal_handler);
+  signal(SIGINT,  signal_handler);
   signal(SIGPIPE, signal_handler);
   signal(SIGKILL, signal_handler);
+  signal(SIGSEGV, signal_handler);
 }
 
 int is_stop(char *instr, int size){
@@ -202,10 +204,10 @@ void init_simulator(void){
       wait(NULL);
       if (nb_proc > 0) {
         usleep(100000);
-        fprintf(stderr, "Program terminated, press enter to exit!\n");
+        fprintf(stderr, "Program terminated, press enter to exit...\n");
         fgetc(stdin);
       } else {
-        fprintf(stderr, "Program terminated!\n");
+        fprintf(stderr, "Program terminated.\n");
       }
       destroy();
       exit(0);

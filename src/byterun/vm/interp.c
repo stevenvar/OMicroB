@@ -141,7 +141,11 @@ void *get_primitive(uint8_t prim_ind) {
 int cptinst = 0;
 
 #ifdef __AVR__
-
+void print_global(){
+}
+void print_stack(){
+}
+/*
 void print_global(){
   Serial.println("GLOBALS =");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
@@ -189,7 +193,7 @@ void print_stack(){
     i++;
   }
 }
-
+*/
 #endif
 
 #ifdef __PC__
@@ -239,27 +243,6 @@ void caml_raise_division_by_zero(void) {
 
 /******************************************************************************/
 
-void init_heap_pointer(val_t *ptr) {
-  val_t old_v = *ptr;
-  if (Is_block(old_v)) {
-    *ptr = Val_block((char *) ocaml_heap + (int) old_v);
-  }
-}
-
-/******************************************************************************/
-
-void init_heap_pointers(void) {
-  int i;
-  for (i = 0; i < OCAML_HEAP_INITIAL_WOSIZE; i ++) {
-    init_heap_pointer(&ocaml_heap[i]);
-  }
-  for (i = 0; i < OCAML_GLOBDATA_NUMBER; i ++) {
-    init_heap_pointer(&ocaml_global_data[i]);
-  }
-}
-
-/******************************************************************************/
-
 void interp_init(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
   trapSp = Val_int(-1);
@@ -282,6 +265,7 @@ val_t interp(void) {
     /* print_heap(); */
     print_global();
     print_stack();
+    /*
     Serial.println("\n\n");
     Serial.print("pc=");
     Serial.println(pc-1);
@@ -289,19 +273,22 @@ val_t interp(void) {
     Serial.println(cptinst);
     Serial.print("env=0x");
     Serial.println((uval_t)Block_val(env),HEX);
-     Serial.print("@acc=0x");
-     Serial.println((uval_t)&acc,HEX);
+    Serial.print("@acc=0x");
+    Serial.println((uval_t)&acc,HEX);
     Serial.print("acc=0x");
     Serial.print(acc,HEX);
     Serial.print(" -> points to 0x");
     Serial.println((uval_t)Block_val(acc),HEX);
+    */
 #endif
 #ifdef __PC__
     printf("=========\n");
     /* print_global(); */
     print_heap();
     print_stack();
-    float f = ((union { val_t v; float f; }) acc).f;
+    union { val_t v; float f; } vf_acc;
+    vf_acc.f = acc;
+    float f = vf_acc.f;
     if (Is_int(acc)) {
       printf("acc = 0x%X - %d or %f \n", acc, Int_val(acc), f);
     } else {
@@ -2548,9 +2535,6 @@ extern "C" {
 #endif
 
 void setup(void) {
-  #ifdef __AVR__
-  /* init_heap_pointers(); */
-  #endif
   interp_init();
   gc_init();
   interp();
