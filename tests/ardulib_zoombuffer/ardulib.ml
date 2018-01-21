@@ -82,6 +82,7 @@ let () =
   (* done; *)
   let buttonA = PIN7 in
   let buttonB = PIN8 in
+  let buttonUp = PINA0 in 
   (* Oled.display(); *)
   Oled.draw 10 10 true;
   Oled.draw 50 10 true;
@@ -98,9 +99,10 @@ let () =
   done;
   Oled.display ();
   while true do
-    let valA = digital_read buttonA in
-    digital_write PIN9 (not (digital_read buttonA));
-    digital_write PIN10 (not (digital_read buttonB));
+
+    digital_write PIN9 (digital_read buttonA);
+    digital_write PIN10 (digital_read buttonB);
+    digital_write PIN11 (digital_read buttonUp);
   done
     (* for i = 0 to 100 do () done; *)
     (* Oled.clear_zone ~cs:PIN12 ~dc:PIN4 30 i; *)
