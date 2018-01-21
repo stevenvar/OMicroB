@@ -301,8 +301,8 @@ void avr_set_bit(uint8_t reg, uint8_t bit){
   uint8_t new_val = old_val | mask;
   if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
     if (old_val != new_val){
-      int ddr = reg - LOWER_PORT + LOWER_DDR;
-      uint8_t ddr_val = regs[ddr];
+      /* int ddr = reg - LOWER_PORT + LOWER_DDR; */
+      /* uint8_t ddr_val = regs[ddr]; */
       /* Forced to remove this as with INPUT_PULLUP, the PORT is also set at the beginning : */
       /* if(!(ddr_val & mask)){ */
 	/* char port_c = 'B' + reg - LOWER_PORT; */
