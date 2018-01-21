@@ -41,8 +41,8 @@ test.hex: test.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 flash: test.avr
-	stty -f $(ATTY) 1200
-	sleep 0
+#	stty -f $(ATTY) 1200
+#	sleep 0
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
 
 listen:

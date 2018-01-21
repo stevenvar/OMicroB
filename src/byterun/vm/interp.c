@@ -301,7 +301,7 @@ val_t interp(void) {
     /* print_global(); */
     print_heap();
     print_stack();
-    float f = *(float *)&acc;
+    float f = ((union { val_t v; float f; }) acc).f;
     if (Is_int(acc)) {
       printf("acc = 0x%X - %d or %f \n", acc, Int_val(acc), f);
     } else {
