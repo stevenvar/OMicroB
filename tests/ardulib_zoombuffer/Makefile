@@ -40,7 +40,7 @@ ardulib.elf: ardulib.c
 ################################################################################
 
 ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) lib/buffer.c ardulib.c
-	$(AVR_GXX) -fpermissive -O2 $(INCLUDES) -I lib $(CFLAGS) $(LFLAGS) -Wall  $^ -Wnarrowing -o $@
+	$(AVR_GXX) -fpermissive -O3 $(INCLUDES) -I lib $(CFLAGS) $(LFLAGS) -Wall  $^ -Wnarrowing -o $@
 
 ardulib.hex: ardulib.avr
 	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@

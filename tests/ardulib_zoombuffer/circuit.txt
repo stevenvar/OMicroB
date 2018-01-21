@@ -7,12 +7,12 @@ led x=15 y=385 radius=5 pin=PIN10 color=red inverse=true
 led x=15 y=370 radius=5 pin=PIN11 color=lightgreen inverse=true
 
 
-button x=40 y=180 width=25 height=25 label="" pin=PINA0 inverse=true
-button x=100 y=180 width=25 height=25 label="" pin=PINA3 inverse=true
-button x=70 y=210 width=25 height=25 label="" pin=PINA1 inverse=true
-button x=70 y=150 width=25 height=25 label="" pin=PINA2 inverse=true
+button x=50 y=180 width=45 height=35 label="" pin=PINA1 inverse=true
+button x=130 y=180 width=45 height=35 label="" pin=PINA3 inverse=true
+button x=90 y=222 width=35 height=45 label="" pin=PINA0 inverse=true
+button x=90 y=138 width=35 height=45 label="" pin=PINA2 inverse=true
 
 
-button x=210 y=180 width=30 height=30 label="A" pin=PIN7 inverse=true
-button x=260 y=200 width=30 height=30 label="B" pin=PIN8 inverse=true
+button x=210 y=170 width=40 height=40 label="A" pin=PIN7 inverse=true
+button x=260 y=190 width=40 height=40 label="B" pin=PIN8 inverse=true
 

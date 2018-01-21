@@ -73,11 +73,10 @@ let set_pixel x y display =
   let y = 63 - y in (* must invert because of Graphics y positions ... *)
   (* in the physical screen, pixels are white when on *)
   set_color white;
-  fill_rect (display.x+x*2) (display.y+y*2) 2 2
+  fill_rect (display.x+x*2) (display.y+y*2) 1 1
 
 let clear_pixel _x _y =
   set_color black; ()
-  (* fill_rect (x+4*x) (y+4*(7-y)) 2 2 *)
 
 let show display =
   (* Graphics.clear_graph (); *)
