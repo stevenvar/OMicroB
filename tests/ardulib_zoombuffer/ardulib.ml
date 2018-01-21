@@ -46,64 +46,25 @@ let sleep x =
 
 
 let () =
-  (* let snake = Array.make 100 (10,10)  in *)
+  let bidule = ref (0,0) in
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
   Oled.boot ~cs:PIN12 ~dc:PIN4 ~rst:PIN6;
-
-     (* let x,y = snake.(i) in *)
-     (* Oled.draw x y true *)
-   (* done; *)
-  (* pin_mode PIN9 OUTPUT; *)
-
-  (* for i = 0 to 10 do  *)
-  (* Oled.draw 30 i ON; *)
-  (* Oled.draw 0 0 true; *)
-  (* Oled.draw 2 0 true; *)
-  (* Oled.draw 4 0 true; *)
-  (* Oled.draw 6 0 true; *)
-  (* Oled.draw 8 0 true; *)
-  (* Oled.draw 0 2 true; *)
-  (* Oled.draw 8 2 true; *)
-  (* Oled.draw 8 4 true; *)
-  (* Oled.draw 8 6 true; *)
-  (* Oled.draw 8 8 true; *)
-  (* for i = 0 to 63 do *)
-    (* Oled.draw i 0 true; *)
-    (* Oled.draw i 31 true *)
-  (* done; *)
-  (* for i = 0 to 31 do *)
-    (* Oled.draw 0 i true; *)
-    (* Oled.draw 63 i true; *)
-  (* done; *)
-
-  (* for i = 0 to 20 do *)
-    (* Oled.draw i i true; *)
-  (* done; *)
   let buttonA = PIN7 in
   let buttonB = PIN8 in
-  let buttonUp = PINA0 in 
-  (* Oled.display(); *)
-  Oled.draw 10 10 true;
-  Oled.draw 50 10 true;
-  Oled.draw 10 20 true;
-  Oled.draw 11 21 true;
-  Oled.draw 12 22 true;
-  Oled.draw 13 23 true;
-  Oled.draw 47 23 true;
-  Oled.draw 48 22 true;
-  Oled.draw 49 21 true;
-  Oled.draw 50 20 true;
-  for i = 0 to 33 do
-    Oled.draw (13+i) 23 true;
+  let buttonUp = PINA0 in
+  digital_write PIN9 false;
+  for i = 0 to 1000 do
+    (* let (i,j) = !bidule in *)
+    (* let new_i = (i+1) mod 64 in *)
+    (* let new_j = if new_i = 0 then (j+1 mod 32) else j in *)
+    (* bidule := (new_i,new_j); *)
+    Oled.draw i 0 true;
+    (* Oled.draw new_i new_j true; *)
+    Oled.display ();
   done;
-  Oled.display ();
   while true do
-
     digital_write PIN9 (digital_read buttonA);
     digital_write PIN10 (digital_read buttonB);
     digital_write PIN11 (digital_read buttonUp);
   done
-    (* for i = 0 to 100 do () done; *)
-    (* Oled.clear_zone ~cs:PIN12 ~dc:PIN4 30 i; *)
-  (* done *)
