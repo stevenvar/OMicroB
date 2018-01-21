@@ -61,7 +61,7 @@ let sync_display =
 
 
 let init_graphics display =
-  let config = Printf.sprintf " %dx%d" (display.width*4) (display.height*4) in
+  let config = Printf.sprintf " %dx%d" (display.width*2) (display.height*2) in
   open_graph config;
   set_window_title "LCD display";
   (* display_mode false; *)
@@ -69,26 +69,26 @@ let init_graphics display =
   sync_display ()
 
 
-let set_pixel x y =
+let set_pixel x y display =
   let y = 63 - y in (* must invert because of Graphics y positions ... *)
   (* in the physical screen, pixels are white when on *)
   set_color white;
-  fill_rect (x*4) (y*4) 4 4
+  fill_rect (display.x+x*2) (display.y+y*2) 2 2
 
 let clear_pixel _x _y =
   set_color black; ()
   (* fill_rect (x+4*x) (y+4*(7-y)) 2 2 *)
 
 let show display =
-  Graphics.clear_graph ();
+  (* Graphics.clear_graph (); *)
   let matrix = display.matrix in
   let height = display.height in
   let width = display.width in
   set_color black;
-  Graphics.fill_rect 0 0 (width*4) (height*4);
+  Graphics.fill_rect display.x display.y (width*2) (height*2);
   let disp i j v =
     match v with
-    | true -> set_pixel i j
+    | true -> set_pixel i j display
     | false -> ()
   in
   begin try
