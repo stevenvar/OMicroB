@@ -1,8 +1,8 @@
 open Avr
 
-let pin = PIN9
-  
+(*
 let () =
+  let pin = PIN11 in
   pin_mode pin OUTPUT;
   let r = ref [] in
   let acc = ref 0 in
@@ -16,3 +16,16 @@ let () =
   digital_write pin true;
   digital_write pin false;
   digital_write pin (!acc = 5_050_000);
+*)
+
+let () =
+  let pins = [ PIN9; PIN11; PIN10 ] in
+  List.iter (fun pin -> pin_mode pin OUTPUT) pins;
+  List.iter (fun pin -> digital_write pin true) pins;
+  while true do
+    List.iter (fun pin ->
+      digital_write pin false;
+      for _i = 1 to 20_000 do () done;
+      digital_write pin true;
+    ) pins;
+  done

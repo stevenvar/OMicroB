@@ -34,7 +34,7 @@ ardulib.c: ardulib.byte $(BIN)/bc2c
 	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 400 -stack-size 30 $< -o $@
 
 ardulib.elf: ardulib.c
-	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $(OPT) $^ -o $@
+	$(GXX) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $(OPT) $^ -o $@
 
 ################################################################################
 

@@ -30,7 +30,7 @@ solilet_simul.c: solilet_simul.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 328 -stack-size 164 $< -o $@
 
 solilet_simul.elf: solilet_simul.c
-	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $^ -o $@
+	$(GXX) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $^ -o $@
 
 ################################################################################
 

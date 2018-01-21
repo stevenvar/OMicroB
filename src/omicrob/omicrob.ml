@@ -9,7 +9,7 @@ let default_gc         = "MAC"
 let default_arch       = 32
 
 let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
-let default_cc_options = [ "-g"; "-Wall"; "-O2" ]
+let default_cxx_options = [ "-g"; "-Wall"; "-O2" ]
 let default_avr_cxx_options = [ "-g"; "-fpermissive"; "-Wall"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-Wl,-gc-sections" ]
 let default_mmcu = "atmega32u4"
 let default_avr = "avr109"
@@ -70,9 +70,9 @@ let gc           = ref None
 let arch         = ref None
 
 let mlopts       = ref []
-let ccopts       = ref []
 let cxxopts      = ref []
-let objcopts     = ref []
+let avrcxxopts   = ref []
+let avrobjcopts  = ref []
 let avrdudeopts  = ref []
 
 (******************************************************************************)
@@ -122,17 +122,17 @@ let spec =
      "<option> Pass the given option to the OCaml compiler");
     ("-mlopts", Arg.String (fun opts -> mlopts := List.rev (split opts ',') @ !mlopts),
      "<opt1,opt2,...> Pass the given options to the OCaml compiler");
-    ("-ccopt", Arg.String (fun opt -> ccopts := opt :: !ccopts),
-     "<option> Pass the given option to the C compiler");
-    ("-ccopts", Arg.String (fun opts -> ccopts := List.rev (split opts ',') @ !ccopts),
-     "<opt1,opt2,...> Pass the given options to the C compiler");
     ("-cxxopt", Arg.String (fun opt -> cxxopts := opt :: !cxxopts),
-     "<option> Pass the given option to the AVR C++ compiler");
+     "<option> Pass the given option to the C compiler");
     ("-cxxopts", Arg.String (fun opts -> cxxopts := List.rev (split opts ',') @ !cxxopts),
+     "<opt1,opt2,...> Pass the given options to the C compiler");
+    ("-avrcxxopt", Arg.String (fun opt -> avrcxxopts := opt :: !avrcxxopts),
+     "<option> Pass the given option to the AVR C++ compiler");
+    ("-avrcxxopts", Arg.String (fun opts -> avrcxxopts := List.rev (split opts ',') @ !avrcxxopts),
      "<opt1,opt2,...> Pass the given options to the AVR C++ compiler");
-    ("-objcopt", Arg.String (fun opt -> objcopts := opt :: !objcopts),
+    ("-avrobjcopt", Arg.String (fun opt -> avrobjcopts := opt :: !avrobjcopts),
      "<option> Pass the given option to the AVR objcopy tool");
-    ("-objcopts", Arg.String (fun opts -> objcopts := List.rev (split opts ',') @ !objcopts),
+    ("-avrobjcopts", Arg.String (fun opts -> avrobjcopts := List.rev (split opts ',') @ !avrobjcopts),
      "<opt1,opt2,...> Pass the given options to the AVR objcopy tool");
     ("-avrdudeopt", Arg.String (fun opt -> avrdudeopts := opt :: !avrdudeopts),
      "<option> Pass the given option to the avrdude flashing program");
@@ -149,7 +149,7 @@ let spec =
      " Print location of ocamlclean and exit");
     ("-bc2c", Arg.Unit (fun () -> Printf.printf "%s\n%!" (if !local then Filename.concat (Filename.concat Config.builddir "bin") "bc2c" else Filename.concat Config.bindir "bc2c"); exit 0),
      " Print location of bc2c and exit");
-    ("-cc", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.cc; exit 0),
+    ("-cxx", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.cxx; exit 0),
      " Print location of C compiler and exit");
     ("-avr-c++", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avr_cxx; exit 0),
      " Print location of AVR C++ compiler and exit");
@@ -177,7 +177,7 @@ Usages:\n\
 \  %s [ OPTIONS ] -c <src.ml>                  (compile .ml   -> .cmo  using ocamlc)\n\
 \  %s [ OPTIONS ] <src.cmo> -o <out.byte>      (compile .cmo  -> .byte using ocamlc)\n\
 \  %s [ OPTIONS ] <in.byte> -o <out.c>         (compile .byte -> .c    using bc2c)\n\
-\  %s [ OPTIONS ] <in.c> -o <out.elf>          (compile .c    -> .elf  using cc)\n\
+\  %s [ OPTIONS ] <in.c> -o <out.elf>          (compile .c    -> .elf  using c++)\n\
 \  %s [ OPTIONS ] <in.c> -o <out.avr>          (compile .c    -> .avr  using c++ for avr)\n\
 \  %s [ OPTIONS ] <in.avr> -o <out.hex>        (compile .avr  -> .hex  using objcopy for avr)\n\
 \  %s [ OPTIONS ] -simul <in.elf> [ sim_prog ] (execute the program in simulation mode)\n\
@@ -283,9 +283,9 @@ let gc           = !gc
 let arch         = !arch
 
 let mlopts       = List.rev !mlopts
-let ccopts       = List.rev !ccopts
 let cxxopts      = List.rev !cxxopts
-let objcopts     = List.rev !objcopts
+let avrcxxopts   = List.rev !avrcxxopts
+let avrobjcopts  = List.rev !avrobjcopts
 let avrdudeopts  = List.rev !avrdudeopts
 
 let input_files  = List.rev !input_files
@@ -430,9 +430,9 @@ let () =
     should_be_none_incomp "-c" "-heap-size" heap_size;
     should_be_none_incomp "-c" "-gc" gc;
     should_be_none_incomp "-c" "-arch" arch;
-    should_be_empty_options "-ccopt" ccopts;
-    should_be_empty_options "-cxxopts" cxxopts;
-    should_be_empty_options "-objcopts" objcopts;
+    should_be_empty_options "-cxxopt" cxxopts;
+    should_be_empty_options "-avrcxxopts" avrcxxopts;
+    should_be_empty_options "-avrobjcopts" avrobjcopts;
     should_be_empty_options "-avrdudeopts" avrdudeopts;
     should_be_empty_files input_cmos;
     should_be_empty_files input_cs;
@@ -468,9 +468,9 @@ let () =
     should_be_none_incomp "-i" "-heap-size" heap_size;
     should_be_none_incomp "-i" "-gc" gc;
     should_be_none_incomp "-i" "-arch" arch;
-    should_be_empty_options "-ccopt" ccopts;
-    should_be_empty_options "-cxxopts" cxxopts;
-    should_be_empty_options "-objcopts" objcopts;
+    should_be_empty_options "-cxxopt" cxxopts;
+    should_be_empty_options "-avrcxxopts" avrcxxopts;
+    should_be_empty_options "-avrobjcopts" avrobjcopts;
     should_be_empty_options "-avrdudeopts" avrdudeopts;
     should_be_empty_files input_cmos;
     should_be_empty_files input_cs;
@@ -529,9 +529,9 @@ let () =
     available_byte := Some output_path;
 
     let vars = [ ("CAMLLIB", libdir) ] in
-    let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-custom" ] @ mlopts in
+    let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-custom" ] @ mlopts @ [ "-cc"; Config.cxx ] in
     let cmd = if debug then cmd @ [ "-ccopt"; "-DDEBUG" ] else cmd in
-    let cmd = cmd @ List.flatten (List.map (fun ccopt -> [ "-ccopt"; ccopt ]) ccopts) in
+    let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
     run ~vars cmd;
 
@@ -550,11 +550,9 @@ let available_c = ref input_c
   
 let () =
   if (
-    input_mls <> [] || input_cmos <> [] || input_byte <> None
+    available_byte <> None
   ) && (
-    output_byte = None || flash || simul
-  ) && (
-    output_c <> None || output_elf <> None || output_avr <> None || output_hex <> None || flash || simul
+    simul || flash || no_output_requested || output_c <> None || output_elf <> None || output_avr <> None || output_hex <> None
   ) then (
     should_be_none_file input_avr;
     should_be_none_file input_elf;
@@ -628,7 +626,7 @@ let () =
 
     available_elf := Some output_path;
     
-    let cmd = [ Config.cc ] @ default_cc_options @ ccopts in
+    let cmd = [ Config.cxx ] @ default_cxx_options @ cxxopts in
     let cmd = if debug then cmd @ [ "-DDEBUG" ] else cmd in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
@@ -662,13 +660,13 @@ let () =
 
     available_avr := Some output_path;
 
-    let cmd = [ Config.avr_cxx ] @ default_avr_cxx_options @ cxxopts in
-    let cmd = if List.exists (fun cxxopt -> starts_with cxxopt ~sub:"-mmcu=") cxxopts then cmd else cmd @ [ "-mmcu=" ^ default_mmcu ] in
+    let cmd = [ Config.avr_cxx ] @ default_avr_cxx_options @ avrcxxopts in
+    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ default_mmcu ] in
     let cmd = if debug then cmd @ [ "-DDEBUG" ] else cmd in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   ) else (
-    should_be_empty_options "-cxxopts" cxxopts;
+    should_be_empty_options "-avrcxxopts" avrcxxopts;
   )
 
 let available_avr = !available_avr
@@ -697,10 +695,10 @@ let () =
 
     available_hex := Some output_path;
     
-    let cmd = [ Config.avr_objcopy; "-O"; "ihex"; "-R"; ".eeprom" ] @ objcopts @ [ input_path; output_path ] in
+    let cmd = [ Config.avr_objcopy; "-O"; "ihex"; "-R"; ".eeprom" ] @ avrobjcopts @ [ input_path; output_path ] in
     run cmd
   ) else (
-    should_be_empty_options "-objcopts" objcopts;
+    should_be_empty_options "-avrobjcopts" avrobjcopts;
   )
 
 let available_hex = !available_hex
