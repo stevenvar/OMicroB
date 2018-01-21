@@ -46,7 +46,7 @@ static int *sync_counter;
 static int sem_regs;
 static int sem_sync;
 static int sem_done;
-static int nb_proc;
+static int proc_nb;
 static int is_slow;
 
 #define INPUT 0x0
@@ -65,7 +65,7 @@ void init_regs(int n, int slow){
   sem_regs = create_sem(1);
   sem_sync = create_sem(1);
   sem_done = create_sem(0);
-  nb_proc = n;
+  proc_nb = n;
   for(i = 0 ; i < NB_REG ; i ++) regs[i] = 0x00;
 }
 
@@ -178,10 +178,10 @@ static void send_set_analog(unsigned int chan, unsigned int val){
 
 static void synchronize(){
   P(sem_sync);
-  *sync_counter = nb_proc;
+  *sync_counter = proc_nb;
   V(sem_sync);
   send_all_proc("SYNC\n", 5);
-  if(nb_proc != 0) P(sem_done);
+  if(proc_nb != 0) P(sem_done);
   may_sleep();
 }
 

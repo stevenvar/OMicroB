@@ -29,7 +29,7 @@ ofacto.c: ofacto.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 8 -stack-size 16 $< -o $@
 
 ofacto.elf: ofacto.c
-	$(GCC) -m32 -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
+	$(GXX) -m32 -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG  -Wall $^ -o $@
 
 ################################################################################
 

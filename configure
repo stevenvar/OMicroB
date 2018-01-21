@@ -75,7 +75,7 @@ check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam i
 
 ################################################################################
 
-GCC="$(which gcc)"
+GXX="$(which g++)"
 AVR_GXX="$(which avr-g++)"
 AVR_OBJCOPY="$(which avr-objcopy)"
 AVRDUDE="$(which avrdude)"
@@ -128,7 +128,7 @@ BINDIR      := $BINDIR
 LIBDIR      := $LIBDIR
 MAN1DIR     := $MANDIR/man1
 MAN3DIR     := $MANDIR/man3
-GCC         := $GCC
+GXX         := $GXX
 AVR_GXX     := $AVR_GXX
 AVR_OBJCOPY := $AVR_OBJCOPY
 AVRDUDE     := $AVRDUDE
@@ -160,7 +160,7 @@ let bindir      = \"$BINDIR\"
 let ocaml       = \"$OCAML\"
 let ocamlc      = \"$OCAMLC\"
 let ocamlclean  = \"$OCAMLCLEAN\"
-let cc          = \"$GCC\"
+let cxx         = \"$GXX\"
 let avr_cxx     = \"$AVR_GXX\"
 let avr_objcopy = \"$AVR_OBJCOPY\"
 let avrdude     = \"$AVRDUDE\"

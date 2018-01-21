@@ -29,7 +29,7 @@ blink.c: blink.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 1 -stack-size 1 $< -o $@
 
 blink.elf: blink.c
-	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -DDEBUG -Wall $^ -o $@
+	$(GXX) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -DDEBUG -Wall $^ -o $@
 
 ################################################################################
 

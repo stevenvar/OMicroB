@@ -35,7 +35,7 @@ ardulib.c: ardulib.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 64 $< -o $@
 
 ardulib.elf: ardulib.c
-	$(GCC) -I $(OCAMLWHERE) $(INCLUDES) $(OPT) -g $^ -o $@
+	$(GXX) -I $(OCAMLWHERE) $(INCLUDES) $(OPT) -g $^ -o $@
 
 ################################################################################
 

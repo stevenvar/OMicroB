@@ -29,7 +29,7 @@ ocalustre.c: ocalustre.byte $(BIN)/bc2c
 	$(BIN)/bc2c -local -arch 32 -heap-size 8 -stack-size 16 $< -o $@
 
 ocalustre.elf: ocalustre.c
-	$(GCC) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@
+	$(GXX) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -DOMICROB_WITH_ARDUBOY -g -std=c99 -D_POSIX_C_SOURCE=199309L -DDEBUG -Wall $^ -o $@
 
 ################################################################################
 
