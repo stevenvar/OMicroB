@@ -8,7 +8,7 @@ let default_heap_size  = 512
 let default_gc         = "MAC"
 let default_arch       = 32
 
-let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats" ]
+let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
 let default_cc_options = [ "-g"; "-Wall"; "-O2" ]
 let default_avr_cxx_options = [ "-g"; "-fpermissive"; "-Wall"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-Wl,-gc-sections" ]
 let default_mmcu = "atmega32u4"
