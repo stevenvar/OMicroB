@@ -19,19 +19,13 @@ let () =
 *)
 
 let () =
-  let pins = [ PIN9; PIN11; PIN10 ] in
+  let pins = [ PIN9; PIN10; PIN11 ] in
   List.iter (fun pin -> pin_mode pin OUTPUT) pins;
   List.iter (fun pin -> digital_write pin true) pins;
   while true do
     List.iter (fun pin ->
       digital_write pin false;
-      for _i = 1 to 400 do () done;
+      for _i = 1 to 100_000_000 do () done;
       digital_write pin true;
     ) pins;
   done
-
-(*
-let () =
-  pin_mode PIN9 OUTPUT;
-  digital_write PIN9 false;
-*)

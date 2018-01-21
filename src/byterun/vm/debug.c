@@ -16,7 +16,7 @@
 
 #ifdef __PC__
 
-void print_heap() {
+void print_heap(void) {
   val_t *ptr;
   int i = 0;
 
@@ -35,14 +35,52 @@ void print_heap() {
       printf("%d  @%p : 0x%08x / @(%p)",i, ptr, *ptr, Block_val(*ptr));
     } else if (*ptr == 0) {
       printf("%d  @%p : _",i, ptr);
-    } else {
+    } else if (f >= -1e6 && f <= 1e6) {
       printf("%d  @%p : 0x%08x (maybe %f)", i, ptr, *ptr, f);
+    } else {
+      printf("%d  @%p : 0x%08x", i, ptr, *ptr);
     }
     printf("\n");
     i ++;
   }
   printf("heap_ptr = %p", heap_ptr);
   printf("\n\n\n");
+}
+
+/******************************************************************************/
+
+void print_global(void) {
+  printf("GLOBAL DATA : \n");
+  for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
+    if (Is_block(ocaml_global_data[i])){
+      printf("@%p : (%d) - 0x%04x -> pointer to %p\n",ocaml_global_data, i, ocaml_global_data[i], Block_val(ocaml_global_data[i]));
+    }
+    else
+      printf("@%p (%d) - 0x%04x -> int / float %d\n",ocaml_global_data+i, i, ocaml_global_data[i], Int_val(ocaml_global_data[i]));
+  }
+}
+
+/******************************************************************************/
+
+extern val_t *sp;
+
+void print_stack(void) {
+  printf(" STACK : \n");
+  int i = 0;
+  for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
+       ptr > sp; ptr --){
+    float f = *(float *)&sp[i];
+    printf("@%p ", &sp[i]);
+    if (Is_int(sp[i])){
+      printf("(%d) : %04x -> %d or %f \n", i, sp[i], Int_val(sp[i]), f);
+    } else if (Is_in_heap(sp[i])) {
+      printf("(%d) : 0x%X -> pointer to %p\n", i, sp[i], Block_val(sp[i]));
+    } else {
+      printf("(%d) : ? 0x%04x -> %f) \n", i, sp[i], f);
+    }
+    i ++;
+  }
+  printf("<size=%ld>\n", ocaml_stack + OCAML_STACK_WOSIZE - sp);
 }
 
 #endif
@@ -56,9 +94,70 @@ void print_heap() {
 void print_heap(void) {
 }
 
+/******************************************************************************/
+
+void print_global(void) {
+}
+
+/*
+void print_global() {
+  Serial.println("GLOBALS =");
+  for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
+    Serial.print("@0x");
+    Serial.println((uval_t)ocaml_global_data+i,HEX);
+    Serial.print(i);
+    Serial.print(" : ");
+    Serial.print(ocaml_global_data[i],HEX);
+    Serial.print(" - ");
+    if (Is_block(ocaml_global_data[i])){
+      Serial.print("0x");
+      Serial.println((uval_t)Block_val(ocaml_global_data[i]),HEX);
+    }
+    else
+      Serial.print("int / float = ");
+      Serial.println(Int_val(ocaml_global_data[i]));
+  }
+}
+*/
+
+/******************************************************************************/
+
+void print_stack(void) {
+}
+
+/*
+void print_stack(){
+  Serial.println(" STACK :");
+  int i = 0;
+  for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
+       ptr > sp; ptr --){
+    Serial.print("@sp[");
+    Serial.print(i);
+    Serial.print("] = 0x");
+    Serial.print((uval_t)&sp[i],HEX);
+    Serial.print(" : ");
+    if (Is_int(sp[i])){
+      Serial.print("int/float =");
+      Serial.print(Int_val(sp[i]),DEC);
+      Serial.print("/");
+      Serial.println(*(float *)&sp[i],5);
+    }
+    else if (Is_block(sp[i])){
+      Serial.print("points to (0x");
+      Serial.print((uval_t)Block_val(sp[i]),HEX);
+      Serial.println(")");
+    }
+    else {
+      Serial.print("0x");
+      Serial.println((val_t)sp[i],HEX);
+    }
+    i++;
+  }
+}
+*/
+
 #endif
 
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-
