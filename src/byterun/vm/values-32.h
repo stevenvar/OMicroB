@@ -65,8 +65,6 @@ extern val_t ocaml_heap[OCAML_HEAP_WOSIZE];
 #define Val_block(x) ((val_t) (intptr_t) (val_t *) (x) | (val_t) 0xFFC00000)
 #define Block_val(x) ((val_t *) (intptr_t) (val_t) (x))
 #else
-// #define Val_block(x) ((val_t) (intptr_t) (val_t *) (x) | (val_t) 0xFFC00000)
-// #define Block_val(x) ((val_t *) (((((intptr_t) (uval_t) (x) & 0x003FFFFF) - ((intptr_t) ocaml_heap & 0x003FFFFF)) & 0x003FFFFF) + (intptr_t) ocaml_heap))
 #define Val_block(x) ((val_t) ((char *) (x) - ((char *) ocaml_heap)) | (val_t) 0xFFC00000)
 #define Block_val(x) ((val_t *) ((char *) ocaml_heap + (((int32_t) (x) << 10) >> 10)))
 #endif
