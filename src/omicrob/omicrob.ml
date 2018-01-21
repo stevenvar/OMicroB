@@ -100,9 +100,9 @@ let spec =
     ] else []
   ) @ [
     ("-debug", Arg.Set debug,
-     " Activate debugging, print informations about execution at runtime\n");
+     " Activate debugging, print informations about execution at runtime");
     ("-simul", Arg.Set simul,
-     " Execute the program in simulation mode on the computer\n");
+     " Execute the program in simulation mode on the computer");
     ("-flash", Arg.Set flash,
      " Transfer the program to the micro-controller\n");
 
