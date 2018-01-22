@@ -222,6 +222,12 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
   may_sleep();
 }
 
+int r = 0;
+int avr_random(int max){
+  r = (r * 109+89)%max;
+  return r;
+}
+
 void avr_write_register(uint8_t reg, uint8_t new_val){
   /* printf("avr_write_register(%d, %d)\n", (int) reg, (int) new_val); */
   init_simulator();

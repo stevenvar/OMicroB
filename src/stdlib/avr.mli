@@ -77,6 +77,7 @@ external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit"
   [@@noalloc]
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
   [@@noalloc]
+external random : int -> int = "caml_avr_random" [@@noalloc]
 val pin_mode : ('a register, 'b register, 'c register) pin -> mode -> unit
 val digital_write :
   ('a register, 'b register, 'c register) pin -> level -> unit

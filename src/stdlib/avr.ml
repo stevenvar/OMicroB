@@ -241,6 +241,7 @@ external read_register : 'a register -> int = "caml_avr_read_register" [@@noallo
 external set_bit : 'a register -> 'a -> unit = "caml_avr_set_bit" [@@noalloc]
 external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit" [@@noalloc]
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit" [@@noalloc]
+external random : int -> int = "caml_avr_random" [@@noalloc]
 
 let pin_mode p m =
   let port = port_of_pin p in
@@ -270,3 +271,6 @@ let digital_read p =
   match read_bit input ibit with
   | true -> HIGH
   | false -> LOW
+
+
+  

@@ -30,6 +30,12 @@ value caml_avr_read_register(value reg) {
   return Val_int(avr_read_register(Int_val(reg)));
 }
 
+int r = 89;
+value caml_avr_random(value max) {
+  r = (r * 109+89)%max;
+  return Val_int(r);
+}
+
 /* value caml_buffer_write(int x, int y, int color){ */
 /*   return Val_unit; */
 /* } */

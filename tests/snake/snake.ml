@@ -43,7 +43,7 @@ let sleep x =
 
 type direction = North | South | East | West
 
-let snake = Array.make 20 (0,0)
+let snake = Array.make 50 (0,0)
 
 (* let current_dir = ref South *)
 
@@ -67,43 +67,56 @@ let new_head dir =
   | West -> ((if cx-1 < 0 then 63 else cx-1),cy)
   | East -> ((cx+1) mod 64,cy)
 
-let apple = ref (10,10)
+let apple = ref (random 64,random 32)
+
+let size = ref 1
 
 exception Break
 
 let draw_snake upto =
-  (* try *)
-    (* Array.iteri (fun i (x,y) -> if i > upto then raise Break else Oled.draw x y true) snake *)
-  (* with Break -> ()  *)
-  for i = 0 to upto do
-    let (x,y) = snake.(i) in
-    Oled.draw x y true
-  done
+  try
+    Array.iteri (fun i (x,y) -> if i > upto then raise Break else Oled.draw x y true) snake
+  with Break -> ()
+  (* for i = 0 to upto do *)
+    (* let (x,y) = snake.(i) in *)
+    (* Oled.draw x y true *)
+  (* done *)
 
 let draw_apple () =
   let x,y = !apple in 
   Oled.draw x y true
 
+let eats_apple () =
+  let xa,ya = !apple in
+  let x,y = snake.(0) in
+  x = xa && y = ya
+              
+
+let remove_tail () =
+  let x,y = snake.(!size+1) in
+  Oled.draw x y false
+
 
 let shift_right array =
-  let x,y = array.(10) in
-  Oled.draw x y false;
+
   for i = Array.length array -1 downto 1 do
     array.(i) <- array.(i-1)
   done
 
-let rec game_loop dir i =
-  if i = 0 then ()
-  else (
-    draw_snake 10;
-    draw_apple ();
-    Oled.display ();
+let rec game_loop dir=
   let head = new_head dir in
   shift_right snake;
   snake.(0) <- head;
-  (* remove_tail (); *)
+  if eats_apple () then
+    incr size
+  else
+    remove_tail ();
   (* sleep 1000; *)
-  game_loop (button_direction dir) (i))
+  
+    draw_snake !size;
+    draw_apple ();
+    Oled.display ();
+  game_loop (button_direction dir)
   
 let init () =
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
@@ -112,7 +125,4 @@ let init () =
     
 let () =
   init ();
-  for i = 0 to 10 do
-    snake.(10-i) <- (0,i);
-  done;
-  game_loop South 10
+  game_loop South 
