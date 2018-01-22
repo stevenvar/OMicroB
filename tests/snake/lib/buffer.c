@@ -87,12 +87,12 @@ uint8_t buffer_get_byte(){
   return out;
 }
 
+#ifdef __AVR__
 void display(){
-  #ifdef __AVR__
   for(int i = 0; i < 1024; i ++){
     uint8_t b = buffer_get_byte ();
    SPDR = b;
    while (!(SPSR & _BV(SPIF))){}
   }
-  #endif
 }
+#endif

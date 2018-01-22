@@ -31,6 +31,9 @@ val_t caml_buffer_display(val_t x){
 #define _BV(x) (1 << x)
 #include "lib/buffer.c"
 
+#define SPSR 16
+
+#define SPIF 0
 
 val_t caml_buffer_write(val_t x, val_t y, val_t color) {
   buffer_write(Int_val(x), Int_val(y), Int_val(color));
@@ -46,7 +49,11 @@ val_t caml_buffer_get_byte(val_t x) {
 }
 
 val_t caml_buffer_display(val_t x){
-  return Val_unit;
+  for(int i = 0; i < 1024; i++){
+    int b = buffer_get_byte ();
+    avr_write_register(SPDR,b);
+  }
+
 }
 
 #else
