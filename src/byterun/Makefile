@@ -6,6 +6,7 @@ HEADERS := $(wildcard */*.h)
 
 OBJECTS :=              \
   .build/std-bindings.o \
+  .build/random.o       \
   .build/sf-regs.o      \
   .build/shared.o       \
   .build/simul.o
@@ -18,6 +19,11 @@ $(LIB)/libcamlrun.a: $(OBJECTS)
 	ar rs $@ $(OBJECTS)
 
 .build/%.o: prims/%.c $(HEADERS)
+	mkdir -p .build/
+	ocamlc -c -ccopt -Wall $<
+	mv $*.o .build/
+
+.build/%.o: stdlib/%.c $(HEADERS)
 	mkdir -p .build/
 	ocamlc -c -ccopt -Wall $<
 	mv $*.o .build/

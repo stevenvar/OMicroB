@@ -1,5 +1,6 @@
 #include <caml/mlvalues.h>
 #include "prims.h"
+#include "../stdlib/random.h"
 
 /******************************************************************************/
 /******************************************************************************/
@@ -30,23 +31,20 @@ value caml_avr_read_register(value reg) {
   return Val_int(avr_read_register(Int_val(reg)));
 }
 
-int r = 89;
-value caml_avr_random(value max) {
-  r = (r * 109+89)%max;
-  return Val_int(r);
+/******************************************************************************/
+
+value caml_random_init(value n) {
+  random_init(Int_val(n));
+  return Val_unit;
 }
 
-/* value caml_buffer_write(int x, int y, int color){ */
-/*   return Val_unit; */
-/* } */
+value caml_random_bits(value bound) {
+  return Int_val(random_bits(Val_int(bound)));
+}
 
-/* value caml_buffer_read(int x, int y){ */
-/*   return Val_int(0); */
-/* } */
-
-/* value caml_buffer_get_byte(){ */
-/*   return Val_unit; */
-/* } */
+value caml_random_bool(value unit) {
+  return Val_bool(random_bool());
+}
 
 /******************************************************************************/
 /******************************************************************************/
