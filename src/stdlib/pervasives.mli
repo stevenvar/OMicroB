@@ -52,3 +52,4 @@ external raise_notrace : exn -> 'a = "%raise_notrace"
 val failwith : string -> 'a
 val invalid_arg : string -> 'a
 external trace : string -> unit = "caml_debug_trace"
+external tracei : int -> unit = "caml_debug_tracei"

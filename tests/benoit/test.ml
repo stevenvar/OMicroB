@@ -39,8 +39,9 @@ let () =
   try
     if true then raise (Exn 10_000);
     trace "Hello";
-  with Exn _ ->
-    trace "World ";
+  with Exn n ->
+    trace "World";
+    tracei n;
   
 (*
 let rec fact n =
