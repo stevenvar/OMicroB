@@ -1,5 +1,6 @@
 #include "../vm/values.h"
 #include "prims.h"
+#include "../stdlib/random.h"
 
 /******************************************************************************/
 /******************************************************************************/
@@ -32,6 +33,21 @@ val_t caml_avr_read_register(val_t reg) {
 
 val_t caml_avr_random(val_t max){
   return Val_int(avr_random(Int_val(max)));
+}
+
+/******************************************************************************/
+
+val_t caml_random_init(val_t n) {
+  random_init(Int_val(n));
+  return Val_unit;
+}
+
+val_t caml_random_bits(val_t bound) {
+  return Int_val(random_bits(Val_int(bound)));
+}
+
+val_t caml_random_bool(val_t unit) {
+  return Val_bool(random_bool());
 }
 
 /******************************************************************************/

@@ -24,6 +24,7 @@
 
 #include "../prims/prims.h"
 #include "../prims/omc-bindings.c"
+#include "../stdlib/random.c"
 
 #ifdef __AVR__
 #include "../avr/avrlib.c"
