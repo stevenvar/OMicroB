@@ -22,10 +22,15 @@
 #error "Unknown garbage collector to use, please define OCAML_GC_MARK_AND_COMPACT or OCAML_GC_STOP_AND_COPY"
 #endif
 
+#ifdef __PC__
+ #include <unistd.h>
+#endif
+
 #include "../prims/prims.h"
 #include "../prims/omc-bindings.c"
 #include "../stdlib/random.c"
 #include "../stdlib/trace.c"
+#include "../stdlib/delay.c"
 
 #ifdef __AVR__
 #include "../avr/avrlib.c"

@@ -21,6 +21,11 @@ value caml_avr_read_bit(value reg, value bit) {
   return Val_bool(avr_read_bit(Int_val(reg), Int_val(bit)));
 }
 
+value caml_avr_delay(value ms) {
+  /* todo  */
+  return Val_unit;
+}
+
 /******************************************************************************/
 
 value caml_avr_write_register(value reg, value val) {
@@ -54,10 +59,14 @@ value caml_debug_trace(value msg) {
   return Val_unit;
 }
 
+<<<<<<< HEAD
+
+=======
 value caml_debug_tracei(value n) {
   debug_tracei(Long_val(n));
   return Val_unit;
 }
+>>>>>>> ee175abb2f691e4f6e18ca1ab3f0908447410804
 
 /******************************************************************************/
 /******************************************************************************/
