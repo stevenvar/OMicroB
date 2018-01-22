@@ -27,7 +27,7 @@ simul : snake.elf
 	./snake.elf '../../bin/omicrob_circuit_simulator circuit.txt'
 	#./snake.elf '../../bin/omicrob_lcd_simulator 128x8 dc=PIN4 cs=PIN12 rst=PIN6'
 
-snake.byte: buffer.c spi.ml oled.ml snake.ml
+snake.byte: buffer.c spi.ml oled.ml arduboy.ml snake.ml
 	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun -ccopt -D__OCAML__ $^ -o $@
 	ocamlclean $@ -o $@
 
