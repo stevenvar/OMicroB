@@ -1,4 +1,3 @@
-open Spi
 open Avr
 
 
@@ -49,12 +48,12 @@ let draw x y color =
   write_buffer x y color
 
 let clear() =
- for i = 0 to 1023 do
+ for _i = 0 to 1023 do
    Spi.transfer(0x00)
  done
 
 let boot ~cs ~dc ~rst =
-    digital_write rst HIGH;
+  digital_write rst HIGH;
   digital_write rst LOW;
   digital_write rst HIGH;
   command_mode cs dc;

@@ -33,10 +33,11 @@ let right_of = function
   | East -> South
   | West -> North
 
-let old_left = ref HIGH
-let old_right = ref HIGH
 
-let button_direction dir =
+let button_direction =
+  let old_left = ref HIGH in
+  let old_right = ref HIGH in
+  fun dir -> 
   let new_left = digital_read button_left in
   let new_right = digital_read button_right in 
   let new_dir = 
@@ -60,10 +61,6 @@ let collides_with_itself () =
     i := !i mod Array.length snake;
   done
   with Break -> ()
-  (* for i = !ptr_tail to !ptr_head-1 do *)
-    (* if snake.(!ptr_head) = snake.(i) then *)
-      (* raise Lose *)
-  (* done *)
 
 let new_head dir =
   let (cx,cy) = decode (snake.(!ptr_head)) in
@@ -84,23 +81,23 @@ let rec game_loop dir=
   let (xh,yh) as head = new_head dir in
   let (xt,yt) = decode (snake.(!ptr_tail)) in
   let new_dir = button_direction dir in
-  if (not (eats_apple ())) then
+  if (eats_apple ()) then
     begin
       Oled.draw xt yt false;
-       ptr_tail := (!ptr_tail + 1) mod (Array.length snake)
+      ptr_tail := (!ptr_tail + 1) mod (Array.length snake)
     end
-  else(
-    apple := new_position ();
-    incr size;
-    if !size = Array.length snake then raise Win;
-  );
+  else 
+     begin
+      Oled.draw xt yt false;
+      ptr_tail := (!ptr_tail + 1) mod (Array.length snake)
+    end;
   ptr_head := (!ptr_head + 1) mod (Array.length snake);
   snake.(!ptr_head) <- encode head;
-  Oled.draw xh yh true;
   draw_apple ();
+  Oled.draw xh yh true;
   Oled.display ();
-  delay(100- !size);
   collides_with_itself ();
+  delay(100 - !size);
   game_loop new_dir
 
 let () =

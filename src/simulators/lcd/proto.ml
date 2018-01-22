@@ -28,8 +28,12 @@ let write_data_to_ram data display =
 let exec cs dc _rst display =
   (* if rst then clear display; *)
   match (cs,dc) with
-  |  (false,false) -> Printf.printf "command mode\n"; display.mode <- Command
-  | (false,true) -> Printf.printf "data mode\n"; display.mode <- Data
+  |  (false,false) ->
+    (* Printf.printf "command mode\n"; *)
+    display.mode <- Command
+  | (false,true) ->
+    (* Printf.printf "data mode\n"; *)
+    display.mode <- Data
   | _ -> ()
 
 let register display =
@@ -48,9 +52,9 @@ let register display =
       if !cpt = 1023 then (refresh display);
       incr cpt;
       cpt := !cpt mod 1024
-    | Command ->
-      if i = 0x22 then Printf.printf "Set page address ...\n"
-      else if i = 0x21 then Printf.printf "Set column address ...\n"
+    | Command -> ()
+      (* if i = 0x22 then Printf.printf "Set page address ...\n" *)
+      (* else if i = 0x21 then Printf.printf "Set column address ...\n" *)
   in
   Simul.add_handler (Simul.Clear_pin_handler (display.cs, handler));
   Simul.add_handler (Simul.Set_pin_handler (display.dc, handler));
