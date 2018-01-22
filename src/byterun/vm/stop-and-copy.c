@@ -77,7 +77,7 @@ void gc_init(void) {
   current_heap = 0;
 }
 
-#if defined(DEBUG)
+#if DEBUG >= 3 // DUMP STACK AND HEAP
 
 int cpt_gc = 0;
 
@@ -172,12 +172,16 @@ void gc_one_val(val_t* ptr, int update) {
  */
 
 void gc(void) {
-  TRACE("#################### STOP & COPY ####################\n");
-#ifdef DEBUG
+#if defined(__PC__) && DEBUG >= 1 // TRACE GC RUNS
+  printf("#################### STOP & COPY ####################\n");
+#endif
+
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
   cpt_gc ++;
   print_heap();
   print_stack();
 #endif
+
   val_t* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
   current_heap = (current_heap + 1) % 2;
@@ -186,13 +190,9 @@ void gc(void) {
   heap_ptr = new_heap;
   heap_todo = new_heap - 1;
 
-
-/* Pourquoi ce ifdef ?  */
-/* #ifdef OCAML_HEAP_INITIAL_WOSIZE */
   for (ptr = ocaml_stack + OCAML_STACK_WOSIZE - 1 ; ptr >= sp; ptr--) {
     gc_one_val(ptr, 1);
   }
-/* #endif */
 
   for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
     gc_one_val(ptr, 1);
@@ -201,11 +201,8 @@ void gc(void) {
   gc_one_val(&acc,1);
   gc_one_val(&env,1);
 
-
-#ifdef DEBUG
-  #ifdef __PC__
-  printf("end of GC number %d ", cpt_gc);
-  #endif
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("End of GC number %d\n", cpt_gc);
   clean_heap();
   print_heap();
 #endif

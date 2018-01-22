@@ -18,7 +18,6 @@ let () =
   digital_write pin (!acc = 5_050_000);
 *)
 
-
 let blink nsleep =
   let pins = [ PIN9; PIN10; PIN11 ] in
   List.iter (fun pin -> pin_mode pin OUTPUT) pins;

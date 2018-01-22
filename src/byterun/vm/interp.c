@@ -150,9 +150,8 @@ void interp(void) {
   }
   
   while (1) {
-#ifdef DEBUG
-#ifdef __PC__
-    printf("[%3d] ", pc);
+
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
     if (0) {
       printf("=========\n");
       /* print_global(); */
@@ -171,24 +170,18 @@ void interp(void) {
       printf("extra_args=%d \n", extra_args);
     }
 #endif
-#endif
 
-#ifdef DEBUG
+#ifdef __PC__ // CHECK PC
     if (pc < 0 || pc >= OCAML_BYTECODE_BSIZE) {
-#ifdef __AVR__
-      while(1){}
-#endif
-#ifdef __PC__
-      printf("error : pc\n");
+      printf("Invalid pc\n");
       exit(1);
-#endif
     }
 #endif
 
     switch(read_opcode()){
 #ifdef OCAML_ACC0
     case OCAML_ACC0 : {
-      TRACE("ACC0");
+      TRACE_INSTRUCTION("ACC0");
       acc = peek(0);
       break;
     }
@@ -196,7 +189,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC1
     case OCAML_ACC1 : {
-      TRACE("ACC1");
+      TRACE_INSTRUCTION("ACC1");
       acc = peek(1);
       break;
     }
@@ -204,7 +197,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC2
     case OCAML_ACC2 : {
-      TRACE("ACC2");
+      TRACE_INSTRUCTION("ACC2");
       acc = peek(2);
       break;
     }
@@ -212,7 +205,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC3
     case OCAML_ACC3 : {
-      TRACE("ACC3");
+      TRACE_INSTRUCTION("ACC3");
       acc = peek(3);
       break;
     }
@@ -220,7 +213,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC4
     case OCAML_ACC4 : {
-      TRACE("ACC4");
+      TRACE_INSTRUCTION("ACC4");
       acc = peek(4);
       break;
     }
@@ -228,7 +221,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC5
     case OCAML_ACC5 : {
-      TRACE("ACC5");
+      TRACE_INSTRUCTION("ACC5");
       acc = peek(5);
       break;
     }
@@ -236,7 +229,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC6
     case OCAML_ACC6 : {
-      TRACE("ACC6");
+      TRACE_INSTRUCTION("ACC6");
       acc = peek(6);
       break;
     }
@@ -244,7 +237,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC7
     case OCAML_ACC7 : {
-      TRACE("ACC7");
+      TRACE_INSTRUCTION("ACC7");
       acc = peek(7);
       break;
     }
@@ -252,7 +245,7 @@ void interp(void) {
 
 #ifdef OCAML_ACC
     case OCAML_ACC : {
-      TRACE("ACC");
+      TRACE_INSTRUCTION("ACC");
       acc = peek(read_uint8());
       break;
     }
@@ -260,7 +253,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSH
     case OCAML_PUSH : {
-      TRACE("PUSH");
+      TRACE_INSTRUCTION("PUSH");
       push(acc);
       break;
     }
@@ -268,7 +261,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC1
     case OCAML_PUSHACC1 : {
-      TRACE("PUSHACC1");
+      TRACE_INSTRUCTION("PUSHACC1");
       push(acc);
       acc = peek(1);
       break;
@@ -277,7 +270,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC2
     case OCAML_PUSHACC2 : {
-      TRACE("PUSHACC2");
+      TRACE_INSTRUCTION("PUSHACC2");
       push(acc);
       acc = peek(2);
       break;
@@ -286,7 +279,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC3
     case OCAML_PUSHACC3 : {
-      TRACE("PUSHACC3");
+      TRACE_INSTRUCTION("PUSHACC3");
       push(acc);
       acc = peek(3);
       break;
@@ -295,7 +288,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC4
     case OCAML_PUSHACC4 : {
-      TRACE("PUSHACC4");
+      TRACE_INSTRUCTION("PUSHACC4");
       push(acc);
       acc = peek(4);
       break;
@@ -304,7 +297,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC5
     case OCAML_PUSHACC5 : {
-      TRACE("PUSHACC5");
+      TRACE_INSTRUCTION("PUSHACC5");
       push(acc);
       acc = peek(5);
       break;
@@ -313,7 +306,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC6
     case OCAML_PUSHACC6 : {
-      TRACE("PUSHACC6");
+      TRACE_INSTRUCTION("PUSHACC6");
       push(acc);
       acc = peek(6);
       break;
@@ -322,7 +315,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC7
     case OCAML_PUSHACC7 : {
-      TRACE("PUSHACC7");
+      TRACE_INSTRUCTION("PUSHACC7");
       push(acc);
       acc = peek(7);
       break;
@@ -331,7 +324,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHACC
     case OCAML_PUSHACC : {
-      TRACE("PUSHACC8");
+      TRACE_INSTRUCTION("PUSHACC8");
       push(acc);
       acc = peek(read_uint8());
       break;
@@ -340,7 +333,7 @@ void interp(void) {
 
 #ifdef OCAML_POP
     case OCAML_POP : {
-      TRACE("POP");
+      TRACE_INSTRUCTION("POP");
       pop_n(read_uint8());
       break;
     }
@@ -348,7 +341,7 @@ void interp(void) {
 
 #ifdef OCAML_ASSIGN
     case OCAML_ASSIGN : {
-      TRACE("ASSIGN");
+      TRACE_INSTRUCTION("ASSIGN");
       sp[read_uint8()] = acc;
       acc = Val_unit;
       break;
@@ -357,7 +350,7 @@ void interp(void) {
 
 #ifdef OCAML_ENVACC1
     case OCAML_ENVACC1 : {
-      TRACE("ENVACC1");
+      TRACE_INSTRUCTION("ENVACC1");
       acc = Field(env, 1);
       break;
     }
@@ -365,7 +358,7 @@ void interp(void) {
 
 #ifdef OCAML_ENVACC2
     case OCAML_ENVACC2 : {
-      TRACE("ENVACC2");
+      TRACE_INSTRUCTION("ENVACC2");
       acc = Field(env, 2);
       break;
     }
@@ -373,7 +366,7 @@ void interp(void) {
 
 #ifdef OCAML_ENVACC3
     case OCAML_ENVACC3 : {
-      TRACE("ENVACC3");
+      TRACE_INSTRUCTION("ENVACC3");
       acc = Field(env, 3);
       break;
     }
@@ -381,7 +374,7 @@ void interp(void) {
 
 #ifdef OCAML_ENVACC4
     case OCAML_ENVACC4 : {
-      TRACE("ENVACC4");
+      TRACE_INSTRUCTION("ENVACC4");
       acc = Field(env, 4);
       break;
     }
@@ -389,7 +382,7 @@ void interp(void) {
 
 #ifdef OCAML_ENVACC
     case OCAML_ENVACC : {
-      TRACE("ENVACC");
+      TRACE_INSTRUCTION("ENVACC");
       acc = Field(env, read_uint8());
       break;
     }
@@ -397,7 +390,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHENVACC1
     case OCAML_PUSHENVACC1 : {
-      TRACE("PUSHENVACC1");
+      TRACE_INSTRUCTION("PUSHENVACC1");
       push(acc);
       acc = Field(env, 1);
       break;
@@ -406,7 +399,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHENVACC2
     case OCAML_PUSHENVACC2 : {
-      TRACE("PUSHENVACC2");
+      TRACE_INSTRUCTION("PUSHENVACC2");
       push(acc);
       acc = Field(env, 2);
       break;
@@ -415,7 +408,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHENVACC3
     case OCAML_PUSHENVACC3 : {
-      TRACE("PUSHENVACC3");
+      TRACE_INSTRUCTION("PUSHENVACC3");
       push(acc);
       acc = Field(env, 3);
       break;
@@ -424,7 +417,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHENVACC4
     case OCAML_PUSHENVACC4 : {
-      TRACE("PUSHENVACC4");
+      TRACE_INSTRUCTION("PUSHENVACC4");
       push(acc);
       acc = Field(env, 4);
       break;
@@ -433,7 +426,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHENVACC
     case OCAML_PUSHENVACC : {
-      TRACE("PUSHENVACC");
+      TRACE_INSTRUCTION("PUSHENVACC");
       push(acc);
       acc = Field(env, read_uint8());
       break;
@@ -442,7 +435,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSH_RETADDR_1B
     case OCAML_PUSH_RETADDR_1B : {
-      TRACE("PUSHRETADDR1B");
+      TRACE_INSTRUCTION("PUSHRETADDR1B");
       push(Val_int(extra_args));
       push(env);
       push(Val_codeptr(read_ptr_1B()));
@@ -452,7 +445,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSH_RETADDR_2B
     case OCAML_PUSH_RETADDR_2B : {
-      TRACE("PUSHRETADDR2B");
+      TRACE_INSTRUCTION("PUSHRETADDR2B");
       push(Val_int(extra_args));
       push(env);
       push(Val_codeptr(read_ptr_2B()));
@@ -462,7 +455,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSH_RETADDR_4B
     case OCAML_PUSH_RETADDR_4B : {
-      TRACE("PUSHRETADDR4B");
+      TRACE_INSTRUCTION("PUSHRETADDR4B");
       push(Val_int(extra_args));
       push(env);
       push(Val_codeptr(read_ptr_4B()));
@@ -472,7 +465,7 @@ void interp(void) {
 
 #ifdef OCAML_APPLY
     case OCAML_APPLY : {
-      TRACE("APPLY");
+      TRACE_INSTRUCTION("APPLY");
       extra_args = read_uint8() - 1;
       pc = Codeptr_val(*(Block_val(acc)));
       env = acc;
@@ -482,7 +475,7 @@ void interp(void) {
 
 #ifdef OCAML_APPLY1
     case OCAML_APPLY1 : {
-      TRACE("APPLY1");
+      TRACE_INSTRUCTION("APPLY1");
       val_t arg1 = pop();
       push(Val_int(extra_args));
       push(env);
@@ -497,7 +490,7 @@ void interp(void) {
 
 #ifdef OCAML_APPLY2
     case OCAML_APPLY2 : {
-      TRACE("APPLY2");
+      TRACE_INSTRUCTION("APPLY2");
       val_t arg1 = pop();
       val_t arg2 = pop();
       push(Val_int(extra_args));
@@ -514,7 +507,7 @@ void interp(void) {
 
 #ifdef OCAML_APPLY3
     case OCAML_APPLY3 : {
-      TRACE("APPLY3");
+      TRACE_INSTRUCTION("APPLY3");
       val_t arg1 = pop();
       val_t arg2 = pop();
       val_t arg3 = pop();
@@ -533,7 +526,7 @@ void interp(void) {
 
 #ifdef OCAML_APPTERM
     case OCAML_APPTERM : {
-      TRACE("APPTERM");
+      TRACE_INSTRUCTION("APPTERM");
       uint8_t nargs = read_uint8();
       uint8_t slotsize = read_uint8();
       val_t * newsp = sp + slotsize - nargs;
@@ -550,7 +543,7 @@ void interp(void) {
 
 #ifdef OCAML_APPTERM1
     case OCAML_APPTERM1 : {
-      TRACE("APPTERM1");
+      TRACE_INSTRUCTION("APPTERM1");
       val_t arg = peek(0);
       pop_n(read_uint8());
       push(arg);
@@ -562,7 +555,7 @@ void interp(void) {
 
 #ifdef OCAML_APPTERM2
     case OCAML_APPTERM2 : {
-      TRACE("APPTERM2");
+      TRACE_INSTRUCTION("APPTERM2");
       val_t arg1 = peek(0);
       val_t arg2 = peek(1);
       pop_n(read_uint8());
@@ -577,7 +570,7 @@ void interp(void) {
 
 #ifdef OCAML_APPTERM3
     case OCAML_APPTERM3 : {
-      TRACE("APPTERM3");
+      TRACE_INSTRUCTION("APPTERM3");
       val_t arg1 = peek(0);
       val_t arg2 = peek(1);
       val_t arg3 = peek(2);
@@ -594,7 +587,7 @@ void interp(void) {
 
 #ifdef OCAML_RETURN
     case OCAML_RETURN : {
-      TRACE("RETURN");
+      TRACE_INSTRUCTION("RETURN");
       uint8_t n = read_uint8();
       pop_n(n);
       if (extra_args > 0){
@@ -613,7 +606,7 @@ void interp(void) {
 
 #ifdef OCAML_RESTART
     case OCAML_RESTART : {
-      TRACE("RESTART");
+      TRACE_INSTRUCTION("RESTART");
       uint8_t nargs = Wosize_val(env) - 2;
       uint8_t i;
       /* pop_n(nargs); */
@@ -628,7 +621,7 @@ void interp(void) {
 
 #ifdef OCAML_GRAB
     case OCAML_GRAB : {
-      TRACE("GRAB");
+      TRACE_INSTRUCTION("GRAB");
       uint8_t n = read_uint8();
       uint8_t i;
       if (extra_args >= n){
@@ -650,7 +643,7 @@ void interp(void) {
 
 #ifdef OCAML_CLOSURE_1B
     case OCAML_CLOSURE_1B : {
-      TRACE("CLOSURE1B");
+      TRACE_INSTRUCTION("CLOSURE1B");
       uint8_t n = read_uint8();
       code_t ptr = read_ptr_1B() - 1;
       uint8_t i;
@@ -668,7 +661,7 @@ void interp(void) {
 
 #ifdef OCAML_CLOSURE_2B
     case OCAML_CLOSURE_2B : {
-      TRACE("CLOSURE2B");
+      TRACE_INSTRUCTION("CLOSURE2B");
       uint8_t n = read_uint8();
       code_t ptr = read_ptr_2B() - 1;
       uint8_t i;
@@ -686,7 +679,7 @@ void interp(void) {
 
 #ifdef OCAML_CLOSURE_4B
     case OCAML_CLOSURE_4B : {
-      TRACE("CLOSURE4B");
+      TRACE_INSTRUCTION("CLOSURE4B");
       uint8_t n = read_uint8();
       code_t ptr = read_ptr_4B() - 1;
       uint8_t i;
@@ -704,7 +697,7 @@ void interp(void) {
 
 #ifdef OCAML_CLOSUREREC_1B
     case OCAML_CLOSUREREC_1B : {
-      TRACE("CLOSUREREC1B");
+      TRACE_INSTRUCTION("CLOSUREREC1B");
        /* f = number of functions */
        /* v = number of variables */
       /* o = offset   */
@@ -741,7 +734,7 @@ void interp(void) {
 
 #ifdef OCAML_CLOSUREREC_2B
     case OCAML_CLOSUREREC_2B : {
-      TRACE("CLOSUREREC2B");
+      TRACE_INSTRUCTION("CLOSUREREC2B");
       uint8_t f = read_uint8();
       uint8_t v = read_uint8();
       code_t o = read_ptr_2B() - 2;
@@ -769,7 +762,7 @@ void interp(void) {
 
 #ifdef OCAML_CLOSUREREC_4B
     case OCAML_CLOSUREREC_4B : {
-      TRACE("CLOSUREREC4B");
+      TRACE_INSTRUCTION("CLOSUREREC4B");
       uint8_t f = read_uint8();
       uint8_t v = read_uint8();
       code_t o = read_ptr_4B() - 2;
@@ -796,7 +789,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHOFFSETCLOSUREM2
     case OCAML_PUSHOFFSETCLOSUREM2 : {
-      TRACE("PUSHOFFSETCLOSUREM2");
+      TRACE_INSTRUCTION("PUSHOFFSETCLOSUREM2");
       push(acc);
       /* fallthrough */
     }
@@ -809,7 +802,7 @@ void interp(void) {
 #if defined(OCAML_PUSHOFFSETCLOSUREM2) || defined(OCAML_OFFSETCLOSUREM2)
       {
         /* value + header */
-        TRACE("OFFSETCLOSUREM2");
+        TRACE_INSTRUCTION("OFFSETCLOSUREM2");
         acc = Val_block(Block_val(env) - 2 * sizeof(val_t));
         break;
       }
@@ -817,7 +810,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHOFFSETCLOSURE0
     case OCAML_PUSHOFFSETCLOSURE0 : {
-      TRACE("PUSHOFFSETCLOSURE0");
+      TRACE_INSTRUCTION("PUSHOFFSETCLOSURE0");
       push(acc);
       /* fallthrough */
     }
@@ -829,7 +822,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHOFFSETCLOSURE0) || defined(OCAML_OFFSETCLOSURE0)
       {
-        TRACE("OFFSETCLOSURE0");
+        TRACE_INSTRUCTION("OFFSETCLOSURE0");
         acc = env;
         break;
       }
@@ -837,7 +830,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHOFFSETCLOSURE2
     case OCAML_PUSHOFFSETCLOSURE2 : {
-      TRACE("PUSHOFFSETCLOSURE2");
+      TRACE_INSTRUCTION("PUSHOFFSETCLOSURE2");
       push(acc);
       /* fallthrough */
     }
@@ -849,7 +842,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHOFFSETCLOSURE2) || defined(OCAML_OFFSETCLOSURE2)
       {
-        TRACE("OFFSETCLOSURE2");
+        TRACE_INSTRUCTION("OFFSETCLOSURE2");
         acc = Val_block(Block_val(env) + 2 * sizeof(val_t));
         break;
       }
@@ -857,7 +850,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHOFFSETCLOSURE
     case OCAML_PUSHOFFSETCLOSURE : {
-      TRACE("PUSHOFFSETCLOSURE");
+      TRACE_INSTRUCTION("PUSHOFFSETCLOSURE");
       push(acc);
       /* fallthrough */
     }
@@ -869,7 +862,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHOFFSETCLOSURE) || defined(OCAML_OFFSETCLOSURE)
       {
-        TRACE("OFFSETCLOSURE");
+        TRACE_INSTRUCTION("OFFSETCLOSURE");
         int n = read_int8();
         acc = Val_block(Block_val(env) + n * sizeof(val_t));
         break;
@@ -878,7 +871,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHGETGLOBAL_1B
     case OCAML_PUSHGETGLOBAL_1B : {
-      TRACE("PUSHGETGLOBAL1B");
+      TRACE_INSTRUCTION("PUSHGETGLOBAL1B");
       push(acc);
       /* fallthrough */
     }
@@ -890,7 +883,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHGETGLOBAL_1B) || defined(OCAML_GETGLOBAL_1B)
       {
-        TRACE("GETGLOBAL1B");
+        TRACE_INSTRUCTION("GETGLOBAL1B");
         acc = ocaml_global_data[read_uint8()];
         break;
       }
@@ -898,7 +891,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHGETGLOBAL_2B
     case OCAML_PUSHGETGLOBAL_2B : {
-      TRACE("PUSHGETGLOBAL2B");
+      TRACE_INSTRUCTION("PUSHGETGLOBAL2B");
       push(acc);
       /* fallthrough */
     }
@@ -910,7 +903,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHGETGLOBAL_2B) || defined(OCAML_GETGLOBAL_2B)
       {
-        TRACE("GETGLOBAL2B");
+        TRACE_INSTRUCTION("GETGLOBAL2B");
         acc = ocaml_global_data[read_uint16()];
         break;
       }
@@ -918,7 +911,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHGETGLOBALFIELD_1B
     case OCAML_PUSHGETGLOBALFIELD_1B : {
-      TRACE("PUSHGETGLOBALFIELD1B");
+      TRACE_INSTRUCTION("PUSHGETGLOBALFIELD1B");
       push(acc);
       /* fallthrough */
     }
@@ -930,7 +923,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHGETGLOBALFIELD_1B) || defined(OCAML_GETGLOBALFIELD_1B)
       {
-        TRACE("GETGLOBALFIELD1B");
+        TRACE_INSTRUCTION("GETGLOBALFIELD1B");
         uint8_t n = read_uint8();
         uint8_t p = read_uint8();
         acc = Field(ocaml_global_data[n], p);
@@ -940,7 +933,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHGETGLOBALFIELD_2B
     case OCAML_PUSHGETGLOBALFIELD_2B : {
-      TRACE("PUSHGETGLOBALFIELD2B");
+      TRACE_INSTRUCTION("PUSHGETGLOBALFIELD2B");
       push(acc);
       /* fallthrough */
     }
@@ -952,7 +945,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHGETGLOBALFIELD_2B) || defined(OCAML_GETGLOBALFIELD_2B)
       {
-        TRACE("GETGLOBALFIELD2B");
+        TRACE_INSTRUCTION("GETGLOBALFIELD2B");
         uint16_t n = read_uint16();
         uint8_t p = read_uint8();
         acc = Field(ocaml_global_data[n], p);
@@ -962,7 +955,7 @@ void interp(void) {
 
 #ifdef OCAML_SETGLOBAL_1B
     case OCAML_SETGLOBAL_1B : {
-      TRACE("SETGLOBAL1B");
+      TRACE_INSTRUCTION("SETGLOBAL1B");
       ocaml_global_data[read_uint8()] = acc;
       acc = Val_unit;
       break;
@@ -971,7 +964,7 @@ void interp(void) {
 
 #ifdef OCAML_SETGLOBAL_2B
     case OCAML_SETGLOBAL_2B : {
-      TRACE("SETGLOBAL2B");
+      TRACE_INSTRUCTION("SETGLOBAL2B");
       ocaml_global_data[read_uint16()] = acc;
       acc = Val_unit;
       break;
@@ -980,7 +973,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHATOM0
     case OCAML_PUSHATOM0 : {
-      TRACE("PUSHATOM0");
+      TRACE_INSTRUCTION("PUSHATOM0");
       push(acc);
       /* fallthrough */
     }
@@ -992,7 +985,7 @@ void interp(void) {
 
 #if defined(OCAML_PUSHATOM0) || defined(OCAML_ATOM0)
       {
-        TRACE("ATOM0");
+        TRACE_INSTRUCTION("ATOM0");
         acc = Val_block(&((&atom0_header)[1]));
         break;
       }
@@ -1000,7 +993,7 @@ void interp(void) {
 
 #ifdef OCAML_MAKEBLOCK_1B
     case OCAML_MAKEBLOCK_1B : {
-      TRACE("MAKEBLOCK1B");
+      TRACE_INSTRUCTION("MAKEBLOCK1B");
       tag_t tag = read_uint8();
       uint8_t size = read_uint8();
       val_t block;
@@ -1014,7 +1007,7 @@ void interp(void) {
 
 #ifdef OCAML_MAKEBLOCK_2B
     case OCAML_MAKEBLOCK_2B : {
-      TRACE("MAKEBLOCK2B");
+      TRACE_INSTRUCTION("MAKEBLOCK2B");
       tag_t tag = read_uint8();
       uint16_t size = read_uint16();
       val_t block;
@@ -1028,7 +1021,7 @@ void interp(void) {
 
 #ifdef OCAML_MAKEBLOCK1
     case OCAML_MAKEBLOCK1 : {
-      TRACE("MAKEBLOCK1");
+      TRACE_INSTRUCTION("MAKEBLOCK1");
       tag_t tag = read_uint8();
       val_t block;
       OCamlAlloc(block, 1, tag);
@@ -1040,7 +1033,7 @@ void interp(void) {
 
 #ifdef OCAML_MAKEBLOCK2
     case OCAML_MAKEBLOCK2 : {
-      TRACE("MAKEBLOCK2");
+      TRACE_INSTRUCTION("MAKEBLOCK2");
       tag_t tag = read_uint8();
       val_t block;
       OCamlAlloc(block, 2, tag);
@@ -1053,7 +1046,7 @@ void interp(void) {
 
 #ifdef OCAML_MAKEBLOCK3
     case OCAML_MAKEBLOCK3 : {
-      TRACE("MAKEBLOCK3");
+      TRACE_INSTRUCTION("MAKEBLOCK3");
       tag_t tag = read_uint8();
       val_t block;
       OCamlAlloc(block, 3, tag);
@@ -1067,7 +1060,7 @@ void interp(void) {
 
 #ifdef OCAML_GETFIELD0
     case OCAML_GETFIELD0 : {
-      TRACE("GETFIELD0");
+      TRACE_INSTRUCTION("GETFIELD0");
       acc = Field(acc, 0);
       break;
     }
@@ -1075,7 +1068,7 @@ void interp(void) {
 
 #ifdef OCAML_GETFIELD1
     case OCAML_GETFIELD1 : {
-      TRACE("GETFIELD1");
+      TRACE_INSTRUCTION("GETFIELD1");
       acc = Field(acc, 1);
       break;
     }
@@ -1083,7 +1076,7 @@ void interp(void) {
 
 #ifdef OCAML_GETFIELD2
     case OCAML_GETFIELD2 : {
-      TRACE("GETFIELD2");
+      TRACE_INSTRUCTION("GETFIELD2");
       acc = Field(acc, 2);
       break;
     }
@@ -1091,7 +1084,7 @@ void interp(void) {
 
 #ifdef OCAML_GETFIELD3
     case OCAML_GETFIELD3 : {
-      TRACE("GETFIELD3");
+      TRACE_INSTRUCTION("GETFIELD3");
       acc = Field(acc, 3);
       break;
     }
@@ -1099,7 +1092,7 @@ void interp(void) {
 
 #ifdef OCAML_GETFIELD
     case OCAML_GETFIELD : {
-      TRACE("GETFIELD");
+      TRACE_INSTRUCTION("GETFIELD");
       acc = Field(acc, read_uint8());
       break;
     }
@@ -1107,7 +1100,7 @@ void interp(void) {
 
 #ifdef OCAML_SETFIELD0
     case OCAML_SETFIELD0 : {
-      TRACE("SETFIELD0");
+      TRACE_INSTRUCTION("SETFIELD0");
       Field(acc, 0) = pop();
       acc = Val_unit;
       break;
@@ -1116,7 +1109,7 @@ void interp(void) {
 
 #ifdef OCAML_SETFIELD1
     case OCAML_SETFIELD1 : {
-      TRACE("SETFIELD1");
+      TRACE_INSTRUCTION("SETFIELD1");
       Field(acc, 1) = pop();
       acc = Val_unit;
       break;
@@ -1125,7 +1118,7 @@ void interp(void) {
 
 #ifdef OCAML_SETFIELD2
     case OCAML_SETFIELD2 : {
-      TRACE("SETFIELD2");
+      TRACE_INSTRUCTION("SETFIELD2");
       Field(acc, 2) = pop();
       acc = Val_unit;
       break;
@@ -1134,7 +1127,7 @@ void interp(void) {
 
 #ifdef OCAML_SETFIELD3
     case OCAML_SETFIELD3 : {
-      TRACE("SETFIELD3");
+      TRACE_INSTRUCTION("SETFIELD3");
       Field(acc, 3) = pop();
       acc = Val_unit;
       break;
@@ -1143,7 +1136,7 @@ void interp(void) {
 
 #ifdef OCAML_SETFIELD
     case OCAML_SETFIELD : {
-      TRACE("SETFIELD");
+      TRACE_INSTRUCTION("SETFIELD");
       Field(acc, read_uint8()) = pop();
       acc = Val_unit;
       break;
@@ -1152,7 +1145,7 @@ void interp(void) {
 
 #ifdef OCAML_VECTLENGTH
     case OCAML_VECTLENGTH : {
-      TRACE("VECTLENGTH");
+      TRACE_INSTRUCTION("VECTLENGTH");
       acc = Val_int(Wosize_val(acc));
       break;
     }
@@ -1160,7 +1153,7 @@ void interp(void) {
 
 #ifdef OCAML_GETVECTITEM
     case OCAML_GETVECTITEM : {
-      TRACE("GETVECTITEM");
+      TRACE_INSTRUCTION("GETVECTITEM");
       acc = Field(acc, Int_val(pop()));
       break;
     }
@@ -1168,7 +1161,7 @@ void interp(void) {
 
 #ifdef OCAML_SETVECTITEM
     case OCAML_SETVECTITEM : {
-      TRACE("SETVECTITEM");
+      TRACE_INSTRUCTION("SETVECTITEM");
       val_t ind = pop();
       val_t val = pop();
       Field(acc, Int_val(ind)) = val;
@@ -1179,7 +1172,7 @@ void interp(void) {
 
 #ifdef OCAML_GETSTRINGCHAR
     case OCAML_GETSTRINGCHAR : {
-      TRACE("GETSTRINGCHAR");
+      TRACE_INSTRUCTION("GETSTRINGCHAR");
       acc = Val_int(StringField(acc, Int_val(pop())));
       break;
     }
@@ -1187,7 +1180,7 @@ void interp(void) {
 
 #ifdef OCAML_SETSTRINGCHAR
     case OCAML_SETSTRINGCHAR : {
-      TRACE("SETSTRINGCHAR");
+      TRACE_INSTRUCTION("SETSTRINGCHAR");
       val_t ind = pop();
       val_t val = pop();
       StringField(acc, Int_val(ind)) = Int_val(val);
@@ -1198,7 +1191,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCH_1B
     case OCAML_BRANCH_1B : {
-      TRACE("BRANCH1B");
+      TRACE_INSTRUCTION("BRANCH1B");
       pc = read_ptr_1B();
       break;
     }
@@ -1206,7 +1199,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCH_2B
     case OCAML_BRANCH_2B : {
-      TRACE("BRANCH2B");
+      TRACE_INSTRUCTION("BRANCH2B");
       pc = read_ptr_2B();
       break;
     }
@@ -1214,7 +1207,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCH_4B
     case OCAML_BRANCH_4B : {
-      TRACE("BRANCH4B");
+      TRACE_INSTRUCTION("BRANCH4B");
       pc = read_ptr_4B();
       break;
     }
@@ -1222,7 +1215,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCHIF_1B
     case OCAML_BRANCHIF_1B : {
-      TRACE("BRANCHIF1B");
+      TRACE_INSTRUCTION("BRANCHIF1B");
       if (acc != Val_false) {
         pc = read_ptr_1B();
       } else {
@@ -1234,7 +1227,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCHIF_2B
     case OCAML_BRANCHIF_2B : {
-      TRACE("BRANCHIF2B");
+      TRACE_INSTRUCTION("BRANCHIF2B");
       if (acc != Val_false) {
         pc = read_ptr_2B();
       } else {
@@ -1246,7 +1239,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCHIF_4B
     case OCAML_BRANCHIF_4B : {
-      TRACE("BRANCHIF4B");
+      TRACE_INSTRUCTION("BRANCHIF4B");
       if (acc != Val_false) {
         pc = read_ptr_4B();
       } else {
@@ -1258,7 +1251,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCHIFNOT_1B
     case OCAML_BRANCHIFNOT_1B : {
-      TRACE("BRANCHIFNOT1B");
+      TRACE_INSTRUCTION("BRANCHIFNOT1B");
       if (acc == Val_false){
         pc = read_ptr_1B();
       } else {
@@ -1270,7 +1263,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCHIFNOT_2B
     case OCAML_BRANCHIFNOT_2B : {
-      TRACE("BRANCHIFNOT2B");
+      TRACE_INSTRUCTION("BRANCHIFNOT2B");
       if (acc == Val_false){
         pc = read_ptr_2B();
       } else {
@@ -1282,7 +1275,7 @@ void interp(void) {
 
 #ifdef OCAML_BRANCHIFNOT_4B
     case OCAML_BRANCHIFNOT_4B : {
-      TRACE("BRANCHIFNOT4B");
+      TRACE_INSTRUCTION("BRANCHIFNOT4B");
       if (acc == Val_false){
         pc = read_ptr_4B();
       } else {
@@ -1294,7 +1287,7 @@ void interp(void) {
 
 #ifdef OCAML_SWITCH_1B
     case OCAML_SWITCH_1B : {
-      TRACE("SWITCH1B");
+      TRACE_INSTRUCTION("SWITCH1B");
       if (Is_int(acc)){
         uint8_t ofs = Int_val(acc) + 2;
         pc += ofs;
@@ -1312,7 +1305,7 @@ void interp(void) {
 
 #ifdef OCAML_SWITCH_2B
     case OCAML_SWITCH_2B : {
-      TRACE("SWITCH2B");
+      TRACE_INSTRUCTION("SWITCH2B");
       if (Is_int(acc)){
         uint8_t ofs = 2 * Int_val(acc) + 2;
         pc += ofs;
@@ -1330,7 +1323,7 @@ void interp(void) {
 
 #ifdef OCAML_SWITCH_4B
     case OCAML_SWITCH_4B : {
-      TRACE("SWITCH4B");
+      TRACE_INSTRUCTION("SWITCH4B");
       if (Is_int(acc)){
         uint8_t ofs = 4 * Int_val(acc) + 2;
         pc += ofs;
@@ -1348,7 +1341,7 @@ void interp(void) {
 
 #ifdef OCAML_BOOLNOT
     case OCAML_BOOLNOT : {
-      TRACE("BOOLNOT");
+      TRACE_INSTRUCTION("BOOLNOT");
       acc = acc ^ 2;
       break;
     }
@@ -1356,7 +1349,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHTRAP_1B
     case OCAML_PUSHTRAP_1B : {
-      TRACE("PUSHTRAP1B");
+      TRACE_INSTRUCTION("PUSHTRAP1B");
       push(Val_int(extra_args));
       push(env);
       push(trapSp);
@@ -1368,7 +1361,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHTRAP_2B
     case OCAML_PUSHTRAP_2B : {
-      TRACE("PUSHTRAP2B");
+      TRACE_INSTRUCTION("PUSHTRAP2B");
       push(Val_int(extra_args));
       push(env);
       push(trapSp);
@@ -1380,7 +1373,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHTRAP_4B
     case OCAML_PUSHTRAP_4B : {
-      TRACE("PUSHTRAP4B");
+      TRACE_INSTRUCTION("PUSHTRAP4B");
       push(Val_int(extra_args));
       push(env);
       push(trapSp);
@@ -1392,7 +1385,7 @@ void interp(void) {
 
 #ifdef OCAML_POPTRAP
     case OCAML_POPTRAP : {
-      TRACE("POPTRAP");
+      TRACE_INSTRUCTION("POPTRAP");
       pop();
       trapSp = pop();
       pop();
@@ -1406,7 +1399,7 @@ void interp(void) {
 #endif
     {
       ocaml_raise:
-      TRACE("RAISE");
+      TRACE_INSTRUCTION("RAISE");
       if (trapSp == Val_int(-1)) {
 #if defined (__PC__)
         printf("Error: uncatched exception: %s\n",
@@ -1434,7 +1427,7 @@ void interp(void) {
 
 #ifdef OCAML_CHECK_SIGNALS
     case OCAML_CHECK_SIGNALS : {
-      TRACE("CHECK_SIGNALS");
+      TRACE_INSTRUCTION("CHECK_SIGNALS");
       /* TODO */
       break;
     }
@@ -1442,7 +1435,7 @@ void interp(void) {
 
 #ifdef OCAML_C_CALL1
     case OCAML_C_CALL1 : {
-      TRACE("CCALL1");
+      TRACE_INSTRUCTION("CCALL1");
       acc = ((val_t (*)(val_t)) (get_primitive(read_uint8())))(acc);
       break;
     }
@@ -1450,7 +1443,7 @@ void interp(void) {
 
 #ifdef OCAML_C_CALL2
     case OCAML_C_CALL2 : {
-      TRACE("CCALL2");
+      TRACE_INSTRUCTION("CCALL2");
       acc = ((val_t (*)(val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0]);
       pop();
       break;
@@ -1459,7 +1452,7 @@ void interp(void) {
 
 #ifdef OCAML_C_CALL3
     case OCAML_C_CALL3 : {
-      TRACE("CCALL3");
+      TRACE_INSTRUCTION("CCALL3");
       acc = ((val_t (*)(val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0], sp[1]);
       pop();
       pop();
@@ -1469,7 +1462,7 @@ void interp(void) {
 
 #ifdef OCAML_C_CALL4
     case OCAML_C_CALL4 : {
-      TRACE("CCALL4");
+      TRACE_INSTRUCTION("CCALL4");
       acc = ((val_t (*)(val_t, val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0], sp[1], sp[2]);
       pop();
       pop();
@@ -1480,7 +1473,7 @@ void interp(void) {
 
 #ifdef OCAML_C_CALL5
     case OCAML_C_CALL5 : {
-      TRACE("CCALL5");
+      TRACE_INSTRUCTION("CCALL5");
       acc = ((val_t (*)(val_t, val_t, val_t, val_t, val_t)) (get_primitive(read_uint8())))(acc, sp[0], sp[1], sp[2], sp[3]);
       pop();
       pop();
@@ -1492,7 +1485,7 @@ void interp(void) {
 
 #ifdef OCAML_C_CALLN
     case OCAML_C_CALLN : {
-      TRACE("CCALLN");
+      TRACE_INSTRUCTION("CCALLN");
       uint8_t narg = read_uint8();
       uint8_t prim = read_uint8();
       push(acc);
@@ -1504,7 +1497,7 @@ void interp(void) {
 
 #ifdef OCAML_CONST0
     case OCAML_CONST0 : {
-      TRACE("CONST0");
+      TRACE_INSTRUCTION("CONST0");
       acc = Val_int(0);
       break;
     }
@@ -1512,7 +1505,7 @@ void interp(void) {
 
 #ifdef OCAML_CONST1
     case OCAML_CONST1 : {
-      TRACE("CONST1");
+      TRACE_INSTRUCTION("CONST1");
       acc = Val_int(1);
       break;
     }
@@ -1520,7 +1513,7 @@ void interp(void) {
 
 #ifdef OCAML_CONST2
     case OCAML_CONST2 : {
-      TRACE("CONST2");
+      TRACE_INSTRUCTION("CONST2");
       acc = Val_int(2);
       break;
     }
@@ -1528,7 +1521,7 @@ void interp(void) {
 
 #ifdef OCAML_CONST3
     case OCAML_CONST3 : {
-      TRACE("CONST3");
+      TRACE_INSTRUCTION("CONST3");
       acc = Val_int(3);
       break;
     }
@@ -1536,7 +1529,7 @@ void interp(void) {
 
 #ifdef OCAML_CONSTINT_1B
     case OCAML_CONSTINT_1B : {
-      TRACE("CONSTINT1B");
+      TRACE_INSTRUCTION("CONSTINT1B");
       acc = Val_int(read_int8());
       break;
     }
@@ -1544,7 +1537,7 @@ void interp(void) {
 
 #ifdef OCAML_CONSTINT_2B
     case OCAML_CONSTINT_2B : {
-      TRACE("CONSTINT2B");
+      TRACE_INSTRUCTION("CONSTINT2B");
       acc = Val_int(read_int16());
       break;
     }
@@ -1552,7 +1545,7 @@ void interp(void) {
 
 #ifdef OCAML_CONSTINT_4B
     case OCAML_CONSTINT_4B : {
-      TRACE("CONSTINT4B");
+      TRACE_INSTRUCTION("CONSTINT4B");
       acc = Val_int(read_int32());
       break;
     }
@@ -1560,7 +1553,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHCONST0
     case OCAML_PUSHCONST0 : {
-      TRACE("PUSHCONST0");
+      TRACE_INSTRUCTION("PUSHCONST0");
       push(acc);
       acc = Val_int(0);
       break;
@@ -1569,7 +1562,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHCONST1
     case OCAML_PUSHCONST1 : {
-      TRACE("PUSHCONST1");
+      TRACE_INSTRUCTION("PUSHCONST1");
       push(acc);
       acc = Val_int(1);
       break;
@@ -1578,7 +1571,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHCONST2
     case OCAML_PUSHCONST2 : {
-      TRACE("PUSHCONST2");
+      TRACE_INSTRUCTION("PUSHCONST2");
       push(acc);
       acc = Val_int(2);
       break;
@@ -1587,7 +1580,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHCONST3
     case OCAML_PUSHCONST3 : {
-      TRACE("PUSHCONST3");
+      TRACE_INSTRUCTION("PUSHCONST3");
       push(acc);
       acc = Val_int(3);
       break;
@@ -1596,7 +1589,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHCONSTINT_1B
     case OCAML_PUSHCONSTINT_1B : {
-      TRACE("PUSHCONSTINT1B");
+      TRACE_INSTRUCTION("PUSHCONSTINT1B");
       push(acc);
       acc = Val_int(read_int8());
       break;
@@ -1605,7 +1598,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHCONSTINT_2B
     case OCAML_PUSHCONSTINT_2B : {
-      TRACE("PUSHCONSTINT2B");
+      TRACE_INSTRUCTION("PUSHCONSTINT2B");
       push(acc);
       acc = Val_int(read_int16());
       break;
@@ -1614,7 +1607,7 @@ void interp(void) {
 
 #ifdef OCAML_PUSHCONSTINT_4B
     case OCAML_PUSHCONSTINT_4B : {
-      TRACE("PUSHCONSTINT4B");
+      TRACE_INSTRUCTION("PUSHCONSTINT4B");
       push(acc);
       acc = Val_int(read_int32());
       break;
@@ -1623,7 +1616,7 @@ void interp(void) {
 
 #ifdef OCAML_NEGINT
     case OCAML_NEGINT : {
-      TRACE("NEGINT");
+      TRACE_INSTRUCTION("NEGINT");
       acc = Val_int(- Int_val(acc));
       break;
     }
@@ -1631,7 +1624,7 @@ void interp(void) {
 
 #ifdef OCAML_ADDINT
     case OCAML_ADDINT : {
-      TRACE("ADDINT");
+      TRACE_INSTRUCTION("ADDINT");
       acc = Val_int((Int_val(acc) + Int_val(pop())));
       break;
     }
@@ -1639,7 +1632,7 @@ void interp(void) {
 
 #ifdef OCAML_SUBINT
     case OCAML_SUBINT : {
-      TRACE("SUBINT");
+      TRACE_INSTRUCTION("SUBINT");
       acc = Val_int((Int_val(acc) - Int_val(pop())));
       break;
     }
@@ -1647,7 +1640,7 @@ void interp(void) {
 
 #ifdef OCAML_MULINT
     case OCAML_MULINT : {
-      TRACE("MULINT");
+      TRACE_INSTRUCTION("MULINT");
       acc = Val_int((Int_val(acc) * Int_val(pop())));
       break;
     }
@@ -1655,7 +1648,7 @@ void interp(void) {
 
 #ifdef OCAML_DIVINT
     case OCAML_DIVINT : {
-      TRACE("DIVINT");
+      TRACE_INSTRUCTION("DIVINT");
       int32_t divisor = Int_val(pop());
       if (divisor == 0){
         caml_raise_division_by_zero();
@@ -1667,7 +1660,7 @@ void interp(void) {
 
 #ifdef OCAML_MODINT
     case OCAML_MODINT : {
-      TRACE("MODINT");
+      TRACE_INSTRUCTION("MODINT");
       int32_t divisor = Int_val(pop());
       if (divisor == 0){
         caml_raise_division_by_zero();
@@ -1679,7 +1672,7 @@ void interp(void) {
 
 #ifdef OCAML_ANDINT
     case OCAML_ANDINT : {
-      TRACE("ANDINT");
+      TRACE_INSTRUCTION("ANDINT");
       acc = Val_int((Int_val(acc) & Int_val(pop())));
       break;
     }
@@ -1687,7 +1680,7 @@ void interp(void) {
 
 #ifdef OCAML_ORINT
     case OCAML_ORINT : {
-      TRACE("ORINT");
+      TRACE_INSTRUCTION("ORINT");
       acc = Val_int((Int_val(acc) | Int_val(pop())));
       break;
     }
@@ -1695,7 +1688,7 @@ void interp(void) {
 
 #ifdef OCAML_XORINT
     case OCAML_XORINT : {
-      TRACE("XORINT");
+      TRACE_INSTRUCTION("XORINT");
       acc = Val_int(Int_val(acc) ^ Int_val(pop()));
       break;
     }
@@ -1703,7 +1696,7 @@ void interp(void) {
 
 #ifdef OCAML_LSLINT
     case OCAML_LSLINT : {
-      TRACE("LSLINT");
+      TRACE_INSTRUCTION("LSLINT");
       acc = Val_int(Int_val(acc) << Int_val(pop()));
       break;
     }
@@ -1711,7 +1704,7 @@ void interp(void) {
 
 #ifdef OCAML_LSRINT
     case OCAML_LSRINT : {
-      TRACE("LSRINT");
+      TRACE_INSTRUCTION("LSRINT");
       acc = Val_int((uval_t)(Int_val(acc)) >> Int_val(pop()));
       break;
     }
@@ -1719,7 +1712,7 @@ void interp(void) {
 
 #ifdef OCAML_ASRINT
     case OCAML_ASRINT : {
-      TRACE("ASRINT");
+      TRACE_INSTRUCTION("ASRINT");
       acc = Val_int(Int_val(acc) >> Int_val(pop()));
       break;
     }
@@ -1727,7 +1720,7 @@ void interp(void) {
 
 #ifdef OCAML_EQ
     case OCAML_EQ : {
-      TRACE("EQ");
+      TRACE_INSTRUCTION("EQ");
       acc = (acc == pop()) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1735,7 +1728,7 @@ void interp(void) {
 
 #ifdef OCAML_NEQ
     case OCAML_NEQ : {
-      TRACE("NEQ");
+      TRACE_INSTRUCTION("NEQ");
       acc = (acc == pop()) ? Val_int(0) : Val_int(1);
       break;
     }
@@ -1743,7 +1736,7 @@ void interp(void) {
 
 #ifdef OCAML_LTINT
     case OCAML_LTINT : {
-      TRACE("LTINT");
+      TRACE_INSTRUCTION("LTINT");
       acc = (acc < pop()) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1751,7 +1744,7 @@ void interp(void) {
 
 #ifdef OCAML_LEINT
     case OCAML_LEINT : {
-      TRACE("LEINT");
+      TRACE_INSTRUCTION("LEINT");
       acc = (acc <= pop()) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1759,7 +1752,7 @@ void interp(void) {
 
 #ifdef OCAML_GTINT
     case OCAML_GTINT : {
-      TRACE("GTINT");
+      TRACE_INSTRUCTION("GTINT");
       acc = (acc > pop()) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1767,7 +1760,7 @@ void interp(void) {
 
 #ifdef OCAML_GEINT
     case OCAML_GEINT : {
-      TRACE("GEINT");
+      TRACE_INSTRUCTION("GEINT");
       acc = (acc >= pop()) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1775,7 +1768,7 @@ void interp(void) {
 
 #ifdef OCAML_ULTINT
     case OCAML_ULTINT : {
-      TRACE("ULTINT");
+      TRACE_INSTRUCTION("ULTINT");
       acc = ((uval_t) acc < (uval_t) pop()) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1783,7 +1776,7 @@ void interp(void) {
 
 #ifdef OCAML_UGEINT
     case OCAML_UGEINT : {
-      TRACE("UGEINT");
+      TRACE_INSTRUCTION("UGEINT");
       acc = ((uval_t) acc >= (uval_t) pop()) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1791,7 +1784,7 @@ void interp(void) {
 
 #ifdef OCAML_OFFSETINT_1B
     case OCAML_OFFSETINT_1B : {
-      TRACE("OFFSETINT_1B");
+      TRACE_INSTRUCTION("OFFSETINT_1B");
       acc = Val_int(Int_val(acc) + read_int8());
       break;
     }
@@ -1799,7 +1792,7 @@ void interp(void) {
 
 #ifdef OCAML_OFFSETINT_2B
     case OCAML_OFFSETINT_2B : {
-      TRACE("OFFSETINT_2B");
+      TRACE_INSTRUCTION("OFFSETINT_2B");
       acc = Val_int(Int_val(acc) + read_int16());
       break;
     }
@@ -1807,7 +1800,7 @@ void interp(void) {
 
 #ifdef OCAML_OFFSETINT_4B
     case OCAML_OFFSETINT_4B : {
-      TRACE("OFFSETINT_4B");
+      TRACE_INSTRUCTION("OFFSETINT_4B");
       acc = Val_int(Int_val(acc) + read_int32());
       break;
     }
@@ -1815,7 +1808,7 @@ void interp(void) {
 
 #ifdef OCAML_OFFSETREF_1B
     case OCAML_OFFSETREF_1B : {
-      TRACE("OFFSETREF_1B");
+      TRACE_INSTRUCTION("OFFSETREF_1B");
       Field(acc, 0) = Val_int(Int_val(Field(acc, 0)) + read_int8());
       acc = Val_unit;
       break;
@@ -1824,7 +1817,7 @@ void interp(void) {
 
 #ifdef OCAML_OFFSETREF_2B
     case OCAML_OFFSETREF_2B : {
-      TRACE("OFFSETREF_2B");
+      TRACE_INSTRUCTION("OFFSETREF_2B");
       Field(acc, 0) = Val_int(Int_val(Field(acc, 0)) + read_int16());
       acc = Val_unit;
       break;
@@ -1833,7 +1826,7 @@ void interp(void) {
 
 #ifdef OCAML_OFFSETREF_4B
     case OCAML_OFFSETREF_4B : {
-      TRACE("OFFSETREF_4B");
+      TRACE_INSTRUCTION("OFFSETREF_4B");
       Field(acc, 0) = Val_int(Int_val(Field(acc, 0)) + read_int32());
       acc = Val_unit;
       break;
@@ -1842,7 +1835,7 @@ void interp(void) {
 
 #ifdef OCAML_ISINT
     case OCAML_ISINT : {
-      TRACE("ISINT");
+      TRACE_INSTRUCTION("ISINT");
       acc = Is_int(acc) ? Val_int(1) : Val_int(0);
       break;
     }
@@ -1850,7 +1843,7 @@ void interp(void) {
 
 #ifdef OCAML_GETMETHOD
     case OCAML_GETMETHOD : {
-      TRACE("GETMETHOD");
+      TRACE_INSTRUCTION("GETMETHOD");
       val_t x = peek(0);
       val_t y = Field(x, 0);
       acc = Field(y, Int_val(acc));
@@ -1860,7 +1853,7 @@ void interp(void) {
 
 #ifdef OCAML_BEQ_1B
     case OCAML_BEQ_1B : {
-      TRACE("BEQ_1B");
+      TRACE_INSTRUCTION("BEQ_1B");
       if (Val_int(read_int8()) == acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -1872,7 +1865,7 @@ void interp(void) {
 
 #ifdef OCAML_BEQ_2B
     case OCAML_BEQ_2B : {
-      TRACE("BEQ_2B");
+      TRACE_INSTRUCTION("BEQ_2B");
       if (Val_int(read_int16()) == acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -1884,7 +1877,7 @@ void interp(void) {
 
 #ifdef OCAML_BEQ_4B
     case OCAML_BEQ_4B : {
-      TRACE("BEQ_4B");
+      TRACE_INSTRUCTION("BEQ_4B");
       if (Val_int(read_int32()) == acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -1896,7 +1889,7 @@ void interp(void) {
 
 #ifdef OCAML_BNEQ_1B
     case OCAML_BNEQ_1B : {
-      TRACE("BNEQ_1B");
+      TRACE_INSTRUCTION("BNEQ_1B");
       if (Val_int(read_int8()) != acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -1908,7 +1901,7 @@ void interp(void) {
 
 #ifdef OCAML_BNEQ_2B
     case OCAML_BNEQ_2B : {
-      TRACE("BNEQ_2B");
+      TRACE_INSTRUCTION("BNEQ_2B");
       if (Val_int(read_int16()) != acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -1920,7 +1913,7 @@ void interp(void) {
 
 #ifdef OCAML_BNEQ_4B
     case OCAML_BNEQ_4B : {
-      TRACE("BNEQ_4B");
+      TRACE_INSTRUCTION("BNEQ_4B");
       if (Val_int(read_int32()) != acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -1932,7 +1925,7 @@ void interp(void) {
 
 #ifdef OCAML_BLTINT_1B
     case OCAML_BLTINT_1B : {
-      TRACE("BLTINT_1B");
+      TRACE_INSTRUCTION("BLTINT_1B");
       if (Val_int(read_int8()) < acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -1944,7 +1937,7 @@ void interp(void) {
 
 #ifdef OCAML_BLTINT_2B
     case OCAML_BLTINT_2B : {
-      TRACE("BLTINT_2B");
+      TRACE_INSTRUCTION("BLTINT_2B");
       if (Val_int(read_int16()) < acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -1956,7 +1949,7 @@ void interp(void) {
 
 #ifdef OCAML_BLTINT_4B
     case OCAML_BLTINT_4B : {
-      TRACE("BLTINT_4B");
+      TRACE_INSTRUCTION("BLTINT_4B");
       if (Val_int(read_int32()) < acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -1968,7 +1961,7 @@ void interp(void) {
 
 #ifdef OCAML_BLEINT_1B
     case OCAML_BLEINT_1B : {
-      TRACE("BLEINT_1B");
+      TRACE_INSTRUCTION("BLEINT_1B");
       if (Val_int(read_int8()) <= acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -1980,7 +1973,7 @@ void interp(void) {
 
 #ifdef OCAML_BLEINT_2B
     case OCAML_BLEINT_2B : {
-      TRACE("BLEINT_2B");
+      TRACE_INSTRUCTION("BLEINT_2B");
       if (Val_int(read_int16()) <= acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -1992,7 +1985,7 @@ void interp(void) {
 
 #ifdef OCAML_BLEINT_4B
     case OCAML_BLEINT_4B : {
-      TRACE("BLEINT_4B");
+      TRACE_INSTRUCTION("BLEINT_4B");
       if (Val_int(read_int32()) <= acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -2004,7 +1997,7 @@ void interp(void) {
 
 #ifdef OCAML_BGTINT_1B
     case OCAML_BGTINT_1B : {
-      TRACE("BGTINT_1B");
+      TRACE_INSTRUCTION("BGTINT_1B");
       if (Val_int(read_int8()) > acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -2016,7 +2009,7 @@ void interp(void) {
 
 #ifdef OCAML_BGTINT_2B
     case OCAML_BGTINT_2B : {
-      TRACE("BGTINT_2B");
+      TRACE_INSTRUCTION("BGTINT_2B");
       if (Val_int(read_int16()) > acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -2028,7 +2021,7 @@ void interp(void) {
 
 #ifdef OCAML_BGTINT_4B
     case OCAML_BGTINT_4B : {
-      TRACE("BGTINT_4B");
+      TRACE_INSTRUCTION("BGTINT_4B");
       if (Val_int(read_int32()) > acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -2040,7 +2033,7 @@ void interp(void) {
 
 #ifdef OCAML_BGEINT_1B
     case OCAML_BGEINT_1B : {
-      TRACE("BGEINT_1B");
+      TRACE_INSTRUCTION("BGEINT_1B");
       if (Val_int(read_int8()) >= acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -2052,7 +2045,7 @@ void interp(void) {
 
 #ifdef OCAML_BGEINT_2B
     case OCAML_BGEINT_2B : {
-      TRACE("BGEINT_2B");
+      TRACE_INSTRUCTION("BGEINT_2B");
       if (Val_int(read_int16()) >= acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -2064,7 +2057,7 @@ void interp(void) {
 
 #ifdef OCAML_BGEINT_4B
     case OCAML_BGEINT_4B : {
-      TRACE("BGEINT_4B");
+      TRACE_INSTRUCTION("BGEINT_4B");
       if (Val_int(read_int32()) >= acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -2076,7 +2069,7 @@ void interp(void) {
 
 #ifdef OCAML_BULTINT_1B
     case OCAML_BULTINT_1B : {
-      TRACE("BULTINT_1B");
+      TRACE_INSTRUCTION("BULTINT_1B");
       if ((uval_t) Val_int(read_int8()) < (uval_t) acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -2088,7 +2081,7 @@ void interp(void) {
 
 #ifdef OCAML_BULTINT_2B
     case OCAML_BULTINT_2B : {
-      TRACE("BULTINT_2B");
+      TRACE_INSTRUCTION("BULTINT_2B");
       if ((uval_t) Val_int(read_int16()) < (uval_t) acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -2100,7 +2093,7 @@ void interp(void) {
 
 #ifdef OCAML_BULTINT_4B
     case OCAML_BULTINT_4B : {
-      TRACE("BULTINT_4B");
+      TRACE_INSTRUCTION("BULTINT_4B");
       if ((uval_t) Val_int(read_int32()) < (uval_t) acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -2112,7 +2105,7 @@ void interp(void) {
 
 #ifdef OCAML_BUGEINT_1B
     case OCAML_BUGEINT_1B : {
-      TRACE("BUGEINT_1B");
+      TRACE_INSTRUCTION("BUGEINT_1B");
       if ((uval_t) Val_int(read_int8()) >= (uval_t) acc) {
         pc = read_ptr_1B() - 1;
       } else {
@@ -2124,7 +2117,7 @@ void interp(void) {
 
 #ifdef OCAML_BUGEINT_2B
     case OCAML_BUGEINT_2B : {
-      TRACE("BUGEINT_2B");
+      TRACE_INSTRUCTION("BUGEINT_2B");
       if ((uval_t) Val_int(read_int16()) >= (uval_t) acc) {
         pc = read_ptr_2B() - 2;
       } else {
@@ -2136,7 +2129,7 @@ void interp(void) {
 
 #ifdef OCAML_BUGEINT_4B
     case OCAML_BUGEINT_4B : {
-      TRACE("BUGEINT_4B");
+      TRACE_INSTRUCTION("BUGEINT_4B");
       if ((uval_t) Val_int(read_int32()) >= (uval_t) acc) {
         pc = read_ptr_4B() - 4;
       } else {
@@ -2148,7 +2141,7 @@ void interp(void) {
 
 #ifdef OCAML_GETPUBMET
     case OCAML_GETPUBMET : {
-      TRACE("GETPUBMET");
+      TRACE_INSTRUCTION("GETPUBMET");
       push(acc);
       acc = Val_int(read_uint32());
       /* fallthrough */
@@ -2157,7 +2150,7 @@ void interp(void) {
 
 #ifdef OCAML_GETDYNMET
     case OCAML_GETDYNMET :
-      TRACE("GETDYNMET");
+      TRACE_INSTRUCTION("GETDYNMET");
 #endif
 
 #if defined(OCAML_GETPUBMET) || defined(OCAML_GETDYNMET)
@@ -2176,13 +2169,13 @@ void interp(void) {
 
 #ifdef OCAML_STOP
     case OCAML_STOP : {
-      TRACE("STOP");
+      TRACE_INSTRUCTION("STOP");
       return;
     }
 #endif
 
     default:
-#if defined(DEBUG) && defined(__PC__)
+#if defined(__PC__)
       printf("Invalid opcode\n");
       exit(1);
 #endif

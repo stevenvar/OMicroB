@@ -1,3 +1,7 @@
+#ifdef __PC__
+#include <stdio.h>
+#endif
+
 #include <string.h>
 #include "values.h"
 #include "fail.h"
@@ -250,13 +254,24 @@ static void compact_blocks(void) {
 /* GC: main function */
 
 void gc(void) {
-  TRACE("#################### MARK & COMPACT ####################\n");
+#if defined(__PC__) && DEBUG >= 1 // TRACE GC RUNS
+  printf("#################### MARK & COMPACT ####################\n");
+#endif
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  print_heap();
+  print_stack();
+#endif
   mark_roots();
   wipe_dead_blocks();
   reverse_root_pointers();
   reverse_heap_pointers();
   update_pointers();
   compact_blocks();
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("END OF MARK & COMPACT\n");
+  print_heap();
+  print_stack();
+#endif
 }
 
 /******************************************************************************/
