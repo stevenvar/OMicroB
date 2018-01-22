@@ -222,12 +222,6 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
   may_sleep();
 }
 
-int r = 0;
-int avr_random(int max){
-  r = (r * 109+89)%max;
-  return r;
-}
-
 void avr_write_register(uint8_t reg, uint8_t new_val){
   /* printf("avr_write_register(%d, %d)\n", (int) reg, (int) new_val); */
   init_simulator();
@@ -297,6 +291,9 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
   may_sleep();
 }
 
+int avr_random(int max){
+  return 0;
+}
 
 void avr_set_bit(uint8_t reg, uint8_t bit){
   /* printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit); */
@@ -338,7 +335,7 @@ void avr_set_bit(uint8_t reg, uint8_t bit){
   }
   /* printf("set bit %d on reg %d \n", bit, reg); */
   V(sem_regs);
-  may_sleep(); 
+  may_sleep();
 }
 
 /******************************/

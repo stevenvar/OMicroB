@@ -5,6 +5,7 @@ open Avr
 external write_buffer : int -> int -> bool -> unit = "caml_buffer_write"
 external read_buffer : int -> int -> bool = "caml_buffer_read"
 external get_byte_buffer : unit -> int = "caml_buffer_get_byte"
+external display : unit -> unit = "caml_buffer_display"
 
 let boot_program =
   [|
@@ -37,13 +38,13 @@ let send_lcd_command cs dc com =
   Spi.transfer com;
   data_mode cs dc
 
-let display () =
-  for i = 0 to 1023 do
-    let b = get_byte_buffer () in
-     (* write_register SPDR b; *)
-     (* while (read_bit SPSR SPIF <> false) do () done *)
-    Spi.transfer(b);
-  done
+(* let display () =
+ *   for i = 0 to 1023 do
+ *     let b = get_byte_buffer () in
+ *      (\* write_register SPDR b; *\)
+ *      (\* while (read_bit SPSR SPIF <> false) do () done *\)
+ *     Spi.transfer(b);
+ *   done *)
 
 let draw x y color =
   write_buffer x y color
@@ -61,5 +62,3 @@ let boot ~cs ~dc ~rst =
   transfer_program boot_program;
   data_mode cs dc;
   clear()
-
-

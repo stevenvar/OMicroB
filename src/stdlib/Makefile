@@ -19,7 +19,7 @@ $(LIB)/stdlib.cma: $(CMOS)
 	ocamlc -a $^ -o $@
 
 %.cmi: %.mli
-	ocamlc -nostdlib -c -w @a $<
+	ocamlc -nostdlib -nopervasives -c -w @a $<
 
 %.cmo: %.ml $(CMIS)
 	ocamlc -nostdlib -c -w @a $<
