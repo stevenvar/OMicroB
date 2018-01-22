@@ -27,7 +27,7 @@
 #endif
 
 #include "../prims/prims.h"
-#include "../prims/omc-bindings.c"
+#include "../prims/bindings.c"
 #include "../stdlib/random.c"
 #include "../stdlib/trace.c"
 #include "../stdlib/delay.c"

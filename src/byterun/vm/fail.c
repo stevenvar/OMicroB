@@ -14,7 +14,7 @@
 
 jmp_buf caml_exception_jmp_buf;
 
-void caml_raise(val_t v) {
+void caml_raise(value v) {
   acc = v;
   longjmp(caml_exception_jmp_buf, 1);
 }
@@ -37,7 +37,7 @@ void caml_raise_division_by_zero(void) {
 
 void caml_raise_invalid_argument(char const *msg) {
   mlsize_t msg_len = strlen(msg);
-  val_t block;
+  value block;
   mlsize_t str_wosize = Wsize_bsize(msg_len) + 1;
   mlsize_t str_bosize = Bsize_wsize(str_wosize);
   OCamlAlloc(block, str_wosize + 3, String_tag);

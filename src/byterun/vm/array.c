@@ -1,9 +1,9 @@
 #include "gc.h"
 
-extern val_t atom0_header;
+extern value atom0_header;
 
-val_t caml_make_vect(val_t len, val_t init) {
-  val_t res;
+value caml_make_vect(value len, value init) {
+  value res;
   mlsize_t size, i;
   size = Int_val(len);
   if (size == 0) {
@@ -18,37 +18,37 @@ val_t caml_make_vect(val_t len, val_t init) {
   return res;
 }
 
-val_t caml_array_get_addr(val_t array, val_t index) {
-  val_t idx = Int_val(index);
+value caml_array_get_addr(value array, value index) {
+  value idx = Int_val(index);
   /*if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error();*/
   return Field(array, idx);
 }
 
-val_t caml_array_set_addr(val_t array, val_t index, val_t newval) {
-  val_t idx = Int_val(index);
+value caml_array_set_addr(value array, value index, value newval) {
+  value idx = Int_val(index);
   /*if (idx < 0 || idx >= Wosize_val(array)) caml_array_bound_error();*/
   Field(array, idx) =  newval;
   return Val_unit;
 }
 
-val_t caml_array_unsafe_get(val_t array, val_t index)
+value caml_array_unsafe_get(value array, value index)
 {
   return Field(array, Int_val(index));
 }
 
-val_t caml_array_unsafe_set(val_t array, val_t index, val_t val)
+value caml_array_unsafe_set(value array, value index, value val)
 {
   Field(array, Int_val(index)) = val;
   return Val_unit;
 }
 
 
-val_t caml_array_get(val_t array, val_t index)
+value caml_array_get(value array, value index)
 {
   return Field(array, Int_val(index));
 }
 
-val_t caml_array_set(val_t array, val_t index, val_t val)
+value caml_array_set(value array, value index, value val)
 {
   Field(array, Int_val(index)) = val;
   return Val_unit;

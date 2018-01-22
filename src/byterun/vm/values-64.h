@@ -9,9 +9,9 @@
 pointeurs flash : tels quels mais limités à 2^63-2^51 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
         int64_t : entiers sur 64 bits (stdint.h)
-          val_t : la représentation uniforme d'une valeur ocaml
+          value : la représentation uniforme d'une valeur ocaml
            bloc : une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
-          champ : une valeur (val_t)
+          champ : une valeur (value)
 */
 
 #include <stdint.h>
@@ -21,8 +21,8 @@ pointeurs flash : tels quels mais limités à 2^63-2^51 en évitant ainsi d'avoi
 /******************************************************************************/
 /* Types */
 
-typedef int64_t val_t;
-typedef uint64_t uval_t;
+typedef int64_t value;
+typedef uint64_t uvalue;
 typedef uint64_t mlsize_t;
 typedef uint64_t header_t;
 typedef uint8_t tag_t;
@@ -33,22 +33,22 @@ typedef uint64_t code_t;
 /* Value classification */
 
 #define Is_int(x) (((x) & 1) != 0)
-#define Is_block(x) (((val_t) (x) & 1) == 0 && ((val_t) (x) >> 51) == 0x1FFF)
+#define Is_block(x) (((value) (x) & 1) == 0 && ((value) (x) >> 51) == 0x1FFF)
 
 /******************************************************************************/
 /* Conversions */
 
-#define Val_int(x) (((val_t) (x) << 1) | 1)
-#define Int_val(x) ((val_t) (x) >> 1)
+#define Val_int(x) (((value) (x) << 1) | 1)
+#define Int_val(x) ((value) (x) >> 1)
 
-#define Val_block(x) ((val_t) ((x - ocaml_heap) << 3) | ((val_t) 0x1FFF << 51))
-#define Block_val(x) (ocaml_heap + (((x) ^ ((val_t) 0x1FFF << 51)) >> 3))
+#define Val_block(x) ((value) ((x - ocaml_heap) << 3) | ((value) 0x1FFF << 51))
+#define Block_val(x) (ocaml_heap + (((x) ^ ((value) 0x1FFF << 51)) >> 3))
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
 
-#define Val_float(x) ((double) x != (double) x ? Val_nan : ((union { double d; val_t n; }) (double) (x)).n)
-#define Float_val(v) (((union { double d; val_t n; }) (val_t) (v)).d)
+#define Val_float(x) ((double) x != (double) x ? Val_nan : ((union { double d; value n; }) (double) (x)).n)
+#define Float_val(v) (((union { double d; value n; }) (value) (v)).d)
 
 /******************************************************************************/
 /* Constants */
@@ -70,17 +70,17 @@ typedef uint64_t code_t;
 #define Code_val(val) Field(val, 0)
 
 #define Make_string_data(c7, c6, c5, c4, c3, c2, c1, c0)                                       \
-  (((val_t) (c0) << 56) | ((val_t) (c1) << 48) | ((val_t) (c2) << 40) | ((val_t) (c3) << 32) | \
-   ((val_t) (c4) << 24) | ((val_t) (c5) << 16) | ((val_t) (c6) <<  8) | ((val_t) (c7)))
+  (((value) (c0) << 56) | ((value) (c1) << 48) | ((value) (c2) << 40) | ((value) (c3) << 32) | \
+   ((value) (c4) << 24) | ((value) (c5) << 16) | ((value) (c6) <<  8) | ((value) (c7)))
 
 #define Make_custom_data(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
 
 #define Make_float(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
 
-#define Make_header(wosize, tag) (((val_t) (wosize) << 10) | tag)
+#define Make_header(wosize, tag) (((value) (wosize) << 10) | tag)
 
-#define Bsize_wsize(sz) ((sz) * sizeof (val_t))
-#define Wsize_bsize(sz) ((sz) / sizeof (val_t))
+#define Bsize_wsize(sz) ((sz) * sizeof (value))
+#define Wsize_bsize(sz) ((sz) / sizeof (value))
 
 #define Wosize_val(val) ((mlsize_t) (Hd_val(val) >> 10))
 #define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))

@@ -193,13 +193,13 @@ let () =
       (* Define heap, acc, stack, global_data, bytecode *)
       Printer.print_opcodes oc opcodes;
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "val_t" "ocaml_heap" "OCAML_HEAP_WOSIZE" heapdata;
+      Printer.print_datagen_word_array oc "value" "ocaml_heap" "OCAML_HEAP_WOSIZE" heapdata;
       Printf.fprintf oc "\n";
-      Printf.fprintf oc "val_t acc = %s;\n" (Printer.string_of_dword accudata);
+      Printf.fprintf oc "value acc = %s;\n" (Printer.string_of_dword accudata);
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "val_t" "ocaml_stack" "OCAML_STACK_WOSIZE" stackdata;
+      Printer.print_datagen_word_array oc "value" "ocaml_stack" "OCAML_STACK_WOSIZE" stackdata;
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "val_t" "ocaml_global_data" "OCAML_GLOBDATA_NUMBER" globdata;
+      Printer.print_datagen_word_array oc "value" "ocaml_global_data" "OCAML_GLOBDATA_NUMBER" globdata;
       Printf.fprintf oc "\n";
       Printer.print_codegen_word_array oc "PROGMEM opcode_t" "const ocaml_bytecode" "OCAML_BYTECODE_BSIZE" bytecode;
       Printf.fprintf oc "\n";

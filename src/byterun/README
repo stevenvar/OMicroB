@@ -8,9 +8,12 @@ avr/:
 
 prims/:
  * Abstract interface to micro-controller primitives (prims/prims.h)
- * Concrete interface between OCaml externals and C primitives from prims/prims.h:
-   - following the standard OCaml representation of values (prims/std-bindings.c).
-   - following the OMicroB representation of values (prims/omc-bindings.c)
+ * Concrete interface between OCaml externals and C primitives from prims/prims.h (prims/bindings.c)
+   - Compiled following the standard OCaml representation of values (with __OCAML__ constant defined)
+   - Compiled following the OMicroB representation of values (without __OCAML__ constant defined)
+
+stdlib/:
+ * Standard library functions compiled for AVR (since included by vm/runtime.c) and X86 for simulation.
 
 simul/:
  * Simulation code for host.

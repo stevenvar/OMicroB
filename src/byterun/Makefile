@@ -5,8 +5,9 @@ TARGETS := $(LIB)/libcamlrun.a
 HEADERS := $(wildcard */*.h)
 
 OBJECTS :=              \
-  .build/std-bindings.o \
+  .build/bindings.o     \
   .build/random.o       \
+  .build/delay.o        \
   .build/trace.o        \
   .build/sf-regs.o      \
   .build/shared.o       \
@@ -21,16 +22,16 @@ $(LIB)/libcamlrun.a: $(OBJECTS)
 
 .build/%.o: prims/%.c $(HEADERS)
 	mkdir -p .build/
-	ocamlc -c -ccopt -Wall $<
+	ocamlc -c -ccopt -Wall -ccopt -D__OCAML__ $<
 	mv $*.o .build/
 
 .build/%.o: stdlib/%.c $(HEADERS)
 	mkdir -p .build/
-	ocamlc -c -ccopt -Wall $<
+	ocamlc -c -ccopt -Wall -ccopt -D__OCAML__ $<
 	mv $*.o .build/
 
 .build/%.o: simul/%.c $(HEADERS)
-	ocamlc -c -ccopt -Wall $<
+	ocamlc -c -ccopt -Wall -ccopt -D__OCAML__ $<
 	mv $*.o .build/
 
 clean:

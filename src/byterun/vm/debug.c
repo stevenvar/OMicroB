@@ -17,7 +17,7 @@
 #ifdef __PC__
 
 void print_heap(void) {
-  val_t *ptr;
+  value *ptr;
   int i = 0;
 
   printf("HEAP (starts at %p, ends at %p, size = %d words) : \n", ocaml_heap, ocaml_heap + OCAML_HEAP_WOSIZE, OCAML_HEAP_WOSIZE);
@@ -62,12 +62,12 @@ void print_global(void) {
 
 /******************************************************************************/
 
-extern val_t *sp;
+extern value *sp;
 
 void print_stack(void) {
   printf(" STACK : \n");
   int i = 0;
-  for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
+  for (value* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
        ptr > sp; ptr --){
     float f = *(float *)&sp[i];
     printf("@%p ", &sp[i]);
@@ -104,14 +104,14 @@ void print_global() {
   Serial.println("GLOBALS =");
   for (int i = 0; i < OCAML_GLOBDATA_NUMBER; i ++){
     Serial.print("@0x");
-    Serial.println((uval_t)ocaml_global_data+i,HEX);
+    Serial.println((uvalue)ocaml_global_data+i,HEX);
     Serial.print(i);
     Serial.print(" : ");
     Serial.print(ocaml_global_data[i],HEX);
     Serial.print(" - ");
     if (Is_block(ocaml_global_data[i])){
       Serial.print("0x");
-      Serial.println((uval_t)Block_val(ocaml_global_data[i]),HEX);
+      Serial.println((uvalue)Block_val(ocaml_global_data[i]),HEX);
     }
     else
       Serial.print("int / float = ");
@@ -129,12 +129,12 @@ void print_stack(void) {
 void print_stack(){
   Serial.println(" STACK :");
   int i = 0;
-  for (val_t* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
+  for (value* ptr = ocaml_stack + OCAML_STACK_WOSIZE;
        ptr > sp; ptr --){
     Serial.print("@sp[");
     Serial.print(i);
     Serial.print("] = 0x");
-    Serial.print((uval_t)&sp[i],HEX);
+    Serial.print((uvalue)&sp[i],HEX);
     Serial.print(" : ");
     if (Is_int(sp[i])){
       Serial.print("int/float =");
@@ -144,12 +144,12 @@ void print_stack(){
     }
     else if (Is_block(sp[i])){
       Serial.print("points to (0x");
-      Serial.print((uval_t)Block_val(sp[i]),HEX);
+      Serial.print((uvalue)Block_val(sp[i]),HEX);
       Serial.println(")");
     }
     else {
       Serial.print("0x");
-      Serial.println((val_t)sp[i],HEX);
+      Serial.println((value)sp[i],HEX);
     }
     i++;
   }

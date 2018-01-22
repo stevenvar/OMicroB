@@ -14,7 +14,7 @@
 
 /******************************************************************************/
 
-static int compare_val(val_t v1, val_t v2) {
+static int compare_val(value v1, value v2) {
   if (v1 == v2) {
     return 0;
   }
@@ -74,7 +74,7 @@ static int compare_val(val_t v1, val_t v2) {
   default: {
     mlsize_t sz1 = Wosize_val(v1);
     mlsize_t sz2 = Wosize_val(v2);
-    val_t * p1, * p2;
+    value * p1, * p2;
     int res;
     if (sz1 != sz2) return sz1 - sz2;
     if (sz1 == 0) return 0;
@@ -93,43 +93,43 @@ static int compare_val(val_t v1, val_t v2) {
 
 /******************************************************************************/
 
-val_t caml_equal(val_t v1, val_t v2)
+value caml_equal(value v1, value v2)
 {
   int res = compare_val(v1, v2);
   return Val_int(res == 0);
 }
 
-val_t caml_notequal(val_t v1, val_t v2)
+value caml_notequal(value v1, value v2)
 {
   int res = compare_val(v1, v2);
   return Val_int(res != 0);
 }
 
-val_t caml_lessthan(val_t v1,val_t v2)
+value caml_lessthan(value v1,value v2)
 {
   int res = compare_val(v1, v2);
   return Val_int(res < 0);
 }
 
-val_t caml_lessequal(val_t v1,val_t v2)
+value caml_lessequal(value v1,value v2)
 {
   int res = compare_val(v1, v2);
   return Val_int(res <= 0);
 }
 
-val_t caml_greaterthan(val_t v1,val_t v2)
+value caml_greaterthan(value v1,value v2)
 {
   int res = compare_val(v1, v2);
   return Val_int(res > 0);
 }
 
-val_t caml_greaterequal(val_t v1,val_t v2)
+value caml_greaterequal(value v1,value v2)
 {
   int res = compare_val(v1, v2);
   return Val_int(res >= 0);
 }
 
-val_t caml_compare(val_t v1, val_t v2)
+value caml_compare(value v1, value v2)
 {
   int res = compare_val(v1, v2);
   if (res < 0)

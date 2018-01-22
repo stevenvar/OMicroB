@@ -6,6 +6,6 @@ void delay(int count){
   }
   #endif
   #ifdef __PC__
-  usleep(count*1000);
+  usleep((useconds_t) count * 1000);
   #endif
 }

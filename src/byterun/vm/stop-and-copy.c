@@ -6,12 +6,12 @@
 #include "debug.h"
 #include "gc.h"
 
-extern val_t acc;
-extern val_t *sp;
+extern value acc;
+extern value *sp;
 
-extern val_t env;
-extern val_t ocaml_stack[OCAML_STACK_WOSIZE];
-extern val_t ocaml_global_data[OCAML_GLOBDATA_NUMBER];
+extern value env;
+extern value ocaml_stack[OCAML_STACK_WOSIZE];
+extern value ocaml_global_data[OCAML_GLOBDATA_NUMBER];
 
 #define Is_black_hd(hd) ((hd) & Color_black)
 #define Is_black_val(val) Is_black_hd(Hd_val(val))
@@ -41,22 +41,22 @@ extern void print_stack();
  * current_heap : 1 ou 2 selon le tas actif
  * les appels d'allocations mémoires ne savent pas dans quel tas seront placé les données.
  */
-const val_t *heap1_start, *heap2_start;
-const val_t *heap1_end, *heap2_end;
+const value *heap1_start, *heap2_start;
+const value *heap1_end, *heap2_end;
 int current_heap;
 
 
 /* heap_ptr : pointeur du premier emplacement libre du tas
  * heap_end : pointeur de fin du tas courant */
-val_t *heap_ptr, *heap_end;
+value *heap_ptr, *heap_end;
 
 /* heap_todo : indique ce qui reste à déplacer */
-val_t *heap_todo;
+value *heap_todo;
 
 /* des variables internes utiles pour le gc */
-val_t *new_heap, *old_heap;
-val_t* tab_heap_start[2];
-val_t* tab_heap_end[2];
+value *new_heap, *old_heap;
+value* tab_heap_start[2];
+value* tab_heap_end[2];
 
 /* Initialisation du GC
  * Cette fonction doit être appelée avant toute allocation du programme ;
@@ -66,14 +66,14 @@ val_t* tab_heap_end[2];
 void gc_init(void) {
   heap1_start = ocaml_heap;
   heap1_end = heap1_start + OCAML_HEAP_WOSIZE / 2;
-  tab_heap_start[0] = (val_t *) heap1_start;
-  tab_heap_end[0] = (val_t *) heap1_end;
+  tab_heap_start[0] = (value *) heap1_start;
+  tab_heap_end[0] = (value *) heap1_end;
   heap2_start = ocaml_heap + OCAML_HEAP_WOSIZE / 2;
   heap2_end = heap2_start + OCAML_HEAP_WOSIZE / 2;
-  tab_heap_start[1] = (val_t *) heap2_start;
-  tab_heap_end[1] = (val_t *) heap2_end;
-  heap_ptr = (val_t *) heap1_start + OCAML_HEAP_INITIAL_WOSIZE;
-  heap_end = (val_t *) heap1_start + OCAML_HEAP_WOSIZE / 2;
+  tab_heap_start[1] = (value *) heap2_start;
+  tab_heap_end[1] = (value *) heap2_end;
+  heap_ptr = (value *) heap1_start + OCAML_HEAP_INITIAL_WOSIZE;
+  heap_end = (value *) heap1_start + OCAML_HEAP_WOSIZE / 2;
   current_heap = 0;
 }
 
@@ -82,9 +82,9 @@ void gc_init(void) {
 int cpt_gc = 0;
 
 void clean_heap(){
-  val_t* from = tab_heap_start[(current_heap+1)%2];
-  val_t* to = tab_heap_end[(current_heap+1)%2];
-  for(val_t* ptr = from ; ptr < to; ptr++){
+  value* from = tab_heap_start[(current_heap+1)%2];
+  value* to = tab_heap_end[(current_heap+1)%2];
+  for(value* ptr = from ; ptr < to; ptr++){
     *ptr = 0;
   }
 }
@@ -95,8 +95,8 @@ void clean_heap(){
  *    c'est-à-dire effectue tous les déplacements attendus
  */
 /* tags in values.h */
-void gc_one_val(val_t* ptr, int update) {
-  val_t val ;
+void gc_one_val(value* ptr, int update) {
+  value val ;
   header_t hd;
   tag_t tag;
   mlsize_t sz;
@@ -118,7 +118,7 @@ void gc_one_val(val_t* ptr, int update) {
       sz = Wosize_hd(hd);
       /* printf("must copy %d blocs \n", sz); */
       if (tag == Infix_tag) {
-        val_t start = val - Infix_offset_hd(hd);
+        value start = val - Infix_offset_hd(hd);
         if (!(Is_black_val(start))) { /* déjà déplacé*/
           gc_one_val(&start,1);
         }
@@ -127,14 +127,14 @@ void gc_one_val(val_t* ptr, int update) {
       else { /* tag < No_scan_tag : tous les autres */
         *heap_ptr = hd;
 	heap_ptr ++;
-        val_t new_val = Val_block(heap_ptr);
+        value new_val = Val_block(heap_ptr);
 	/* int n = sz ; */
-	/* val_t* po = heap_ptr; */
-	/* val_t* pi = (Block_val(val)); */
+	/* value* po = heap_ptr; */
+	/* value* pi = (Block_val(val)); */
 	/* while (n--){ */
 	/*   *po++ = *pi++; */
 	/* } */
-	memcpy(heap_ptr, Block_val(val), sz * sizeof (val_t));
+	memcpy(heap_ptr, Block_val(val), sz * sizeof (value));
         Field(val, 0) = new_val;
         heap_ptr += sz;
         Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
@@ -182,7 +182,7 @@ void gc(void) {
   print_stack();
 #endif
 
-  val_t* ptr; /* pointeur de parcours de la pile et des globales  */
+  value* ptr; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
   current_heap = (current_heap + 1) % 2;
   heap_end = tab_heap_end[current_heap];

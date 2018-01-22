@@ -9,9 +9,9 @@
 pointeurs flash : tels quels mais limités à 2^31-2^22 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
         int32_t : entiers sur 32 bits (stdint.h)
-          val_t : la représentation uniforme d'une valeur ocaml
+          value : la représentation uniforme d'une valeur ocaml
            bloc : une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
-          champ : une valeur (val_t)
+          champ : une valeur (value)
 
           en-tête : longueur (22bits) | marque (2 bits) | numéro de constructeur (8bits)
 
@@ -29,8 +29,8 @@ pointeurs flash : tels quels mais limités à 2^31-2^22 en évitant ainsi d'avoi
 
 #ifndef TYPES
 #define TYPES
-typedef int32_t val_t;
-typedef uint32_t uval_t;
+typedef int32_t value;
+typedef uint32_t uvalue;
 typedef uint32_t mlsize_t;
 typedef int32_t header_t;
 typedef uint8_t tag_t;
@@ -46,37 +46,37 @@ typedef uint32_t code_t;
 #endif
 #endif
 
-extern val_t ocaml_heap[OCAML_HEAP_WOSIZE];
+extern value ocaml_heap[OCAML_HEAP_WOSIZE];
 
 /******************************************************************************/
 /* Value classification */
 
 #define Is_int(x) (((x) & 1) != 0)
-#define Is_block(x) (((val_t) (x) & 0x3) == 0 && (((uval_t) (x)) >> 22) == 0x3FF)
+#define Is_block(x) (((value) (x) & 0x3) == 0 && (((uvalue) (x)) >> 22) == 0x3FF)
 #define Is_in_heap(x) (Is_block(x) && (uintptr_t) (Block_val(x) - ocaml_heap) < OCAML_HEAP_WOSIZE)
 
 /******************************************************************************/
 /* Conversions */
 
-#define Val_int(x) ((val_t) (((uval_t) (x) << 1) | 1))
-#define Int_val(x) ((val_t) (x) >> 1)
+#define Val_int(x) ((value) (((uvalue) (x) << 1) | 1))
+#define Int_val(x) ((value) (x) >> 1)
 
-#define Val_long(x) ((val_t) (((uval_t) (long) (x) << 1) | 1))
-#define Long_val(x) ((long) ((val_t) (x) >> 1))
+#define Val_long(x) ((value) (((uvalue) (long) (x) << 1) | 1))
+#define Long_val(x) ((long) ((value) (x) >> 1))
 
 #ifdef __AVR__
-#define Val_block(x) ((val_t) (intptr_t) (val_t *) (x) | (val_t) 0xFFC00000)
-#define Block_val(x) ((val_t *) (intptr_t) (val_t) (x))
+#define Val_block(x) ((value) (intptr_t) (value *) (x) | (value) 0xFFC00000)
+#define Block_val(x) ((value *) (intptr_t) (value) (x))
 #else
-#define Val_block(x) ((val_t) ((char *) (x) - ((char *) ocaml_heap)) | (val_t) 0xFFC00000)
-#define Block_val(x) ((val_t *) ((char *) ocaml_heap + (((int32_t) (x) << 10) >> 10)))
+#define Val_block(x) ((value) ((char *) (x) - ((char *) ocaml_heap)) | (value) 0xFFC00000)
+#define Block_val(x) ((value *) ((char *) ocaml_heap + (((int32_t) (x) << 10) >> 10)))
 #endif
 
 #define Val_bool(x) Val_int((x) != 0)
 #define Bool_val(x) Int_val(x)
 
-/* #define Val_float(x) ((float) x != (float) x ? Val_nan : ((union { float f; val_t v; }) (float) (x)).v) */
-/* #define Float_val(v) (((union { float f; val_t v; }) (val_t) (v)).f) */
+/* #define Val_float(x) ((float) x != (float) x ? Val_nan : ((union { float f; value v; }) (float) (x)).v) */
+/* #define Float_val(v) (((union { float f; value v; }) (value) (v)).f) */
 
 #define Val_codeptr(x) Val_int(x)
 #define Codeptr_val(x) Int_val(x)
@@ -92,14 +92,14 @@ extern val_t ocaml_heap[OCAML_HEAP_WOSIZE];
 /******************************************************************************/
 /* Blocks */
 
-#define Field(val, i) (((val_t *) Block_val(val))[i])
+#define Field(val, i) (((value *) Block_val(val))[i])
 #define String_val(val) ((char *) Block_val(val))
 #define StringField(val, i) String_val(val)[i]
 
 #define Hd_val(val) Field(val, -1)
 #define Code_val(val) Field(val, 0)
 
-#define Make_string_data(c3, c2, c1, c0) (((val_t) (c0) << 24) | ((val_t) (c1) << 16) | ((val_t) (c2) << 8) | ((val_t) (c3)))
+#define Make_string_data(c3, c2, c1, c0) (((value) (c0) << 24) | ((value) (c1) << 16) | ((value) (c2) << 8) | ((value) (c3)))
 
 #define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
 
@@ -108,7 +108,7 @@ extern val_t ocaml_heap[OCAML_HEAP_WOSIZE];
 #define Bsize_wsize(sz) ((sz) << 2)
 #define Wsize_bsize(sz) ((sz) >> 2)
 
-#define Make_header(size, tag, color) ((val_t) ((((uval_t) (tag)) << 24) | (((uval_t) (size)) << 2) | ((uval_t) (color))))
+#define Make_header(size, tag, color) ((value) ((((uvalue) (tag)) << 24) | (((uvalue) (size)) << 2) | ((uvalue) (color))))
 
 #define Tag_hd(h) ((tag_t) ((header_t) (h) >> 24))
 #define Wosize_hd(h) ((mlsize_t) (((header_t) (h) >> 2) & 0x3FFFFF))

@@ -6,21 +6,21 @@
 
 #ifdef __OCAML__
 
-typedef uint32_t val_t;
+typedef uint32_t value;
 
-val_t caml_buffer_write(val_t x, val_t y, val_t color) {
+value caml_buffer_write(value x, value y, value color) {
   return 0;
 }
 
-val_t caml_buffer_read(val_t x, val_t y) {
+value caml_buffer_read(value x, value y) {
   return 0;
 }
 
-val_t caml_buffer_get_byte(val_t x) {
+value caml_buffer_get_byte(value x) {
   return 0;
 }
 
-val_t caml_buffer_display(val_t x){
+value caml_buffer_display(value x){
   return 0;
 }
 
@@ -35,20 +35,20 @@ val_t caml_buffer_display(val_t x){
 
 #define SPIF 0
 
-val_t caml_buffer_write(val_t x, val_t y, val_t color) {
+value caml_buffer_write(value x, value y, value color) {
   buffer_write(Int_val(x), Int_val(y), Int_val(color));
   return Val_unit;
 }
 
-val_t caml_buffer_read(val_t x, val_t y) {
+value caml_buffer_read(value x, value y) {
   return Val_int(buffer_read(Int_val(x), Int_val(y)));
 }
 
-val_t caml_buffer_get_byte(val_t x) {
+value caml_buffer_get_byte(value x) {
   return Val_int(buffer_get_byte());
 }
 
-val_t caml_buffer_display(val_t x){
+value caml_buffer_display(value x){
   for(int i = 0; i < 1024; i++){
     int b = buffer_get_byte ();
     avr_write_register(SPDR,b);
@@ -63,20 +63,20 @@ val_t caml_buffer_display(val_t x){
 #include "../../src/byterun/vm/values.h"
 #include "lib/buffer.h"
 
-val_t caml_buffer_write(val_t x, val_t y, val_t color) {
+value caml_buffer_write(value x, value y, value color) {
   buffer_write(Int_val(x), Int_val(y), Int_val(color));
   return Val_unit;
 }
 
-val_t caml_buffer_read(val_t x, val_t y) {
+value caml_buffer_read(value x, value y) {
   return Val_int(buffer_read(Int_val(x), Int_val(y)));
 }
 
-val_t caml_buffer_get_byte(val_t x) {
+value caml_buffer_get_byte(value x) {
   return Val_int(buffer_get_byte());
 }
 
-val_t caml_buffer_display(val_t x){
+value caml_buffer_display(value x){
   display();
   return Val_unit;
 }

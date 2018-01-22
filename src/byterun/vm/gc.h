@@ -5,8 +5,8 @@
 
 #include "values.h"
 
-extern val_t *heap_ptr;
-extern val_t *heap_end;
+extern value *heap_ptr;
+extern value *heap_end;
 
 void gc_init(void);
 void gc(void);

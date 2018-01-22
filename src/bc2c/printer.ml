@@ -90,7 +90,7 @@ let string_of_dword dword =
   | FLOAT bytes        -> print_bytes "Make_float" bytes
   | CHARS chars        -> print_chars chars
   | BYTES bytes        -> print_bytes "Make_custom_data" bytes
-  | CUSTOM name        -> Printf.sprintf "(val_t) &%s_custom_operations" name
+  | CUSTOM name        -> Printf.sprintf "(value) &%s_custom_operations" name
   | HEADER (tag, size) -> Printf.sprintf "Make_header(%d, %s, Color_white)" size (print_tag tag)
   | POINTER ind        -> Printf.sprintf "Val_block(&ocaml_heap[%d])" ind
   | CODEPTR ptr        -> Printf.sprintf "Val_codeptr(%d)" ptr
