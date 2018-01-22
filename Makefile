@@ -10,7 +10,6 @@ all: config
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
 
-
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
              $(ETC)/Makefile.conf -ot configure ]; then               \
@@ -21,31 +20,45 @@ config:
 
 install: all
 	mkdir -p "$(LIBDIR)"
+	mkdir -p "$(LIBEXECDIR)"
+	mkdir -p "$(INCLUDEDIR)"
 	mkdir -p "$(BINDIR)"
 	mkdir -p "$(MAN1DIR)"
 	mkdir -p "$(MAN3DIR)"
 	cp bin/bc2c "$(BINDIR)/bc2c"
 	cp bin/omicrob "$(BINDIR)/omicrob"
-	cp man/bc2c.1.gz "$(MAN1DIR)/bc2c.1.gz"
-	cp man/omicrob.1.gz "$(MAN1DIR)/omicrob.1.gz"
+	cp bin/*_simulator "$(LIBEXECDIR)/"
+	cp doc/bc2c.1 "$(MAN1DIR)/bc2c.1"
+	cp doc/omicrob.1 "$(MAN1DIR)/omicrob.1"
 	cp lib/stdlib.cma "$(LIBDIR)/stdlib.cma"
 	cp lib/libcamlrun.a "$(LIBDIR)/libcamlrun.a"
 	cp lib/*.ml "$(LIBDIR)/"
 	cp lib/*.mli "$(LIBDIR)/"
 	cp lib/*.cmo "$(LIBDIR)/"
 	cp lib/*.cmi "$(LIBDIR)/"
+	cp -a lib/extra "$(LIBDIR)/extra"
+	cp -a src/byterun/vm "$(INCLUDEDIR)/"
+	cp -a src/byterun/prims "$(INCLUDEDIR)/"
+	cp -a src/byterun/simul "$(INCLUDEDIR)/"
+	cp -a src/byterun/avr "$(INCLUDEDIR)/"
 
 uninstall:
 	-rm -f "$(BINDIR)/bc2c"
 	-rm -f "$(BINDIR)/omicrob"
-	-rm -f "$(MAN1DIR)/omicrob.1.gz"
-	-rm -f "$(MAN1DIR)/bc2c.1.gz"
+	-rm -f "$(MAN1DIR)/omicrob.1"
+	-rm -f "$(MAN1DIR)/bc2c.1"
 	-rm -f "$(LIBDIR)/stdlib.cma"
 	-rm -f "$(LIBDIR)/libcamlrun.a"
 	-rm -f "$(LIBDIR)/"*.ml
 	-rm -f "$(LIBDIR)/"*.mli
 	-rm -f "$(LIBDIR)/"*.cmi
 	-rm -f "$(LIBDIR)/"*.cmo
+	-rm -rf "$(LIBDIR)/extra"
+	-rm -f "$(LIBEXECDIR)/"*_simulator
+	-rm -f "$(INCLUDEDIR)/vm/"*
+	-rm -f "$(INCLUDEDIR)/prims/"*
+	-rm -f "$(INCLUDEDIR)/simul/"*
+	-rm -f "$(INCLUDEDIR)/avr/"*
 	@for mod in $(MAN_3P_BASES); do \
 	  rm -f "$(MAN3DIR)/"$$mod.3p;	\
 	done
@@ -53,6 +66,12 @@ uninstall:
 	  rm -f "$(MAN3DIR)/"$$mod.3o;	\
 	done
 	@if [ -d "$(LIBDIR)" ]; then rmdir "$(LIBDIR)"; fi
+	@if [ -d "$(LIBEXECDIR)" ]; then rmdir "$(LIBEXECDIR)"; fi
+	@if [ -d "$(INCLUDEDIR)/vm" ]; then rmdir "$(INCLUDEDIR)/vm"; fi
+	@if [ -d "$(INCLUDEDIR)/prims" ]; then rmdir "$(INCLUDEDIR)/prims"; fi
+	@if [ -d "$(INCLUDEDIR)/simul" ]; then rmdir "$(INCLUDEDIR)/simul"; fi
+	@if [ -d "$(INCLUDEDIR)/avr" ]; then rmdir "$(INCLUDEDIR)/avr"; fi
+	@if [ -d "$(INCLUDEDIR)" ]; then rmdir "$(INCLUDEDIR)"; fi
 
 etc/Makefile.conf:
 	@echo "You must run ./configure before" 1>&2

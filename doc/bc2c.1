@@ -1,0 +1,40 @@
+.TH BC2C 1
+
+.SH NAME
+bc2c \- Compiler from OCaml bytecode executable file to C source file linked with the OMicroB virtual machine
+
+.SH SYNOPSIS
+
+bc2c [ OPTIONS ] <input.byte>
+
+.SH DESCRIPTION
+
+The \fBbc2c\fR(1) command compiles an OCaml bytecode executable file
+to a C source file linked with OMicroB, a virtual machine adapted to
+micro-controllers.
+
+It applies some code transformations, compactions and optimisations to
+make the generated C file compatible with the OMicroB Virtual Machine,
+improve memory usage and increase run speed.
+
+The \fBbc2c\fR(1) command is typically ran via the \fBomicrob\fR(1)
+building tool.
+
+.SH OPTIONS
+
+The following command-line options are recognized by \fBomicrob(1)\fR:
+
+  -o <file.c>           Set output file (default: <bytecode>.c)
+  -i <file.c>           Include this local file into the generated file (with #include "...")
+  -I <file.c>           Include this global file into the generated file (with #include <...>)
+  -stack-size <word-nb> Set stack size (default: 64)
+  -heap-size <word-nb>  Set heap size (default: 256)
+  -gc <gc-algo>         Set garbage collector algorithm Stop&Copy or Mark&Compact (default: MAC)
+  -arch <bit-nb>        Set virtual machine architecture (default: 32)
+  -debug                Generate code in debug mode
+  -verbose              Increase verbosity
+  -version              Print version and exit
+  -local                Use the OMicroB build directory instead of installation directory
+
+.SH SEE ALSO
+.BR omicrob\fR(1),\ \fBocamlc\fR(1),\ \fBocamlclean\fR(1),\ \fBavr-g++\fR(1),\ \fBavr-objcopy\fR(1),\ \fBavrdude\fR(1),\ \fBocapic\fR(1)

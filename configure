@@ -12,14 +12,18 @@ function error () {
 function usage () {
     echo "$@" 1>&2
     error "Usage: $0 [ OPTIONS... ]
- -bindir <dir>   Directory where the binaries will be installed
-                 (default: /usr/local/bin)
- -libdir <dir>   Directory where the OCaml library will be installed
-                 (default: /usr/local/lib/omicrob)
- -mandir <dir>   Directory where the manual pages will be installed
-                 (default: /usr/local/man)
- -prefix <dir>   Set bindir, libdir and mandir to <dir>/bin, <dir>/lib/omicrob
-                 and <dir>/man respectively"
+ -bindir <dir>       Directory where the binaries will be installed
+                     (default: /usr/local/bin)
+ -libdir <dir>       Directory where the OCaml library will be installed
+                     (default: /usr/local/lib/omicrob)
+ -libexecdir <dir>   Directory where the OCaml library executable files will be installed
+                     (default: /usr/local/libexec/omicrob)
+ -includedir <dir>   Directory where the OCaml virtual machine will be installed
+                     (default: /usr/local/include/omicrob)
+ -mandir <dir>       Directory where the manual pages will be installed
+                     (default: /usr/local/man)
+ -prefix <dir>       Set bindir, libdir, libexecdir includedir and mandir to <dir>/bin, <dir>/lib/omicrob,
+                     <dir>/libexec/omicrob, <dir>/include/omicrob and <dir>/man respectively"
 }
 
 function check_command () {
@@ -93,6 +97,8 @@ ROOT="$(pwd)"
 
 BINDIR=/usr/local/bin
 LIBDIR=/usr/local/lib/omicrob
+LIBEXECDIR=/usr/local/libexec/omicrob
+INCLUDEDIR=/usr/local/include/omicrob
 MANDIR=/usr/local/man
 
 while [ $# -ne 0 ]; do
@@ -103,6 +109,12 @@ while [ $# -ne 0 ]; do
         -libdir)
             check_absolute_path "$2"
             LIBDIR="$(remove_trailing_slash "$2")" ;;
+        -libexecdir)
+            check_absolute_path "$2"
+            LIBEXECDIR="$(remove_trailing_slash "$2")" ;;
+        -includedir)
+            check_absolute_path "$2"
+            INCLUDEDIR="$(remove_trailing_slash "$2")" ;;
         -mandir)
             check_absolute_path "$2"
             MANDIR="$(remove_trailing_slash "$2")" ;;
@@ -111,6 +123,8 @@ while [ $# -ne 0 ]; do
             PREFIX="$(remove_trailing_slash "$2")"
             BINDIR="$PREFIX/bin"
             LIBDIR="$PREFIX/lib/omicrob"
+            LIBEXECDIR="$PREFIX/libexec/omicrob"
+            INCLUDEDIR="$PREFIX/include/omicrob"
             MANDIR="$PREFIX/man" ;;
         *)
         usage "Don't know what to do with \"$1\""
@@ -126,6 +140,8 @@ VERSION     := $VERSION
 OCAMLCLEAN  := $OCAMLCLEAN
 BINDIR      := $BINDIR
 LIBDIR      := $LIBDIR
+LIBEXECDIR  := $LIBEXECDIR
+INCLUDEDIR  := $INCLUDEDIR
 MAN1DIR     := $MANDIR/man1
 MAN3DIR     := $MANDIR/man3
 GXX         := $GXX
@@ -156,6 +172,8 @@ endef
 echo -n "\
 let builddir    = \"$ROOT\"
 let libdir      = \"$LIBDIR\"
+let libexecdir  = \"$LIBEXECDIR\"
+let includedir  = \"$INCLUDEDIR\"
 let bindir      = \"$BINDIR\"
 let ocaml       = \"$OCAML\"
 let ocamlc      = \"$OCAMLC\"

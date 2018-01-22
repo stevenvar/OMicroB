@@ -1,11 +1,17 @@
 include ../../etc/Makefile.conf
 
 MODULES := std_exit pervasives list array avr
+
+MLS  := $(MODULES:=.ml)
+MLIS := $(MODULES:=.mli)
 CMOS := $(MODULES:=.cmo)
 CMIS := $(MODULES:=.cmi)
 
+LIB_MLS  := $(foreach ml,$(MLS),$(LIB)/$(ml))
+LIB_MLIS := $(foreach mli,$(MLIS),$(LIB)/$(mli))
+LIB_CMIS := $(foreach cmi,$(CMIS),$(LIB)/$(cmi))
 
-TARGETS :=  $(LIB)/stdlib.cma $(LIB)/std_exit.cmo  $(foreach cmi,$(CMIS),$(LIB)/$(cmi))
+TARGETS :=  $(LIB)/stdlib.cma $(LIB)/std_exit.cmo $(LIB_MLS) $(LIB_MLIS) $(LIB_CMIS)
 
 stdlib: $(TARGETS)
 
@@ -23,6 +29,12 @@ pervasives.cmi: pervasives.mli
 
 pervasives.cmo: pervasives.ml pervasives.cmi
 	ocamlc -nostdlib -nopervasives -c -w @a $<
+
+$(LIB)/%.mli: %.mli
+	cp $< $@
+
+$(LIB)/%.ml: %.ml
+	cp $< $@
 
 $(LIB)/%.cmi: %.cmi
 	cp $< $@
