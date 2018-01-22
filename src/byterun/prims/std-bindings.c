@@ -1,6 +1,7 @@
 #include <caml/mlvalues.h>
 #include "prims.h"
 #include "../stdlib/random.h"
+#include "../stdlib/trace.h"
 
 /******************************************************************************/
 /******************************************************************************/
@@ -44,6 +45,13 @@ value caml_random_bits(value bound) {
 
 value caml_random_bool(value unit) {
   return Val_bool(random_bool());
+}
+
+/******************************************************************************/
+
+value caml_debug_trace(value msg) {
+  debug_trace(String_val(msg));
+  return Val_unit;
 }
 
 /******************************************************************************/
