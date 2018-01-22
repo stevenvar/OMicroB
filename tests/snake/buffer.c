@@ -32,7 +32,6 @@ value caml_buffer_display(value x){
 #include "lib/buffer.c"
 
 #define SPSR 16
-
 #define SPIF 0
 
 value caml_buffer_write(value x, value y, value color) {

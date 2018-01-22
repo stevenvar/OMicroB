@@ -16,8 +16,6 @@ let make_matrix sx sy init =
 let init l f =
   if l = 0 then [||] else
   if l < 0 then invalid_arg "Array.init"
-  (* See #6575. We could also check for maximum array size, but this depends
-     on whether we create a float array or a regular one... *)
   else
    let res = make l (f 0) in
    for i = 1 to pred l do

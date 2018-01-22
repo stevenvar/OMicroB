@@ -1,7 +1,7 @@
 
 open Types
 
-(* 128 * 8 pages of 1 byte(here : a char)  *)
+(* 128 * 8 pages of 1 byte (here : an int)  *)
 
 let size = 128*8
 
@@ -9,6 +9,9 @@ let create () = Array.make size 0
 
 let fill c display =
    Array.fill display.ddram 0 (Array.length display.ddram) c
+
+let translate_position col page display =
+  page*display.width + col
 
 let write =
   let i = ref 0 in
