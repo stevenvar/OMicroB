@@ -1,4 +1,4 @@
-(*open Avr*)
+open Avr
 
 (*
 let () =
@@ -60,8 +60,29 @@ let () =
   pin_mode pin OUTPUT;
   digital_write pin HIGH;
 *)
-
+(*
 let () =
   for _i = 1 to 1_000_000 do
     tracei (Random.int 1_000_000);
   done
+*)
+
+module type S = module type of String
+module type T = module type of Bytes
+module type C = module type of Char
+
+external magic : 'a -> 'b = "%identity"
+
+let () =
+  pin_mode PIN9 OUTPUT;
+  let module M : S = struct include String end in
+  let module N : T = struct include Bytes end in
+  let module P : C = struct include Char end in
+  let m = (module M : S) in
+  let n = (module N : T) in
+  let p = (module P : C) in
+  digital_write PIN9 (magic m);
+  digital_write PIN9 (magic n);
+  digital_write PIN9 (magic p);
+    
+      

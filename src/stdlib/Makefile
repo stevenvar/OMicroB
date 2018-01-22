@@ -1,6 +1,6 @@
 include ../../etc/Makefile.conf
 
-MODULES := std_exit pervasives list array random avr
+MODULES := std_exit pervasives char bytes string list array random avr
 
 MLS  := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
