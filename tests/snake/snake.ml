@@ -5,8 +5,8 @@ let dc = PIN4
 let rst = PIN6
 let button_left = PINA2
 let button_right = PINA1
-let button_down = PINA3
-let button_up = PINA0
+(* let button_down = PINA3 *)
+(* let button_up = PINA0 *)
 let button_a = PIN7
 let button_b = PIN8
 let g = PIN9
@@ -22,8 +22,8 @@ let init_rgb r g b =
 let boot_pins () =
   pin_mode button_left INPUT_PULLUP;
   pin_mode button_right INPUT_PULLUP;
-  pin_mode button_down INPUT_PULLUP;
-  pin_mode button_up INPUT_PULLUP;
+  (* pin_mode button_down INPUT_PULLUP; *)
+  (* pin_mode button_up INPUT_PULLUP; *)
   pin_mode r OUTPUT;
   pin_mode g OUTPUT;
   pin_mode b OUTPUT;
@@ -49,13 +49,24 @@ let ptr_tail = ref 0
 
 (* let current_dir = ref South *)
 
+let left_of = function
+    South -> East
+  | North -> West
+  | East -> North
+  | West -> South
+
+let right_of = function
+    South -> West
+  | North -> East
+  | East -> South
+  | West -> North
+
+
 let button_direction dir =
   let dr = digital_read in
-  match (dr button_up, dr button_down, dr button_left, dr button_right) with
-  | LOW,_,_,_ when dir <> South -> North
-  | _ , LOW, _,_ when dir <> North -> South
-  | _, _, LOW, _ when dir <> East -> West
-  | _, _, _ , LOW when dir <> West -> East
+  match (dr button_left, dr button_right) with
+  | LOW,_ -> left_of dir
+  | _ , LOW -> right_of dir
   | _ -> dir
 
 let max x y = if x > y then x else y
@@ -139,6 +150,7 @@ let rec game_loop dir=
   draw_apple ();
   (* sleep 2000; *)
   Oled.display ();
+  delay(100);
   game_loop new_dir
 
 let init () =

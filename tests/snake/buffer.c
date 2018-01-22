@@ -53,7 +53,7 @@ val_t caml_buffer_display(val_t x){
     int b = buffer_get_byte ();
     avr_write_register(SPDR,b);
   }
-
+  return Val_unit;
 }
 
 #else

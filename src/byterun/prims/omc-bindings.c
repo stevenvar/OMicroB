@@ -2,6 +2,7 @@
 #include "prims.h"
 #include "../stdlib/random.h"
 #include "../stdlib/trace.h"
+#include "../stdlib/delay.h"
 
 /******************************************************************************/
 /******************************************************************************/
@@ -20,6 +21,12 @@ val_t caml_avr_clear_bit(val_t reg, val_t bit) {
 val_t caml_avr_read_bit(val_t reg, val_t bit) {
   return Val_bool(avr_read_bit(Int_val(reg), Int_val(bit)));
 }
+
+val_t caml_avr_delay(val_t ms) {
+  delay(Int_val(ms));
+  return Val_unit;
+}
+
 
 /******************************************************************************/
 

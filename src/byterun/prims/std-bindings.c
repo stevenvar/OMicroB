@@ -21,6 +21,11 @@ value caml_avr_read_bit(value reg, value bit) {
   return Val_bool(avr_read_bit(Int_val(reg), Int_val(bit)));
 }
 
+value caml_avr_delay(value ms) {
+  /* todo  */
+  return Val_unit;
+}
+
 /******************************************************************************/
 
 value caml_avr_write_register(value reg, value val) {
@@ -53,6 +58,8 @@ value caml_debug_trace(value msg) {
   debug_trace(String_val(msg));
   return Val_unit;
 }
+
+
 
 /******************************************************************************/
 /******************************************************************************/

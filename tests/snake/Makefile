@@ -2,7 +2,7 @@ include ../../etc/Makefile.conf
 
 ATTY     := /dev/tty.usbmodem14331
 # CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
-CFLAGS   := -mmcu=atmega32u4
+CFLAGS   := -mmcu=atmega32u4 -DF_CPU=16000000L
 LFLAGS   := -Wl,-Os -Wl,--gc-sections
 INCLUDES := -I$(SRC)/stdlib/ -I$(SRC)/byterun/
 
@@ -32,7 +32,7 @@ snake.byte: buffer.c spi.ml oled.ml snake.ml
 	ocamlclean $@ -o $@
 
 snake.c: snake.byte $(BIN)/bc2c
-	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 200 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 350 -stack-size 32 $< -o $@
 
 snake.elf: snake.c
 	$(GXX) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $(OPT) $^ -o $@
