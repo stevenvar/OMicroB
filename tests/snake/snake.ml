@@ -8,7 +8,7 @@ let _ =  Random.init 10
 let encode (x,y) = (x lsl 8) lor y
 let decode x = (x / 256 , x mod 256)
 
-let snake = Array.make 10 (encode (0,0))
+let snake = Array.make 100 (encode (0,0))
 let ptr_head = ref 1
 let ptr_tail = ref 0
 let size = ref 1
@@ -33,11 +33,21 @@ let right_of = function
   | East -> South
   | West -> North
 
+let old_left = ref HIGH
+let old_right = ref HIGH
+
 let button_direction dir =
-  match (digital_read button_left, digital_read button_right) with
-  | LOW,_ -> left_of dir
-  | _ , LOW -> right_of dir
+  let new_left = digital_read button_left in
+  let new_right = digital_read button_right in 
+  let new_dir = 
+  match new_left,new_right with
+  | LOW,_ when !old_left <> LOW -> left_of dir
+  | _ , LOW  when !old_right <> LOW -> right_of dir
   | _ -> dir
+  in
+  old_left := new_left;
+  old_right := new_right;
+  new_dir
 
 exception Break
 let collides_with_itself () =
