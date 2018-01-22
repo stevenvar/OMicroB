@@ -82,6 +82,14 @@ let avrdudeopts  = ref []
   
 let help =
   ref (fun () -> assert false)
+
+let () =
+  let build_omicrob = Filename.concat (Filename.concat Config.builddir "bin") "omicrob" in
+  try
+    let build_stats = Unix.stat build_omicrob in
+    let my_stats = Unix.stat Sys.argv.(0) in
+    if build_stats.Unix.st_ino = my_stats.Unix.st_ino then local := true;
+  with _ -> ()
   
 let spec =
   Arg.align (
@@ -310,6 +318,10 @@ let output_hex   = !output_hex
 let libdir =
   if local then Filename.concat Config.builddir "lib"
   else Config.libdir
+
+let libexecdir =
+  if local then Filename.concat Config.builddir "bin"
+  else Config.libexecdir
     
 let bc2c =
   if local then Filename.concat (Filename.concat Config.builddir "bin") "bc2c"
@@ -711,12 +723,14 @@ let available_hex = !available_hex
 
 let () =
   if simul then (
-    let path =
+    let env_path = try Sys.getenv "PATH" ^ ":" ^ libexecdir with _ -> libexecdir in
+    let vars = [ ("PATH", env_path) ] in
+    let elf_path =
       match available_elf with
       | None -> error "no input file run simulation"
-      | Some path -> path in
-    let cmd = [ if Filename.is_relative path then Filename.concat Filename.current_dir_name path else path ] @ input_prgms in
-    run cmd
+      | Some elf_path -> elf_path in
+    let cmd = [ if Filename.is_relative elf_path then Filename.concat Filename.current_dir_name elf_path else elf_path ] @ input_prgms in
+    run ~vars cmd
   ) else (
     should_be_empty_files input_prgms;
   )

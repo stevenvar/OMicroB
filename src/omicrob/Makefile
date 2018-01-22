@@ -5,7 +5,7 @@ TARGETS := $(BIN)/omicrob
 omicrob: $(TARGETS)
 
 $(BIN)/omicrob: config.ml omicrob.ml
-	$(OCAMLOPT) -w @a -safe-string -strict-formats -strict-sequence $^ -o $@
+	$(OCAMLOPT) -w @a -safe-string -strict-formats -strict-sequence unix.cmxa $^ -o $@
 
 config.ml: $(ETC)/config.ml
 	cp $< $@

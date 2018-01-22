@@ -16,6 +16,7 @@ $(TARG): .build/$(BUILD)
 
 .build/$(BUILD): $(SRCS) config.ml $(EXTRA)/simul.ml $(EXTRA)/simul.mli
 	$(OCAMLBUILD) $(OPTIONS) $(BUILD)
+	@touch $@
 
 config.ml: $(ETC)/config.ml
 	cp $< $@

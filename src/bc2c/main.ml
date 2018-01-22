@@ -18,6 +18,16 @@ let rusage = ref (fun () -> assert false)
 
 (******************************************************************************)
 
+let () =
+  let build_bc2c = Filename.concat (Filename.concat Config.builddir "bin") "bc2c" in
+  try
+    let build_stats = Unix.stat build_bc2c in
+    let my_stats = Unix.stat Sys.argv.(0) in
+    if build_stats.Unix.st_ino = my_stats.Unix.st_ino then local := true;
+  with _ -> ()
+  
+(******************************************************************************)
+
 let spec = [
   ("-o", Arg.String (fun o -> output_path := Some o),
    "<file.c> Set output file (default: <bytecode>.c)");
@@ -125,7 +135,7 @@ let gc =
   | "MC" | "MAC" | "MARK_AND_COMPACT" | "MARK&COMPACT" -> `MAC
   | str -> usage_error (Printf.sprintf "invalid gc algorithm: %S" str)
     
-let lib_dir = if local then [ Config.builddir; "src"; "byterun"; "vm" ] else [ Config.libdir ]
+let lib_dir = if local then [ Config.builddir; "src"; "byterun"; "vm" ] else [ Config.includedir; "vm" ]
 
 let values_h  = List.fold_right Filename.concat lib_dir "values.h"
 let runtime_c = List.fold_right Filename.concat lib_dir "runtime.c"

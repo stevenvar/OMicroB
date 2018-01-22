@@ -5,7 +5,7 @@ TARGETS := test.byte test.c test.elf test.avr test.hex
 test: $(TARGETS)
 
 $(TARGETS): test.ml
-	../../bin/omicrob -local $^
+	../../bin/omicrob $^
 
 flash: test.hex
 	../../bin/omicrob -flash -sudo $^
