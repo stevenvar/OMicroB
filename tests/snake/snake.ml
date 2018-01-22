@@ -39,11 +39,21 @@ let button_direction dir =
   | _ , LOW -> right_of dir
   | _ -> dir
 
+exception Break
 let collides_with_itself () =
-  for i = !ptr_tail to !ptr_head-1 do
-    if snake.(!ptr_head) = snake.(i) then
-      raise Lose
+  let i = ref !ptr_tail in
+  try
+  while true do
+    if !i = !ptr_head then raise Break;
+    if snake.(!i) = snake.(!ptr_head) then raise Lose;
+    incr i;
+    i := !i mod Array.length snake;
   done
+  with Break -> ()
+  (* for i = !ptr_tail to !ptr_head-1 do *)
+    (* if snake.(!ptr_head) = snake.(i) then *)
+      (* raise Lose *)
+  (* done *)
 
 let new_head dir =
   let (cx,cy) = decode (snake.(!ptr_head)) in
