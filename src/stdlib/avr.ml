@@ -68,6 +68,8 @@ type ('a,'b,'c) pin =
 
 type mode = INPUT | OUTPUT | INPUT_PULLUP
 
+type level = LOW | HIGH
+
 let port_of_pin : type a b c . (a register,b register, c register) pin -> a register =
   function
   | PIN0 -> PORTD
@@ -259,10 +261,12 @@ let digital_write p b =
   let port = port_of_pin p in
   let bit = port_bit_of_pin p in
   match b with
-  | true -> set_bit port bit
-  | false -> clear_bit port bit
+  | HIGH -> set_bit port bit
+  | LOW -> clear_bit port bit
 
 let digital_read p =
   let input = input_of_pin p in
   let ibit = input_bit_of_pin p in
-  read_bit input ibit
+  match read_bit input ibit with
+  | true -> HIGH
+  | false -> LOW

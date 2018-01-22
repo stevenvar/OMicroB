@@ -61,6 +61,7 @@ type ('a, 'b, 'c) pin =
   | PINA4 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
   | PINA5 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
 type mode = INPUT | OUTPUT | INPUT_PULLUP
+type level = LOW | HIGH
 val port_of_pin : ('a register, 'b register, 'c register) pin -> 'a register
 val ddr_of_pin : ('a register, 'b register, 'c register) pin -> 'b register
 val input_of_pin : ('a register, 'b register, 'c register) pin -> 'c register
@@ -78,5 +79,5 @@ external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
   [@@noalloc]
 val pin_mode : ('a register, 'b register, 'c register) pin -> mode -> unit
 val digital_write :
-  ('a register, 'b register, 'c register) pin -> bool -> unit
-val digital_read : ('a register, 'b register, 'c register) pin -> bool
+  ('a register, 'b register, 'c register) pin -> level -> unit
+val digital_read : ('a register, 'b register, 'c register) pin -> level

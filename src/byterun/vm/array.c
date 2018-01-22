@@ -41,3 +41,15 @@ val_t caml_array_unsafe_set(val_t array, val_t index, val_t val)
   Field(array, Int_val(index)) = val;
   return Val_unit;
 }
+
+
+val_t caml_array_get(val_t array, val_t index)
+{
+  return Field(array, Int_val(index));
+}
+
+val_t caml_array_set(val_t array, val_t index, val_t val)
+{
+  Field(array, Int_val(index)) = val;
+  return Val_unit;
+}
