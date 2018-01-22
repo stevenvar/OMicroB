@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-void    random_init(int32_t n);
-int32_t random_bits(int32_t bound);
-bool    random_bool(void);
+void     random_init(int32_t n);
+uint32_t random_bits(uint32_t bound);
+bool     random_bool(void);
 
 #endif

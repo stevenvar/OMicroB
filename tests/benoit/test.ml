@@ -1,4 +1,4 @@
-open Avr
+(*open Avr*)
 
 (*
 let () =
@@ -17,7 +17,7 @@ let () =
   digital_write pin false;
   digital_write pin (!acc = 5_050_000);
 *)
-
+(*
 let blink nsleep =
   let pins = [ PIN9; PIN10; PIN11 ] in
   List.iter (fun pin -> pin_mode pin OUTPUT) pins;
@@ -29,7 +29,8 @@ let blink nsleep =
       digital_write pin HIGH;
     ) pins;
   done
-
+*)
+(*
 let () = pin_mode PIN9 OUTPUT
 
 exception Exn of int
@@ -41,7 +42,7 @@ let () =
   with Exn n ->
     trace "World";
     tracei n;
-  
+*)
 (*
 let rec fact n =
   if n = 0 then 1 else n * fact (n - 1)
@@ -59,3 +60,8 @@ let () =
   pin_mode pin OUTPUT;
   digital_write pin HIGH;
 *)
+
+let () =
+  for _i = 1 to 1_000_000 do
+    tracei (Random.int 1_000_000);
+  done

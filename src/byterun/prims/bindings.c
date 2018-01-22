@@ -51,7 +51,7 @@ value caml_random_init(value n) {
 }
 
 value caml_random_bits(value bound) {
-  return Int_val(random_bits(Val_int(bound)));
+  return Val_int(random_bits((uint32_t) Int_val(bound)));
 }
 
 value caml_random_bool(value unit) {
