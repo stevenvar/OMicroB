@@ -1,7 +1,7 @@
 
 open Types
 
-(* 128 * 8 pages of 1 byte(here : a char)  *)
+(* 128 * 8 pages of 1 byte (here : an int)  *)
 
 let size = 128*8
 

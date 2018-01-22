@@ -1,20 +1,7 @@
-(*************************************************************************)
-(*                                                                       *)
-(*                                OCaPIC                                 *)
-(*                                                                       *)
-(*                             Benoit Vaugon                             *)
-(*                                                                       *)
-(*    This file is distributed under the terms of the CeCILL license.    *)
-(*    See file ../../../LICENSE-en.                                      *)
-(*                                                                       *)
-(*************************************************************************)
 
 (* open Printf;; *)
 open Graphics
 open Types
-
-
-
 
 let green = rgb 0 200 50
 let blue = rgb 0 50 200
@@ -31,7 +18,9 @@ let create_display x y cs dc rst column_nb line_nb =
     line_nb = line_nb;
     width = column_nb;
     height = 8 * line_nb;
-    matrix = Array.make_matrix 128 64 false;
+    current_col = 0;
+    current_page = 0;
+    matrix = Array.make_matrix column_nb (8*line_nb) false;
     ddram = Ddram.create ();
     mode = Data
   }

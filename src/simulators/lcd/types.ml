@@ -18,6 +18,8 @@ type display = {
   matrix : matrix;
   ddram : ddram;
   mutable mode : mode;
+  mutable current_col : int;
+  mutable current_page : int;
   (* cgram : cgram; *)
   (* mutable ram_addr : int;
    * mutable selected_ram : ram;
