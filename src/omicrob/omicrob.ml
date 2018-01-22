@@ -543,7 +543,7 @@ let () =
     available_byte := Some output_path;
 
     let vars = [ ("CAMLLIB", libdir) ] in
-    let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-custom" ] @ mlopts @ [ "-cc"; Config.cxx ] in
+    let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-custom" ] @ mlopts in
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
