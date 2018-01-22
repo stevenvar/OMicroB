@@ -42,7 +42,6 @@ let send_lcd_command cs dc com =
  *   for i = 0 to 1023 do
  *     let b = get_byte_buffer () in
  *      (\* write_register SPDR b; *\)
- *      (\* while (read_bit SPSR SPIF <> false) do () done *\)
  *     Spi.transfer(b);
  *   done *)
 
