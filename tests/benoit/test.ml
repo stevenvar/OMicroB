@@ -38,9 +38,9 @@ exception Exn of int
 let () =
   try
     if true then raise (Exn 10_000);
-    blink 1_000;
-  with Exn n ->
-    blink n;
+    trace "Hello";
+  with Exn _ ->
+    trace "World ";
   
 (*
 let rec fact n =

@@ -7,6 +7,7 @@ HEADERS := $(wildcard */*.h)
 OBJECTS :=              \
   .build/std-bindings.o \
   .build/random.o       \
+  .build/trace.o        \
   .build/sf-regs.o      \
   .build/shared.o       \
   .build/simul.o
