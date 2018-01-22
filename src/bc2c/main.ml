@@ -3,8 +3,8 @@ open! Analyser
 
 (******************************************************************************)
 
-let stack_size = ref 128
-let heap_size = ref 1024
+let stack_size = ref 64
+let heap_size = ref 256
 let gc = ref "MAC"
 let arch = ref Arch.A32
 let output_path = ref None
@@ -22,7 +22,7 @@ let spec = [
   ("-o", Arg.String (fun o -> output_path := Some o),
    "<file.c> Set output file (default: <bytecode>.c)");
   ("-i", Arg.String (fun path -> lincludes := path :: !lincludes),
-   "<file.c> Include this local file into the generated file (with #include \"...\"");
+   "<file.c> Include this local file into the generated file (with #include \"...\")");
   ("-I", Arg.String (fun path -> gincludes := path :: !gincludes),
    "<file.c> Include this global file into the generated file (with #include <...>)");
   ("-stack-size", Arg.Set_int stack_size,
