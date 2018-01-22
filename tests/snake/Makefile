@@ -32,7 +32,7 @@ snake.byte: buffer.c spi.ml oled.ml snake.ml
 	ocamlclean $@ -o $@
 
 snake.c: snake.byte $(BIN)/bc2c
-	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 300 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -i buffer.c -local -arch 32 -heap-size 200 -stack-size 64 $< -o $@
 
 snake.elf: snake.c
 	$(GXX) -I $(OCAMLWHERE) -I$(SRC)/byterun/ -g $(OPT) $^ -o $@
