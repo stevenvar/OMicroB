@@ -152,7 +152,7 @@ void interp(void) {
   while (1) {
 
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-    if (0) {
+    {
       printf("=========\n");
       /* print_global(); */
       print_heap();
