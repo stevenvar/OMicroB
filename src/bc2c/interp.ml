@@ -209,7 +209,7 @@ let caml_hash i j seed v =
 external format_float : bytes -> float -> bytes = "caml_format_float"
 external format_int : bytes -> int -> bytes = "caml_format_int"
 
-let ccall prim args =
+let ccall ooid prim args =
   match prim, args with
   | "caml_abs_float", [ Float x ] -> Float (abs_float x)
   | "caml_acos_float", [ Float x ] -> Float (acos x)
@@ -286,6 +286,7 @@ let ccall prim args =
   | "caml_string_equal", [ Bytes b1; Bytes b2 ] -> if Bytes.equal b1 b2 then Int 1 else Int 0
   | "caml_tan_float", [ Float x ] -> Float (tan x)
   | "caml_tanh_float", [ Float x ] -> Float (tanh x)
+  | "caml_fresh_oo_id", [ Int 0 ] -> Int (incr ooid; pred !ooid)
   | _ -> raise Exit
 
 (******************************************************************************)
@@ -295,6 +296,7 @@ let exec prims globals code cycle_limit =
   let globals = Array.map import_value globals in
   let code_size = Array.length code in
 
+  let ooid = ref 0 in
   let unit = Int 0 in
   let accu = ref unit in
   let pc = ref 0 in
@@ -746,33 +748,33 @@ let exec prims globals code cycle_limit =
         incr pc;
 
       | C_CALL1 idx ->
-        accu := ccall (get_prim prims idx) [ !accu ];
+        accu := ccall ooid (get_prim prims idx) [ !accu ];
         incr pc;
       | C_CALL2 idx ->
-        accu := ccall (get_prim prims idx) [ !accu; pop stack ];
+        accu := ccall ooid (get_prim prims idx) [ !accu; pop stack ];
         incr pc;
       | C_CALL3 idx ->
         let v1 = pop stack in
         let v2 = pop stack in
-        accu := ccall (get_prim prims idx) [ !accu; v1; v2 ];
+        accu := ccall ooid (get_prim prims idx) [ !accu; v1; v2 ];
         incr pc;
       | C_CALL4 idx ->
         let v1 = pop stack in
         let v2 = pop stack in
         let v3 = pop stack in
-        accu := ccall (get_prim prims idx) [ !accu; v1; v2; v3 ];
+        accu := ccall ooid (get_prim prims idx) [ !accu; v1; v2; v3 ];
         incr pc;
       | C_CALL5 idx ->
         let v1 = pop stack in
         let v2 = pop stack in
         let v3 = pop stack in
         let v4 = pop stack in
-        accu := ccall (get_prim prims idx) [ !accu; v1; v2; v3; v4 ];
+        accu := ccall ooid (get_prim prims idx) [ !accu; v1; v2; v3; v4 ];
         incr pc;
       | C_CALLN (narg, idx) ->
         let args = ref [ !accu ] in
         for _i = 2 to narg do args := pop stack :: !args done;
-        accu := ccall (get_prim prims idx) (List.rev !args);
+        accu := ccall ooid (get_prim prims idx) (List.rev !args);
         incr pc;
 
       | CONST0 ->
@@ -929,7 +931,7 @@ let exec prims globals code cycle_limit =
     done;
     assert false (* Unreachable code *)
   with
-  | Exit -> !pc, !accu, !stack, globals, !last_valid_cycle
+  | Exit -> !pc, !ooid, !accu, !stack, globals, !last_valid_cycle
   | Stack_overflow   -> failwith "Evaluation failed: stack overflow"
   | Out_of_memory    -> failwith "Evaluation failed: out of memory"
   | Division_by_zero -> failwith "Evaluation failed: division by zero"
@@ -937,8 +939,8 @@ let exec prims globals code cycle_limit =
 (******************************************************************************)
 
 let run prims globals code =
-  let _, _, _, _, cycle_limit = exec prims globals code max_int in
-  let pc, accu, stack, globals, _ = exec prims globals code cycle_limit in
-  pc, accu, stack, globals
+  let _, _, _, _, _, cycle_limit = exec prims globals code max_int in
+  let pc, ooid, accu, stack, globals, _ = exec prims globals code cycle_limit in
+  pc, ooid, accu, stack, globals
 
 (******************************************************************************)

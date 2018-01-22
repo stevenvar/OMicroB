@@ -1,38 +1,58 @@
+#ifdef __AVR__
+#include <avr/io.h>
+#include <util/delay.h>
+#endif
+
+#include <setjmp.h>
+#include <string.h>
+
 #include "values.h"
+#include "gc.h"
 #include "fail.h"
 
-/*
-static val_t out_of_memory_s[] = {
-  Make_header(4, String_tag, Color_white),
-  Make_string_data('O', 'u', 't', '_'),
-  Make_string_data('o', 'f', '_', 'm'),
-  Make_string_data('e', 'm', 'o', 'r'),
-  Make_string_data('y', '\0', '\0', '\2')
-};
+/******************************************************************************/
 
-static val_t out_of_memory[] = {
-  Make_header(2, Object_tag, Color_white),
-  (val_t) ((intptr_t) &(out_of_memory_s[1]) | 0x7FF00000),
-  Val_int(-1)
-};
-*/
+jmp_buf caml_exception_jmp_buf;
 
 void caml_raise(val_t v) {
-  // TODO
+  acc = v;
+  longjmp(caml_exception_jmp_buf, 1);
 }
 
-void caml_invalid_argument(char const *msg) {
-  // TODO
-}
+/******************************************************************************/
 
-void caml_out_of_memory(void) {
-  // TODO
-}
-
-void caml_raise_division_by_zero(void) {
-  // TODO
+void caml_raise_out_of_memory(void) {
+  caml_raise(ocaml_out_of_memory);
 }
 
 void caml_raise_stack_overflow(void) {
-  // TODO
+  caml_raise(ocaml_stack_overflow);
 }
+
+void caml_raise_division_by_zero(void) {
+  caml_raise(ocaml_division_by_zero);
+}
+
+/******************************************************************************/
+
+void caml_raise_invalid_argument(char const *msg) {
+  mlsize_t msg_len = strlen(msg);
+  val_t block;
+  mlsize_t str_wosize = Wsize_bsize(msg_len) + 1;
+  mlsize_t str_bosize = Bsize_wsize(str_wosize);
+  OCamlAlloc(block, str_wosize + 3, String_tag);
+  if (block == 0) {
+    caml_raise_out_of_memory();
+  } else {
+    Hd_val(block) = Make_header(str_wosize, String_tag, Color_white);
+    Field(block, str_wosize - 1) = 0;
+    memcpy(String_val(block), msg, msg_len);
+    String_val(block)[str_bosize - 1] = str_bosize - msg_len - 1;
+    Field(block, str_wosize) = Make_header(2, 0, Color_white);
+    Field(block, str_wosize + 1) = ocaml_invalid_argument;
+    Field(block, str_wosize + 2) = block;
+    caml_raise(Val_block(&Field(block, str_wosize + 1)));
+  }
+}
+
+/******************************************************************************/

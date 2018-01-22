@@ -143,7 +143,7 @@ let () =
   try
     Tools.with_oc output_path (fun oc ->
       let bytefile = Bytefile.read bytecode_path in
-      let accu, stack, globals, code = Cleaner.clean bytefile.Bytefile.prim bytefile.Bytefile.data bytefile.Bytefile.code in
+      let ooid, accu, stack, globals, code = Cleaner.clean bytefile.Bytefile.prim bytefile.Bytefile.data bytefile.Bytefile.code in
       let bytecode, opcodes, codemap = Codegen.export code in
       let accudata, stackdata, globdata, heapdata = Datagen.export arch codemap accu stack globals in
       let stackdata = Datagen.reverse_stack stack_size stackdata in
@@ -168,6 +168,7 @@ let () =
       Printf.fprintf oc "#define OCAML_BYTECODE_BSIZE       %8d\n" (List.length bytecode);
       Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER     %8d\n" (Array.length bytefile.Bytefile.prim);
       Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH         %8s\n" (Arch.to_string arch);
+      Printf.fprintf oc "#define OCAML_STARTING_OOID        %8d\n" ooid;
       Printf.fprintf oc "\n";
 
       (* Defined Variables *)

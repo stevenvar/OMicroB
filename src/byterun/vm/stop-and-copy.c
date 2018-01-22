@@ -171,12 +171,10 @@ void gc_one_val(val_t* ptr, int update) {
  *
  */
 
-void gc(mlsize_t size) {
+void gc(void) {
+  TRACE("#################### STOP & COPY ####################\n");
 #ifdef DEBUG
-  cpt_gc++;
-#ifdef __PC__
-  printf("==================================================GC=====================================\n");
-#endif
+  cpt_gc ++;
   print_heap();
   print_stack();
 #endif
@@ -211,24 +209,4 @@ void gc(mlsize_t size) {
   clean_heap();
   print_heap();
 #endif
-  /* il n y a pas eu assez de récupération */
-  if (heap_ptr + size > heap_end) {
-#if defined __AVR__
-    DDRB |= _BV(7);
-    DDRB |= _BV(5);
-    while(1){
-      PORTB ^=_BV(5);
-      PORTB ^=_BV(7);
-      for (unsigned int i = 0; i < 1000; i ++) {
-	for (unsigned int j = 0; j < 1000; j ++){
-	  asm("");
-	}
-      }
-    }
-#endif
-#ifdef __PC__
-    printf("HEAP OVERFLOW (I needed %d blocks)\n",size);
-#endif
-    exit(200);
-  }
 }

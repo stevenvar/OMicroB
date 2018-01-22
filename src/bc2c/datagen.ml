@@ -193,7 +193,17 @@ let export arch codemap accu stack data =
       push (CHARS (List.rev (char_of_int zero_pad :: !current_strdata)));
       ptr
 
+  and export_exception tag fields =
+    if tag <> Obj.object_tag then raise Exit;
+    match fields with
+    | [| Bytes str; Int (-1) |] when Bytes.to_string str = "Out_of_memory"    -> EXCEPTION OUT_OF_MEMORY
+    | [| Bytes str; Int (-9) |] when Bytes.to_string str = "Stack_overflow"   -> EXCEPTION STACK_OVERFLOW
+    | [| Bytes str; Int (-6) |] when Bytes.to_string str = "Division_by_zero" -> EXCEPTION DIVISION_BY_ZERO
+    | [| Bytes str; Int (-4) |] when Bytes.to_string str = "Invalid_argument" -> EXCEPTION INVALID_ARGUMENT
+    | _ -> raise Exit
+       
   and export_block tag fields =
+    try export_exception tag fields with Exit ->
     try Sharer.find_block sharer fields with Not_found ->
       push (HEADER (tag, Array.length fields));
       let ptr = pointer () in

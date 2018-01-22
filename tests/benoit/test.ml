@@ -18,14 +18,44 @@ let () =
   digital_write pin (!acc = 5_050_000);
 *)
 
-let () =
+
+let blink nsleep =
   let pins = [ PIN9; PIN10; PIN11 ] in
   List.iter (fun pin -> pin_mode pin OUTPUT) pins;
-  List.iter (fun pin -> digital_write pin true) pins;
+  List.iter (fun pin -> digital_write pin HIGH) pins;
   while true do
     List.iter (fun pin ->
-      digital_write pin false;
-      for _i = 1 to 100_000_000 do () done;
-      digital_write pin true;
+      digital_write pin LOW;
+      for _i = 1 to nsleep do () done;
+      digital_write pin HIGH;
     ) pins;
   done
+
+let () = pin_mode PIN9 OUTPUT
+
+exception Exn of int
+    
+let () =
+  try
+    if true then raise (Exn 10_000);
+    blink 1_000;
+  with Exn n ->
+    blink n;
+  
+(*
+let rec fact n =
+  if n = 0 then 1 else n * fact (n - 1)
+
+let () =
+  try
+    ignore (fact 1_000);
+    blink 5_000;
+  with Stack_overflow ->
+    blink 20_000;
+*)
+(*
+let () =
+  let pin = PIN10 in
+  pin_mode pin OUTPUT;
+  digital_write pin HIGH;
+*)

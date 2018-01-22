@@ -249,26 +249,14 @@ static void compact_blocks(void) {
 /******************************************************************************/
 /* GC: main function */
 
-void mark_and_compact(void) {
+void gc(void) {
+  TRACE("#################### MARK & COMPACT ####################\n");
   mark_roots();
   wipe_dead_blocks();
   reverse_root_pointers();
   reverse_heap_pointers();
   update_pointers();
   compact_blocks();
-}
-
-void gc(mlsize_t wosize) {
-#if defined(__PC__) && defined(DEBUG)
-  printf("#################### MARK & COMPACT ####################\n");
-#endif
-  mark_and_compact();
-  if (heap_ptr + (wosize + 1) > heap_end) {
-    #ifdef __PC__
-    printf("HEAP OVERFLOW\n");
-    #endif 
-    caml_out_of_memory();
-  }
 }
 
 /******************************************************************************/

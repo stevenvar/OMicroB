@@ -42,7 +42,9 @@ void error(const char *msg){
 }
 
 void signal_handler(int signum){
-  fprintf(stderr, "%s!\n", strsignal(signum));
+  if (signum == SIGSEGV) {
+    fprintf(stderr, "%s!\n", strsignal(signum));
+  }
   terminate();
 }
 

@@ -189,7 +189,7 @@ let rec remap_value code_mapper sharer v =
     CodePtr code_mapper.(ptr)
 
 let clean prims globals code =
-  let pc, accu, stack, globals = Interp.run prims globals code in
+  let pc, ooid, accu, stack, globals = Interp.run prims globals code in
 
   let living_code = Array.map (fun _ -> false) code in
   let read_globals = Array.map (fun _ -> false) globals in
@@ -222,4 +222,4 @@ let clean prims globals code =
   let stack = List.map (remap_value code_mapper sharer) stack in
   let accu = remap_value code_mapper sharer accu in
 
-  accu, stack, globals, code
+  ooid, accu, stack, globals, code

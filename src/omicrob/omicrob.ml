@@ -4,13 +4,13 @@
 (* Constants *)
 
 let default_stack_size = 64
-let default_heap_size  = 512
+let default_heap_size  = 256
 let default_gc         = "MAC"
 let default_arch       = 32
 
 let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
 let default_cxx_options = [ "-g"; "-Wall"; "-O2" ]
-let default_avr_cxx_options = [ "-g"; "-fpermissive"; "-Wall"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-Wl,-gc-sections" ]
+let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-Wl,-gc-sections" ]
 
 let default_mmcu  = "atmega32u4"
 let default_avr   = "avr109"
@@ -715,7 +715,7 @@ let () =
       match available_elf with
       | None -> error "no input file run simulation"
       | Some path -> path in
-    let cmd = [ path ] @ input_prgms in
+    let cmd = [ if Filename.is_relative path then Filename.concat Filename.current_dir_name path else path ] @ input_prgms in
     run cmd
   ) else (
     should_be_empty_files input_prgms;

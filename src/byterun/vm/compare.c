@@ -57,18 +57,18 @@ static int compare_val(val_t v1, val_t v2) {
   }
 
   case Abstract_tag:
-    caml_invalid_argument("compare: abstract value");
+    caml_raise_invalid_argument("compare: abstract value");
 
   case Closure_tag:
 
   case Infix_tag:
-    caml_invalid_argument("compare: functional value");
+    caml_raise_invalid_argument("compare: functional value");
 
   case Object_tag:
     return (Oid_val(v1) - Oid_val(v2));
 
   case Custom_tag:
-    caml_invalid_argument("compare: custom value");
+    caml_raise_invalid_argument("compare: custom value");
     /* return Custom_ops_val(v1)->compare(v1, v2); */
 
   default: {

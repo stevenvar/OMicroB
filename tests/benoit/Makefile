@@ -10,6 +10,9 @@ $(TARGETS): test.ml
 flash: test.hex
 	../../bin/omicrob -flash -sudo $^
 
+simul: test.elf
+	./test.elf ../../bin/omicrob_pin_simulator
+
 clean:
 	@rm -f *.cmo *.cmi *.cmx *.o $(TARGETS)
 
