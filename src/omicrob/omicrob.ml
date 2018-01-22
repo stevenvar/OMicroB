@@ -11,9 +11,11 @@ let default_arch       = 32
 let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
 let default_cxx_options = [ "-g"; "-Wall"; "-O2" ]
 let default_avr_cxx_options = [ "-g"; "-fpermissive"; "-Wall"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-Wl,-gc-sections" ]
-let default_mmcu = "atmega32u4"
-let default_avr = "avr109"
-let default_baud = 57_600
+
+let default_mmcu  = "atmega32u4"
+let default_avr   = "avr109"
+let default_baud  = 57_600
+let default_clock = 16_000_000
 
 (******************************************************************************)
 (******************************************************************************)
@@ -662,6 +664,7 @@ let () =
 
     let cmd = [ Config.avr_cxx ] @ default_avr_cxx_options @ avrcxxopts in
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ default_mmcu ] in
+    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int default_clock ] in
     let cmd = if debug then cmd @ [ "-DDEBUG" ] else cmd in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd

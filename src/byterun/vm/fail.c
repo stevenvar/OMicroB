@@ -1,5 +1,6 @@
 #include "values.h"
 #include "fail.h"
+
 /*
 static val_t out_of_memory_s[] = {
   Make_header(4, String_tag, Color_white),
@@ -15,6 +16,7 @@ static val_t out_of_memory[] = {
   Val_int(-1)
 };
 */
+
 void caml_raise(val_t v) {
   // TODO
 }
@@ -24,5 +26,13 @@ void caml_invalid_argument(char const *msg) {
 }
 
 void caml_out_of_memory(void) {
+  // TODO
+}
+
+void caml_raise_division_by_zero(void) {
+  // TODO
+}
+
+void caml_raise_stack_overflow(void) {
   // TODO
 }

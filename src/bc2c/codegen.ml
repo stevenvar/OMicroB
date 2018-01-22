@@ -138,25 +138,25 @@ let export_code_from_codemap code codemap =
       check_bounds "ASSIGN" n 0 255;
       export_opcode Opcode.ASSIGN;
       export_uint8 n;
-    | ENVACC1 ->
+    | ENVACC1 | ENVACC 1 ->
       export_opcode Opcode.ENVACC1;
-    | ENVACC2 ->
+    | ENVACC2 | ENVACC 2 ->
       export_opcode Opcode.ENVACC2;
-    | ENVACC3 ->
+    | ENVACC3 | ENVACC 3 ->
       export_opcode Opcode.ENVACC3;
-    | ENVACC4 ->
+    | ENVACC4 | ENVACC 4 ->
       export_opcode Opcode.ENVACC4;
     | ENVACC n ->
       check_bounds "ENVACC" n 5 255;
       export_opcode Opcode.ENVACC;
       export_uint8 n;
-    | PUSHENVACC1 ->
+    | PUSHENVACC1 | PUSHENVACC 1 ->
       export_opcode Opcode.PUSHENVACC1;
-    | PUSHENVACC2 ->
+    | PUSHENVACC2 | PUSHENVACC 2 ->
       export_opcode Opcode.PUSHENVACC2;
-    | PUSHENVACC3 ->
+    | PUSHENVACC3 | PUSHENVACC 3 ->
       export_opcode Opcode.PUSHENVACC3;
-    | PUSHENVACC4 ->
+    | PUSHENVACC4 | PUSHENVACC 4 ->
       export_opcode Opcode.PUSHENVACC4;
     | PUSHENVACC n ->
       check_bounds "PUSHENVACC" n 5 255;
