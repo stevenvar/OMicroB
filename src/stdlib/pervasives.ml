@@ -94,3 +94,4 @@ let invalid_arg s = raise(Invalid_argument s)
 (* Debug *)
 
 external trace : string -> unit = "caml_debug_trace"
+external tracei : int -> unit = "caml_debug_tracei"

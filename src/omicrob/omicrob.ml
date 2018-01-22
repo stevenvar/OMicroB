@@ -59,7 +59,7 @@ let output_files = ref []
 let compile_only = ref false
 let infer_interf = ref false
 let just_print   = ref false
-let debug        = ref false
+let trace        = ref 0
 let sudo         = ref false
 let simul        = ref false
 let flash        = ref false
@@ -110,8 +110,8 @@ let spec =
        " Use the OMicroB build directory instead of installation directory")
     ] else []
   ) @ [
-    ("-debug", Arg.Set debug,
-     " Activate debugging, print informations about execution at runtime");
+    ("-trace", Arg.Set_int trace,
+     " Set verbosity of traces: print informations about execution at runtime (default: 0)");
     ("-sudo", Arg.Set sudo,
      " Use sudo when flashing the micro-controller with avrdude");
     ("-simul", Arg.Set simul,
@@ -280,7 +280,7 @@ let () =
 let compile_only = !compile_only
 let infer_interf = !infer_interf
 let just_print   = !just_print
-let debug        = !debug
+let trace        = !trace
 let sudo         = !sudo
 let simul        = !simul
 let flash        = !flash
@@ -437,7 +437,7 @@ let rec get_first_defined path_opts ext =
 let () =
   if compile_only then (
     should_be_false "-c" "-i" infer_interf;
-    should_be_false "-c" "-debug" debug;
+    should_be_false "-c" "-trace" (trace <> 0);
     should_be_false "-c" "-simul" simul;
     should_be_false "-c" "-flash" flash;
     should_be_none_incomp "-c" "-stack-size" stack_size;
@@ -475,7 +475,7 @@ let () =
 let () =
   if infer_interf then (
     should_be_false "-i" "-c" compile_only;
-    should_be_false "-i" "-debug" debug;
+    should_be_false "-i" "-trace" (trace <> 0);
     should_be_false "-i" "-simul" simul;
     should_be_false "-i" "-flash" flash;
     should_be_none_incomp "-i" "-stack-size" stack_size;
@@ -544,7 +544,7 @@ let () =
 
     let vars = [ ("CAMLLIB", libdir) ] in
     let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-custom" ] @ mlopts @ [ "-cc"; Config.cxx ] in
-    let cmd = if debug then cmd @ [ "-ccopt"; "-DDEBUG" ] else cmd in
+    let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
     run ~vars cmd;
@@ -641,7 +641,7 @@ let () =
     available_elf := Some output_path;
     
     let cmd = [ Config.cxx ] @ default_cxx_options @ cxxopts in
-    let cmd = if debug then cmd @ [ "-DDEBUG" ] else cmd in
+    let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   )
@@ -677,7 +677,7 @@ let () =
     let cmd = [ Config.avr_cxx ] @ default_avr_cxx_options @ avrcxxopts in
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ default_mmcu ] in
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int default_clock ] in
-    let cmd = if debug then cmd @ [ "-DDEBUG" ] else cmd in
+    let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   ) else (

@@ -59,7 +59,14 @@ value caml_debug_trace(value msg) {
   return Val_unit;
 }
 
+<<<<<<< HEAD
 
+=======
+value caml_debug_tracei(value n) {
+  debug_tracei(Long_val(n));
+  return Val_unit;
+}
+>>>>>>> ee175abb2f691e4f6e18ca1ab3f0908447410804
 
 /******************************************************************************/
 /******************************************************************************/
