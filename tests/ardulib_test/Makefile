@@ -32,7 +32,7 @@ ardulib.byte: spi.ml ardulib.ml
 	ocamlclean $@ -o $@
 
 ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 128 -stack-size 64 $< -o $@
+	$(BIN)/bc2c -local -arch 32 -heap-size 300 -stack-size 32 $< -o $@
 
 ardulib.elf: ardulib.c
 	$(GXX) -I $(OCAMLWHERE) $(INCLUDES) $(OPT) -g $^ -o $@

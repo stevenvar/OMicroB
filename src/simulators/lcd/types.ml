@@ -20,6 +20,10 @@ type display = {
   mutable mode : mode;
   mutable current_col : int;
   mutable current_page : int;
+  mutable min_col : int;
+  mutable max_col : int;
+  mutable min_page : int;
+  mutable max_page : int;
   (* cgram : cgram; *)
   (* mutable ram_addr : int;
    * mutable selected_ram : ram;

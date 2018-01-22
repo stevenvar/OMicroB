@@ -10,6 +10,9 @@ let create () = Array.make size 0
 let fill c display =
    Array.fill display.ddram 0 (Array.length display.ddram) c
 
+let translate_position col page display =
+  page*display.width + col
+
 let write =
   let i = ref 0 in
   fun c display ->
