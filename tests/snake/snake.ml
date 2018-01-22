@@ -2,7 +2,7 @@ open Avr
 open Arduboy
 type direction = North | South | East | West
 
-let _ =  Random.init 10
+let _ =  Random.init 42
 
 (* encoding couple in int *)
 let encode (x,y) = (x lsl 8) lor y
@@ -83,8 +83,9 @@ let rec game_loop dir=
   let new_dir = button_direction dir in
   if (eats_apple ()) then
     begin
-      Oled.draw xt yt false;
-      ptr_tail := (!ptr_tail + 1) mod (Array.length snake)
+      apple := new_position ();
+      incr size;
+      if !size = Array.length snake then raise Win;
     end
   else 
      begin
