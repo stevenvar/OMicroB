@@ -99,7 +99,7 @@ let rec game_loop dir=
   Oled.draw xh yh true;
   draw_apple ();
   Oled.display ();
-  delay(100);
+  delay(100- !size);
   collides_with_itself ();
   game_loop new_dir
 

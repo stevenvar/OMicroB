@@ -12,7 +12,7 @@ flash: snake.hex
 	$(BIN)/omicrob -flash -sudo $<
 
 simul: snake.elf
-	$(BIN)/omicrob -simul $< ../../bin/omicrob_circuit_simulator\ circuit.txt
+	./$< '../../bin/omicrob_circuit_simulator circuit.txt'
 
 clean:
 	@rm *.cmo
