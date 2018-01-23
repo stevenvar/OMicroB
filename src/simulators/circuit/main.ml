@@ -42,6 +42,7 @@ try
   in
   try
     let components = Parser.main Lexer.lex lexbuf in
+    at_exit (fun () -> print_endline "STOP");
     Window.init_graphics ();
     List.iter Component.register components;
     Simul.start ();

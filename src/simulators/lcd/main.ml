@@ -68,6 +68,7 @@ let _ =
   let column_nb = fst size in
   let line_nb = snd size in
   (try
+    at_exit (fun () -> print_endline "STOP");
     let display = Display.create_display 0 0 cs dc rst column_nb line_nb in
     Display.init_graphics display;
     Proto.register display;
