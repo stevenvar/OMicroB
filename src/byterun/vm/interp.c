@@ -1408,7 +1408,7 @@ void interp(void) {
         } else {
           exn_name = String_val(Field(Field(acc, 0), 0));
         }
-        printf("Error: uncatched exception: %s\n", exn_name);
+        printf("Error: uncaught exception: %s\n", exn_name);
 #endif
 #if defined __AVR__
         DDRB |= _BV(5);

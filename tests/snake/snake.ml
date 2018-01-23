@@ -6,9 +6,9 @@ let _ =  Random.init 42
 
 (* encoding couple in int *)
 let encode (x,y) = (x lsl 8) lor y
-let decode x = (x / 256 , x mod 256)
+let decode x = (x / 256, x mod 256)
 
-let snake = Array.make 100 (encode (0,0))
+let snake = Array.make 10 (encode (0,0))
 let ptr_head = ref 1
 let ptr_tail = ref 0
 let size = ref 1
@@ -18,7 +18,7 @@ exception Win
 
 let new_position () =
   (Random.int 64, Random.int 32)
-
+ 
 let apple = ref (new_position ())
 
 let left_of = function
@@ -56,7 +56,8 @@ let collides_with_itself () =
   try
   while true do
     if !i = !ptr_head then raise Break;
-    if snake.(!i) = snake.(!ptr_head) then raise Lose;
+    if snake.(!i) = snake.(!ptr_head) then
+      raise Lose;
     incr i;
     i := !i mod Array.length snake;
   done
@@ -85,7 +86,8 @@ let rec game_loop dir=
     begin
       apple := new_position ();
       incr size;
-      if !size = Array.length snake then raise Win;
+      if !size = Array.length snake then 
+        raise Win;
     end
   else 
      begin
@@ -101,7 +103,7 @@ let rec game_loop dir=
   delay(100 - !size);
   game_loop new_dir
 
-let () =
+let () = 
   init ();
   try
     game_loop South

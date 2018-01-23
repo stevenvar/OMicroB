@@ -38,6 +38,7 @@
 #define PINF 14
 
 
+#define SPSR 16
 #define SPDR 17
 
 static unsigned char *regs;
@@ -213,6 +214,8 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
     }
   }
   else if(reg == SPDR){
+    /* put 1 in SPSR.SPIF to simulate write ok : */
+    regs[SPSR] = 0xFF;
     regs[reg] = new_val;
     send_write_port('G'-'B',new_val);
   }
@@ -364,7 +367,7 @@ static void out_write_port(int port, unsigned char new_val){
     int ddr_val = regs[ddr];
     int old_val = regs[port];
     if((new_val & ~ddr_val) != 0xFF){
-      char port_c = 'A' + port - LOWER_PORT;
+      char port_c = 'B' + port - LOWER_PORT;
       fprintf(stderr,
               "Warning: an outside component writes PORT%c=0x%02X when TRIS%c=0x%02X\n",
               port_c, new_val, port_c, ddr_val);
