@@ -188,6 +188,46 @@ let rec remap_value code_mapper sharer v =
   | CodePtr ptr ->
     CodePtr code_mapper.(ptr)
 
+let list_used_primitives prims code =
+  let prim_nb = Array.length prims in
+  let used_prims = Array.make prim_nb false in
+  Array.iter (fun instr ->
+    match instr with
+    | C_CALL1 idx | C_CALL2 idx | C_CALL3 idx | C_CALL4 idx | C_CALLN (_, idx) ->
+      assert (idx >= 0 && idx < prim_nb);
+      used_prims.(idx) <- true;
+    | _ -> ()
+  ) code;
+  used_prims
+
+let clean_primitives old_prims old_code =
+  let old_prim_nb = Array.length old_prims in
+  let used_prims = list_used_primitives old_prims old_code in
+  let prim_mapper = Array.make old_prim_nb (-1) in
+  let new_prim_nb = Array.fold_left (fun acc b -> if b then acc + 1 else acc) 0 used_prims in
+  let new_prims = Array.make new_prim_nb "" in
+  let new_i = ref 0 in
+  Array.iteri (fun old_i b ->
+    if b then (
+      prim_mapper.(old_i) <- !new_i;
+      new_prims.(!new_i) <- old_prims.(old_i);
+      incr new_i;
+    )
+  ) used_prims;
+  assert (!new_i = new_prim_nb);
+  let new_code =
+    Array.map (fun instr ->
+      match instr with
+      | C_CALL1 idx -> C_CALL1 prim_mapper.(idx)
+      | C_CALL2 idx -> C_CALL2 prim_mapper.(idx)
+      | C_CALL3 idx -> C_CALL3 prim_mapper.(idx)
+      | C_CALL4 idx -> C_CALL4 prim_mapper.(idx)
+      | C_CALL5 idx -> C_CALL5 prim_mapper.(idx)
+      | C_CALLN (narg, idx) -> C_CALLN (narg, prim_mapper.(idx))
+      | _ -> instr
+    ) old_code in
+  (new_prims, new_code)
+    
 let clean prims globals code =
   let pc, ooid, accu, stack, globals = Interp.run prims globals code in
 
@@ -222,4 +262,6 @@ let clean prims globals code =
   let stack = List.map (remap_value code_mapper sharer) stack in
   let accu = remap_value code_mapper sharer accu in
 
-  ooid, accu, stack, globals, code
+  let prims, code = clean_primitives prims code in
+  
+  ooid, accu, stack, globals, prims, code

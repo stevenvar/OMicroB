@@ -66,7 +66,7 @@ let () =
     tracei (Random.int 1_000_000);
   done
 *)
-
+(*
 module type S = module type of String
 module type T = module type of Bytes
 module type C = module type of Char
@@ -84,5 +84,8 @@ let () =
   digital_write PIN9 (magic m);
   digital_write PIN9 (magic n);
   digital_write PIN9 (magic p);
-    
-      
+*)
+
+let () =
+  let tbl = [| 1; 3; 5; 7; 9; 11 |] in
+  Array.iter tracei tbl

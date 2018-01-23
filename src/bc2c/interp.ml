@@ -295,6 +295,7 @@ let ccall ooid prim args =
   | "caml_tan_float", [ Float x ] -> Float (tan x)
   | "caml_tanh_float", [ Float x ] -> Float (tanh x)
   | "caml_fresh_oo_id", [ Int 0 ] -> Int (incr ooid; pred !ooid)
+  | "caml_obj_dup", [ Block (_mut, tag, tbl) ] -> Block (Mutable, tag, Array.copy tbl)
   | _ -> raise Exit
 
 (******************************************************************************)
