@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "values.h"
+#include "fail.h"
 
 extern value *heap_ptr;
 extern value *heap_end;
@@ -16,7 +17,7 @@ void gc(void);
     if (heap_ptr + (wosize) + 1 > heap_end) {                          \
       gc();                                                            \
       if (heap_ptr + (wosize) + 1 > heap_end) {                        \
-        (result) = 0;                                                  \
+        caml_raise_out_of_memory();                                    \
       }                                                                \
     }                                                                  \
     *heap_ptr = Make_header((wosize), (tag), Color_white);             \
