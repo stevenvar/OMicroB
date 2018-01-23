@@ -93,6 +93,10 @@ value caml_string_compare(value s1, value s2) {
   return sz1 < sz2 ? -1 : 1;
 }
 
+value caml_bytes_compare(value b1, value b2) {
+  return caml_string_compare(b1, b2);
+}
+
 value caml_bytes_equal(value s1, value s2) {
   return caml_string_equal(s1, s2);
 }

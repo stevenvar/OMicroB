@@ -16,5 +16,6 @@ value caml_string_equal(value s1, value s2);
 value caml_bytes_equal(value s1, value s2);
 value caml_string_notequal(value s1, value s2);
 value caml_string_compare(value s1, value s2);
+value caml_bytes_compare(value b1, value b2);
 
 #endif
