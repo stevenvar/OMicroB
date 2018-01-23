@@ -71,7 +71,7 @@ let code_ptrs_of_value v =
     | Int _ | Int32 _ | Int64 _ | Nativeint _
     | Float _ | Float_array _ | Bytes _ ->
       acc
-    | Object vs | Block (_, vs) ->
+    | Object (_mut, vs) | Block (_mut, _, vs) ->
       Array.fold_left loop acc vs
     | Closure { ofs = _; ptrs; env } ->
       Array.fold_left loop (Array.to_list ptrs @ acc) env
@@ -162,15 +162,15 @@ let rec remap_value code_mapper sharer v =
   | Int _ | Int32 _ | Int64 _ | Nativeint _
   | Float _ | Float_array _ | Bytes _ ->
     v
-  | Object vs -> (
+  | Object (mut, vs) -> (
     try Sharer.find_block sharer vs with Not_found ->
-      let res = Object (Array.map (remap_value code_mapper sharer) vs) in
+      let res = Object (mut, Array.map (remap_value code_mapper sharer) vs) in
       Sharer.put_block sharer vs res;
       res
   )
-  | Block (tag, vs) -> (
+  | Block (mut, tag, vs) -> (
     try Sharer.find_block sharer vs with Not_found ->
-      let res = Block (tag, Array.map (remap_value code_mapper sharer) vs) in
+      let res = Block (mut, tag, Array.map (remap_value code_mapper sharer) vs) in
       Sharer.put_block sharer vs res;
       res
   )

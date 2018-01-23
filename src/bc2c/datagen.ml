@@ -49,10 +49,10 @@ let export arch codemap accu stack data =
     | Int64 n -> export_int64 n
     | Nativeint n -> export_nativeint n
     | Float x -> export_float x
-    | Float_array tbl -> export_float_array tbl
-    | Bytes str -> export_bytes str
-    | Object fields -> export_block Obj.object_tag fields
-    | Block (tag, fields) -> export_block tag fields
+    | Float_array (_mut, tbl) -> export_float_array tbl (* TODO *)
+    | Bytes (_mut, str) -> export_bytes str (* TODO *)
+    | Object (_mut, fields) -> export_block Obj.object_tag fields (* TODO *)
+    | Block (_mut, tag, fields) -> export_block tag fields (* TODO *)
     | Closure closure -> export_closure closure
     | CodePtr pc -> export_code_ptr pc
 
@@ -196,10 +196,10 @@ let export arch codemap accu stack data =
   and export_exception tag fields =
     if tag <> Obj.object_tag then raise Exit;
     match fields with
-    | [| Bytes str; Int (-1) |] when Bytes.to_string str = "Out_of_memory"    -> EXCEPTION OUT_OF_MEMORY
-    | [| Bytes str; Int (-9) |] when Bytes.to_string str = "Stack_overflow"   -> EXCEPTION STACK_OVERFLOW
-    | [| Bytes str; Int (-6) |] when Bytes.to_string str = "Division_by_zero" -> EXCEPTION DIVISION_BY_ZERO
-    | [| Bytes str; Int (-4) |] when Bytes.to_string str = "Invalid_argument" -> EXCEPTION INVALID_ARGUMENT
+    | [| Bytes (_mut, str); Int (-1) |] when Bytes.to_string str = "Out_of_memory"    -> EXCEPTION OUT_OF_MEMORY
+    | [| Bytes (_mut, str); Int (-9) |] when Bytes.to_string str = "Stack_overflow"   -> EXCEPTION STACK_OVERFLOW
+    | [| Bytes (_mut, str); Int (-6) |] when Bytes.to_string str = "Division_by_zero" -> EXCEPTION DIVISION_BY_ZERO
+    | [| Bytes (_mut, str); Int (-4) |] when Bytes.to_string str = "Invalid_argument" -> EXCEPTION INVALID_ARGUMENT
     | _ -> raise Exit
        
   and export_block tag fields =

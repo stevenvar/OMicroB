@@ -244,7 +244,7 @@ let set_file kind ext r path =
 let push_input_file path =
   input_files := path :: !input_files;
   match Filename.extension path with
-  | ".txt" when String.mem path ' ' -> input_prgms := path :: !input_prgms
+  | ".txt" when String.contains path ' ' -> input_prgms := path :: !input_prgms
   | ""             -> input_prgms := path :: !input_prgms
   | ".ml" | ".mli" -> input_mls := path :: !input_mls
   | ".cmo"         -> input_cmos := path :: !input_cmos

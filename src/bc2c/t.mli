@@ -1,13 +1,15 @@
+type mutability = Mutable | Immutable
+
 type value =
 | Int         of int
 | Int32       of Int32.t
 | Int64       of Int64.t
 | Nativeint   of Nativeint.t
 | Float       of float
-| Float_array of float array
-| Bytes       of bytes
-| Object      of value array
-| Block       of int * value array
+| Float_array of mutability * float array
+| Bytes       of mutability * bytes
+| Object      of mutability * value array
+| Block       of mutability * int * value array
 | Closure     of closure
 | CodePtr     of code_ptr
 
