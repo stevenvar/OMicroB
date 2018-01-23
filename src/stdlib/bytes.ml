@@ -30,8 +30,8 @@ external unsafe_get : bytes -> int -> char = "%bytes_unsafe_get"
 external unsafe_set : bytes -> int -> char -> unit = "%bytes_unsafe_set"
 external unsafe_fill : bytes -> int -> int -> char -> unit
                      = "caml_fill_bytes" [@@noalloc]
-external unsafe_to_string : bytes -> string = "%bytes_to_string"
-external unsafe_of_string : string -> bytes = "%bytes_of_string"
+external unsafe_to_string : bytes -> string = "caml_unsafe_string_of_bytes"
+external unsafe_of_string : string -> bytes = "caml_unsafe_bytes_of_string"
 
 external unsafe_blit : bytes -> int -> bytes -> int -> int -> unit
                      = "caml_blit_bytes" [@@noalloc]

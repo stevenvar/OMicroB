@@ -1402,10 +1402,13 @@ void interp(void) {
       TRACE_INSTRUCTION("RAISE");
       if (trapSp == Val_int(-1)) {
 #if defined (__PC__)
-        printf("Error: uncatched exception: %s\n",
-               Tag_val(acc) == Object_tag ?
-               String_val(Field(acc, 0)) :
-               String_val(Field(Field(acc, 0), 0)));
+        char *exn_name;
+        if (Is_block(acc) && Tag_val(acc) == Object_tag && Wosize_val(acc) > 0 && Is_block(Field(acc, 0)) && Tag_val(Field(acc, 0)) == String_tag) {
+          exn_name = String_val(Field(acc, 0));
+        } else {
+          exn_name = String_val(Field(Field(acc, 0), 0));
+        }
+        printf("Error: uncatched exception: %s\n", exn_name);
 #endif
 #if defined __AVR__
         DDRB |= _BV(5);

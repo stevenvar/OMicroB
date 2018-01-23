@@ -193,7 +193,7 @@ let list_used_primitives prims code =
   let used_prims = Array.make prim_nb false in
   Array.iter (fun instr ->
     match instr with
-    | C_CALL1 idx | C_CALL2 idx | C_CALL3 idx | C_CALL4 idx | C_CALLN (_, idx) ->
+    | C_CALL1 idx | C_CALL2 idx | C_CALL3 idx | C_CALL4 idx | C_CALL5 idx | C_CALLN (_, idx) ->
       assert (idx >= 0 && idx < prim_nb);
       used_prims.(idx) <- true;
     | _ -> ()

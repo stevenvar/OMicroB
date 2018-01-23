@@ -5,7 +5,7 @@ TARGETS := test.byte test.c test.elf test.avr test.hex
 test: $(TARGETS)
 
 $(TARGETS): test.ml
-	../../bin/omicrob $^
+	../../bin/omicrob -heap-size 1024 -stack-size 128 $^
 
 flash: test.hex
 	../../bin/omicrob -flash -sudo $^

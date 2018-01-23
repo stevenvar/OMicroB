@@ -51,7 +51,6 @@ void signal_handler(int signum){
 void signals(){
   signal(SIGINT,  signal_handler);
   signal(SIGPIPE, signal_handler);
-  signal(SIGKILL, signal_handler);
   signal(SIGSEGV, signal_handler);
 }
 

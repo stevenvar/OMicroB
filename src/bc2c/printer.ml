@@ -106,12 +106,10 @@ let print_opcodes oc opcodes =
 
 let print_prim oc prim =
   let prim_nb = Array.length prim in
-  let prim_ind = ref 0 in
   Printf.fprintf oc "PROGMEM void * const ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {\n";
-  Array.iter (fun prim_name ->
-    Printf.fprintf oc "  (void *) &%s" prim_name;
-    incr prim_ind;
-    if !prim_ind <> prim_nb then Printf.fprintf oc ",";
+  Array.iteri (fun prim_ind prim_name ->
+    Printf.fprintf oc "  /* %2d */  (void *) &%s" prim_ind prim_name;
+    if prim_ind <> prim_nb then Printf.fprintf oc ",";
     Printf.fprintf oc "\n";
   ) prim;
   Printf.fprintf oc "};\n"

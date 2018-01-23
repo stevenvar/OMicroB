@@ -60,6 +60,16 @@ value caml_random_bool(value unit) {
 
 /******************************************************************************/
 
+value caml_unsafe_string_of_bytes(value b) {
+  return b;
+}
+
+value caml_unsafe_bytes_of_string(value s) {
+  return s;
+}
+
+/******************************************************************************/
+
 value caml_debug_trace(value msg) {
   debug_trace(String_val(msg));
   return Val_unit;

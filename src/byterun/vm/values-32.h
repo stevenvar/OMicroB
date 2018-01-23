@@ -3,10 +3,10 @@
 
   Codage des valeurs par du Nan boxing 32 bits avec :
 
-          float : tels quels avec 1 seul Nan 0111 1111 1100 0000 0000 0000 0000 0000
+          float : tels quels avec 1 seul Nan 0111 1111 1000 0000 0000 0000 0000 0000
            int  : 1 bit de marque à la fin
-       pointeur : 1111 1111 11xx xxxx xxxx xxxx xxxx xx00  (alignement)
-pointeurs flash : tels quels mais limités à 2^31-2^22 en évitant ainsi d'avoir que des 1 dans la zone Nan
+       pointeur : 1111 1111 1xxx xxxx xxxx xxxx xxxx xx00  (alignement)
+pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoir que des 1 dans la zone Nan
 
         int32_t : entiers sur 32 bits (stdint.h)
           value : la représentation uniforme d'une valeur ocaml
@@ -52,7 +52,7 @@ extern value ocaml_heap[OCAML_HEAP_WOSIZE];
 /* Value classification */
 
 #define Is_int(x) (((x) & 1) != 0)
-#define Is_block(x) (((value) (x) & 0x3) == 0 && (((uvalue) (x)) >> 22) == 0x3FF)
+#define Is_block(x) (((value) (x) & 0x3) == 0 && (((uvalue) (x)) >> 23) == 0x1FF)
 #define Is_in_heap(x) (Is_block(x) && (uintptr_t) (Block_val(x) - ocaml_heap) < OCAML_HEAP_WOSIZE)
 
 /******************************************************************************/
@@ -65,11 +65,11 @@ extern value ocaml_heap[OCAML_HEAP_WOSIZE];
 #define Long_val(x) ((long) ((value) (x) >> 1))
 
 #ifdef __AVR__
-#define Val_block(x) ((value) (intptr_t) (value *) (x) | (value) 0xFFC00000)
+#define Val_block(x) ((value) (intptr_t) (value *) (x) | (value) 0xFF800000)
 #define Block_val(x) ((value *) (intptr_t) (value) (x))
 #else
-#define Val_block(x) ((value) ((char *) (x) - ((char *) ocaml_heap)) | (value) 0xFFC00000)
-#define Block_val(x) ((value *) ((char *) ocaml_heap + (((int32_t) (x) << 10) >> 10)))
+#define Val_block(x) ((value) ((char *) (x) - ((char *) ocaml_heap)) | (value) 0xFF800000)
+#define Block_val(x) ((value *) ((char *) ocaml_heap + (((int32_t) (x) << 9) >> 9)))
 #endif
 
 #define Val_bool(x) Val_int((x) != 0)
@@ -87,7 +87,7 @@ extern value ocaml_heap[OCAML_HEAP_WOSIZE];
 #define Val_false Val_int(0)
 #define Val_true  Val_int(1)
 #define Val_unit  Val_int(0)
-#define Val_nan   0x7FC00000
+#define Val_nan   0x7F800000
 
 /******************************************************************************/
 /* Blocks */
