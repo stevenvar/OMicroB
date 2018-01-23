@@ -244,6 +244,8 @@ let set_file kind ext r path =
 let push_input_file path =
   input_files := path :: !input_files;
   match Filename.extension path with
+  | ".txt" when String.mem path ' ' -> input_prgms := path :: !input_prgms
+  | ""             -> input_prgms := path :: !input_prgms
   | ".ml" | ".mli" -> input_mls := path :: !input_mls
   | ".cmo"         -> input_cmos := path :: !input_cmos
   | ".c"           -> input_cs := path :: !input_cs
@@ -251,7 +253,6 @@ let push_input_file path =
   | ".avr"         -> set_file "input" ".avr"  input_avr  path
   | ".elf"         -> set_file "input" ".elf"  input_elf  path
   | ".hex"         -> set_file "input" ".hex"  input_hex  path
-  | ""             -> input_prgms := path :: !input_prgms
   | _              -> error "don't know what to do with input file %S" path
      
 let push_output_file path =
