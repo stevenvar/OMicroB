@@ -1,0 +1,5 @@
+open Avr
+
+let _ =
+  pin_mode PIN11 OUTPUT;
+  digital_write PIN11 LOW

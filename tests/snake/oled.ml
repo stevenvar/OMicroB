@@ -37,13 +37,6 @@ let send_lcd_command cs dc com =
   Spi.transfer com;
   data_mode cs dc
 
-(* let display () =
- *   for i = 0 to 1023 do
- *     let b = get_byte_buffer () in
- *      (\* write_register SPDR b; *\)
- *     Spi.transfer(b);
- *   done *)
-
 let draw x y color =
   write_buffer x y color
 
