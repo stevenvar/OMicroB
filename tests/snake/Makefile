@@ -15,8 +15,8 @@ simul: snake.elf
 	./$< '../../bin/omicrob_circuit_simulator circuit.txt'
 
 clean:
-	@rm *.cmo
-	@rm *.cmi
+	@rm -f *.cmo *.cmi
+	@rm -rf *.elf.dSYM
 	@rm -f $(TARGETS)
 
 .PHONY: all flash clean
