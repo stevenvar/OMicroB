@@ -83,8 +83,10 @@ typedef uint32_t code_t;
 #define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)
 
-#define Val_float(x) ((float) (x) != (float) (x) ? Val_nan : ((union { float f; value v; }) { .f = (x) }).v)
-#define Float_val(v) (((union { float f; value v; }) { .v = (v) }).f)
+union float_or_value { float f; value v; };
+
+#define Val_float(x) ((float) (x) != (float) (x) ? Val_nan : ((union float_or_value) { .f = (x) }).v)
+#define Float_val(v) (((union float_or_value) { .v = (v) }).f)
 
 #define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
 #define Codeptr_val(x) (((value) (x) & 0x7FFFFFFF) >> 1)
