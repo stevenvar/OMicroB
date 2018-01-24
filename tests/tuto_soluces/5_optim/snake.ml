@@ -8,7 +8,7 @@ let _ =  Random.init 42
 let encode (x,y) = (x lsl 8) lor y
 let decode x = (x / 256, x mod 256)
 
-let snake = Array.make 100 (encode (0,0))
+let snake = Array.make 10 (encode (0,0))
 let ptr_head = ref 1
 let ptr_tail = ref 0
 let size = ref 1

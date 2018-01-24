@@ -27,21 +27,9 @@ let right_of = function
   | East -> South
   | West -> North
 
-let button_direction =
-  let old_left = ref HIGH in
-  let old_right = ref HIGH in
-  fun dir -> 
-  let new_left = digital_read button_left in
-  let new_right = digital_read button_right in 
-  let new_dir = 
-  match new_left,new_right with
-  | LOW,_ when !old_left <> LOW -> left_of dir
-  | _ , LOW  when !old_right <> LOW -> right_of dir
-  | _ -> dir
-  in
-  old_left := new_left;
-  old_right := new_right;
-  new_dir
+let button_direction dir = North
+  (* TODO *)
+
 
 
 let collides_with_itself () = ()
@@ -79,9 +67,9 @@ let rec game_loop dir=
       ()
     end
   ;
-  (* mettre à jour le pointeur de tête *)
+  (* TODO : mettre à jour le pointeur de tête *)
   snake.(!ptr_head) <- head;
-  (* afficher tête *)
+  (* TODO : afficher tête *)
   draw_apple ();
   Oled.display ();
   collides_with_itself ();

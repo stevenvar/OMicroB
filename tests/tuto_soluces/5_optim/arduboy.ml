@@ -37,4 +37,4 @@ let boot_pins () =
 let init () =
   Spi.begin_spi ~ss:SS ~sck:SCK ~mosi:MOSI;
   boot_pins ();
-  Oled.boot ~cs:cs ~dc:dc ~rst:rst
+  Oled.boot ~cs:cs ~dc:dc ~rst:rst;
