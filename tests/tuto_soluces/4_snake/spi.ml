@@ -5,6 +5,7 @@ let begin_spi ~ss ~sck ~mosi =
   pin_mode ss OUTPUT;
   set_bit SPCR MSTR;
   set_bit SPCR SPE;
+  set_bit SPSR SPI2x;
   pin_mode sck OUTPUT;
   pin_mode mosi OUTPUT
 

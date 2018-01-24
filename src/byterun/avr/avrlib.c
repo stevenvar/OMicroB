@@ -41,6 +41,8 @@ bool avr_read_bit(uint8_t reg, uint8_t bit) {
 
 /******************************************************************************/
 
+#include <avr/interrupt.h>
+
 void avr_write_register(uint8_t reg, uint8_t val) {
   *(get_reg_addr(reg)) = val;
 }

@@ -214,7 +214,6 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
     }
   }
   else if(reg == SPDR){
-    /* put 1 in SPSR.SPIF to simulate write ok : */
     regs[reg] = new_val;
     send_write_port('G'-'B',new_val);
   }
@@ -245,11 +244,11 @@ uint8_t avr_read_register(uint8_t reg){
 }
 
 bool avr_read_bit(uint8_t reg, uint8_t bit){
+    /* printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit); */
   /* Dirty hack  */
   if (reg == SPSR){
-      return 0;
+      return 1;
   }
-  /* printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit); */
   uint8_t mask = 1 << bit;
   uint8_t val;
   init_simulator();
