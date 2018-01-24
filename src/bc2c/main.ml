@@ -195,6 +195,7 @@ let () =
       Printf.fprintf oc "\n";
 
       (* Define heaps, acc, stack and global data *)
+      Printf.fprintf oc "PROGMEM extern value const ocaml_flash_heap[OCAML_FLASH_HEAP_WOSIZE];";
       Printer.print_datagen_word_array oc "value" "ocaml_ram_heap" "OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE" static_heap_data;
       Printf.fprintf oc "\n";
       Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_heap" "OCAML_FLASH_HEAP_WOSIZE" flash_heap_data;

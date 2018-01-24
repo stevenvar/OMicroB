@@ -6,7 +6,7 @@ TARGETS := solilet.byte solilet.c solilet.elf solilet.avr solilet.hex
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -mlopt -verbose -stack-size 32 -heap-size 300
+	$(BIN)/omicrob -v $^ -mlopt -verbose -stack-size 800 -heap-size 450
 
 flash: solilet.hex
 	$(BIN)/omicrob -flash -sudo $<
