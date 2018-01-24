@@ -144,8 +144,13 @@ void send_all_proc(const char *instr, int size){
   V(sem_outs);
 }
 
+#ifdef __OCAML__
+#include <caml/mlvalues.h>
+value caml_sys_get_argv(value unit);
+#else
 static const char *global_argv_tbl[] = { "<unknown>", NULL };
 const char **global_argv = global_argv_tbl;
+#endif
 
 void init_simulator(void){
   int i, j;
@@ -157,9 +162,14 @@ void init_simulator(void){
   if(test_reinit) return;
   test_reinit = 1;
 
+#ifdef __OCAML__
+  argv = ((const char ***) caml_sys_get_argv(Val_unit))[1];
+  argc = Wosize_val((value) argv);
+#else
   argv = global_argv;
   argc = 0;
   while (argv[argc] != NULL) argc ++;
+#endif
 
   nb_proc = argc - 1;
 
