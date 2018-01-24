@@ -77,7 +77,7 @@ void debug_blink_pause(void) {
 #ifdef __PC__
 
 void print_value(value v) {
-  float f = ((union { float f; value v; }) { .v = v }).f;
+  float f = ((union float_or_value) { .v = v }).f;
   printf("0x%08x / ", v);
   if (Is_int(v)) {
     printf("(int = %d / float = %f)", Int_val(v), f);
