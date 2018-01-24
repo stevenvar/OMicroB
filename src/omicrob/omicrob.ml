@@ -760,7 +760,7 @@ let () =
           with _ -> Printf.eprintf "Error: fail to open /dev.\n%!"; exit 1 in
         let available_ttys = ref [] in
         Array.iter (fun dev_path ->
-          if is_substring dev_path ~sub:"usbmodem"
+          if is_substring dev_path ~sub:"tty.usbmodem"
           || is_substring dev_path ~sub:"USB"
           || is_substring dev_path ~sub:"ACM"
           then (
