@@ -22,7 +22,7 @@ void gc(void);
     }                                                                  \
     *heap_ptr = Make_header((wosize), (tag), Color_white);             \
     heap_ptr ++;                                                       \
-    (result) = Val_block(heap_ptr);                                    \
+    (result) = Val_dynamic_block(heap_ptr);                            \
     heap_ptr += (wosize);                                              \
   } while(0)
 

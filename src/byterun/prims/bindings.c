@@ -70,13 +70,23 @@ value caml_unsafe_bytes_of_string(value s) {
 
 /******************************************************************************/
 
+#ifdef __OCAML__
+#define String_field(val, i) String_val(val)[i]
+#endif
+
 value caml_debug_trace(value msg) {
-  debug_trace(String_val(msg));
+  mlsize_t sz = string_length(msg);
+  mlsize_t i;
+  debug_trace_open();
+  for (i = 0; i < sz; i ++) {
+    debug_trace_char(String_field(msg, i));
+  }
+  debug_trace_close();
   return Val_unit;
 }
 
 value caml_debug_tracei(value n) {
-  debug_tracei(Long_val(n));
+  debug_trace_int(Int_val(n));
   return Val_unit;
 }
 

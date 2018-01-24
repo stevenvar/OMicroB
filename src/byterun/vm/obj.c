@@ -10,8 +10,11 @@ value caml_obj_dup(value arg) {
   } else {
     value res;
     tag_t tg = Tag_val(arg);
+    mlsize_t i;
     OCamlAlloc(res, sz, tg);
-    memcpy((char *) Block_val(res), (char *) Block_val(arg), sz * sizeof(value));
+    for (i = 0; i < sz; i ++) {
+      Ram_field(res, i) = Field(arg, i);
+    }
     return res;
   }
 }

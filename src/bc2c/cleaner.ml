@@ -157,32 +157,34 @@ let remap_instr code_mapper globals_mapper instr =
   | CLOSUREREC (f, v, o, t) -> CLOSUREREC (f, v, code_mapper.(o), Array.map (fun p -> code_mapper.(p)) t)
   | SWITCH (n, ptrs) -> SWITCH (n, Array.map (fun p -> code_mapper.(p)) ptrs)
 
-let rec remap_value code_mapper sharer v =
+let rec remap_value code_mapper qhtbl v =
   match v with
   | Int _ | Int32 _ | Int64 _ | Nativeint _
   | Float _ | Float_array _ | Bytes _ ->
     v
-  | Object (mut, vs) -> (
-    try Sharer.find_block sharer vs with Not_found ->
-      let res = Object (mut, Array.map (remap_value code_mapper sharer) vs) in
-      Sharer.put_block sharer vs res;
+  | Object (mut, old_vs) -> (
+    try Qhtbl.find qhtbl v with Not_found ->
+      let new_vs = Array.copy old_vs in
+      let res = Object (mut, new_vs) in
+      Qhtbl.put qhtbl v res;
+      Array.iteri (fun i v -> new_vs.(i) <- remap_value code_mapper qhtbl v) old_vs;
       res
   )
-  | Block (mut, tag, vs) -> (
-    try Sharer.find_block sharer vs with Not_found ->
-      let res = Block (mut, tag, Array.map (remap_value code_mapper sharer) vs) in
-      Sharer.put_block sharer vs res;
+  | Block (mut, tag, old_vs) -> (
+    try Qhtbl.find qhtbl v with Not_found ->
+      let new_vs = Array.copy old_vs in
+      let res = Block (mut, tag, new_vs) in
+      Qhtbl.put qhtbl v res;
+      Array.iteri (fun i v -> new_vs.(i) <- remap_value code_mapper qhtbl v) old_vs;
       res
   )
-  | Closure { ofs; ptrs; env } -> (
-    try Sharer.find_closure sharer ptrs env with Not_found ->
-      let res =
-        Closure {
-          ofs;
-          ptrs = Array.map (fun ptr -> code_mapper.(ptr)) ptrs;
-          env = Array.map (remap_value code_mapper sharer) env;
-        } in
-      Sharer.put_closure sharer ptrs env res;
+  | Closure { ofs; ptrs = old_ptrs; env = old_env } -> (
+    try Qhtbl.find qhtbl v with Not_found ->
+      let new_ptrs = Array.map (fun ptr -> code_mapper.(ptr)) old_ptrs in
+      let new_env = Array.copy old_env in
+      let res = Closure { ofs; ptrs = new_ptrs; env = new_env } in
+      Qhtbl.put qhtbl v res;
+      Array.iteri (fun i v -> new_env.(i) <- remap_value code_mapper qhtbl v) old_env;
       res
   )
   | CodePtr ptr ->
@@ -257,10 +259,10 @@ let clean prims globals code =
 
   let code = Array.map (remap_instr code_mapper globals_mapper) code in
 
-  let sharer = Sharer.create () in
-  let globals = Array.map (remap_value code_mapper sharer) globals in
-  let stack = List.map (remap_value code_mapper sharer) stack in
-  let accu = remap_value code_mapper sharer accu in
+  let qhtbl = Qhtbl.create () in
+  let globals = Array.map (remap_value code_mapper qhtbl) globals in
+  let stack = List.map (remap_value code_mapper qhtbl) stack in
+  let accu = remap_value code_mapper qhtbl accu in
 
   let prims, code = clean_primitives prims code in
   

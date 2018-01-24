@@ -5,17 +5,17 @@
 int string_length(value s) {
   mlsize_t temp;
   temp = Bosize_val(s) - 1;
-  return temp - StringField(s, temp);
+  return temp - String_field(s, temp);
 }
 
 value caml_create_bytes(value ml_len) {
   value res;
-  mlsize_t str_len = Long_val(ml_len);
+  mlsize_t str_len = Int_val(ml_len);
   mlsize_t blk_wlen = Wsize_bsize(str_len) + 1;
   mlsize_t blk_blen = Bsize_wsize(blk_wlen);
   OCamlAlloc(res, blk_wlen, String_tag);
-  Field(res, blk_wlen - 1) = 0;
-  String_val(res)[blk_blen - 1] = blk_blen - str_len - 1;
+  Ram_field(res, blk_wlen - 1) = 0;
+  Ram_string_field(res, blk_blen - 1) = blk_blen - str_len - 1;
   return res;
 }
 
@@ -28,18 +28,14 @@ value caml_ml_bytes_length(value b) {
 }
 
 value caml_blit_string(value ml_s, value ml_sofs, value ml_b, value ml_bofs, value ml_len) {
-  char *s = String_val(ml_s);
-  mlsize_t sofs = Long_val(ml_sofs);
-  char *b = String_val(ml_b);
-  mlsize_t bofs = Long_val(ml_bofs);
-  mlsize_t len = Long_val(ml_len);
-  s += sofs;
-  b += bofs;
-  while (len > 0) {
-    *b = *s;
-    b ++;
-    s ++;
-    len --;
+  mlsize_t sofs = Int_val(ml_sofs);
+  mlsize_t bofs = Int_val(ml_bofs);
+  mlsize_t len = Int_val(ml_len);
+  mlsize_t i;
+  assert(Is_block(ml_b));
+  assert(Is_in_ram(ml_b));
+  for (i = 0; i < len; i ++) {
+    Ram_string_field(ml_b, bofs + i) = String_field(ml_s, sofs + i);
   }
   return Val_unit;
 }
@@ -49,48 +45,50 @@ value caml_blit_bytes(value ml_s, value ml_sofs, value ml_b, value ml_bofs, valu
 }
 
 value caml_fill_bytes(value ml_b, value ml_ofs, value ml_len, value ml_c) {
-  char *b = String_val(ml_b);
-  mlsize_t ofs = Long_val(ml_ofs);
-  mlsize_t len = Long_val(ml_len);
-  char c = (char) Long_val(ml_c);
-  b += ofs;
-  while (len > 0) {
-    *b = c;
-    b ++;
-    len --;
+  mlsize_t ofs = Int_val(ml_ofs);
+  mlsize_t len = Int_val(ml_len);
+  char c = (char) Int_val(ml_c);
+  mlsize_t i;
+  assert(Is_block(ml_b));
+  assert(Is_in_ram(ml_b));
+  for (i = 0; i < len; i ++) {
+    Ram_string_field(ml_b, ofs + i) = c;
   }
   return Val_unit;
 }
 
 value caml_string_equal(value s1, value s2) {
-  mlsize_t sz1, sz2;
-  value *p1, *p2;
+  mlsize_t sz1, sz2, i;
   if (s1 == s2) return Val_true;
   sz1 = Wosize_val(s1);
   sz2 = Wosize_val(s2);
   if (sz1 != sz2) return Val_false;
-  p1 = &Field(s1, 0);
-  p2 = &Field(s2, 0);
-  while (sz1 > 0) {
-    if (*p1 != *p2) {
-      return Val_false;
-    }
-    sz1 --;
-    p1 ++;
-    p2 ++;
+  for (i = 0; i < sz1; i ++) {
+    value v1 = Field(s1, i);
+    value v2 = Field(s2, i);
+    if (v1 != v2) return Val_false;
   }
   return Val_true;
 }
 
-value caml_string_compare(value s1, value s2) {
-  mlsize_t sz1, sz2;
-  int c;
-  if (s1 == s2) return Val_int(0);
+int string_compare(value s1, value s2) {
+  mlsize_t sz1, sz2, sz, i;
+  if (s1 == s2) return 0;
   sz1 = Bosize_val(s1);
   sz2 = Bosize_val(s2);
-  c = memcmp(String_val(s1), String_val(s2), sz1 < sz2 ? sz1 : sz2);
-  if (c != 0) return Val_int(c < 0 ? -1 : 1);
+  sz = sz1 < sz2 ? sz1 : sz2;
+  for (i = 0; i < sz; i ++) {
+    char c1 = String_field(s1, i);
+    char c2 = String_field(s2, i);
+    if (c1 < c2) return -1;
+    if (c1 > c2) return 1;
+  }
+  if (sz1 == sz2) return 0;
   return sz1 < sz2 ? -1 : 1;
+}
+
+value caml_string_compare(value s1, value s2) {
+  return Val_int(string_compare(s1, s2));
 }
 
 value caml_bytes_compare(value b1, value b2) {

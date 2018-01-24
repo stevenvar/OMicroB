@@ -22,15 +22,15 @@ void caml_raise(value v) {
 /******************************************************************************/
 
 void caml_raise_out_of_memory(void) {
-  caml_raise(ocaml_out_of_memory);
+  caml_raise(OCAML_Out_of_memory);
 }
 
 void caml_raise_stack_overflow(void) {
-  caml_raise(ocaml_stack_overflow);
+  caml_raise(OCAML_Stack_overflow);
 }
 
 void caml_raise_division_by_zero(void) {
-  caml_raise(ocaml_division_by_zero);
+  caml_raise(OCAML_Division_by_zero);
 }
 
 /******************************************************************************/
@@ -44,15 +44,21 @@ void caml_raise_invalid_argument(char const *msg) {
   if (block == 0) {
     caml_raise_out_of_memory();
   } else {
-    Hd_val(block) = Make_header(str_wosize, String_tag, Color_white);
-    Field(block, str_wosize - 1) = 0;
-    memcpy(String_val(block), msg, msg_len);
-    String_val(block)[str_bosize - 1] = str_bosize - msg_len - 1;
-    Field(block, str_wosize) = Make_header(2, 0, Color_white);
-    Field(block, str_wosize + 1) = ocaml_invalid_argument;
-    Field(block, str_wosize + 2) = block;
-    caml_raise(Val_block(&Field(block, str_wosize + 1)));
+    Ram_hd_val(block) = Make_header(str_wosize, String_tag, Color_white);
+    Ram_field(block, str_wosize - 1) = 0;
+    memcpy(Ram_string_val(block), msg, msg_len);
+    Ram_string_val(block)[str_bosize - 1] = str_bosize - msg_len - 1;
+    Ram_field(block, str_wosize) = Make_header(2, 0, Color_white);
+    Ram_field(block, str_wosize + 1) = OCAML_Invalid_argument;
+    Ram_field(block, str_wosize + 2) = block;
+    caml_raise(Val_dynamic_block(&Ram_field(block, str_wosize + 1)));
   }
+}
+
+/******************************************************************************/
+
+void caml_raise_index_out_of_bounds(void) {
+  caml_raise_invalid_argument("index out of bounds");
 }
 
 /******************************************************************************/

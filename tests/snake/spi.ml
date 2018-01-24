@@ -15,4 +15,4 @@ let end_spi () =
 (* Emit data through the SPI connection *)
 let transfer data =
   write_register SPDR data;
-  while (read_bit SPSR SPIF <> true) do () done
+  while (read_bit SPSR SPIF <> false) do () done

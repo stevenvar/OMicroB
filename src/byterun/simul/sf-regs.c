@@ -247,7 +247,7 @@ uint8_t avr_read_register(uint8_t reg){
 bool avr_read_bit(uint8_t reg, uint8_t bit){
   /* Dirty hack  */
   if (reg == SPSR){
-      return 1;
+      return 0;
   }
   /* printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit); */
   uint8_t mask = 1 << bit;

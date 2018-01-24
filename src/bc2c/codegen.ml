@@ -249,54 +249,115 @@ let export_code_from_codemap code codemap =
       export_opcode Opcode.PUSHOFFSETCLOSURE;
       export_int8 n;
     | GETGLOBAL n ->
-      check_bounds "GETGLOBAL" n 0 0x10000;
-      if n < 0x100 then (
-        export_opcode Opcode.GETGLOBAL_1B;
-        export_uint8 n;
+      check_bounds "GETGLOBAL" n (-0x10001) 0x10001;
+      if n > 0 then (
+        let n = n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.GETRAMGLOBAL_1B;
+          export_uint8 n;
+        ) else (
+          export_opcode Opcode.GETRAMGLOBAL_2B;
+          export_uint16 n;
+        )
+      ) else if n < 0 then (
+        let n = -n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.GETFLASHGLOBAL_1B;
+          export_uint8 n;
+        ) else (
+          export_opcode Opcode.GETFLASHGLOBAL_2B;
+          export_uint16 n;
+        )
       ) else (
-        export_opcode Opcode.GETGLOBAL_2B;
-        export_uint16 n;
+        assert false (* Impossible *)
       )
     | PUSHGETGLOBAL n ->
-      check_bounds "PUSHGETGLOBAL" n 0 0x10000;
-      if n < 0x100 then (
-        export_opcode Opcode.PUSHGETGLOBAL_1B;
-        export_uint8 n;
+      check_bounds "PUSHGETGLOBAL" n (-0x10001) 0x10001;
+      if n > 0 then (
+        let n = n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.PUSHGETRAMGLOBAL_1B;
+          export_uint8 n;
+        ) else (
+          export_opcode Opcode.PUSHGETRAMGLOBAL_2B;
+          export_uint16 n;
+        )
+      ) else if n < 0 then (
+        let n = -n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.PUSHGETFLASHGLOBAL_1B;
+          export_uint8 n;
+        ) else (
+          export_opcode Opcode.PUSHGETFLASHGLOBAL_2B;
+          export_uint16 n;
+        )
       ) else (
-        export_opcode Opcode.PUSHGETGLOBAL_2B;
-        export_uint16 n;
+        assert false (* Impossible *)
       )
     | GETGLOBALFIELD (n, p) ->
-      check_bounds "GETGLOBALFIELD n:" n 0 0x10000;
+      check_bounds "GETGLOBALFIELD n:" n (-0x10001) 0x10001;
       check_bounds "GETGLOBALFIELD p:" p 0 0x100;
-      if n < 0x100 then (
-        export_opcode Opcode.GETGLOBALFIELD_1B;
-        export_uint8 n;
-        export_uint8 p;
+      if n > 0 then (
+        let n = n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.GETRAMGLOBALFIELD_1B;
+          export_uint8 n;
+          export_uint8 p;
+        ) else (
+          export_opcode Opcode.GETRAMGLOBALFIELD_2B;
+          export_uint16 n;
+          export_uint8 p;
+        )
+      ) else if n < 0 then (
+        let n = -n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.GETFLASHGLOBALFIELD_1B;
+          export_uint8 n;
+          export_uint8 p;
+        ) else (
+          export_opcode Opcode.GETFLASHGLOBALFIELD_2B;
+          export_uint16 n;
+          export_uint8 p;
+        )
       ) else (
-        export_opcode Opcode.GETGLOBALFIELD_2B;
-        export_uint16 n;
-        export_uint8 p;
+        assert false (* Impossible *)
       )
     | PUSHGETGLOBALFIELD (n, p) ->
-      check_bounds "PUSHGETGLOBALFIELD n:" n 0 0x10000;
+      check_bounds "PUSHGETGLOBALFIELD n:" n (-0x10001) 0x10001;
       check_bounds "PUSHGETGLOBALFIELD p:" p 0 0x100;
-      if n < 0x100 then (
-        export_opcode Opcode.PUSHGETGLOBALFIELD_1B;
-        export_uint8 n;
-        export_uint8 p;
+      if n > 0 then (
+        let n = n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.PUSHGETRAMGLOBALFIELD_1B;
+          export_uint8 n;
+          export_uint8 p;
+        ) else (
+          export_opcode Opcode.PUSHGETRAMGLOBALFIELD_2B;
+          export_uint16 n;
+          export_uint8 p;
+        )
+      ) else if n < 0 then (
+        let n = -n - 1 in
+        if n < 0x100 then (
+          export_opcode Opcode.PUSHGETFLASHGLOBALFIELD_1B;
+          export_uint8 n;
+          export_uint8 p;
+        ) else (
+          export_opcode Opcode.PUSHGETFLASHGLOBALFIELD_2B;
+          export_uint16 n;
+          export_uint8 p;
+        )
       ) else (
-        export_opcode Opcode.PUSHGETGLOBALFIELD_2B;
-        export_uint16 n;
-        export_uint8 p;
+        assert false (* Impossible *)
       )
     | SETGLOBAL n ->
-      check_bounds "SETGLOBAL" n 0 0x10000;
+      let n = n - 1 in
+      check_bounds "SETRAMGLOBAL" n 0 0x10000;
       if n < 0x100 then (
-        export_opcode Opcode.SETGLOBAL_1B;
+        export_opcode Opcode.SETRAMGLOBAL_1B;
         export_uint8 n;
       ) else (
-        export_opcode Opcode.SETGLOBAL_2B;
+        export_opcode Opcode.SETRAMGLOBAL_2B;
         export_uint16 n;
       )
     | ATOM0 ->

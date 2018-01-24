@@ -1,5 +1,7 @@
 open Avr
 
+let () = pin_mode PIN9 OUTPUT
+
 (*
 let () =
   let pin = PIN11 in
@@ -30,18 +32,23 @@ let blink nsleep =
     ) pins;
   done
 *)
+let () =
+  Array.iter (fun i -> tracei i) [| 1; 3; 5 |]
+  
 (*
-let () = pin_mode PIN9 OUTPUT
-
 exception Exn of int
     
 let () =
   try
-    if true then raise (Exn 10_000);
+    if false then raise (Exn 10_000);
+    if true then raise Out_of_memory;
     trace "Hello";
-  with Exn n ->
+  with
+  | Exn n ->
     trace "World";
     tracei n;
+  | Out_of_memory ->
+    trace "OOM";
 *)
 (*
 let rec fact n =
@@ -58,15 +65,15 @@ let () =
 let () =
   let pin = PIN10 in
   pin_mode pin OUTPUT;
-  digital_write pin HIGH;
+  digital_write pin LOW;
 *)
 (*
 let () =
-  for _i = 1 to 1_000_000 do
+  for _i = 1 to 1_000 do
     tracei (Random.int 1_000_000);
   done
 *)
-
+(*
 module type S = module type of String
 module type T = module type of Bytes
 module type C = module type of Char
@@ -84,7 +91,7 @@ let () =
   digital_write PIN9 (magic m);
   digital_write PIN9 (magic n);
   digital_write PIN9 (magic p);
-
+*)
 (*
 let () =
   let tbl = [| 1; 3; 5; 7; 9; 11 |] in

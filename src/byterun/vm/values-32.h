@@ -1,20 +1,27 @@
 /*
-  Version 32 bits
+  32 bits version of values:
 
-  Codage des valeurs par du Nan boxing 32 bits avec :
+Floatting point values: ieee754 with only one NaN
+                          NaN : 0111 1111 1100 0000 0000 0000 0000 0000
+                         +inf : 0111 1111 1000 0000 0000 0000 0000 0000
+                         -inf : 1111 1111 1000 0000 0000 0000 0000 0000
+                 other floats : xyyy yyyy yxxx xxxx xxxx xxxx xxxx xxxx (with at least one y != 1)
 
-          float : tels quels avec 1 seul Nan 0111 1111 1000 0000 0000 0000 0000 0000
-           int  : 1 bit de marque à la fin
-       pointeur : 1111 1111 1xxx xxxx xxxx xxxx xxxx xx00  (alignement)
-pointeurs flash : tels quels mais limités à 2^31-2^23 en évitant ainsi d'avoir que des 1 dans la zone Nan
+Integers, constant variants, etc:
+                        int   : xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxx1
 
-        int32_t : entiers sur 32 bits (stdint.h)
-          value : la représentation uniforme d'une valeur ocaml
-           bloc : une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
-          champ : une valeur (value)
+dynamic heap pointers   (ram) : 1111 1111 100x xxxx xxxx xxxx xxxx xx00 (never NULL => distinct to -inf)
+ static heap pointers   (ram) : 1111 1111 101x xxxx xxxx xxxx xxxx xx00
+        heap pointers (flash) : 1111 1111 110x xxxx xxxx xxxx xxxx xx00
 
-          en-tête : longueur (22bits) | marque (2 bits) | numéro de constructeur (8bits)
+        code pointers (flash) : 10xx xxxx xxxx xxxx xxxx xxxx xxxx xxx1
 
+       exception mark for FFI : 1111 1111 1yyx xxxx xxxx xxxx xxxx xx10
+
+OCaml values:
+                        value : uniform representation of an OCaml value
+                        block : OCaml value with multiple fields: 1 header followed by fields
+                 block header : tag (8 bits) | size (22bits) | color (2 bits)
 */
 
 #ifndef VALUES_32_H
@@ -37,67 +44,80 @@ typedef uint8_t tag_t;
 typedef uint8_t color_t;
 typedef uint8_t opcode_t;
 
-#if OCAML_BYTECODE_BSIZE < 256
+#if OCAML_BYTECODE_BSIZE < 0x100
 typedef uint8_t code_t;
-#elif OCAML_BYTECODE_BSIZE < 65536
+#elif OCAML_BYTECODE_BSIZE < 0x10000
 typedef uint16_t code_t;
 #else
 typedef uint32_t code_t;
 #endif
 #endif
 
-extern value ocaml_heap[OCAML_HEAP_WOSIZE];
-
 /******************************************************************************/
 /* Value classification */
 
-#define Is_int(x) (((x) & 1) != 0)
-#define Is_block(x) (((value) (x) & 0x3) == 0 && (((uvalue) (x)) >> 23) == 0x1FF)
-#define Is_in_heap(x) (Is_block(x) && (uintptr_t) (Block_val(x) - ocaml_heap) < OCAML_HEAP_WOSIZE)
+#define Is_block(x)                 (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 23) == 0x01FF)
+#define Is_int(x)                   (((uint8_t) (x) & 0x1) == 0x1)
+
+#define Is_block_in_dynamic_heap(x) (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 21) == 0x07FC)
+#define Is_block_in_static_heap(x)  (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 21) == 0x07FD)
+#define Is_block_in_flash_heap(x)   (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 21) == 0x07FE)
+
+#define Is_in_ram(x)                ((((uint8_t) ((uint32_t) (x) >> 16)) & 0x40) == 0x00)
+
+#define Maybe_code_pointer(x)       (((uint32_t) (x) >> 30) == 0x2) // Useful for debugging
 
 /******************************************************************************/
 /* Conversions */
 
-#define Val_int(x) ((value) (((uvalue) (x) << 1) | 1))
-#define Int_val(x) ((value) (x) >> 1)
+#define Val_dynamic_block(x) ((value) ((char *) (x) - (char *) ocaml_ram_heap) | (value) 0xFF800000)
+#define Val_static_block(x)  ((value) ((char *) (x) - (char *) ocaml_ram_heap) | (value) 0xFFA00000)
+#define Val_flash_block(x)   ((value) ((char *) (x) - (char *) ocaml_flash_heap)   | (value) 0xFFC00000)
 
-#define Val_long(x) ((value) (((uvalue) (long) (x) << 1) | 1))
-#define Long_val(x) ((long) ((value) (x) >> 1))
+#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + (((int32_t) (x) << 11) >> 11)))
+#define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((int32_t) (x) & 0x001FFFFF)))
 
-#ifdef __AVR__
-#define Val_block(x) ((value) (intptr_t) (value *) (x) | (value) 0xFF800000)
-#define Block_val(x) ((value *) (intptr_t) (value) (x))
-#else
-#define Val_block(x) ((value) ((char *) (x) - ((char *) ocaml_heap)) | (value) 0xFF800000)
-#define Block_val(x) ((value *) ((char *) ocaml_heap + (((int32_t) (x) << 9) >> 9)))
-#endif
+#define Val_int(x) ((value) (((uint32_t) (x) << 1) | 1))
+#define Int_val(x) ((int32_t) ((value) (x) >> 1))
 
-#define Val_bool(x) Val_int((x) != 0)
-#define Bool_val(x) Int_val(x)
+#define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
+#define Bool_val(x) (((uint8_t) (x) & 2) != 0)
 
-/* #define Val_float(x) ((float) x != (float) x ? Val_nan : ((union { float f; value v; }) (float) (x)).v) */
-/* #define Float_val(v) (((union { float f; value v; }) (value) (v)).f) */
+#define Val_float(x) ((float) (x) != (float) (x) ? Val_nan : ((union { float f; value v; }) { .f = (x) }).v)
+#define Float_val(v) (((union { float f; value v; }) { .v = (v) }).f)
 
-#define Val_codeptr(x) Val_int(x)
-#define Codeptr_val(x) Int_val(x)
+#define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
+#define Codeptr_val(x) (((value) (x) & 0x7FFFFFFF) >> 1)
 
 /******************************************************************************/
 /* Constants */
 
-#define Val_false Val_int(0)
-#define Val_true  Val_int(1)
-#define Val_unit  Val_int(0)
-#define Val_nan   0x7F800000
+#define Val_false ((value) 0x1)
+#define Val_true  ((value) 0x3)
+#define Val_unit  ((value) 0x1)
+#define Val_nan   ((value) 0x7FC00000)
 
 /******************************************************************************/
 /* Blocks */
 
-#define Field(val, i) (((value *) Block_val(val))[i])
-#define String_val(val) ((char *) Block_val(val))
-#define StringField(val, i) String_val(val)[i]
+#define Ram_field(val, i) (Ram_block_val(val)[i])
+#define Ram_string_field(val, i) (((char *) Ram_block_val(val))[i])
+
+#ifdef __AVR__
+#define Flash_field(val, i) (pgm_read_dword_near(Flash_block_val(val) + i))
+#define Flash_string_field(val, i) ((char) pgm_read_byte_near((char *) Flash_block_val(val) + i))
+#else
+#define Flash_field(val, i) (Flash_block_val(val)[i])
+#define Flash_string_field(val, i) (((char *) Flash_block_val(val))[i])
+#endif
+
+#define Field(val, i) (Is_in_ram(val) ? Ram_field(val, i) : Flash_field(val, i))
+#define String_field(val, i) (Is_in_ram(val) ? Ram_string_field(val, i) : Flash_string_field(val, i))
+
+#define Ram_hd_val(val) Ram_field(val, -1)
+#define Ram_string_val(val) ((char *) Ram_block_val(val))
 
 #define Hd_val(val) Field(val, -1)
-#define Code_val(val) Field(val, 0)
 
 #define Make_string_data(c3, c2, c1, c0) (((value) (c0) << 24) | ((value) (c1) << 16) | ((value) (c2) << 8) | ((value) (c3)))
 
@@ -128,9 +148,6 @@ extern value ocaml_heap[OCAML_HEAP_WOSIZE];
 #define Color_brown 3  /* During marking stage: color of block headers moved at an infix location                                              */
                        /* (-: Red paint + Black paint -> Brown paint :-)                                                                       */
 
-#define Val_double(x) (x)
-#define Double_val(x) (x)
-
 /******************************************************************************/
 /* Tags */
 
@@ -151,19 +168,6 @@ extern value ocaml_heap[OCAML_HEAP_WOSIZE];
 /* Infix_tag 249 */
 #define Infix_offset_hd(hd) Bosize_hd(hd)
 #define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
-
-/* Forward_tag 250 */
-#define Forward_val(v) Field(v, 0)
-
-/* Custom_tag 255 */
-#define Data_custom_val(v) ((void *) &Field(v, 1))
-
-/******************************************************************************/
-/* Custom operations */
-
-extern void *int32_custom_operations;
-extern void *int64_custom_operations;
-extern void *nativeint_custom_operations;
 
 /******************************************************************************/
 /******************************************************************************/

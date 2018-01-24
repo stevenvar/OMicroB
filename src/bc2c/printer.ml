@@ -40,13 +40,6 @@ let print_codegen_word_array oc ty name size data =
     | OPCODE _ -> true in
   print_c_array oc ty name size data pp nl
 
-let string_of_exception exc =
-  match exc with
-  | OUT_OF_MEMORY    -> "ocaml_out_of_memory"
-  | STACK_OVERFLOW   -> "ocaml_stack_overflow"
-  | DIVISION_BY_ZERO -> "ocaml_division_by_zero"
-  | INVALID_ARGUMENT -> "ocaml_invalid_argument"
-    
 let string_of_dword dword =
   let bprint_char buf c =
     match c with
@@ -92,9 +85,9 @@ let string_of_dword dword =
   | BYTES bytes        -> print_bytes "Make_custom_data" bytes
   | CUSTOM name        -> Printf.sprintf "(value) &%s_custom_operations" name
   | HEADER (tag, size) -> Printf.sprintf "Make_header(%d, %s, Color_white)" size (print_tag tag)
-  | POINTER ind        -> Printf.sprintf "Val_block(&ocaml_heap[%d])" ind
+  | SPOINTER ind       -> Printf.sprintf "Val_static_block(&ocaml_ram_heap[%d])" ind
+  | FPOINTER ind       -> Printf.sprintf "Val_flash_block(&ocaml_flash_heap[%d])" ind
   | CODEPTR ptr        -> Printf.sprintf "Val_codeptr(%d)" ptr
-  | EXCEPTION exc      -> Printf.sprintf "%s" (string_of_exception exc)
 
 let print_datagen_word_array oc ty name size data =
   print_c_array oc ty name size data string_of_dword (fun _ -> true)

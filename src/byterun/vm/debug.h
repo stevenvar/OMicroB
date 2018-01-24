@@ -1,6 +1,25 @@
 #ifndef __DEBUG_H__
 #define __DEBUG_H__
 
+/******************************************************************************/
+
+#ifdef __PC__
+
+#include <assert.h>
+
+#else
+
+#define assert(x) do { if (!(x)) debug_blink_error();  } while(0);
+
+void debug_blink_error(void);
+void debug_blink_uncatched_exception(void);
+void debug_blink_message(int n);
+void debug_blink_pause(void);
+
+#endif
+
+/******************************************************************************/
+
 /*
   DEBUG levels:
     == 0: no debug, only traces from the OCaml program
@@ -15,8 +34,16 @@
 #define TRACE_INSTRUCTION(instr_name)
 #endif
 
-void print_heap(void);
-void print_global(void);
+/******************************************************************************/
+
+void print_value(value v);
+void print_dynamic_heap(void);
+void print_static_heap(void);
+void print_flash_heap(void);
+void print_ram_global_data(void);
+void print_flash_global_data(void);
 void print_stack(void);
+
+/******************************************************************************/
 
 #endif
