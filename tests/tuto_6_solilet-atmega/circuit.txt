@@ -1,0 +1,3 @@
+window width=500 height=200 bgcolor=lightgray title="Arduboy"
+
+led x=50 y=180 radius=5 pin=PIN11 color=yellow

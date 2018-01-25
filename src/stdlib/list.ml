@@ -1,10 +1,19 @@
+(**************************************************************************)
+(*                                                                        *)
+(*                                 OCaml                                  *)
+(*                                                                        *)
+(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
+(*                                                                        *)
+(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
+(*     en Automatique.                                                    *)
+(*                                                                        *)
+(*   All rights reserved.  This file is distributed under the terms of    *)
+(*   the GNU Lesser General Public License version 2.1, with the          *)
+(*   special exception on linking described in the file LICENSE.          *)
+(*                                                                        *)
+(**************************************************************************)
 
 (* List operations *)
-
-let rec ( @ ) l1 l2 =
-  match l1 with
-    [] -> l2
-  | hd :: tl -> hd :: (tl @ l2)
 
 let rec length_aux len = function
     [] -> len
@@ -322,3 +331,155 @@ let stable_sort cmp l =
 
 let sort = stable_sort
 let fast_sort = stable_sort
+
+(* Note: on a list of length between about 100000 (depending on the minor
+   heap size and the type of the list) and Sys.max_array_size, it is
+   actually faster to use the following, but it might also use more memory
+   because the argument list cannot be deallocated incrementally.
+
+   Also, there seems to be a bug in this code or in the
+   implementation of obj_truncate.
+
+external obj_truncate : 'a array -> int -> unit = "caml_obj_truncate"
+
+let array_to_list_in_place a =
+  let l = Array.length a in
+  let rec loop accu n p =
+    if p <= 0 then accu else begin
+      if p = n then begin
+        obj_truncate a p;
+        loop (a.(p-1) :: accu) (n-1000) (p-1)
+      end else begin
+        loop (a.(p-1) :: accu) n (p-1)
+      end
+    end
+  in
+  loop [] (l-1000) l
+
+
+let stable_sort cmp l =
+  let a = Array.of_list l in
+  Array.stable_sort cmp a;
+  array_to_list_in_place a
+
+*)
+
+
+(** sorting + removing duplicates *)
+
+let sort_uniq cmp l =
+  let rec rev_merge l1 l2 accu =
+    match l1, l2 with
+    | [], l2 -> rev_append l2 accu
+    | l1, [] -> rev_append l1 accu
+    | h1::t1, h2::t2 ->
+        let c = cmp h1 h2 in
+        if c = 0 then rev_merge t1 t2 (h1::accu)
+        else if c < 0
+        then rev_merge t1 l2 (h1::accu)
+        else rev_merge l1 t2 (h2::accu)
+  in
+  let rec rev_merge_rev l1 l2 accu =
+    match l1, l2 with
+    | [], l2 -> rev_append l2 accu
+    | l1, [] -> rev_append l1 accu
+    | h1::t1, h2::t2 ->
+        let c = cmp h1 h2 in
+        if c = 0 then rev_merge_rev t1 t2 (h1::accu)
+        else if c > 0
+        then rev_merge_rev t1 l2 (h1::accu)
+        else rev_merge_rev l1 t2 (h2::accu)
+  in
+  let rec sort n l =
+    match n, l with
+    | 2, x1 :: x2 :: _ ->
+       let c = cmp x1 x2 in
+       if c = 0 then [x1]
+       else if c < 0 then [x1; x2] else [x2; x1]
+    | 3, x1 :: x2 :: x3 :: _ ->
+       let c = cmp x1 x2 in
+       if c = 0 then begin
+         let c = cmp x2 x3 in
+         if c = 0 then [x2]
+         else if c < 0 then [x2; x3] else [x3; x2]
+       end else if c < 0 then begin
+         let c = cmp x2 x3 in
+         if c = 0 then [x1; x2]
+         else if c < 0 then [x1; x2; x3]
+         else let c = cmp x1 x3 in
+         if c = 0 then [x1; x2]
+         else if c < 0 then [x1; x3; x2]
+         else [x3; x1; x2]
+       end else begin
+         let c = cmp x1 x3 in
+         if c = 0 then [x2; x1]
+         else if c < 0 then [x2; x1; x3]
+         else let c = cmp x2 x3 in
+         if c = 0 then [x2; x1]
+         else if c < 0 then [x2; x3; x1]
+         else [x3; x2; x1]
+       end
+    | n, l ->
+       let n1 = n asr 1 in
+       let n2 = n - n1 in
+       let l2 = chop n1 l in
+       let s1 = rev_sort n1 l in
+       let s2 = rev_sort n2 l2 in
+       rev_merge_rev s1 s2 []
+  and rev_sort n l =
+    match n, l with
+    | 2, x1 :: x2 :: _ ->
+       let c = cmp x1 x2 in
+       if c = 0 then [x1]
+       else if c > 0 then [x1; x2] else [x2; x1]
+    | 3, x1 :: x2 :: x3 :: _ ->
+       let c = cmp x1 x2 in
+       if c = 0 then begin
+         let c = cmp x2 x3 in
+         if c = 0 then [x2]
+         else if c > 0 then [x2; x3] else [x3; x2]
+       end else if c > 0 then begin
+         let c = cmp x2 x3 in
+         if c = 0 then [x1; x2]
+         else if c > 0 then [x1; x2; x3]
+         else let c = cmp x1 x3 in
+         if c = 0 then [x1; x2]
+         else if c > 0 then [x1; x3; x2]
+         else [x3; x1; x2]
+       end else begin
+         let c = cmp x1 x3 in
+         if c = 0 then [x2; x1]
+         else if c > 0 then [x2; x1; x3]
+         else let c = cmp x2 x3 in
+         if c = 0 then [x2; x1]
+         else if c > 0 then [x2; x3; x1]
+         else [x3; x2; x1]
+       end
+    | n, l ->
+       let n1 = n asr 1 in
+       let n2 = n - n1 in
+       let l2 = chop n1 l in
+       let s1 = sort n1 l in
+       let s2 = sort n2 l2 in
+       rev_merge s1 s2 []
+  in
+  let len = length l in
+  if len < 2 then l else sort len l
+
+let rec compare_lengths l1 l2 =
+  match l1, l2 with
+  | [], [] -> 0
+  | [], _ -> -1
+  | _, [] -> 1
+  | _ :: l1, _ :: l2 -> compare_lengths l1 l2
+;;
+
+let rec compare_length_with l n =
+  match l with
+  | [] ->
+    if n = 0 then 0 else
+      if n > 0 then -1 else 1
+  | _ :: l ->
+    if n <= 0 then 1 else
+      compare_length_with l (n-1)
+;;

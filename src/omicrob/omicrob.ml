@@ -37,7 +37,7 @@ let split str c =
 let starts_with str ~sub =
   let str_len = String.length str in
   let sub_len = String.length sub in
-  str_len >= sub_len && String.sub str (str_len - sub_len) sub_len = sub
+  str_len >= sub_len && String.sub str 0 sub_len = sub
 
 let is_substring str ~sub =
   let str_len = String.length str in
