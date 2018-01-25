@@ -164,11 +164,13 @@ void interp(void) {
   
   while (1) {
 
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+#if defined(__PC__) && DEBUG >= 4 // DUMP STACK AND HEAP
     {
       printf("=========\n");
       /* print_global(); */
-      print_heap();
+        print_dynamic_heap();
+  print_static_heap();
+  print_flash_heap();
       print_stack();
       union { value v; float f; } vf_acc;
       vf_acc.f = acc;

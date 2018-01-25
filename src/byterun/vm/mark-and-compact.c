@@ -298,7 +298,9 @@ void gc(void) {
   printf("#################### MARK & COMPACT ####################\n");
 #endif
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-  print_heap();
+  print_dynamic_heap();
+  print_static_heap();
+  print_flash_heap();
   print_stack();
 #endif
   mark_roots();
@@ -309,7 +311,9 @@ void gc(void) {
   compact_blocks();
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
   printf("END OF MARK & COMPACT\n");
-  print_heap();
+  print_dynamic_heap();
+  print_static_heap();
+  print_flash_heap();
   print_stack();
 #endif
 }

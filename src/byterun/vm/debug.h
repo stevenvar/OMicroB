@@ -25,7 +25,8 @@ void debug_blink_pause(void);
     == 0: no debug, only traces from the OCaml program
     >= 1: trace GC runs
     >= 2: trace VM instructions
-    >= 3: dump stack and heap at each VM instruction
+    >= 3: dump stack and heap at each GC
+    >= 4: dump stack and heap at each VM instruction
 */
 
 #if DEBUG >= 2 && defined(__PC__)

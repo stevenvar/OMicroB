@@ -127,7 +127,7 @@ void print_ram_global_data(void) {
   print_table("RAM GLOBAL DATA", ocaml_ram_global_data, OCAML_RAM_GLOBDATA_NUMBER);
 }
 
-void print_statck(void) {
+void print_stack(void) {
   print_table("STACK", ocaml_stack, OCAML_STACK_WOSIZE);
 }
 
