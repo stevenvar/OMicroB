@@ -16,7 +16,6 @@ let end_spi () =
 (* Emit data through the SPI connection *)
 let transfer data =
   write_register SPDR data;
-  pin_mode PIN9 OUTPUT;
   while (read_bit SPSR SPIF) = false do
     ()
   done

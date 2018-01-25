@@ -18,10 +18,10 @@ stdlib: $(TARGETS)
 $(LIB)/stdlib.cma: $(CMOS)
 	$(OCAMLC) -a $^ -o $@
 
-%.cmi: %.mli
+%.cmi: $(SRC)/stdlib/%.mli
 	$(OCAMLC) -nostdlib -nopervasives -c -w @a $<
 
-%.cmo: %.ml $(CMIS)
+%.cmo: $(SRC)/stdlib/%.ml $(CMIS)
 	$(OCAMLC) -nostdlib -c -w @a $<
 
 pervasives.cmi: pervasives.mli
