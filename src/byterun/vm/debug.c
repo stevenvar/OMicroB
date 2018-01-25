@@ -105,7 +105,7 @@ static void print_table(const char *name, const value *table, mlsize_t table_wos
 
   for (ptr = table, i = 0; ptr < table + table_wosize; ptr ++, i ++) {
 #ifdef OCAML_GC_STOP_AND_COPY
-    if (ptr == ocaml_dynamic_heap + OCAML_DYNAMIC_HEAP_WOSIZE / 2) {
+    if (ptr == ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE / 2) {
       printf("======================================================\n");
     }
 #endif
