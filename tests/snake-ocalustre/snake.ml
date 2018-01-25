@@ -141,7 +141,18 @@ let draw_apple () =
   let x,y = !apple in
   Oled.draw x y true
 
+let bip () =
+  pin_mode PIN13 OUTPUT;
+  pin_mode PIN5 OUTPUT;
+  for _i = 1 to 1_000 do
+    digital_write PIN13 HIGH;
+    digital_write PIN5 LOW;
+    digital_write PIN13 LOW;
+    digital_write PIN5 HIGH;
+  done
+    
 let eats_apple () =
+  (*bip ();*)
   snake.(!ptr_head) = (!apple)
 
 let new_head_step = new_head (false,false)
