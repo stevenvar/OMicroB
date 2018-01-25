@@ -203,6 +203,8 @@ let () =
       Printf.fprintf oc "\n";
       Printf.fprintf oc "value acc = %s;\n" (Printer.string_of_dword accu_data);
       Printf.fprintf oc "\n";
+      Printf.fprintf oc "value env = Val_unit;\n";
+      Printf.fprintf oc "\n";
       Printer.print_datagen_word_array oc "value" "ocaml_stack" "OCAML_STACK_WOSIZE" stack_data;
       Printf.fprintf oc "\n";
       Printer.print_datagen_word_array oc "value" "ocaml_ram_global_data" "OCAML_RAM_GLOBDATA_NUMBER" ram_global_data;

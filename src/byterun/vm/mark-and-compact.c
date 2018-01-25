@@ -102,6 +102,7 @@ static void mark_roots(void) {
   value *p, *end;
 
   mark_root(acc);
+  mark_root(env);
 
   end = ocaml_stack + OCAML_STACK_WOSIZE;
   for (p = sp; p < end; p ++) {
@@ -176,6 +177,7 @@ static void reverse_root_pointers(void) {
   value *p, *end;
 
   reverse_pointer(&acc);
+  reverse_pointer(&env);
 
   end = ocaml_stack + OCAML_STACK_WOSIZE;
   for (p = sp; p < end; p ++) {

@@ -24,7 +24,6 @@
 
 code_t pc;
 value *sp;
-value env;
 value trapSp;
 uint8_t extra_args;
 
