@@ -10,12 +10,12 @@
 
 For flashing (optional but fun) you'll need the avr-gcc tools :
 
-On MacOS (with HomeBrew) :
+On MacOS (with Homebrew) :
 
 ```
 brew tap osx-cross/avr
-brew install avr-libc
-brew install avrdude --with-usb
+brew install avr-gcc
+brew install avrdude
 ```
 
 On Ubuntu/Debian Linux : 

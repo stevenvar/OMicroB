@@ -6,7 +6,7 @@ TARGETS := snake.byte snake.c snake.elf snake.avr snake.hex
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -avrcxxopt -O2 -v $^ -mlopt -verbose -stack-size 100 -heap-size 200
+	$(BIN)/omicrob -avrcxxopt -O2 -v $^ -mlopt -verbose -stack-size 64 -heap-size 300
 
 flash: snake.hex
 	$(BIN)/omicrob -flash -sudo $<

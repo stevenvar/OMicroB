@@ -18,12 +18,5 @@ let transfer data =
   write_register SPDR data;
   pin_mode PIN9 OUTPUT;
   while (read_bit SPSR SPIF) = false do
-    digital_write PIN9 LOW;
-  done;
-(*   while true do
- *     let b = read_bit SPSR SPIF in
- *     tracei (if b then 1 else 0);
- *     digital_write PIN9 HIGH;
- *     digital_write PIN11 HIGH;
- *     digital_write PIN10 (if b then LOW else HIGH);
- * done *)
+    ()
+  done
