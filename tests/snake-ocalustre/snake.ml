@@ -59,16 +59,34 @@ let collides_with_itself () =
   done
   with Break -> ()
 
+(* Generated code *)
 let rising_edge in_f =
   let st__aux_1 = ref false  in
   let rising_edge_step in_f =
     let _aux_1 = !st__aux_1  in
     let out_f = in_f && (not _aux_1)  in st__aux_1 := in_f; out_f  in
-  rising_edge_step 
+  rising_edge_step
 let new_dir (dir,left,right) =
   let new_dir_step (dir,left,right) =
-    let n_d = East in
-    n_d in
+    let n_d =
+      if left
+      then
+        (if dir = South
+         then East
+         else
+           if dir = North then West else if dir = East then North else South)
+      else
+        if right
+        then
+          (if dir = South
+           then West
+           else
+             if dir = North
+             then East
+             else if dir = East then South else North)
+        else dir
+       in
+    n_d  in
   new_dir_step 
 let new_x (dir,x) =
   let new_x_step (dir,x) =
@@ -84,8 +102,8 @@ let new_y (dir,y) =
   new_y_step 
 
 let new_head (b1,b2) =
-  let st_y = ref 10  in
-  let st_x = ref 10  in
+  let st_y = ref 0  in
+  let st_x = ref 1  in
   let st_dir = ref South  in
   let st_left = ref false  in
   let st_right = ref false  in
@@ -117,16 +135,7 @@ let new_head (b1,b2) =
     st_y := _aux_5;
     (x, y)  in
   new_head_step 
-
-
-
-(* let new_head dir =
- *   let (cx,cy) = (snake.(!ptr_head)) in
- *   match dir with
- *   | South -> (cx,(cy+1) mod 32)
- *   | North -> (cx,(cy - 1 + 32) mod 32)
- *   | West -> ((cx-1 + 64) mod 64,cy)
- *   | East -> ((cx+1) mod 64,cy) *)
+(* . *)
 
 let draw_apple () =
   let x,y = !apple in
@@ -147,27 +156,27 @@ let lob = function
 
 let game_loop ()=
   while true do 
-  let (xh,yh) as head = new_head_step (bol (digital_read button_left),bol (digital_read button_right)) in
+  let (xh,yh) as head = new_head_step (not (bol (digital_read button_left)),not (bol (digital_read button_right))) in
   let (xt,yt) = (snake.(!ptr_tail)) in
-  (* let new_dir = button_direction dir in *)
-  (* if (eats_apple ()) then
-   *   begin
-   *     apple := new_position ();
-   *     incr size;
-   *     if !size = Array.length snake then 
-   *       raise Win;
-   *   end
-   * else 
-   *    begin
-   *     Oled.draw xt yt false;
-   *     ptr_tail := (!ptr_tail + 1) mod (Array.length snake)
-   *   end; *)
+  (* let new_dir = button_direction  in *)
+  if (eats_apple ()) then
+    begin
+      apple := new_position ();
+      incr size;
+      if !size = Array.length snake then 
+        raise Win;
+    end
+  else 
+     begin
+      Oled.draw xt yt false;
+      ptr_tail := (!ptr_tail + 1) mod (Array.length snake)
+    end;
   ptr_head := (!ptr_head + 1) mod (Array.length snake);
   snake.(!ptr_head) <- head;
-  (* draw_apple (); *)
+  draw_apple ();
   Oled.draw xh yh true;
   Oled.display ();
-  (* collides_with_itself (); *)
+  collides_with_itself ();
   delay(100 - !size);
 done
 
