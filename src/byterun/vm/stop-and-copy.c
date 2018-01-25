@@ -6,18 +6,9 @@
 #include "debug.h"
 #include "gc.h"
 
-extern value acc;
-extern value *sp;
-
-extern value env;
-extern value ocaml_stack[OCAML_STACK_WOSIZE];
-extern value ocaml_global_data[OCAML_GLOBDATA_NUMBER];
-
 #define Is_black_hd(hd) ((hd) & Color_black)
 #define Is_black_val(val) Is_black_hd(Hd_val(val))
 #define Set_black_hd(hd) ((hd) | Color_black)
-
-extern void print_stack();
 
 /*
  * implantation d'un S&C
@@ -41,9 +32,9 @@ extern void print_stack();
  * current_heap : 1 ou 2 selon le tas actif
  * les appels d'allocations mémoires ne savent pas dans quel tas seront placé les données.
  */
-const value *heap1_start, *heap2_start;
-const value *heap1_end, *heap2_end;
-int current_heap;
+static const value *heap1_start, *heap2_start;
+static const value *heap1_end, *heap2_end;
+static int current_heap;
 
 
 /* heap_ptr : pointeur du premier emplacement libre du tas
@@ -51,12 +42,12 @@ int current_heap;
 value *heap_ptr, *heap_end;
 
 /* heap_todo : indique ce qui reste à déplacer */
-value *heap_todo;
+static value *heap_todo;
 
 /* des variables internes utiles pour le gc */
-value *new_heap, *old_heap;
-value* tab_heap_start[2];
-value* tab_heap_end[2];
+static value *new_heap, *old_heap;
+static value* tab_heap_start[2];
+static value* tab_heap_end[2];
 
 /* Initialisation du GC
  * Cette fonction doit être appelée avant toute allocation du programme ;
@@ -64,24 +55,24 @@ value* tab_heap_end[2];
  * heap_size : la taille du tas utile. Au final 2 zones de cette taille seront allouées.
  */
 void gc_init(void) {
-  heap1_start = ocaml_heap;
-  heap1_end = heap1_start + OCAML_HEAP_WOSIZE / 2;
+  heap1_start = ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE;
+  heap1_end = heap1_start + OCAML_DYNAMIC_HEAP_WOSIZE / 2;
   tab_heap_start[0] = (value *) heap1_start;
   tab_heap_end[0] = (value *) heap1_end;
-  heap2_start = ocaml_heap + OCAML_HEAP_WOSIZE / 2;
-  heap2_end = heap2_start + OCAML_HEAP_WOSIZE / 2;
+  heap2_start = ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE / 2;
+  heap2_end = heap2_start + OCAML_DYNAMIC_HEAP_WOSIZE / 2;
   tab_heap_start[1] = (value *) heap2_start;
   tab_heap_end[1] = (value *) heap2_end;
-  heap_ptr = (value *) heap1_start + OCAML_HEAP_INITIAL_WOSIZE;
-  heap_end = (value *) heap1_start + OCAML_HEAP_WOSIZE / 2;
+  heap_ptr = (value *) heap1_start;
+  heap_end = (value *) heap1_start + OCAML_DYNAMIC_HEAP_WOSIZE / 2;
   current_heap = 0;
 }
 
-#if DEBUG >= 3 // DUMP STACK AND HEAP
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
 
-int cpt_gc = 0;
+static int cpt_gc = 0;
 
-void clean_heap(){
+static void clean_heap(){
   value* from = tab_heap_start[(current_heap+1)%2];
   value* to = tab_heap_end[(current_heap+1)%2];
   for(value* ptr = from ; ptr < to; ptr++){
@@ -105,7 +96,7 @@ void gc_one_val(value* ptr, int update) {
  start:
   val = *ptr;
   /* printf("The address of the val is %p\n", ptr); */
-  if (Is_block(val)) {
+  if (Is_block_in_dynamic_heap(val)) {
     /* printf("The val is a pointer to %p \n", Block_val(val));  */
     hd = Hd_val(val);
     if (Is_black_hd(hd)) { /* bloc déjà copié, mettre à jour la référence*/
@@ -127,17 +118,17 @@ void gc_one_val(value* ptr, int update) {
       else { /* tag < No_scan_tag : tous les autres */
         *heap_ptr = hd;
 	heap_ptr ++;
-        value new_val = Val_block(heap_ptr);
+        value new_val = Val_dynamic_block(heap_ptr);
 	/* int n = sz ; */
 	/* value* po = heap_ptr; */
 	/* value* pi = (Block_val(val)); */
 	/* while (n--){ */
 	/*   *po++ = *pi++; */
 	/* } */
-	memcpy(heap_ptr, Block_val(val), sz * sizeof (value));
-        Field(val, 0) = new_val;
+	memcpy(heap_ptr, Ram_block_val(val), sz * sizeof (value));
+        Ram_field(val, 0) = new_val;
         heap_ptr += sz;
-        Hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
+        Ram_hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
 	*ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
       }
     }
@@ -178,11 +169,15 @@ void gc(void) {
 
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
   cpt_gc ++;
-  print_heap();
+  print_static_heap();
+  print_dynamic_heap();
+  print_flash_heap();
+  print_ram_global_data();
+  print_flash_global_data();
   print_stack();
 #endif
 
-  value* ptr; /* pointeur de parcours de la pile et des globales  */
+  value* ptr, *end; /* pointeur de parcours de la pile et des globales  */
   old_heap = tab_heap_start[current_heap % 2];
   current_heap = (current_heap + 1) % 2;
   heap_end = tab_heap_end[current_heap];
@@ -194,8 +189,26 @@ void gc(void) {
     gc_one_val(ptr, 1);
   }
 
-  for (ptr = ocaml_global_data; ptr < ocaml_global_data + OCAML_GLOBDATA_NUMBER; ptr++) {
+  end = ocaml_ram_global_data + OCAML_RAM_GLOBDATA_NUMBER;
+  for (ptr = ocaml_ram_global_data; ptr < end; ptr ++) {
     gc_one_val(ptr, 1);
+  }
+
+  ptr = ocaml_ram_heap;
+  end = ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE;
+  while (ptr < end) {
+    header_t h = *ptr;
+    mlsize_t sz = Wosize_hd(h);
+    if (Tag_hd(h) < No_scan_tag) {
+      ptr ++;
+      while (sz > 0) {
+        gc_one_val(ptr, 1);
+        ptr ++;
+        sz --;
+      }
+    } else {
+      ptr += sz + 1;
+    }
   }
 
   gc_one_val(&acc,1);
@@ -204,6 +217,11 @@ void gc(void) {
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
   printf("End of GC number %d\n", cpt_gc);
   clean_heap();
-  print_heap();
+  print_static_heap();
+  print_dynamic_heap();
+  print_flash_heap();
+  print_ram_global_data();
+  print_flash_global_data();
+  print_stack();
 #endif
 }
