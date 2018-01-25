@@ -90,14 +90,18 @@ let new_dir (dir,left,right) =
   new_dir_step 
 let new_x (dir,x) =
   let new_x_step (dir,x) =
-    let n_x = if dir = West then x - 1 else if dir = East then x + 1 else x
-       in
+    let n_x =
+      if dir = West
+      then ((x - 1) + 64) mod 64
+      else if dir = East then ((x + 1) + 64) mod 64 else x  in
     n_x  in
   new_x_step 
 let new_y (dir,y) =
   let new_y_step (dir,y) =
-    let n_y = if dir = North then y - 1 else if dir = South then y + 1 else y
-       in
+    let n_y =
+      if dir = North
+      then ((y - 1) + 32) mod 32
+      else if dir = South then ((y + 1) + 32) mod 32 else y  in
     n_y  in
   new_y_step 
 
