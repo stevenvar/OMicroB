@@ -1,0 +1,9 @@
+window width=310 height=460 bgcolor=lightgray title="Arduboy"
+
+#lcd x=30 y=300 column_nb=128 line_nb=8 cs=PIN12 dc=PIN4 rst=PIN6
+
+led x=15 y=400 radius=5 pin=PIN9 color=red inverse=true
+
+button x=210 y=170 width=40 height=40 label="A" pin=PIN7 color=red inverse=true
+
+
