@@ -221,13 +221,21 @@ let export arch codemap accu stack ram_globals flash_globals =
     | Arch.A16 ->
       assert false (* TODO *)
     | Arch.A32 ->
-      let n = Int32.bits_of_float x in
-      let (n0, n1, n2, n3) = int32_bytes n in
-      FLOAT [ n3; n2; n1; n0 ]
+      if classify_float x = FP_nan then (
+        FLOAT [ 0x7F; 0xA0; 0x00; 0x00 ]
+      ) else (
+        let n = Int32.bits_of_float x in
+        let (n0, n1, n2, n3) = int32_bytes n in
+        FLOAT [ n3; n2; n1; n0 ]
+      )
     | Arch.A64 ->
-      let n = Int64.bits_of_float x in
-      let (n0, n1, n2, n3, n4, n5, n6, n7) = int64_bytes n in
-      FLOAT [ n7; n6; n5; n4; n3; n2; n1; n0 ]
+      if classify_float x = FP_nan then (
+        FLOAT [ 0x7F; 0xFF; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ]
+      ) else (
+        let n = Int64.bits_of_float x in
+        let (n0, n1, n2, n3, n4, n5, n6, n7) = int64_bytes n in
+        FLOAT [ n7; n6; n5; n4; n3; n2; n1; n0 ]
+      )
 
   and export_float_array mut tbl =
     let heap, pointer = heap_pointer_of_mutability mut in

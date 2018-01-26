@@ -11,4 +11,5 @@ let mktbl =
   
 let () =
   pin_mode PIN9 OUTPUT;
-  trace (string_of_float (prod (mktbl 4)))
+  trace (string_of_float (prod (mktbl 4)));
+  trace (string_of_float nan)
