@@ -88,7 +88,9 @@ void print_value(value v) {
   } else if (Is_block_in_flash_heap(v)) {
     printf("@(%p) (block in flash heap)", Flash_block_val(v));
   } else if (v == 0) {
-    printf("ZERO");
+    printf("NULL");
+  } else if (Maybe_code_pointer(v)) {
+    printf("code pointer %d", Codeptr_val(v));
   } else if (f >= -1e6 && f <= 1e6) {
     printf("(maybe %f)", f);
   } else {

@@ -167,13 +167,10 @@ void interp(void) {
     {
       printf("=========\n");
       /* print_global(); */
-        print_dynamic_heap();
-  print_static_heap();
-  print_flash_heap();
+      print_dynamic_heap();
+      print_static_heap();
+      print_flash_heap();
       print_stack();
-      union { value v; float f; } vf_acc;
-      vf_acc.f = acc;
-      float f = vf_acc.f;
       printf("acc = "); print_value(acc);
       printf("env = "); print_value(env);
       printf("pc = %d\n", pc);
@@ -667,7 +664,7 @@ void interp(void) {
         push(acc);
       }
       OCamlAlloc(acc, n + 1, Closure_tag);
-      Ram_field(acc, 0) = Val_int(ptr);
+      Ram_field(acc, 0) = Val_codeptr(ptr);
       for (i = 0; i < n; i ++) {
         Ram_field(acc, i + 1) = pop();
       }
@@ -685,7 +682,7 @@ void interp(void) {
         push(acc);
       }
       OCamlAlloc(acc, n + 1, Closure_tag);
-      Ram_field(acc, 0) = Val_int(ptr);
+      Ram_field(acc, 0) = Val_codeptr(ptr);
       for (i = 0; i < n; i ++) {
         Ram_field(acc, i + 1) = pop();
       }
@@ -703,7 +700,7 @@ void interp(void) {
         push(acc);
       }
       OCamlAlloc(acc, n + 1, Closure_tag);
-      Ram_field(acc, 0) = Val_int(ptr);
+      Ram_field(acc, 0) = Val_codeptr(ptr);
       for (i = 0; i < n; i ++) {
         Ram_field(acc, i + 1) = pop();
       }

@@ -2,21 +2,29 @@
   32 bits version of values:
 
 Floatting point values: ieee754 with only one NaN
-                          NaN : 0111 1111 1100 0000 0000 0000 0000 0000
+                          NaN : 0111 1111 1010 0000 0000 0000 0000 0000
                          +inf : 0111 1111 1000 0000 0000 0000 0000 0000
-                         -inf : 1111 1111 1000 0000 0000 0000 0000 0000
-                 other floats : xyyy yyyy yxxx xxxx xxxx xxxx xxxx xxxx (with at least one y != 1)
+                         -inf : 1000 0000 0111 1111 1111 1111 1111 1111
+        other positive floats : 0eee eeee emmm mmmm mmmm mmmm mmmm mmmm (as is)
+        other negative floats : 1eee eeee emmm mmmm mmmm mmmm mmmm mmmm (with exponant and mantiss inverted)
 
 Integers, constant variants, etc:
                         int   : xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxx1
 
-dynamic heap pointers   (ram) : 1111 1111 100x xxxx xxxx xxxx xxxx xx00 (never NULL => distinct to -inf)
- static heap pointers   (ram) : 1111 1111 101x xxxx xxxx xxxx xxxx xx00
-        heap pointers (flash) : 1111 1111 110x xxxx xxxx xxxx xxxx xx00
+dynamic heap pointers   (ram) : 0111 1111 1100 xxxx xxxx xxxx xxxx xx00
+ static heap pointers   (ram) : 0111 1111 1101 xxxx xxxx xxxx xxxx xx00
+        heap pointers (flash) : 0111 1111 1110 xxxx xxxx xxxx xxxx xx00
+
+                  small pairs : 0111 1111 1111 aaaa aaaa bbbb bbbb tt00 // TODO
 
         code pointers (flash) : 10xx xxxx xxxx xxxx xxxx xxxx xxxx xxx1
 
-       exception mark for FFI : 1111 1111 1yyx xxxx xxxx xxxx xxxx xx10
+                 white header : tttt tttt ssss ssss ssss ssss ssss ss00
+                   red header : tttt tttt ssss ssss ssss ssss ssss ss01
+                 black header : tttt tttt ssss ssss ssss ssss ssss ss10
+                 brown header : tttt tttt ssss ssss ssss ssss ssss ss11
+
+              unaligned_block : 0111 1111 11yy xxxx xxxx xxxx xxxx xx10
 
 OCaml values:
                         value : uniform representation of an OCaml value
@@ -56,26 +64,36 @@ typedef uint32_t code_t;
 /******************************************************************************/
 /* Value classification */
 
-#define Is_block(x)                 (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 23) == 0x01FF)
-#define Is_int(x)                   (((uint8_t) (x) & 0x1) == 0x1)
+// Is a block in one of the trhee heaps?
+#define Is_block(x)                 (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 22) == 0x01FF)
+// Is an int, a float or a code pointer?
+#define Is_int(x)                   (((uint8_t) (x) & 0x1) == 0x01)
 
-#define Is_block_in_dynamic_heap(x) (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 21) == 0x07FC)
-#define Is_block_in_static_heap(x)  (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 21) == 0x07FD)
-#define Is_block_in_flash_heap(x)   (((uint8_t) (x) & 0x3) == 0x0 && (uint16_t) ((uint32_t) (x) >> 21) == 0x07FE)
+// Is an exceptions that crossed FFI or a blacken header at the marking stage of a Mark&Compact
+#define Is_unaligned_block(x)       (((uint8_t) (x) & 0x3) == 0x02 && (uint16_t) ((uint32_t) (x) >> 22) == 0x01FF)
 
-#define Is_in_ram(x)                ((((uint8_t) ((uint32_t) (x) >> 16)) & 0x40) == 0x00)
+// Is a block in the dynamic heap
+#define Is_block_in_dynamic_heap(x) (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 20) == 0x07FC)
+// Is a block in the static heap
+#define Is_block_in_static_heap(x)  (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 20) == 0x07FD)
+// Is a block in the flash heap
+#define Is_block_in_flash_heap(x)   (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 20) == 0x07FE)
 
-#define Maybe_code_pointer(x)       (((uint32_t) (x) >> 30) == 0x2) // Useful for debugging
+// (x) is assumed to be a block, is it in one of the ram heaps?
+#define Is_in_ram(x)                ((((uint8_t) ((uint32_t) (x) >> 16)) & 0x20) == 0x00)
+
+// (x) is assumed to be an integer, can it be a code pointer? (pretty-printing purpose)
+#define Maybe_code_pointer(x)       (((uint32_t) (x) >> 30) == 0x2)
 
 /******************************************************************************/
 /* Conversions */
 
-#define Val_dynamic_block(x) ((value) ((char *) (x) - (char *) ocaml_ram_heap) | (value) 0xFF800000)
-#define Val_static_block(x)  ((value) ((char *) (x) - (char *) ocaml_ram_heap) | (value) 0xFFA00000)
-#define Val_flash_block(x)   ((value) ((char *) (x) - (char *) ocaml_flash_heap)   | (value) 0xFFC00000)
+#define Val_dynamic_block(x) ((value) ((char *) (x) - (char *)   ocaml_ram_heap) | (value) 0x7FC00000)
+#define Val_static_block(x)  ((value) ((char *) (x) - (char *)   ocaml_ram_heap) | (value) 0x7FD00000)
+#define Val_flash_block(x)   ((value) ((char *) (x) - (char *) ocaml_flash_heap) | (value) 0x7FE00000)
 
-#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + (((int32_t) (x) << 11) >> 11)))
-#define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((int32_t) (x) & 0x001FFFFF)))
+#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + (((int32_t) (x) << 12) >> 12)))
+#define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((int32_t) (x) & 0x000FFFFF)))
 
 #define Val_int(x) ((value) (((uint32_t) (x) << 1) | 1))
 #define Int_val(x) ((int32_t) ((value) (x) >> 1))
@@ -84,12 +102,14 @@ typedef uint32_t code_t;
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)
 
 union float_or_value { float f; value v; };
+#define bitwise_value_of_float(f) (((union float_or_value) { .f = (x) }).v)
+#define bitwise_float_of_value(v) (((union float_or_value) { .v = (v) }).f)
 
-#define Val_float(x) ((float) (x) != (float) (x) ? Val_nan : ((union float_or_value) { .f = (x) }).v)
-#define Float_val(v) (((union float_or_value) { .v = (v) }).f)
+#define Val_float(f) ((float) (f) != (float) (f) ? Val_nan : bitwise_value_of_float(f) < 0 ? bitwise_value_of_float(f) ^ 0x7FFFFFFF : bitwise_value_of_float(f))
+#define Float_val(v) ((value) (v) < 0 ? bitwise_float_of_value((v) ^ 0x7FFFFFFF) : bitwise_float_of_value(v))
 
 #define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
-#define Codeptr_val(x) (((value) (x) & 0x7FFFFFFF) >> 1)
+#define Codeptr_val(x) (((uint32_t) (x) >> 1) & 0x7FFFFFFF)
 
 /******************************************************************************/
 /* Constants */
@@ -97,7 +117,7 @@ union float_or_value { float f; value v; };
 #define Val_false ((value) 0x1)
 #define Val_true  ((value) 0x3)
 #define Val_unit  ((value) 0x1)
-#define Val_nan   ((value) 0x7FC00000)
+#define Val_nan   ((value) 0x7FA00000)
 
 /******************************************************************************/
 /* Blocks */

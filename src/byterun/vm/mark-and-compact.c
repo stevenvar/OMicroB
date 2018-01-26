@@ -33,7 +33,7 @@ void gc_init(void) {
 static void mark_block(value *p) {
   value v = *p;
   while (v != Color_black) {                                  /* Did go back to the root block header?   */
-    if (Color_hd(v) == Color_black) {                         /* Did go back to another block header?    */
+    if (Is_unaligned_block(v)) {                              /* Did go back to another block header?    */
       value *old_p = Ram_block_val(v ^ Color_black);
       header_t old_h = *old_p;
       if (Color_hd(old_h) == Color_red) {
