@@ -29,18 +29,18 @@ let create_display x y cs dc rst column_nb line_nb =
     mode = Data
   }
 
-
 let sync_display =
   let sync_mutex = Mutex.create () in
   let sync_check = ref false in
   let rec sync_thread () =
-    begin try
-            Thread.delay 0.1;
-            Mutex.lock sync_mutex;
-            let must_sync = !sync_check in
-            sync_check := false;
-            Mutex.unlock sync_mutex;
-            if must_sync then synchronize ();
+    begin
+      try
+        Thread.delay 0.01;
+        Mutex.lock sync_mutex;
+        let must_sync = !sync_check in
+        sync_check := false;
+        Mutex.unlock sync_mutex;
+        if must_sync then synchronize ();
       with exn ->
         Printf.eprintf "Unhandled exception %s\n%!" (Printexc.to_string exn)
     end;
@@ -52,13 +52,11 @@ let sync_display =
     sync_check := true;
     Mutex.unlock sync_mutex
 
-
 let init_graphics display =
   let config = Printf.sprintf " %dx%d" (display.width*2) (display.height*2) in
   open_graph config;
   set_window_title "LCD display";
-  (* display_mode false; *)
-  (* display_border display; *)
+  display_mode false;
   sync_display ()
 
 

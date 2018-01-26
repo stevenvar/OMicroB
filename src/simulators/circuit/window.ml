@@ -45,19 +45,21 @@ let init_graphics () =
     Graphics.set_color Color.black;
     Graphics.draw_rect 0 0 (w - 1) (h - 1);
     Graphics.display_mode false;
+    Graphics.auto_synchronize false;
 ;;
 
 let sync_display =
   let sync_mutex = Mutex.create () in
   let sync_check = ref false in
   let rec sync_thread () =
-    begin try
-            Thread.delay 0.1;
-            Mutex.lock sync_mutex;
-            let must_sync = !sync_check in
-            sync_check := false;
-            Mutex.unlock sync_mutex;
-            if must_sync then Graphics.synchronize ();
+    begin
+      try
+        Thread.delay 0.01;
+        Mutex.lock sync_mutex;
+        let must_sync = !sync_check in
+        sync_check := false;
+        Mutex.unlock sync_mutex;
+        if must_sync then Graphics.synchronize ();
       with exn ->
         Printf.eprintf "Unhandled exception %s\n%!" (Printexc.to_string exn)
     end;
