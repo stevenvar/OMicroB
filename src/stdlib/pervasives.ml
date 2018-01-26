@@ -258,7 +258,7 @@ let valid_float_lexem s =
   in
   loop 0
 
-let string_of_float f = valid_float_lexem (format_float "%.12g" f)
+let string_of_float f = valid_float_lexem (format_float "%.3g" f)
 
 external float_of_string : string -> float = "caml_float_of_string"
 

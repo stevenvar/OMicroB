@@ -3,7 +3,7 @@
 
 #include "values.h"
 
-int string_length(value s);
+mlsize_t string_length(value s);
 int string_compare(value s1, value s2);
 
 value caml_create_bytes(value len);

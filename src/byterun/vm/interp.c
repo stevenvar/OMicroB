@@ -27,8 +27,6 @@ value *sp;
 value trapSp;
 uint8_t extra_args;
 
-PROGMEM const value atom0_header = Make_header(0, 0, Color_white);
-
 PROGMEM extern void * const ocaml_primitives[];
 
 /******************************************************************************/
@@ -1070,16 +1068,15 @@ void interp(void) {
 #ifdef OCAML_ATOM0
     case OCAML_ATOM0 :
 #endif
-
-      
 #if defined(OCAML_PUSHATOM0) || defined(OCAML_ATOM0)
       {
         TRACE_INSTRUCTION("ATOM0");
-        acc = Val_flash_block(&atom0_header + 1);
+        acc = OCAML_atom0;
         break;
       }
 #endif
 
+      
 #ifdef OCAML_MAKEBLOCK_1B
     case OCAML_MAKEBLOCK_1B : {
       TRACE_INSTRUCTION("MAKEBLOCK1B");

@@ -1,14 +1,12 @@
 #include "debug.h"
 #include "gc.h"
 
-extern PROGMEM const value atom0_header;
-
 value caml_make_vect(value len, value init) {
   value res;
   mlsize_t size, i;
   size = Int_val(len);
   if (size == 0) {
-    res = Val_flash_block(&atom0_header + 1);
+    res = OCAML_atom0;
   } else {
     OCamlAlloc(res, size, 0);
     for (i = 0; i < size; i ++) {
@@ -52,4 +50,31 @@ value caml_array_get(value array, value index) {
 
 value caml_array_set(value array, value index, value val) {
   return caml_array_set_addr(array, index, val); // OK since floats are not boxed
+}
+
+value caml_array_sub(value array, value ml_ofs, value ml_len) {
+  mlsize_t ofs = Int_val(ml_ofs);
+  mlsize_t len = Int_val(ml_len);
+  value result;
+  mlsize_t i;
+  OCamlAlloc(result, len, 0);
+  for (i = 0; i < len; i ++) {
+    Ram_field(result, i) = Field(array, i + ofs);
+  }
+  return result;
+}
+
+value caml_array_append(value tbl1, value tbl2) {
+  mlsize_t sz1 = Wosize_val(tbl1);
+  mlsize_t sz2 = Wosize_val(tbl2);
+  value result;
+  mlsize_t i;
+  OCamlAlloc(result, sz1 + sz2, 0);
+  for (i = 0; i < sz1; i ++) {
+    Ram_field(result, i) = Field(tbl1, i);
+  }
+  for (i = 0; i < sz2; i ++) {
+    Ram_field(result, i + sz1) = Field(tbl2, i);
+  }
+  return result;
 }

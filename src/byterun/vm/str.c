@@ -1,22 +1,33 @@
 #include <string.h>
+#include <stdio.h>
 #include "values.h"
 #include "str.h"
 
-int string_length(value s) {
+mlsize_t string_length(value s) {
   mlsize_t temp;
   temp = Bosize_val(s) - 1;
   return temp - String_field(s, temp);
 }
 
-value caml_create_bytes(value ml_len) {
+value create_bytes(mlsize_t str_len) {
   value res;
-  mlsize_t str_len = Int_val(ml_len);
   mlsize_t blk_wlen = Wsize_bsize(str_len) + 1;
   mlsize_t blk_blen = Bsize_wsize(blk_wlen);
   OCamlAlloc(res, blk_wlen, String_tag);
   Ram_field(res, blk_wlen - 1) = 0;
   Ram_string_field(res, blk_blen - 1) = blk_blen - str_len - 1;
   return res;
+}
+
+value copy_bytes(const char *str) {
+  mlsize_t str_len = strlen(str);
+  value res = create_bytes(str_len);
+  memcpy(Ram_string_val(res), str, str_len);
+  return res;
+}
+
+value caml_create_bytes(value ml_len) {
+  return create_bytes(Int_val(ml_len));
 }
 
 value caml_ml_string_length(value s) {
@@ -101,4 +112,35 @@ value caml_bytes_equal(value s1, value s2) {
 
 value caml_string_notequal(value s1, value s2) {
   return Val_bool(!Bool_val(caml_string_equal(s1, s2)));
+}
+
+value caml_string_get(value s, value i) {
+  mlsize_t idx = Int_val(i);
+  mlsize_t len = string_length(s);
+  if (idx >= len) caml_raise_index_out_of_bounds();
+  return Val_int(String_field(s, i));
+}
+
+value caml_format_int(value s, value n) {
+  mlsize_t len = string_length(s), i;
+  char str[len + 1];
+  char buf[13];
+  for (i = 0; i < len; i ++) {
+    str[i] = String_field(s, i);
+  }
+  str[i] = '\0';
+  snprintf(buf, sizeof(buf), str, Int_val(n));
+  return copy_bytes(buf);
+}
+
+value caml_format_float(value s, value x) {
+  mlsize_t len = string_length(s), i;
+  char str[len + 1];
+  char buf[13];
+  for (i = 0; i < len; i ++) {
+    str[i] = String_field(s, i);
+  }
+  str[i] = '\0';
+  snprintf(buf, sizeof(buf), str, Float_val(x));
+  return copy_bytes(buf);
 }

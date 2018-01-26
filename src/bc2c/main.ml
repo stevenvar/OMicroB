@@ -156,7 +156,7 @@ let () =
       let ooid, accu, stack, globals, prims, code = Cleaner.clean bytefile.Bytefile.prim bytefile.Bytefile.data bytefile.Bytefile.code in
       let ram_globals, flash_globals, code = Datagen.split_globals globals code in
       let bytecode, opcodes, codemap = Codegen.export code in
-      let exceptions, accu_data, stack_data, ram_global_data, flash_global_data, static_heap_data, flash_heap_data = Datagen.export arch codemap accu stack ram_globals flash_globals in
+      let atom0, exceptions, accu_data, stack_data, ram_global_data, flash_global_data, static_heap_data, flash_heap_data = Datagen.export arch codemap accu stack ram_globals flash_globals in
       let stack_data = Datagen.reverse_stack stack_size stack_data in
 
       let flash_heap_size = List.length flash_heap_data in
@@ -212,10 +212,14 @@ let () =
       Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_global_data" "OCAML_FLASH_GLOBDATA_NUMBER" flash_global_data;
       Printf.fprintf oc "\n";
 
-      (* Exceptions *)
+      (* Define exceptions *)
       List.iter (fun (exn_name, exn_data) ->
         Printf.fprintf oc "#define OCAML_%-20s %s\n" exn_name (Printer.string_of_dword exn_data);
       ) exceptions;
+      Printf.fprintf oc "\n";
+
+      (* Define atom0 *)
+      Printf.fprintf oc "#define OCAML_%-20s %s\n" "atom0" (Printer.string_of_dword atom0);
       Printf.fprintf oc "\n";
       
       (* Define bytecode *)

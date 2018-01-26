@@ -299,6 +299,8 @@ let export arch codemap accu stack ram_globals flash_globals =
   and export_code_ptr code_ptr =
     CODEPTR codemap.(code_ptr) in
 
+  let atom0 = export_value (Block (Immutable, 0, [||])) in
+  
   let exceptions =
     List.map (fun (name, id) ->
       let block = Block (Immutable, Obj.object_tag, [| Bytes (Immutable, Bytes.of_string name); Int id |]) in
@@ -309,7 +311,7 @@ let export arch codemap accu stack ram_globals flash_globals =
   let stack = List.map export_value stack in
   let ram_global_data = Array.map export_value ram_globals in
   let flash_global_data = Array.map export_value flash_globals in
-  (exceptions, accu, stack, Array.to_list ram_global_data, Array.to_list flash_global_data, Heap.contents static_heap, Heap.contents flash_heap)
+  (atom0, exceptions, accu, stack, Array.to_list ram_global_data, Array.to_list flash_global_data, Heap.contents static_heap, Heap.contents flash_heap)
 
 (******************************************************************************)
 (******************************************************************************)

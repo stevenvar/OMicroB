@@ -95,18 +95,19 @@ typedef uint32_t code_t;
 #define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + (((int32_t) (x) << 12) >> 12)))
 #define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((int32_t) (x) & 0x000FFFFF)))
 
-#define Val_int(x) ((value) (((uint32_t) (x) << 1) | 1))
+#define Val_int(x) ((value) (((uint32_t) (int32_t) (x) << 1) | 1))
 #define Int_val(x) ((int32_t) ((value) (x) >> 1))
 
 #define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)
 
 union float_or_value { float f; value v; };
-#define bitwise_value_of_float(f) (((union float_or_value) { .f = (x) }).v)
-#define bitwise_float_of_value(v) (((union float_or_value) { .v = (v) }).f)
 
-#define Val_float(f) ((float) (f) != (float) (f) ? Val_nan : bitwise_value_of_float(f) < 0 ? bitwise_value_of_float(f) ^ 0x7FFFFFFF : bitwise_value_of_float(f))
-#define Float_val(v) ((value) (v) < 0 ? bitwise_float_of_value((v) ^ 0x7FFFFFFF) : bitwise_float_of_value(v))
+#define bitwise_value_of_float(x) (((union float_or_value) { .f = (x) }).v)
+#define bitwise_float_of_value(x) (((union float_or_value) { .v = (x) }).f)
+
+#define Val_float(x) ((float) (x) != (float) (x) ? Val_nan : (bitwise_value_of_float((float) (x)) < 0 ? bitwise_value_of_float((float) (x)) ^ 0x7FFFFFFF : bitwise_value_of_float((float) (x))))
+#define Float_val(x) ((value) (x) < 0 ? bitwise_float_of_value((value) (x) ^ 0x7FFFFFFF) : bitwise_float_of_value((value) (x)))
 
 #define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
 #define Codeptr_val(x) (((uint32_t) (x) >> 1) & 0x7FFFFFFF)
