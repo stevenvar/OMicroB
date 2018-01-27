@@ -226,7 +226,10 @@ let export arch codemap accu stack ram_globals flash_globals =
       ) else (
         let n = Int32.bits_of_float x in
         let (n0, n1, n2, n3) = int32_bytes n in
-        FLOAT [ n3; n2; n1; n0 ]
+        if n3 land 0x80 <> 0 then
+          FLOAT [ n3 lxor 0x7F; n2 lxor 0xFF; n1 lxor 0xFF; n0 lxor 0xFF ]
+        else
+          FLOAT [ n3; n2; n1; n0 ]
       )
     | Arch.A64 ->
       if classify_float x = FP_nan then (

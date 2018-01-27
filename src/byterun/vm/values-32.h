@@ -2,22 +2,22 @@
   32 bits version of values:
 
 Floatting point values: ieee754 with only one NaN
-                          NaN : 0111 1111 1010 0000 0000 0000 0000 0000
-                         +inf : 0111 1111 1000 0000 0000 0000 0000 0000
-                         -inf : 1000 0000 0111 1111 1111 1111 1111 1111
-        other positive floats : 0eee eeee emmm mmmm mmmm mmmm mmmm mmmm (as is)
-        other negative floats : 1eee eeee emmm mmmm mmmm mmmm mmmm mmmm (with exponant and mantiss inverted)
+                          NaN : 0111 1111 1010 0000 0000 0000 0000 0000 (unique)
+                         +inf : 0111 1111 1000 0000 0000 0000 0000 0000 (unique)
+                         -inf : 1000 0000 0111 1111 1111 1111 1111 1111 (unique)
+        other positive floats : 0eee eeee emmm mmmm mmmm mmmm mmmm mmmm (as is, collide int)
+        other negative floats : 1eee eeee emmm mmmm mmmm mmmm mmmm mmmm (with exponant and mantiss inverted, collide int and code pointer)
 
 Integers, constant variants, etc:
-                        int   : xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxx1
+                        int   : xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxx1 (collide float and code pointer)
 
-dynamic heap pointers   (ram) : 0111 1111 1100 xxxx xxxx xxxx xxxx xx00
- static heap pointers   (ram) : 0111 1111 1101 xxxx xxxx xxxx xxxx xx00
-        heap pointers (flash) : 0111 1111 1110 xxxx xxxx xxxx xxxx xx00
+dynamic heap pointers   (ram) : 0111 1111 1100 xxxx xxxx xxxx xxxx xx00 (unique)
+ static heap pointers   (ram) : 0111 1111 1101 xxxx xxxx xxxx xxxx xx00 (unique)
+        heap pointers (flash) : 0111 1111 1110 xxxx xxxx xxxx xxxx xx00 (unique)
 
-                  small pairs : 0111 1111 1111 aaaa aaaa bbbb bbbb tt00 // TODO
+                            ? : 0111 1111 1110 xxxx xxxx xxxx xxxx xx00 (unique)
 
-        code pointers (flash) : 10xx xxxx xxxx xxxx xxxx xxxx xxxx xxx1
+        code pointers (flash) : 10xx xxxx xxxx xxxx xxxx xxxx xxxx xxx1 (collide float and int)
 
                  white header : tttt tttt ssss ssss ssss ssss ssss ss00
                    red header : tttt tttt ssss ssss ssss ssss ssss ss01

@@ -24,6 +24,13 @@ value caml_gt_float(value v1, value v2) {
   return Val_bool(Float_val(v1) > Float_val(v2));
 }
 
+value caml_float_compare(value v1, value v2) {
+  if (v1 == v2) return Val_int(0);
+  if (v1 == Val_nan) return Val_int(-1);
+  if (v2 == Val_nan) return Val_int(1);
+  return v1 < v2 ? Val_int(-1) : Val_int(1);
+}
+
 value caml_add_float(value v1, value v2) {
   return Val_float(Float_val(v1) + Float_val(v2));
 }

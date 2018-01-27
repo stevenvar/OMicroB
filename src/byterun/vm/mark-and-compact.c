@@ -26,13 +26,15 @@ void gc_init(void) {
 /******************************************************************************/
 /* GC: marking algorithm */
 
+#define UNIQUE_MARK Val_dynamic_block(ocaml_ram_heap)
+
 /* Mark a block as alive (with a Black color mark) and          */
 /* all blocks reachable from it, directy or indirectly.         */
 /* The parameter p is a pointer to the last field of the block. */
 /* The entire header of the block should be the value heap+2.   */
 static void mark_block(value *p) {
   value v = *p;
-  while (v != Color_black) {                                  /* Did go back to the root block header?   */
+  while (v != UNIQUE_MARK) {                                  /* Did go back to the root block header?   */
     if (Is_unaligned_block(v)) {                              /* Did go back to another block header?    */
       value *old_p = Ram_block_val(v ^ Color_black);
       header_t old_h = *old_p;
@@ -87,7 +89,7 @@ static void mark_root(value v) {
     header_t h = Ram_hd_val(v);
     if (Color_hd(h) == Color_white) {                   /* Is this block not already scanned?                        */
       if (Tag_hd(h) < No_scan_tag) {                    /* Is this block scannable?                                  */
-        Ram_hd_val(v) = Color_black;                    /* Set root header to a unique unaligned value               */
+        Ram_hd_val(v) = UNIQUE_MARK;                    /* Set root header to a unique unaligned value               */
         mark_block(&Ram_field(v, Wosize_hd(h) - 1));
       }
       Ram_hd_val(v) = h | Color_black;                  /* Restore the (blacken) root header                         */
