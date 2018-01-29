@@ -36,7 +36,6 @@ static const value *heap1_start, *heap2_start;
 static const value *heap1_end, *heap2_end;
 static int current_heap;
 
-
 /* heap_ptr : pointeur du premier emplacement libre du tas
  * heap_end : pointeur de fin du tas courant */
 value *heap_ptr, *heap_end;
@@ -69,8 +68,6 @@ void gc_init(void) {
 }
 
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-
-static int cpt_gc = 0;
 
 static void clean_heap(){
   value* from = tab_heap_start[(current_heap+1)%2];
@@ -163,12 +160,13 @@ void gc_one_val(value* ptr, int update) {
  */
 
 void gc(void) {
+  gc_count ++;
+  
 #if defined(__PC__) && DEBUG >= 1 // TRACE GC RUNS
   printf("#################### STOP & COPY ####################\n");
 #endif
 
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-  cpt_gc ++;
   print_static_heap();
   print_dynamic_heap();
   print_flash_heap();
@@ -215,7 +213,7 @@ void gc(void) {
   gc_one_val(&env,1);
 
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-  printf("End of GC number %d\n", cpt_gc);
+  printf("End of GC number %d\n", gc_count);
   clean_heap();
   print_static_heap();
   print_dynamic_heap();

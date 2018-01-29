@@ -83,7 +83,7 @@ let string_of_dword dword =
   | FLOAT bytes        -> print_bytes "Make_float" bytes
   | CHARS chars        -> print_chars chars
   | BYTES bytes        -> print_bytes "Make_custom_data" bytes
-  | CUSTOM name        -> Printf.sprintf "(value) &%s_custom_operations" name
+  | CUSTOM name        -> Printf.sprintf "%s_CUSTOM_FLAG" name
   | HEADER (tag, size) -> Printf.sprintf "Make_header(%d, %s, Color_white)" size (print_tag tag)
   | SPOINTER ind       -> Printf.sprintf "Val_static_block(&ocaml_ram_heap[%d])" ind
   | FPOINTER ind       -> Printf.sprintf "Val_flash_block(&ocaml_flash_heap[%d])" ind

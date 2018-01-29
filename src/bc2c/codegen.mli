@@ -1,1 +1,1 @@
-val export : OByteLib.Code.t -> T.cword list * Opcode.t list * int array
+val export : T.instr array -> T.cword list * Opcode.t list * int array

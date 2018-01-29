@@ -230,8 +230,8 @@ let clean_primitives old_prims old_code =
     ) old_code in
   (new_prims, new_code)
     
-let clean prims globals code =
-  let pc, ooid, accu, stack, globals = Interp.run prims globals code in
+let clean arch prims globals code =
+  let pc, ooid, accu, stack, globals = Interp.run arch prims globals code in
 
   let living_code = Array.map (fun _ -> false) code in
   let read_globals = Array.map (fun _ -> false) globals in

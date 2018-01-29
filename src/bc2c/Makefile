@@ -2,7 +2,7 @@ include ../../etc/Makefile.conf
 
 SRCS    := $(wildcard *.ml *.mli)
 TARGETS := $(BIN)/bc2c
-FLAGS   := -cflags -I,+../obytelib -lflags -I,+../obytelib -libs obytelib,unix
+FLAGS   := -cflags -I,+../obytelib,-g -lflags -I,+../obytelib,-g -libs obytelib,unix
 
 bc2c: $(TARGETS)
 

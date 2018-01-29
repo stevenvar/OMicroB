@@ -9,6 +9,8 @@ OBJECTS :=              \
   .build/random.o       \
   .build/delay.o        \
   .build/trace.o        \
+  .build/gc.o           \
+  .build/format.o       \
   .build/sf-regs.o      \
   .build/shared.o       \
   .build/simul.o

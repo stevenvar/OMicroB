@@ -1,4 +1,5 @@
 val clean :
+  Arch.t          ->
   OByteLib.Prim.t ->
   OByteLib.Data.t ->
   OByteLib.Code.t ->

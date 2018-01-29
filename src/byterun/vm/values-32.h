@@ -112,6 +112,8 @@ union float_or_value { float f; value v; };
 #define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
 #define Codeptr_val(x) (((uint32_t) (x) >> 1) & 0x7FFFFFFF)
 
+#define Hd_size_bitcnt 22
+
 /******************************************************************************/
 /* Constants */
 
@@ -144,9 +146,9 @@ union float_or_value { float f; value v; };
 
 #define Make_string_data(c3, c2, c1, c0) (((value) (c0) << 24) | ((value) (c1) << 16) | ((value) (c2) << 8) | ((value) (c3)))
 
-#define Make_custom_data(b3, b2, b1, b0) Make_string_data(b3, b2, b1, b0)
+#define Make_custom_data(b0, b1, b2, b3) Make_string_data(b0, b1, b2, b3)
 
-#define Make_float(b3, b2, b1, b0) Make_string_data(b0, b1, b2, b3)
+#define Make_float(b0, b1, b2, b3) Make_string_data(b0, b1, b2, b3)
 
 #define Bsize_wsize(sz) ((sz) << 2)
 #define Wsize_bsize(sz) ((sz) >> 2)

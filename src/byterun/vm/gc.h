@@ -6,6 +6,7 @@
 #include "values.h"
 #include "fail.h"
 
+extern uint32_t gc_count;
 extern value *heap_ptr;
 extern value *heap_end;
 

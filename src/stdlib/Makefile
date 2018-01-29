@@ -1,6 +1,10 @@
 include ../../etc/Makefile.conf
 
-MODULES := std_exit pervasives char bytes string list array random avr
+MODULES :=                                                       \
+  std_exit pervasives char bytes bytesLabels string stringLabels \
+  list listLabels map array arrayLabels uchar sys buffer random  \
+  complex gc int32 int64 obj hashtbl set moreLabels queue sort   \
+  stack stdLabels avr
 
 MLS  := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
@@ -23,6 +27,9 @@ $(LIB)/stdlib.cma: $(CMOS)
 
 %.cmo: $(SRC)/stdlib/%.ml $(CMIS)
 	$(OCAMLC) -nostdlib -c -w @a $<
+
+%Labels.cmo: $(SRC)/stdlib/%Labels.ml $(CMIS)
+	$(OCAMLC) -nostdlib -nolabels -c -w @a $<
 
 pervasives.cmi: pervasives.mli
 	$(OCAMLC) -nostdlib -nopervasives -c -w @a $<

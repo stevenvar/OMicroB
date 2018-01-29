@@ -12,7 +12,7 @@ let export_code_from_codemap code codemap =
   let export_opcode op =
     bytecode := OPCODE op :: !bytecode;
     incr pc in
-    
+
   let export_int8 n =
     assert (n >= -0x80 && n < 0x80);
     bytecode := SBYTE n :: !bytecode;
@@ -90,124 +90,124 @@ let export_code_from_codemap code codemap =
   Array.iteri (fun instr_ind instr ->
     codemap.(instr_ind) <- !pc;
     match instr with
-    | ACC0 ->
+    | STD ACC0 ->
       export_opcode Opcode.ACC0;
-    | ACC1 ->
+    | STD ACC1 ->
       export_opcode Opcode.ACC1;
-    | ACC2 ->
+    | STD ACC2 ->
       export_opcode Opcode.ACC2;
-    | ACC3 ->
+    | STD ACC3 ->
       export_opcode Opcode.ACC3;
-    | ACC4 ->
+    | STD ACC4 ->
       export_opcode Opcode.ACC4;
-    | ACC5 ->
+    | STD ACC5 ->
       export_opcode Opcode.ACC5;
-    | ACC6 ->
+    | STD ACC6 ->
       export_opcode Opcode.ACC6;
-    | ACC7 ->
+    | STD ACC7 ->
       export_opcode Opcode.ACC7;
-    | ACC n ->
-      check_bounds "ACC" n 8 255;
+    | STD (ACC n) ->
+      check_bounds "ACC" n 8 0xFF;
       export_opcode Opcode.ACC;
       export_uint8 n;
-    | PUSH | PUSHACC0 ->
+    | STD PUSH | STD PUSHACC0 ->
       export_opcode Opcode.PUSH;
-    | PUSHACC1 ->
+    | STD PUSHACC1 ->
       export_opcode Opcode.PUSHACC1;
-    | PUSHACC2 ->
+    | STD PUSHACC2 ->
       export_opcode Opcode.PUSHACC2;
-    | PUSHACC3 ->
+    | STD PUSHACC3 ->
       export_opcode Opcode.PUSHACC3;
-    | PUSHACC4 ->
+    | STD PUSHACC4 ->
       export_opcode Opcode.PUSHACC4;
-    | PUSHACC5 ->
+    | STD PUSHACC5 ->
       export_opcode Opcode.PUSHACC5;
-    | PUSHACC6 ->
+    | STD PUSHACC6 ->
       export_opcode Opcode.PUSHACC6;
-    | PUSHACC7 ->
+    | STD PUSHACC7 ->
       export_opcode Opcode.PUSHACC7;
-    | PUSHACC n ->
-      check_bounds "PUSHACC" n 8 255;
+    | STD (PUSHACC n) ->
+      check_bounds "PUSHACC" n 8 0xFF;
       export_opcode Opcode.PUSHACC;
       export_uint8 n;
-    | POP n ->
-      check_bounds "POP" n 1 255;
+    | STD (POP n) ->
+      check_bounds "POP" n 1 0xFF;
       export_opcode Opcode.POP;
       export_uint8 n;
-    | ASSIGN n ->
-      check_bounds "ASSIGN" n 0 255;
+    | STD (ASSIGN n) ->
+      check_bounds "ASSIGN" n 0 0xFF;
       export_opcode Opcode.ASSIGN;
       export_uint8 n;
-    | ENVACC1 | ENVACC 1 ->
+    | STD ENVACC1 | STD (ENVACC 1) ->
       export_opcode Opcode.ENVACC1;
-    | ENVACC2 | ENVACC 2 ->
+    | STD ENVACC2 | STD (ENVACC 2) ->
       export_opcode Opcode.ENVACC2;
-    | ENVACC3 | ENVACC 3 ->
+    | STD ENVACC3 | STD (ENVACC 3) ->
       export_opcode Opcode.ENVACC3;
-    | ENVACC4 | ENVACC 4 ->
+    | STD ENVACC4 | STD (ENVACC 4) ->
       export_opcode Opcode.ENVACC4;
-    | ENVACC n ->
-      check_bounds "ENVACC" n 5 255;
+    | STD (ENVACC n) ->
+      check_bounds "ENVACC" n 5 0xFF;
       export_opcode Opcode.ENVACC;
       export_uint8 n;
-    | PUSHENVACC1 | PUSHENVACC 1 ->
+    | STD PUSHENVACC1 | STD (PUSHENVACC 1) ->
       export_opcode Opcode.PUSHENVACC1;
-    | PUSHENVACC2 | PUSHENVACC 2 ->
+    | STD PUSHENVACC2 | STD (PUSHENVACC 2) ->
       export_opcode Opcode.PUSHENVACC2;
-    | PUSHENVACC3 | PUSHENVACC 3 ->
+    | STD PUSHENVACC3 | STD (PUSHENVACC 3) ->
       export_opcode Opcode.PUSHENVACC3;
-    | PUSHENVACC4 | PUSHENVACC 4 ->
+    | STD PUSHENVACC4 | STD (PUSHENVACC 4) ->
       export_opcode Opcode.PUSHENVACC4;
-    | PUSHENVACC n ->
-      check_bounds "PUSHENVACC" n 5 255;
+    | STD (PUSHENVACC n) ->
+      check_bounds "PUSHENVACC" n 5 0xFF;
       export_opcode Opcode.PUSHENVACC;
       export_uint8 n;
-    | PUSH_RETADDR ptr ->
+    | STD (PUSH_RETADDR ptr) ->
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in
       let export_ofs = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.push_retaddr in
       export_opcode opcode;
       export_ofs ofs;
-    | APPLY n ->
-      check_bounds "APPLY" n 4 255;
+    | STD (APPLY n) ->
+      check_bounds "APPLY" n 4 0xFF;
       export_opcode Opcode.APPLY;
       export_uint8 n;
-    | APPLY1 ->
+    | STD APPLY1 ->
       export_opcode Opcode.APPLY1;
-    | APPLY2 ->
+    | STD APPLY2 ->
       export_opcode Opcode.APPLY2;
-    | APPLY3 ->
+    | STD APPLY3 ->
       export_opcode Opcode.APPLY3;
-    | APPTERM (n, p) ->
-      check_bounds "APPTERM n:" n 0 255;
-      check_bounds "APPTERM p:" p 0 255;
+    | STD (APPTERM (n, p)) ->
+      check_bounds "APPTERM n:" n 0 0xFF;
+      check_bounds "APPTERM p:" p 0 0xFF;
       export_opcode Opcode.APPTERM;
       export_uint8 n;
       export_uint8 p;
-    | APPTERM1 n ->
-      check_bounds "APPTERM1" n 0 255;
+    | STD (APPTERM1 n) ->
+      check_bounds "APPTERM1" n 0 0xFF;
       export_opcode Opcode.APPTERM1;
       export_uint8 n;
-    | APPTERM2 n ->
-      check_bounds "APPTERM2" n 0 255;
+    | STD (APPTERM2 n) ->
+      check_bounds "APPTERM2" n 0 0xFF;
       export_opcode Opcode.APPTERM2;
       export_uint8 n;
-    | APPTERM3 n ->
-      check_bounds "APPTERM3" n 0 255;
+    | STD (APPTERM3 n) ->
+      check_bounds "APPTERM3" n 0 0xFF;
       export_opcode Opcode.APPTERM3;
       export_uint8 n;
-    | RETURN n ->
-      check_bounds "RETURN" n 0 255;
+    | STD (RETURN n) ->
+      check_bounds "RETURN" n 0 0xFF;
       export_opcode Opcode.RETURN;
       export_uint8 n;
-    | RESTART ->
+    | STD RESTART ->
       export_opcode Opcode.RESTART;
-    | GRAB n ->
-      check_bounds "GRAB" n 0 255;
+    | STD (GRAB n) ->
+      check_bounds "GRAB" n 0 0xFF;
       export_opcode Opcode.GRAB;
       export_uint8 n;
-    | CLOSURE (n, ptr) ->
+    | STD (CLOSURE (n, ptr)) ->
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in
       let export_ofs = export_of_kind kind in
@@ -215,9 +215,9 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export_uint8 n;
       export_ofs ofs;
-    | CLOSUREREC (f, v, o, t) ->
-      check_bounds "CLOSUREREC f:" f 0 255;
-      check_bounds "CLOSUREREC v:" v 0 255;
+    | STD (CLOSUREREC (f, v, o, t)) ->
+      check_bounds "CLOSUREREC f:" f 0 0xFF;
+      check_bounds "CLOSUREREC v:" v 0 0xFF;
       let oofs = ofs_of_ptr o in
       let tofss = Array.map ofs_of_ptr t in
       let kind = kind_of_int_list (oofs :: Array.to_list tofss) in
@@ -228,131 +228,117 @@ let export_code_from_codemap code codemap =
       export_uint8 v;
       export_ofs oofs;
       Array.iter export_ofs tofss;
-    | OFFSETCLOSUREM2 ->
+    | STD OFFSETCLOSUREM2 ->
       export_opcode Opcode.OFFSETCLOSUREM2;
-    | OFFSETCLOSURE0 ->
+    | STD OFFSETCLOSURE0 ->
       export_opcode Opcode.OFFSETCLOSURE0;
-    | OFFSETCLOSURE2 ->
+    | STD OFFSETCLOSURE2 ->
       export_opcode Opcode.OFFSETCLOSURE2;
-    | OFFSETCLOSURE n ->
+    | STD (OFFSETCLOSURE n) ->
       check_bounds "CLOSUREREC" n (-0x80) 0x7F;
       export_opcode Opcode.OFFSETCLOSURE;
       export_int8 n;
-    | PUSHOFFSETCLOSUREM2 ->
+    | STD PUSHOFFSETCLOSUREM2 ->
       export_opcode Opcode.PUSHOFFSETCLOSUREM2;
-    | PUSHOFFSETCLOSURE0 ->
+    | STD PUSHOFFSETCLOSURE0 ->
       export_opcode Opcode.PUSHOFFSETCLOSURE0;
-    | PUSHOFFSETCLOSURE2 ->
+    | STD PUSHOFFSETCLOSURE2 ->
       export_opcode Opcode.PUSHOFFSETCLOSURE2;
-    | PUSHOFFSETCLOSURE n ->
+    | STD (PUSHOFFSETCLOSURE n) ->
       check_bounds "PUSHOFFSETCLOSURE" n (-0x80) 0x7F;
       export_opcode Opcode.PUSHOFFSETCLOSURE;
       export_int8 n;
-    | GETGLOBAL n ->
-      check_bounds "GETGLOBAL" n (-0x10001) 0x10001;
-      if n > 0 then (
-        let n = n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.GETRAMGLOBAL_1B;
-          export_uint8 n;
-        ) else (
-          export_opcode Opcode.GETRAMGLOBAL_2B;
-          export_uint16 n;
-        )
-      ) else if n < 0 then (
-        let n = -n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.GETFLASHGLOBAL_1B;
-          export_uint8 n;
-        ) else (
-          export_opcode Opcode.GETFLASHGLOBAL_2B;
-          export_uint16 n;
-        )
+    | STD (GETGLOBAL _)
+    | STD (PUSHGETGLOBAL _)
+    | STD (GETGLOBALFIELD _)
+    | STD (PUSHGETGLOBALFIELD _) ->
+      assert false
+    | GETRAMGLOBAL n ->
+      check_bounds "GETGLOBAL" n 0 0xFFFF;
+      if n < 0x100 then (
+        export_opcode Opcode.GETRAMGLOBAL_1B;
+        export_uint8 n;
       ) else (
-        assert false (* Impossible *)
+        export_opcode Opcode.GETRAMGLOBAL_2B;
+        export_uint16 n;
       )
-    | PUSHGETGLOBAL n ->
-      check_bounds "PUSHGETGLOBAL" n (-0x10001) 0x10001;
-      if n > 0 then (
-        let n = n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.PUSHGETRAMGLOBAL_1B;
-          export_uint8 n;
-        ) else (
-          export_opcode Opcode.PUSHGETRAMGLOBAL_2B;
-          export_uint16 n;
-        )
-      ) else if n < 0 then (
-        let n = -n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.PUSHGETFLASHGLOBAL_1B;
-          export_uint8 n;
-        ) else (
-          export_opcode Opcode.PUSHGETFLASHGLOBAL_2B;
-          export_uint16 n;
-        )
+    | GETFLASHGLOBAL n ->
+      check_bounds "GETGLOBAL" n 0 0xFFFF;
+      if n < 0x100 then (
+        export_opcode Opcode.GETFLASHGLOBAL_1B;
+        export_uint8 n;
       ) else (
-        assert false (* Impossible *)
+        export_opcode Opcode.GETFLASHGLOBAL_2B;
+        export_uint16 n;
       )
-    | GETGLOBALFIELD (n, p) ->
-      check_bounds "GETGLOBALFIELD n:" n (-0x10001) 0x10001;
-      check_bounds "GETGLOBALFIELD p:" p 0 0x100;
-      if n > 0 then (
-        let n = n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.GETRAMGLOBALFIELD_1B;
-          export_uint8 n;
-          export_uint8 p;
-        ) else (
-          export_opcode Opcode.GETRAMGLOBALFIELD_2B;
-          export_uint16 n;
-          export_uint8 p;
-        )
-      ) else if n < 0 then (
-        let n = -n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.GETFLASHGLOBALFIELD_1B;
-          export_uint8 n;
-          export_uint8 p;
-        ) else (
-          export_opcode Opcode.GETFLASHGLOBALFIELD_2B;
-          export_uint16 n;
-          export_uint8 p;
-        )
+    | PUSHGETRAMGLOBAL n ->
+      check_bounds "PUSHGETGLOBAL" n 0 0xFFFF;
+      if n < 0x100 then (
+        export_opcode Opcode.PUSHGETRAMGLOBAL_1B;
+        export_uint8 n;
       ) else (
-        assert false (* Impossible *)
+        export_opcode Opcode.PUSHGETRAMGLOBAL_2B;
+        export_uint16 n;
       )
-    | PUSHGETGLOBALFIELD (n, p) ->
-      check_bounds "PUSHGETGLOBALFIELD n:" n (-0x10001) 0x10001;
-      check_bounds "PUSHGETGLOBALFIELD p:" p 0 0x100;
-      if n > 0 then (
-        let n = n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.PUSHGETRAMGLOBALFIELD_1B;
-          export_uint8 n;
-          export_uint8 p;
-        ) else (
-          export_opcode Opcode.PUSHGETRAMGLOBALFIELD_2B;
-          export_uint16 n;
-          export_uint8 p;
-        )
-      ) else if n < 0 then (
-        let n = -n - 1 in
-        if n < 0x100 then (
-          export_opcode Opcode.PUSHGETFLASHGLOBALFIELD_1B;
-          export_uint8 n;
-          export_uint8 p;
-        ) else (
-          export_opcode Opcode.PUSHGETFLASHGLOBALFIELD_2B;
-          export_uint16 n;
-          export_uint8 p;
-        )
+    | PUSHGETFLASHGLOBAL n ->
+      check_bounds "PUSHGETGLOBAL" n 0 0xFFFF;
+      if n < 0x100 then (
+        export_opcode Opcode.PUSHGETFLASHGLOBAL_1B;
+        export_uint8 n;
       ) else (
-        assert false (* Impossible *)
+        export_opcode Opcode.PUSHGETFLASHGLOBAL_2B;
+        export_uint16 n;
       )
-    | SETGLOBAL n ->
-      let n = n - 1 in
-      check_bounds "SETRAMGLOBAL" n 0 0x10000;
+    | GETRAMGLOBALFIELD (n, p) ->
+      check_bounds "GETGLOBALFIELD n:" n 0 0xFFFF;
+      check_bounds "GETGLOBALFIELD p:" p 0 0xFF;
+      if n < 0x100 then (
+        export_opcode Opcode.GETRAMGLOBALFIELD_1B;
+        export_uint8 n;
+        export_uint8 p;
+      ) else (
+        export_opcode Opcode.GETRAMGLOBALFIELD_2B;
+        export_uint16 n;
+        export_uint8 p;
+      )
+    | GETFLASHGLOBALFIELD (n, p) ->
+      check_bounds "GETGLOBALFIELD n:" n 0 0xFFFF;
+      check_bounds "GETGLOBALFIELD p:" p 0 0xFF;
+      if n < 0x100 then (
+        export_opcode Opcode.GETFLASHGLOBALFIELD_1B;
+        export_uint8 n;
+        export_uint8 p;
+      ) else (
+        export_opcode Opcode.GETFLASHGLOBALFIELD_2B;
+        export_uint16 n;
+        export_uint8 p;
+      )
+    | PUSHGETRAMGLOBALFIELD (n, p) ->
+      check_bounds "PUSHGETGLOBALFIELD n:" n 0 0xFFFF;
+      check_bounds "PUSHGETGLOBALFIELD p:" p 0 0xFF;
+      if n < 0x100 then (
+        export_opcode Opcode.PUSHGETRAMGLOBALFIELD_1B;
+        export_uint8 n;
+        export_uint8 p;
+      ) else (
+        export_opcode Opcode.PUSHGETRAMGLOBALFIELD_2B;
+        export_uint16 n;
+        export_uint8 p;
+      )
+    | PUSHGETFLASHGLOBALFIELD (n, p) ->
+      check_bounds "PUSHGETGLOBALFIELD n:" n 0 0xFFFF;
+      check_bounds "PUSHGETGLOBALFIELD p:" p 0 0xFF;
+      if n < 0x100 then (
+        export_opcode Opcode.PUSHGETFLASHGLOBALFIELD_1B;
+        export_uint8 n;
+        export_uint8 p;
+      ) else (
+        export_opcode Opcode.PUSHGETFLASHGLOBALFIELD_2B;
+        export_uint16 n;
+        export_uint8 p;
+      )
+    | STD (SETGLOBAL n) ->
+      check_bounds "SETRAMGLOBAL" n 0 0xFFFF;
       if n < 0x100 then (
         export_opcode Opcode.SETRAMGLOBAL_1B;
         export_uint8 n;
@@ -360,15 +346,15 @@ let export_code_from_codemap code codemap =
         export_opcode Opcode.SETRAMGLOBAL_2B;
         export_uint16 n;
       )
-    | ATOM0 ->
+    | STD ATOM0 ->
       export_opcode Opcode.ATOM0;
-    | ATOM _ ->
+    | STD (ATOM _) ->
       Tools.fail "ATOM with non-zero tag is not supported";
-    | PUSHATOM0 ->
+    | STD PUSHATOM0 ->
       export_opcode Opcode.PUSHATOM0;
-    | PUSHATOM _ ->
+    | STD (PUSHATOM _) ->
       Tools.fail "PUSHATOM with non-zero tag is not supported";
-    | MAKEBLOCK (tag, size) ->
+    | STD (MAKEBLOCK (tag, size)) ->
       check_bounds "MAKEBLOCK tag:" tag 0 0xFF;
       check_bounds "MAKEBLOCK size:" size 1 0xFFFF;
       if size < 0x100 then (
@@ -380,28 +366,28 @@ let export_code_from_codemap code codemap =
         export_uint8 tag;
         export_uint16 size;
       )
-    | MAKEBLOCK1 tag ->
-      check_bounds "MAKEBLOCK1" tag 0 255;
+    | STD (MAKEBLOCK1 tag) ->
+      check_bounds "MAKEBLOCK1" tag 0 0xFF;
       export_opcode Opcode.MAKEBLOCK1;
       export_uint8 tag;
-    | MAKEBLOCK2 tag ->
-      check_bounds "MAKEBLOCK2" tag 0 255;
+    | STD (MAKEBLOCK2 tag) ->
+      check_bounds "MAKEBLOCK2" tag 0 0xFF;
       export_opcode Opcode.MAKEBLOCK2;
       export_uint8 tag;
-    | MAKEBLOCK3 tag ->
-      check_bounds "MAKEBLOCK3" tag 0 255;
+    | STD (MAKEBLOCK3 tag) ->
+      check_bounds "MAKEBLOCK3" tag 0 0xFF;
       export_opcode Opcode.MAKEBLOCK3;
       export_uint8 tag;
-    | MAKEFLOATBLOCK 1 ->
+    | STD (MAKEFLOATBLOCK 1) ->
       export_opcode Opcode.MAKEBLOCK1;
       export_uint8 0;
-    | MAKEFLOATBLOCK 2 ->
+    | STD (MAKEFLOATBLOCK 2) ->
       export_opcode Opcode.MAKEBLOCK2;
       export_uint8 0;
-    | MAKEFLOATBLOCK 3 ->
+    | STD (MAKEFLOATBLOCK 3) ->
       export_opcode Opcode.MAKEBLOCK3;
       export_uint8 0;
-    | MAKEFLOATBLOCK size ->
+    | STD (MAKEFLOATBLOCK size) ->
       check_bounds "MAKEFLOATBLOCK" size 4 0xFFFF;
       if size < 0x100 then (
         export_opcode Opcode.MAKEBLOCK_1B;
@@ -412,64 +398,64 @@ let export_code_from_codemap code codemap =
         export_uint8 0;
         export_uint16 size;
       )
-    | GETFIELD0 | GETFLOATFIELD 0 ->
+    | STD GETFIELD0 | STD (GETFLOATFIELD 0) ->
       export_opcode Opcode.GETFIELD0;
-    | GETFIELD1 | GETFLOATFIELD 1 ->
+    | STD GETFIELD1 | STD (GETFLOATFIELD 1) ->
       export_opcode Opcode.GETFIELD1;
-    | GETFIELD2 | GETFLOATFIELD 2 ->
+    | STD GETFIELD2 | STD (GETFLOATFIELD 2) ->
       export_opcode Opcode.GETFIELD2;
-    | GETFIELD3 | GETFLOATFIELD 3 ->
+    | STD GETFIELD3 | STD (GETFLOATFIELD 3) ->
       export_opcode Opcode.GETFIELD3;
-    | GETFIELD n | GETFLOATFIELD n ->
-      check_bounds "GETFIELD" n 4 255;
+    | STD GETFIELD n | STD (GETFLOATFIELD n) ->
+      check_bounds "GETFIELD" n 4 0xFF;
       export_opcode Opcode.GETFIELD;
       export_uint8 n;
-    | SETFIELD0 | SETFLOATFIELD 0 ->
+    | STD SETFIELD0 | STD (SETFLOATFIELD 0) ->
       export_opcode Opcode.SETFIELD0;
-    | SETFIELD1 | SETFLOATFIELD 1 ->
+    | STD SETFIELD1 | STD (SETFLOATFIELD 1) ->
       export_opcode Opcode.SETFIELD1;
-    | SETFIELD2 | SETFLOATFIELD 2 ->
+    | STD SETFIELD2 | STD (SETFLOATFIELD 2) ->
       export_opcode Opcode.SETFIELD2;
-    | SETFIELD3 | SETFLOATFIELD 3 ->
+    | STD SETFIELD3 | STD (SETFLOATFIELD 3) ->
       export_opcode Opcode.SETFIELD3;
-    | SETFIELD n | SETFLOATFIELD n ->
-      check_bounds "SETFIELD" n 0 255;
+    | STD (SETFIELD n) | STD (SETFLOATFIELD n) ->
+      check_bounds "SETFIELD" n 0 0xFF;
       export_opcode Opcode.SETFIELD;
       export_uint8 n;
-    | VECTLENGTH ->
+    | STD VECTLENGTH ->
       export_opcode Opcode.VECTLENGTH;
-    | GETVECTITEM ->
+    | STD GETVECTITEM ->
       export_opcode Opcode.GETVECTITEM;
-    | SETVECTITEM ->
+    | STD SETVECTITEM ->
       export_opcode Opcode.SETVECTITEM;
-    | GETSTRINGCHAR ->
+    | STD GETSTRINGCHAR ->
       export_opcode Opcode.GETSTRINGCHAR;
-    | SETSTRINGCHAR ->
+    | STD SETSTRINGCHAR ->
       export_opcode Opcode.SETSTRINGCHAR;
-    | BRANCH ptr ->
+    | STD (BRANCH ptr) ->
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in
       let export_ofs = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.branch in
       export_opcode opcode;
       export_ofs ofs;
-    | BRANCHIF ptr ->
+    | STD (BRANCHIF ptr) ->
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in
       let export_ofs = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.branchif in
       export_opcode opcode;
       export_ofs ofs;
-    | BRANCHIFNOT ptr ->
+    | STD (BRANCHIFNOT ptr) ->
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in
       let export_ofs = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.branchifnot in
       export_opcode opcode;
       export_ofs ofs;
-    | SWITCH (n, ptrs) ->
-      check_bounds "SWITCH ofs:" (n land 0xFFFF) 0 255;
-      check_bounds "SWITCH sz:" (n lsr 16) 0 255;
+    | STD (SWITCH (n, ptrs)) ->
+      check_bounds "SWITCH ofs:" (n land 0xFFFF) 0 0xFF;
+      check_bounds "SWITCH sz:" (n lsr 16) 0 0xFF;
       let ofss = Array.map ofs_of_ptr ptrs in
       let kind = kind_of_int_list (Array.to_list ofss) in
       let export_ofs = export_of_kind kind in
@@ -478,136 +464,146 @@ let export_code_from_codemap code codemap =
       export_uint8 (n land 0xFFFF);
       export_uint8 (n lsr 16);
       Array.iter export_ofs ofss;
-    | BOOLNOT ->
+    | STD BOOLNOT ->
       export_opcode Opcode.BOOLNOT;
-    | PUSHTRAP ptr ->
+    | STD (PUSHTRAP ptr) ->
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in
       let export_ofs = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.pushtrap in
       export_opcode opcode;
       export_ofs ofs;
-    | POPTRAP ->
+    | STD POPTRAP ->
       export_opcode Opcode.POPTRAP;
-    | RAISE ->
+    | STD RAISE ->
       export_opcode Opcode.RAISE;
-    | RERAISE ->
+    | STD RERAISE ->
       export_opcode Opcode.RAISE;
-    | RAISE_NOTRACE ->
+    | STD RAISE_NOTRACE ->
       export_opcode Opcode.RAISE;
-    | CHECK_SIGNALS ->
+    | STD CHECK_SIGNALS ->
       export_opcode Opcode.CHECK_SIGNALS;
-    | C_CALL1 idx ->
-      check_bounds "C_CALL1" idx 0 255;
+    | STD (C_CALL1 idx) ->
+      check_bounds "C_CALL1" idx 0 0xFF;
       export_opcode Opcode.C_CALL1;
       export_uint8 idx;
-    | C_CALL2 idx ->
-      check_bounds "C_CALL2" idx 0 255;
+    | STD (C_CALL2 idx) ->
+      check_bounds "C_CALL2" idx 0 0xFF;
       export_opcode Opcode.C_CALL2;
       export_uint8 idx;
-    | C_CALL3 idx ->
-      check_bounds "C_CALL3" idx 0 255;
+    | STD (C_CALL3 idx) ->
+      check_bounds "C_CALL3" idx 0 0xFF;
       export_opcode Opcode.C_CALL3;
       export_uint8 idx;
-    | C_CALL4 idx ->
-      check_bounds "C_CALL4" idx 0 255;
+    | STD (C_CALL4 idx) ->
+      check_bounds "C_CALL4" idx 0 0xFF;
       export_opcode Opcode.C_CALL4;
       export_uint8 idx;
-    | C_CALL5 idx ->
-      check_bounds "C_CALL5" idx 0 255;
+    | STD (C_CALL5 idx) ->
+      check_bounds "C_CALL5" idx 0 0xFF;
       export_opcode Opcode.C_CALL5;
       export_uint8 idx;
-    | C_CALLN (narg, idx) ->
-      check_bounds "C_CALLN narg:" narg 0 255;
-      check_bounds "C_CALLN idx:" idx 0 255;
+    | STD (C_CALLN (narg, idx)) ->
+      check_bounds "C_CALLN narg:" narg 0 0xFF;
+      check_bounds "C_CALLN idx:" idx 0 0xFF;
       export_opcode Opcode.C_CALLN;
       export_uint8 narg;
       export_uint8 idx;
-    | CONST0 ->
+    | CONSTFLOAT bytes ->
+      export_opcode Opcode.CONSTFLOAT;
+      List.iter export_uint8 bytes;
+    | PUSHCONSTFLOAT bytes ->
+      export_opcode Opcode.PUSHCONSTFLOAT;
+      List.iter export_uint8 bytes;
+    | STD CONST0 | STD (CONSTINT 0) ->
       export_opcode Opcode.CONST0;
-    | CONST1 ->
+    | STD CONST1 | STD (CONSTINT 1) ->
       export_opcode Opcode.CONST1;
-    | CONST2 ->
+    | STD CONST2 | STD (CONSTINT 2) ->
       export_opcode Opcode.CONST2;
-    | CONST3 ->
+    | STD CONST3 | STD (CONSTINT 3) ->
       export_opcode Opcode.CONST3;
-    | CONSTINT n ->
+    | STD (CONSTINT n) ->
       check_bounds "CONSTINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let kind = kind_of_int n in
       let export_int = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.constint in
       export_opcode opcode;
       export_int n;
-    | PUSHCONST0 ->
+    | STD PUSHCONST0 | STD (PUSHCONSTINT 0) ->
       export_opcode Opcode.PUSHCONST0;
-    | PUSHCONST1 ->
+    | STD PUSHCONST1 | STD (PUSHCONSTINT 1) ->
       export_opcode Opcode.PUSHCONST1;
-    | PUSHCONST2 ->
+    | STD PUSHCONST2 | STD (PUSHCONSTINT 2) ->
       export_opcode Opcode.PUSHCONST2;
-    | PUSHCONST3 ->
+    | STD PUSHCONST3 | STD (PUSHCONSTINT 3) ->
       export_opcode Opcode.PUSHCONST3;
-    | PUSHCONSTINT n ->
+    | STD (PUSHCONSTINT n) ->
       check_bounds "PUSHCONSTINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let kind = kind_of_int n in
       let export_int = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.pushconstint in
       export_opcode opcode;
       export_int n;
-    | NEGINT ->
+    | STD NEGINT ->
       export_opcode Opcode.NEGINT;
-    | ADDINT ->
+    | STD ADDINT ->
       export_opcode Opcode.ADDINT;
-    | SUBINT ->
+    | STD SUBINT ->
       export_opcode Opcode.SUBINT;
-    | MULINT ->
+    | STD MULINT ->
       export_opcode Opcode.MULINT;
-    | DIVINT ->
+    | STD DIVINT ->
       export_opcode Opcode.DIVINT;
-    | MODINT ->
+    | STD MODINT ->
       export_opcode Opcode.MODINT;
-    | ANDINT ->
+    | STD ANDINT ->
       export_opcode Opcode.ANDINT;
-    | ORINT ->
+    | STD ORINT ->
       export_opcode Opcode.ORINT;
-    | XORINT ->
+    | STD XORINT ->
       export_opcode Opcode.XORINT;
-    | LSLINT ->
+    | STD LSLINT ->
       export_opcode Opcode.LSLINT;
-    | LSRINT ->
+    | STD LSRINT ->
       export_opcode Opcode.LSRINT;
-    | ASRINT ->
+    | STD ASRINT ->
       export_opcode Opcode.ASRINT;
-    | EQ ->
+    | STD EQ ->
       export_opcode Opcode.EQ;
-    | NEQ ->
+    | STD NEQ ->
       export_opcode Opcode.NEQ;
-    | LTINT ->
+    | STD LTINT ->
       export_opcode Opcode.LTINT;
-    | LEINT ->
+    | STD LEINT ->
       export_opcode Opcode.LEINT;
-    | GTINT ->
+    | STD GTINT ->
       export_opcode Opcode.GTINT;
-    | GEINT ->
+    | STD GEINT ->
       export_opcode Opcode.GEINT;
-    | OFFSETINT n ->
+    | STD (OFFSETINT 0) ->
+      ()
+    | STD (OFFSETINT n) ->
       check_bounds "OFFSETINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let kind = kind_of_int n in
       let export_int = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.offsetint in
       export_opcode opcode;
       export_int n;
-    | OFFSETREF n ->
+    | STD (OFFSETREF 0) ->
+      ()
+    | STD (OFFSETREF n) ->
       check_bounds "OFFSETREF" n (-0x8000_0000) 0x7FFF_FFFF;
       let kind = kind_of_int n in
       let export_int = export_of_kind kind in
       let opcode = opcode_of_kind kind Opcode.offsetref in
       export_opcode opcode;
       export_int n;
-    | ISINT ->
+    | STD ISINT ->
       export_opcode Opcode.ISINT;
-    | GETMETHOD ->
+    | STD GETMETHOD ->
       export_opcode Opcode.GETMETHOD;
-    | BEQ (n, ptr) ->
+    | STD (BEQ (n, ptr)) ->
       check_bounds "BEQ" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -616,7 +612,7 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | BNEQ (n, ptr) ->
+    | STD (BNEQ (n, ptr)) ->
       check_bounds "BNEQ" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -625,7 +621,7 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | BLTINT (n, ptr) ->
+    | STD (BLTINT (n, ptr)) ->
       check_bounds "BLTINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -634,7 +630,7 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | BLEINT (n, ptr) ->
+    | STD (BLEINT (n, ptr)) ->
       check_bounds "BLEINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -643,7 +639,7 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | BGTINT (n, ptr) ->
+    | STD (BGTINT (n, ptr)) ->
       check_bounds "BGTINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -652,7 +648,7 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | BGEINT (n, ptr) ->
+    | STD (BGEINT (n, ptr)) ->
       check_bounds "BGEINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -661,11 +657,11 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | ULTINT ->
+    | STD ULTINT ->
       export_opcode Opcode.ULTINT;
-    | UGEINT ->
+    | STD UGEINT ->
       export_opcode Opcode.UGEINT;
-    | BULTINT (n, ptr) ->
+    | STD (BULTINT (n, ptr)) ->
       check_bounds "BULTINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -674,7 +670,7 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | BUGEINT (n, ptr) ->
+    | STD (BUGEINT (n, ptr)) ->
       check_bounds "BUGEINT" n (-0x8000_0000) 0x7FFF_FFFF;
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int_list [ n; ofs ] in
@@ -683,16 +679,16 @@ let export_code_from_codemap code codemap =
       export_opcode opcode;
       export n;
       export ofs;
-    | GETPUBMET (htag, _cache) ->
+    | STD (GETPUBMET (htag, _cache)) ->
       export_opcode Opcode.GETPUBMET;
       export_uint32 htag;
-    | GETDYNMET ->
+    | STD GETDYNMET ->
       export_opcode Opcode.GETDYNMET;
-    | STOP ->
+    | STD STOP ->
       export_opcode Opcode.STOP;
-    | EVENT ->
+    | STD EVENT ->
       Tools.fail "unexpected debug instruction: EVENT";
-    | BREAK ->
+    | STD BREAK ->
       Tools.fail "unexpected debug instruction: BREAK";
   ) code;
   List.rev !bytecode

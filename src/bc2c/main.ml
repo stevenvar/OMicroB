@@ -153,8 +153,8 @@ let () =
   try
     Tools.with_oc output_path (fun oc ->
       let bytefile = Bytefile.read bytecode_path in
-      let ooid, accu, stack, globals, prims, code = Cleaner.clean bytefile.Bytefile.prim bytefile.Bytefile.data bytefile.Bytefile.code in
-      let ram_globals, flash_globals, code = Datagen.split_globals globals code in
+      let ooid, accu, stack, globals, prims, code = Cleaner.clean arch bytefile.Bytefile.prim bytefile.Bytefile.data bytefile.Bytefile.code in
+      let ram_globals, flash_globals, code = Datagen.split_globals arch globals code in
       let bytecode, opcodes, codemap = Codegen.export code in
       let atom0, exceptions, accu_data, stack_data, ram_global_data, flash_global_data, static_heap_data, flash_heap_data = Datagen.export arch codemap accu stack ram_globals flash_globals in
       let stack_data = Datagen.reverse_stack stack_size stack_data in

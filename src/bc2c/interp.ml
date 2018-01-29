@@ -209,14 +209,106 @@ let caml_array_concat lst =
   let tbl = Array.concat l in
   Block (Mutable, 0, tbl)
 
-let caml_hash i j seed v =
-  ignore (i, j, seed, v);
-  raise Exit (* TODO *)
+let caml_hash =
+  let trunc n = Int64.logand n 0xFFFF_FFFFL in
+  let mul n p = trunc (Int64.mul (trunc n) (trunc p)) in
+  let add n p = trunc (Int64.add (trunc n) (trunc p)) in
+  let rec hash arch count limit h v =
+    if !count <= 1 || !limit = 0 then h else (
+      decr count;
+      match v with
+      | Int i ->
+        decr limit;
+        add (mul h 223L) (Int64.of_int (2 * i + 1))
+      | Int32 _ | Int64 _ | Nativeint _ ->
+        (* TODO: mangage custom blocks *)
+        Printf.eprintf "Warning: caml_hash: fail to hash custom block";
+        raise Exit
+      | Float _ | Float_array _ ->
+        (* TODO: mangage floats *)
+        Printf.eprintf "Warning: caml_hash: fail to hash float";
+        raise Exit
+      | Bytes (_mut, b) ->
+        let len = Bytes.length b in
+        let blk_wolen = len / Arch.byte_count arch + 1 in
+        let blk_bylen = blk_wolen * Arch.byte_count arch in
+        let get i =
+          if i < len then int_of_char (Bytes.get b i)
+          else if i = blk_bylen - 1 then blk_bylen - len - 1
+          else 0 in
+        let h = ref (add (mul h 223L) (Int64.of_int Obj.string_tag)) in
+        for i = 0 to blk_wolen - 1 do
+          let w = ref 0 in
+          for j = Arch.byte_count arch - 1 downto 0 do
+            w := !w * 256 + get (i * Arch.byte_count arch + j);
+          done;
+          h := add (mul !h 223L) (Int64.of_int !w);
+        done;
+        if !limit < blk_wolen then limit := 0
+        else limit := !limit - blk_wolen;
+        !h
+      | Object (_mut, tbl) -> (
+        match tbl.(1) with
+        | exception _ -> assert false (* Impossible *)
+        | Int i -> decr limit; add (mul h 223L) (Int64.of_int (2 * i + 1))
+        | _ -> assert false (* Impossible *)
+      )
+      | Block (_mut, tag, tbl) ->
+        let sz = Array.length tbl in
+        let h = add (mul h 223L) (Int64.of_int tag) in
+        let rec loop h i =
+          if i = sz then h else (
+            let h = hash arch count limit h tbl.(i) in
+            if !count = 0 || !limit = 0 then h
+            else loop h (i + 1)
+          ) in
+        loop h 0
+      | Closure _ ->
+        (* TODO: manage closures *)
+        Printf.eprintf "Warning: caml_hash: fail to hash closure";
+        raise Exit
+      | CodePtr _ ->
+        (* TODO: manage code pointers *)
+        Printf.eprintf "Warning: caml_hash: fail to hash code pointer";
+        raise Exit
+    ) in
+  fun arch count limit seed v ->
+    Int64.to_int (Int64.logand (hash arch (ref count) (ref limit) (trunc (Int64.of_int seed)) v) 0x3FFF_FFFFL)
 
-external format_float : bytes -> float -> bytes = "caml_format_float"
-external format_int : bytes -> int -> bytes = "caml_format_int"
+let rec caml_compare v0 v1 =
+  match v0, v1 with
+  | Int i0, Int i1 -> Pervasives.compare i0 i1
+  | Int32 i0, Int32 i1 -> Int32.compare i0 i1
+  | Int64 i0, Int64 i1 -> Int64.compare i0 i1
+  | Nativeint i0, Nativeint i1 -> Nativeint.compare i0 i1
+  | Float f0, Float f1 -> Pervasives.compare f0 f1 (* May be incorrect with runtime representation of floats *)
+  | Float_array (_mut0, tbl0), Float_array(_mut1, tbl1) -> Pervasives.compare tbl0 tbl1
+  | Bytes (_mut0, b0), Bytes (_mut1, b1) -> Bytes.compare b0 b1
+  | Object (_mut0, tbl0), Object (_mut1, tbl1) -> caml_compare_arrays tbl0 tbl1
+  | Block (_mut0, tag0, tbl0), Block (_mut1, tag1, tbl1) ->
+     if tag0 < tag1 then -1
+     else if tag0 > tag1 then 1
+     else caml_compare_arrays tbl0 tbl1
+  | Closure _, Closure _ -> invalid_arg "compare: functional value"
+  | CodePtr _, CodePtr _ -> invalid_arg "compare: functional value"
+  | _ -> Printf.eprintf "Warning: caml_compare: fail to compare some values\n%!"; raise Exit
 
-let ccall ooid prim args =
+and caml_compare_arrays tbl0 tbl1 =
+  let len0 = Array.length tbl0 in
+  let len1 = Array.length tbl1 in
+  if len0 < len1 then -1
+  else if len0 > len1 then 1
+  else
+    let rec loop i =
+      if i = len0 then 0 else
+        let c = caml_compare tbl0.(i) tbl1.(i) in
+        if c = 0 then loop (i + 1) else c in
+    loop 0
+
+external format_float : string -> float -> string = "caml_format_float"
+external format_int : string -> int -> string = "caml_format_int"
+
+let ccall arch ooid prim args =
   match prim, args with
   | "caml_abs_float", [ Float x ] -> Float (abs_float x)
   | "caml_acos_float", [ Float x ] -> Float (acos x)
@@ -225,6 +317,9 @@ let ccall ooid prim args =
   | "caml_array_blit", [ Block (_mut0, 0, v0); Int s0; Block (mut1, 0, v1); Int s1; Int len ] -> assert (mut1 = Mutable); Array.blit v0 s0 v1 s1 len; Int 0
   | "caml_array_concat", [ lst ] -> caml_array_concat lst
   | "caml_array_sub", [ Block (_mut, 0, v); Int ofs; Int len ] -> Block (Mutable, 0, Array.sub v ofs len)
+  | "caml_array_get_addr", [ Block (_mut, 0, tbl); Int ind ] -> Array.get tbl ind
+  | "caml_array_set_addr", [ Block (_mut, 0, tbl); Int ind; v ] -> Array.set tbl ind v; Int 0
+  | "caml_array_make_vect", [ Int len; init ] -> Block (Mutable, 0, Array.make len init)
   | "caml_asin_float", [ Float x ] -> Float (asin x)
   | "caml_atan2_float", [ Float x; Float y ] -> Float (atan2 x y)
   | "caml_atan_float", [ Float x ] -> Float (atan x)
@@ -243,8 +338,10 @@ let ccall ooid prim args =
   | "caml_float_of_string", [ Bytes (_mut, b) ] -> Float (float_of_string (Bytes.unsafe_to_string b))
   | "caml_floor_float", [ Float x ] -> Float (floor x)
   | "caml_fmod_float", [ Float x; Float y ] -> Float (mod_float x y)
-  | "caml_format_float", [ Bytes (_mut, b); Float x ] -> Bytes (Immutable, format_float b x)
-  | "format_int", [ Bytes (_mut, b); Int i ] -> Bytes (Immutable, format_int b i)
+  | "caml_format_float", [ Bytes (_mut, b); Float x ] -> Bytes (Immutable, Bytes.of_string (format_float (Bytes.to_string b) x))
+  | "caml_string_of_float", [ Float x ] -> Bytes (Immutable, Bytes.of_string (format_float "%.3g" x))
+  | "format_int", [ Bytes (_mut, b); Int i ] -> Bytes (Immutable, Bytes.of_string (format_int (Bytes.to_string b) i))
+  | "string_of_int", [ Int i ] -> Bytes (Immutable, Bytes.of_string (format_int "%d" i))
   | "caml_frexp_float", [ Float x ] -> let y, i = frexp x in Block (Immutable, 0, [| Float y; Int i |])
   | "caml_gc_compaction", [ Int 0 ] -> Gc.compact (); Int 0
   | "caml_gc_counters", [ Int 0 ] -> let x, y, z = Gc.counters () in Block (Immutable, 0, [| Float x; Float y; Float z |])
@@ -258,18 +355,19 @@ let ccall ooid prim args =
   | "caml_get_major_credit", [ Int 0 ] -> Int (Gc.get_credit ())
   | "caml_get_minor_free", [ Int 0 ] -> Int (Gc.get_minor_free ())
   | "caml_get_public_method", [ Object (_mut, obj); Int tag ] -> find_object_method obj tag
-  | "caml_hash", [ Int i; Int j; Int k; v ] -> caml_hash i j k v
-  | "caml_hash_univ_param", [ Int i; Int j; v ] -> caml_hash i j 0 v
+  | "caml_hash", [ Int count; Int limit; Int seed; v ] -> Int (caml_hash arch count limit seed v)
   | "caml_hypot_float", [ Float x; Float y ] -> Float (hypot x y)
   | "caml_int32_bits_of_float", [ Float x ] -> Int32 (Int32.bits_of_float x)
   | "caml_int32_float_of_bits", [ Int32 i ] -> Float (Int32.float_of_bits i)
   | "caml_int32_format", [ Bytes (_mut, b); Int32 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int32.format (Bytes.unsafe_to_string b) i))
+  | "caml_string_of_int32", [ Int32 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int32.to_string i))
   | "caml_int32_of_float", [ Float x ] -> Int32 (Int32.of_float x)
   | "caml_int32_of_string", [ Bytes (_mut, b) ] -> Int32 (Int32.of_string (Bytes.unsafe_to_string b))
   | "caml_int32_to_float", [ Int32 i ] -> Float (Int32.to_float i)
   | "caml_int64_bits_of_float", [ Float x ] -> Int64 (Int64.bits_of_float x)
   | "caml_int64_float_of_bits", [ Int64 i ] -> Float (Int64.float_of_bits i)
   | "caml_int64_format", [ Bytes (_mut, b); Int64 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int64.format (Bytes.unsafe_to_string b) i))
+  | "caml_string_of_int64", [ Int64 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int64.to_string i))
   | "caml_int64_of_float", [ Float x ] -> Int64 (Int64.of_float x)
   | "caml_int64_of_string", [ Bytes (_mut, b) ] -> Int64 (Int64.of_string (Bytes.unsafe_to_string b))
   | "caml_int64_to_float", [ Int64 i ] -> Float (Int64.to_float i)
@@ -298,11 +396,25 @@ let ccall ooid prim args =
   | "caml_obj_dup", [ Block (_mut, tag, tbl) ] -> Block (Mutable, tag, Array.copy tbl)
   | "caml_unsafe_string_of_bytes", [ Bytes (_mut, b) ] -> Bytes (Immutable, Bytes.copy b)
   | "caml_unsafe_bytes_of_string", [ Bytes (_mut, b) ] -> Bytes (Mutable, Bytes.copy b)
-  | _ -> raise Exit
+  | "caml_sys_const_big_endian", [ Int 0 ] -> Int 0
+  | "caml_sys_const_word_size", [ Int 0 ] -> Int (Arch.bit_count arch)
+  | "caml_sys_const_int_size", [ Int 0 ] -> Int (Arch.bit_count arch - 1)
+  | "caml_sys_const_max_wosize", [ Int 0 ] -> Int (1 lsl (Arch.hd_size_bitcnt arch) - 1)
+  | "caml_random_bits", [ Int 0 ] -> Int (Random.bits ())
+  | "caml_compare", [ v0; v1 ] -> Int (caml_compare v0 v1)
+  | _ ->
+    begin
+      match prim with
+      | "caml_avr_set_bit" | "caml_avr_clear_bit" | "caml_avr_read_bit" | "caml_avr_delay"
+      | "caml_avr_write_register" | "caml_avr_read_register"
+      | "caml_debug_trace" | "caml_debug_tracei" -> ()
+      | _ -> Printf.eprintf "Warning: unknown primitive %S.\n%!" prim
+    end;
+    raise Exit
 
 (******************************************************************************)
 
-let exec prims globals code cycle_limit =
+let exec arch prims globals code cycle_limit =
   let import_value = make_import_value () in
   let globals = Array.map import_value globals in
   let code_size = Array.length code in
@@ -759,33 +871,33 @@ let exec prims globals code cycle_limit =
         incr pc;
 
       | C_CALL1 idx ->
-        accu := ccall ooid (get_prim prims idx) [ !accu ];
+        accu := ccall arch ooid (get_prim prims idx) [ !accu ];
         incr pc;
       | C_CALL2 idx ->
-        accu := ccall ooid (get_prim prims idx) [ !accu; pop stack ];
+        accu := ccall arch ooid (get_prim prims idx) [ !accu; pop stack ];
         incr pc;
       | C_CALL3 idx ->
         let v1 = pop stack in
         let v2 = pop stack in
-        accu := ccall ooid (get_prim prims idx) [ !accu; v1; v2 ];
+        accu := ccall arch ooid (get_prim prims idx) [ !accu; v1; v2 ];
         incr pc;
       | C_CALL4 idx ->
         let v1 = pop stack in
         let v2 = pop stack in
         let v3 = pop stack in
-        accu := ccall ooid (get_prim prims idx) [ !accu; v1; v2; v3 ];
+        accu := ccall arch ooid (get_prim prims idx) [ !accu; v1; v2; v3 ];
         incr pc;
       | C_CALL5 idx ->
         let v1 = pop stack in
         let v2 = pop stack in
         let v3 = pop stack in
         let v4 = pop stack in
-        accu := ccall ooid (get_prim prims idx) [ !accu; v1; v2; v3; v4 ];
+        accu := ccall arch ooid (get_prim prims idx) [ !accu; v1; v2; v3; v4 ];
         incr pc;
       | C_CALLN (narg, idx) ->
         let args = ref [ !accu ] in
         for _i = 2 to narg do args := pop stack :: !args done;
-        accu := ccall ooid (get_prim prims idx) (List.rev !args);
+        accu := ccall arch ooid (get_prim prims idx) (List.rev !args);
         incr pc;
 
       | CONST0 ->
@@ -949,9 +1061,9 @@ let exec prims globals code cycle_limit =
 
 (******************************************************************************)
 
-let run prims globals code =
-  let _, _, _, _, _, cycle_limit = exec prims globals code max_int in
-  let pc, ooid, accu, stack, globals, _ = exec prims globals code cycle_limit in
+let run arch prims globals code =
+  let _, _, _, _, _, cycle_limit = exec arch prims globals code max_int in
+  let pc, ooid, accu, stack, globals, _ = exec arch prims globals code cycle_limit in
   pc, ooid, accu, stack, globals
 
 (******************************************************************************)

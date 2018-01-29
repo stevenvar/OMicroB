@@ -6,16 +6,79 @@ open T
 
 let exception_list = [
   ("Out_of_memory", -1);
-  ("Stack_overflow", -9);
-  ("Division_by_zero", -6);
+  ("Failure", -3);
   ("Invalid_argument", -4);
+  ("Division_by_zero", -6);
+  ("Stack_overflow", -9);
 ]
 
 (******************************************************************************)
 (******************************************************************************)
 (******************************************************************************)
 
-let split_globals globals code =
+let int32_bytes n =
+  let n0 = Int32.to_int (Int32.logand n 0xFFl) in
+  let n1 = Int32.to_int (Int32.logand (Int32.shift_right n  8) 0xFFl) in
+  let n2 = Int32.to_int (Int32.logand (Int32.shift_right n 16) 0xFFl) in
+  let n3 = Int32.to_int (Int32.logand (Int32.shift_right n 24) 0xFFl) in
+  (n3, n2, n1, n0)
+
+let int64_bytes n =
+  let n0 = Int64.to_int (Int64.logand n 0xFFL) in
+  let n1 = Int64.to_int (Int64.logand (Int64.shift_right n  8) 0xFFL) in
+  let n2 = Int64.to_int (Int64.logand (Int64.shift_right n 16) 0xFFL) in
+  let n3 = Int64.to_int (Int64.logand (Int64.shift_right n 24) 0xFFL) in
+  let n4 = Int64.to_int (Int64.logand (Int64.shift_right n 32) 0xFFL) in
+  let n5 = Int64.to_int (Int64.logand (Int64.shift_right n 40) 0xFFL) in
+  let n6 = Int64.to_int (Int64.logand (Int64.shift_right n 48) 0xFFL) in
+  let n7 = Int64.to_int (Int64.logand (Int64.shift_right n 56) 0xFFL) in
+  (n7, n6, n5, n4, n3, n2, n1, n0)
+
+let nativeint_bytes n =
+  let n0 = Nativeint.to_int (Nativeint.logand n 0xFFn) in
+  let n1 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n  8) 0xFFn) in
+  let n2 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 16) 0xFFn) in
+  let n3 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 24) 0xFFn) in
+  let n4 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 32) 0xFFn) in
+  let n5 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 40) 0xFFn) in
+  let n6 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 48) 0xFFn) in
+  let n7 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 56) 0xFFn) in
+  (n7, n6, n5, n4, n3, n2, n1, n0)
+
+(******************************************************************************)
+
+let float_bytes arch x =
+  match arch with
+  | Arch.A16 -> (
+    assert false (* TODO *)
+  )
+  | Arch.A32 -> (
+    if classify_float x = FP_nan then (
+      [ 0x7F; 0xA0; 0x00; 0x00 ]
+    ) else (
+      let n = Int32.bits_of_float x in
+      let (n3, n2, n1, n0) = int32_bytes n in
+      if n3 land 0x80 <> 0 then
+        [ n3 lxor 0x7F; n2 lxor 0xFF; n1 lxor 0xFF; n0 lxor 0xFF ]
+      else
+        [ n3; n2; n1; n0 ]
+    )
+  )
+  | Arch.A64 -> (
+    if classify_float x = FP_nan then (
+      [ 0x7F; 0xFF; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ]
+    ) else (
+      let n = Int64.bits_of_float x in
+      let (n7, n6, n5, n4, n3, n2, n1, n0) = int64_bytes n in
+      [ n7; n6; n5; n4; n3; n2; n1; n0 ]
+    )
+  )
+    
+(******************************************************************************)
+(******************************************************************************)
+(******************************************************************************)
+
+let split_globals arch globals code =
   let open OByteLib.Instr in
   let global_nb = Array.length globals in
   let is_get_tbl = Array.make global_nb false in
@@ -28,7 +91,7 @@ let split_globals globals code =
     | _ -> ()
   ) code;
 
-  let global_map = Array.make global_nb 0 in
+  let global_map = Array.make global_nb `None in
   
   let ram_lst   = ref [] in
   let flash_lst = ref [] in
@@ -38,13 +101,25 @@ let split_globals globals code =
 
   for i = 0 to global_nb - 1 do
     if is_set_tbl.(i) then (
-      global_map.(i) <- !ram_ind + 1;
+      global_map.(i) <- `Ram !ram_ind;
       ram_lst := globals.(i) :: !ram_lst;
       incr ram_ind;
     ) else if is_get_tbl.(i) then (
-      global_map.(i) <- - !flash_ind - 1;
-      flash_lst := globals.(i) :: !flash_lst;
-      incr flash_ind;
+      match globals.(i) with
+      | Int n ->
+        global_map.(i) <- `Int n
+      | Int32 n when Arch.support_int32 arch n ->
+        global_map.(i) <- `Int (Int32.to_int n)
+      | Int64 n when Arch.support_int64 arch n ->
+        global_map.(i) <- `Int (Int64.to_int n)
+      | Nativeint n when Arch.support_nativeint arch n ->
+        global_map.(i) <- `Int (Nativeint.to_int n)
+      | Float f ->
+        global_map.(i) <- `Float (float_bytes arch f)
+      | _ ->
+        global_map.(i) <- `Flash !flash_ind;
+        flash_lst := globals.(i) :: !flash_lst;
+        incr flash_ind;
     )
   done;
 
@@ -54,49 +129,46 @@ let split_globals globals code =
   let new_code =
     Array.map (fun instr ->
       match instr with
-      | GETGLOBAL n -> GETGLOBAL global_map.(n)
-      | PUSHGETGLOBAL n -> PUSHGETGLOBAL global_map.(n)
-      | GETGLOBALFIELD (n, p) -> GETGLOBALFIELD (global_map.(n), p)
-      | PUSHGETGLOBALFIELD (n, p) -> PUSHGETGLOBALFIELD (global_map.(n), p)
-      | SETGLOBAL n -> SETGLOBAL global_map.(n)
-      | _ -> instr
+      | GETGLOBAL n -> (
+        match global_map.(n) with
+        | `Ram ind -> GETRAMGLOBAL ind
+        | `Flash ind -> GETFLASHGLOBAL ind
+        | `Int i -> STD (CONSTINT i)
+        | `Float bytes -> CONSTFLOAT bytes
+        | `None -> assert false
+      )
+      | PUSHGETGLOBAL n -> (
+        match global_map.(n) with
+        | `Ram ind -> PUSHGETRAMGLOBAL ind
+        | `Flash ind -> PUSHGETFLASHGLOBAL ind
+        | `Int i -> STD (PUSHCONSTINT i)
+        | `Float bytes -> PUSHCONSTFLOAT bytes
+        | `None -> assert false
+      )
+      | GETGLOBALFIELD (n, p) -> (
+        match global_map.(n) with
+        | `Ram ind -> GETRAMGLOBALFIELD (ind, p)
+        | `Flash ind -> GETFLASHGLOBALFIELD (ind, p)
+        | `Int _ | `Float _ | `None -> assert false
+      )
+      | PUSHGETGLOBALFIELD (n, p) -> (
+        match global_map.(n) with
+        | `Ram ind -> PUSHGETRAMGLOBALFIELD (ind, p)
+        | `Flash ind -> PUSHGETFLASHGLOBALFIELD (ind, p)
+        | `Int _ | `Float _ | `None -> assert false
+      )
+      | SETGLOBAL n -> (
+        match global_map.(n) with
+        | `Ram ind -> STD (SETGLOBAL ind)
+        | `Flash _ | `Int _ | `Float _ | `None -> assert false
+      )
+      | _ -> STD instr
     ) code in
   
   (ram_globals, flash_globals, new_code)
-  
+    
 (******************************************************************************)
 (******************************************************************************)
-(******************************************************************************)
-
-let int32_bytes n =
-  let n0 = Int32.to_int (Int32.logand n 0xFFl) in
-  let n1 = Int32.to_int (Int32.logand (Int32.shift_right n  8) 0xFFl) in
-  let n2 = Int32.to_int (Int32.logand (Int32.shift_right n 16) 0xFFl) in
-  let n3 = Int32.to_int (Int32.logand (Int32.shift_right n 24) 0xFFl) in
-  (n0, n1, n2, n3)
-
-let int64_bytes n =
-  let n0 = Int64.to_int (Int64.logand n 0xFFL) in
-  let n1 = Int64.to_int (Int64.logand (Int64.shift_right n  8) 0xFFL) in
-  let n2 = Int64.to_int (Int64.logand (Int64.shift_right n 16) 0xFFL) in
-  let n3 = Int64.to_int (Int64.logand (Int64.shift_right n 24) 0xFFL) in
-  let n4 = Int64.to_int (Int64.logand (Int64.shift_right n 32) 0xFFL) in
-  let n5 = Int64.to_int (Int64.logand (Int64.shift_right n 40) 0xFFL) in
-  let n6 = Int64.to_int (Int64.logand (Int64.shift_right n 48) 0xFFL) in
-  let n7 = Int64.to_int (Int64.logand (Int64.shift_right n 56) 0xFFL) in
-  (n0, n1, n2, n3, n4, n5, n6, n7)
-
-let nativeint_bytes n =
-  let n0 = Nativeint.to_int (Nativeint.logand n 0xFFn) in
-  let n1 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n  8) 0xFFn) in
-  let n2 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 16) 0xFFn) in
-  let n3 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 24) 0xFFn) in
-  let n4 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 32) 0xFFn) in
-  let n5 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 40) 0xFFn) in
-  let n6 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 48) 0xFFn) in
-  let n7 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 56) 0xFFn) in
-  (n0, n1, n2, n3, n4, n5, n6, n7)
-
 (******************************************************************************)
 
 let export arch codemap accu stack ram_globals flash_globals =
@@ -135,63 +207,67 @@ let export arch codemap accu stack ram_globals flash_globals =
     INT n
 
   and export_int32 n =
+    if Arch.support_int32 arch n then INT (Int32.to_int n) else
     try Sharer.find_int32 sharer n with Not_found ->
       let ptr =
-        let (n0, n1, n2, n3) = int32_bytes n in
+        let (n3, n2, n1, n0) = int32_bytes n in
         match arch with
         | Arch.A16 ->
           Heap.push flash_heap (HEADER (Obj.custom_tag, 3));
           let ptr = flash_pointer () in
-          Heap.push flash_heap (CUSTOM "int32");
-          Heap.push flash_heap (BYTES [ n3; n2 ]);
-          Heap.push flash_heap (BYTES [ n1; n0 ]);
+          Heap.push flash_heap (CUSTOM "INT32");
+          Heap.push flash_heap (BYTES [ n0; n1 ]);
+          Heap.push flash_heap (BYTES [ n2; n3 ]);
           ptr
         | Arch.A32 ->
           Heap.push flash_heap (HEADER (Obj.custom_tag, 2));
           let ptr = flash_pointer () in
-          Heap.push flash_heap (CUSTOM "int32");
-          Heap.push flash_heap (BYTES [ n3; n2; n1; n0 ]);
+          Heap.push flash_heap (CUSTOM "INT32");
+          Heap.push flash_heap (BYTES [ n0; n1; n2; n3 ]);
           ptr
         | Arch.A64 ->
           Heap.push flash_heap (HEADER (Obj.custom_tag, 2));
           let ptr = flash_pointer () in
-          Heap.push flash_heap (CUSTOM "int32");
-          Heap.push flash_heap (BYTES [ 0; 0; 0; 0; n3; n2; n1; n0 ]);
+          Heap.push flash_heap (CUSTOM "INT32");
+          if n >= 0l then Heap.push flash_heap (BYTES [ n0; n1; n2; n3; 0; 0; 0; 0 ])
+          else Heap.push flash_heap (BYTES [ n0; n1; n2; n3; 0xFF; 0xFF; 0xFF; 0xFF ]);
           ptr in
       Sharer.put_int32 sharer n ptr;
       ptr
 
   and export_int64 n =
+    if Arch.support_int64 arch n then INT (Int64.to_int n) else
     try Sharer.find_int64 sharer n with Not_found ->
       let ptr =
-        let (n0, n1, n2, n3, n4, n5, n6, n7) = int64_bytes n in
+        let (n7, n6, n5, n4, n3, n2, n1, n0) = int64_bytes n in
         match arch with
         | Arch.A16 ->
           Heap.push flash_heap (HEADER (Obj.custom_tag, 5));
           let ptr = flash_pointer () in
-          Heap.push flash_heap (CUSTOM "int64");
-          Heap.push flash_heap (BYTES [ n7; n6 ]);
-          Heap.push flash_heap (BYTES [ n5; n4 ]);
-          Heap.push flash_heap (BYTES [ n3; n2 ]);
-          Heap.push flash_heap (BYTES [ n1; n0 ]);
+          Heap.push flash_heap (CUSTOM "INT64");
+          Heap.push flash_heap (BYTES [ n0; n1 ]);
+          Heap.push flash_heap (BYTES [ n2; n3 ]);
+          Heap.push flash_heap (BYTES [ n4; n5 ]);
+          Heap.push flash_heap (BYTES [ n6; n7 ]);
           ptr
         | Arch.A32 ->
           Heap.push flash_heap (HEADER (Obj.custom_tag, 3));
           let ptr = flash_pointer () in
-          Heap.push flash_heap (CUSTOM "int64");
-          Heap.push flash_heap (BYTES [ n7; n6; n5; n4 ]);
-          Heap.push flash_heap (BYTES [ n3; n2; n1; n0 ]);
+          Heap.push flash_heap (CUSTOM "INT64");
+          Heap.push flash_heap (BYTES [ n0; n1; n2; n3 ]);
+          Heap.push flash_heap (BYTES [ n4; n5; n6; n7 ]);
           ptr
         | Arch.A64 ->
           Heap.push flash_heap (HEADER (Obj.custom_tag, 2));
           let ptr = flash_pointer () in
-          Heap.push flash_heap (CUSTOM "int64");
-          Heap.push flash_heap (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
+          Heap.push flash_heap (CUSTOM "INT64");
+          Heap.push flash_heap (BYTES [ n0; n1; n2; n3; n4; n5; n6; n7 ]);
           ptr in
       Sharer.put_int64 sharer n ptr;
       ptr
 
   and export_nativeint n =
+    if Arch.support_nativeint arch n then INT (Nativeint.to_int n) else
     try Sharer.find_nativeint sharer n with Not_found ->
       let ptr =
         Heap.push flash_heap (HEADER (Obj.custom_tag, 2));
@@ -202,43 +278,22 @@ let export arch codemap accu stack ram_globals flash_globals =
           if n < -0x8000n || n >= 0x8000n then Tools.fail "nativeint %nd out of bounds [ %d; %d ]" n (-0x8000) 0x7FFF;
           let n0 = Nativeint.to_int (Nativeint.logand n 0xFFn) in
           let n1 = Nativeint.to_int (Nativeint.logand (Nativeint.shift_right n 8) 0xFFn) in
-          Heap.push flash_heap (BYTES [ n1; n0 ]);
+          Heap.push flash_heap (BYTES [ n0; n1 ]);
           ptr
         | Arch.A32 ->
           if n < -0x8000_0000n || n >= 0x8000_0000n then Tools.fail "nativeint %nd out of bounds [ %d; %d ]" n (-0x8000_0000) 0x7FFF_FFFF;
           let (n0, n1, n2, n3, _, _, _, _) = nativeint_bytes n in
-          Heap.push flash_heap (BYTES [ n3; n2; n1; n0 ]);
+          Heap.push flash_heap (BYTES [ n0; n1; n2; n3 ]);
           ptr
         | Arch.A64 ->
           let (n0, n1, n2, n3, n4, n5, n6, n7) = nativeint_bytes n in
-          Heap.push flash_heap (BYTES [ n7; n6; n5; n4; n3; n2; n1; n0 ]);
+          Heap.push flash_heap (BYTES [ n0; n1; n2; n3; n4; n5; n6; n7 ]);
           ptr in
       Sharer.put_nativeint sharer n ptr;
       ptr
 
   and export_float x =
-    match arch with
-    | Arch.A16 ->
-      assert false (* TODO *)
-    | Arch.A32 ->
-      if classify_float x = FP_nan then (
-        FLOAT [ 0x7F; 0xA0; 0x00; 0x00 ]
-      ) else (
-        let n = Int32.bits_of_float x in
-        let (n0, n1, n2, n3) = int32_bytes n in
-        if n3 land 0x80 <> 0 then
-          FLOAT [ n3 lxor 0x7F; n2 lxor 0xFF; n1 lxor 0xFF; n0 lxor 0xFF ]
-        else
-          FLOAT [ n3; n2; n1; n0 ]
-      )
-    | Arch.A64 ->
-      if classify_float x = FP_nan then (
-        FLOAT [ 0x7F; 0xFF; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ]
-      ) else (
-        let n = Int64.bits_of_float x in
-        let (n0, n1, n2, n3, n4, n5, n6, n7) = int64_bytes n in
-        FLOAT [ n7; n6; n5; n4; n3; n2; n1; n0 ]
-      )
+    FLOAT (List.rev (float_bytes arch x))
 
   and export_float_array mut tbl =
     let heap, pointer = heap_pointer_of_mutability mut in

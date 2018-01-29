@@ -57,4 +57,3 @@ let () =
     (neg_infinity, 188.);
     (neg_infinity, neg_infinity);
   ]
-    

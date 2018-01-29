@@ -221,9 +221,6 @@ type ('a,'b) result = Ok of 'a | Error of 'b
 
 (* String conversion functions *)
 
-external format_int : string -> int -> string = "caml_format_int"
-external format_float : string -> float -> string = "caml_format_float"
-
 let string_of_bool b =
   if b then "true" else "false"
 let bool_of_string = function
@@ -236,8 +233,7 @@ let bool_of_string_opt = function
   | "false" -> Some false
   | _ -> None
 
-let string_of_int n =
-  format_int "%d" n
+external string_of_int : int -> string = "caml_string_of_int"
 
 external int_of_string : string -> int = "caml_int_of_string"
 
@@ -258,7 +254,8 @@ let valid_float_lexem s =
   in
   loop 0
 
-let string_of_float f = valid_float_lexem (format_float "%.3g" f)
+external caml_string_of_float : float -> string = "caml_string_of_float"
+let string_of_float f = valid_float_lexem (caml_string_of_float f)
 
 external float_of_string : string -> float = "caml_float_of_string"
 

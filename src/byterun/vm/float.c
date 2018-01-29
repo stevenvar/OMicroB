@@ -31,6 +31,10 @@ value caml_float_compare(value v1, value v2) {
   return v1 < v2 ? Val_int(-1) : Val_int(1);
 }
 
+value caml_neg_float(value v) {
+  return Val_float(-Float_val(v));
+}
+
 value caml_add_float(value v1, value v2) {
   return Val_float(Float_val(v1) + Float_val(v2));
 }

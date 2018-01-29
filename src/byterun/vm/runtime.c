@@ -13,6 +13,11 @@
 #include "obj.c"
 #include "oo.c"
 #include "str.c"
+#include "sys.c"
+#include "gc.c"
+#include "hash.c"
+#include "int32.c"
+#include "int64.c"
 
 #if defined(OCAML_GC_MARK_AND_COMPACT)
 #include "mark-and-compact.c"

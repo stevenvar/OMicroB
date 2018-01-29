@@ -136,6 +136,8 @@ type t =
 | PUSHCONSTINT_1B
 | PUSHCONSTINT_2B
 | PUSHCONSTINT_4B
+| CONSTFLOAT
+| PUSHCONSTFLOAT
 | NEGINT
 | ADDINT
 | SUBINT
@@ -331,6 +333,8 @@ let to_string opcode =
   | PUSHCONSTINT_1B            -> "PUSHCONSTINT_1B"
   | PUSHCONSTINT_2B            -> "PUSHCONSTINT_2B"
   | PUSHCONSTINT_4B            -> "PUSHCONSTINT_4B"
+  | CONSTFLOAT                 -> "CONSTFLOAT"
+  | PUSHCONSTFLOAT             -> "PUSHCONSTFLOAT"
   | NEGINT                     -> "NEGINT"
   | ADDINT                     -> "ADDINT"
   | SUBINT                     -> "SUBINT"

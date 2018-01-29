@@ -880,6 +880,7 @@ void interp(void) {
       }
 #endif
 
+
 #ifdef OCAML_PUSHGETRAMGLOBAL_1B
     case OCAML_PUSHGETRAMGLOBAL_1B : {
       TRACE_INSTRUCTION("PUSHGETRAMGLOBAL1B");
@@ -1617,66 +1618,19 @@ void interp(void) {
     }
 #endif
 
-#ifdef OCAML_CONST0
-    case OCAML_CONST0 : {
-      TRACE_INSTRUCTION("CONST0");
-      acc = Val_int(0);
-      break;
-    }
-#endif
-
-#ifdef OCAML_CONST1
-    case OCAML_CONST1 : {
-      TRACE_INSTRUCTION("CONST1");
-      acc = Val_int(1);
-      break;
-    }
-#endif
-
-#ifdef OCAML_CONST2
-    case OCAML_CONST2 : {
-      TRACE_INSTRUCTION("CONST2");
-      acc = Val_int(2);
-      break;
-    }
-#endif
-
-#ifdef OCAML_CONST3
-    case OCAML_CONST3 : {
-      TRACE_INSTRUCTION("CONST3");
-      acc = Val_int(3);
-      break;
-    }
-#endif
-
-#ifdef OCAML_CONSTINT_1B
-    case OCAML_CONSTINT_1B : {
-      TRACE_INSTRUCTION("CONSTINT1B");
-      acc = Val_int(read_int8());
-      break;
-    }
-#endif
-
-#ifdef OCAML_CONSTINT_2B
-    case OCAML_CONSTINT_2B : {
-      TRACE_INSTRUCTION("CONSTINT2B");
-      acc = Val_int(read_int16());
-      break;
-    }
-#endif
-
-#ifdef OCAML_CONSTINT_4B
-    case OCAML_CONSTINT_4B : {
-      TRACE_INSTRUCTION("CONSTINT4B");
-      acc = Val_int(read_int32());
-      break;
-    }
-#endif
-
 #ifdef OCAML_PUSHCONST0
     case OCAML_PUSHCONST0 : {
       TRACE_INSTRUCTION("PUSHCONST0");
       push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONST0
+    case OCAML_CONST0 :
+#endif
+#if defined(OCAML_PUSHCONST0) || defined(OCAML_CONST0)
+    {
+      TRACE_INSTRUCTION("CONST0");
       acc = Val_int(0);
       break;
     }
@@ -1686,6 +1640,15 @@ void interp(void) {
     case OCAML_PUSHCONST1 : {
       TRACE_INSTRUCTION("PUSHCONST1");
       push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONST1
+    case OCAML_CONST1 :
+#endif
+#if defined(OCAML_PUSHCONST1) || defined(OCAML_CONST1)
+    {
+      TRACE_INSTRUCTION("CONST1");
       acc = Val_int(1);
       break;
     }
@@ -1695,6 +1658,15 @@ void interp(void) {
     case OCAML_PUSHCONST2 : {
       TRACE_INSTRUCTION("PUSHCONST2");
       push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONST2
+    case OCAML_CONST2 :
+#endif
+#if defined(OCAML_PUSHCONST2) || defined(OCAML_CONST2)
+    {
+      TRACE_INSTRUCTION("CONST2");
       acc = Val_int(2);
       break;
     }
@@ -1704,6 +1676,15 @@ void interp(void) {
     case OCAML_PUSHCONST3 : {
       TRACE_INSTRUCTION("PUSHCONST3");
       push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONST3
+    case OCAML_CONST3 :
+#endif
+#if defined(OCAML_PUSHCONST3) || defined(OCAML_CONST3)
+    {
+      TRACE_INSTRUCTION("CONST3");
       acc = Val_int(3);
       break;
     }
@@ -1713,6 +1694,15 @@ void interp(void) {
     case OCAML_PUSHCONSTINT_1B : {
       TRACE_INSTRUCTION("PUSHCONSTINT1B");
       push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONSTINT_1B
+    case OCAML_CONSTINT_1B :
+#endif
+#if defined(OCAML_PUSHCONSTINT_1B) || defined(OCAML_CONSTINT_1B)
+    {
+      TRACE_INSTRUCTION("CONSTINT1B");
       acc = Val_int(read_int8());
       break;
     }
@@ -1722,6 +1712,15 @@ void interp(void) {
     case OCAML_PUSHCONSTINT_2B : {
       TRACE_INSTRUCTION("PUSHCONSTINT2B");
       push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONSTINT_2B
+    case OCAML_CONSTINT_2B :
+#endif
+#if defined(OCAML_PUSHCONSTINT_2B) || defined(OCAML_CONSTINT_2B)
+    {
+      TRACE_INSTRUCTION("CONSTINT2B");
       acc = Val_int(read_int16());
       break;
     }
@@ -1731,7 +1730,42 @@ void interp(void) {
     case OCAML_PUSHCONSTINT_4B : {
       TRACE_INSTRUCTION("PUSHCONSTINT4B");
       push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONSTINT_4B
+    case OCAML_CONSTINT_4B :
+#endif
+#if defined(OCAML_PUSHCONSTINT_4B) || defined(OCAML_CONSTINT_4B)
+    {
+      TRACE_INSTRUCTION("CONSTINT4B");
       acc = Val_int(read_int32());
+      break;
+    }
+#endif
+
+#ifdef OCAML_PUSHCONSTFLOAT
+    case OCAML_PUSHCONSTFLOAT : {
+      TRACE_INSTRUCTION("PUSHCONSTFLOAT");
+      push(acc);
+      /* fallthrough */
+    }
+#endif
+#ifdef OCAML_CONSTFLOAT
+    case OCAML_CONSTFLOAT :
+#endif
+#if defined(OCAML_PUSHCONSTFLOAT) || defined(OCAML_CONSTFLOAT)
+    {
+      TRACE_INSTRUCTION("CONSTFLOAT");
+#if OCAML_VIRTUAL_ARCH == 16
+      acc = read_int16();
+#elif OCAML_VIRTUAL_ARCH == 32
+      acc = read_int32();
+#elif OCAML_VIRTUAL_ARCH == 64
+      acc = read_int64();
+#else
+#error "Unknown virtual architecture, please define OCAML_VIRTUAL_ARCH"
+#endif
       break;
     }
 #endif

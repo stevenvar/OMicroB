@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include <inttypes.h>
 #include "values.h"
 #include "str.h"
 
@@ -121,26 +122,20 @@ value caml_string_get(value s, value i) {
   return Val_int(String_field(s, i));
 }
 
-value caml_format_int(value s, value n) {
-  mlsize_t len = string_length(s), i;
-  char str[len + 1];
+value caml_string_of_int(value v) {
   char buf[13];
-  for (i = 0; i < len; i ++) {
-    str[i] = String_field(s, i);
-  }
-  str[i] = '\0';
-  snprintf(buf, sizeof(buf), str, Int_val(n));
+#if OCAML_VIRTUAL_ARCH == 16
+  snprintf(buf, sizeof(buf), "%" PRId16, Int_val(v));
+#elif OCAML_VIRTUAL_ARCH == 32
+  snprintf(buf, sizeof(buf), "%" PRId32, Int_val(v));
+#elif OCAML_VIRTUAL_ARCH == 64
+  snprintf(buf, sizeof(buf), "%" PRId64, Int_val(v));
+#endif
   return copy_bytes(buf);
 }
 
-value caml_format_float(value s, value x) {
-  mlsize_t len = string_length(s), i;
-  char str[len + 1];
+value caml_string_of_float(value v) {
   char buf[13];
-  for (i = 0; i < len; i ++) {
-    str[i] = String_field(s, i);
-  }
-  str[i] = '\0';
-  snprintf(buf, sizeof(buf), str, Float_val(x));
+  snprintf(buf, sizeof(buf), "%.3lg", (double) Float_val(v));
   return copy_bytes(buf);
 }

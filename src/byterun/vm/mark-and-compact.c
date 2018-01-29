@@ -298,6 +298,7 @@ static void compact_blocks(void) {
 /* GC: main function */
 
 void gc(void) {
+  gc_count ++;
 #if defined(__PC__) && DEBUG >= 1 // TRACE GC RUNS
   printf("#################### MARK & COMPACT ####################\n");
 #endif
