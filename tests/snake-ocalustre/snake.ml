@@ -181,7 +181,7 @@ let game_loop ()=
   Oled.draw xh yh true;
   Oled.display ();
   collides_with_itself ();
-  delay(100 - !size);
+(*delay(100 - !size);*)
 done
 
 let () = 
