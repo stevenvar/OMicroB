@@ -43,7 +43,7 @@ external field : t -> int -> t = "%obj_field"
     [set_field] MUST NOT be called on immutable blocks.  (Blocks allocated
     in C stubs, or with [new_block] below, are always considered mutable.)
 
-    The same goes for [set_double_field] and [set_tag].  However, for
+    The same goes for [set_tag].  However, for
     [set_tag], in the case of immutable blocks where the middle-end optimizers
     never see code that discriminates on their tag (for example records), the
     operation should be safe.  Such uses are nonetheless discouraged.
@@ -56,9 +56,6 @@ external field : t -> int -> t = "%obj_field"
 external set_field : t -> int -> t -> unit = "%obj_set_field"
 external set_tag : t -> int -> unit = "caml_obj_set_tag"
 
-val [@inline always] double_field : t -> int -> float  (* @since 3.11.2 *)
-val [@inline always] set_double_field : t -> int -> float -> unit
-  (* @since 3.11.2 *)
 external new_block : int -> int -> t = "caml_obj_block"
 external dup : t -> t = "caml_obj_dup"
 external truncate : t -> int -> unit = "caml_obj_truncate"
