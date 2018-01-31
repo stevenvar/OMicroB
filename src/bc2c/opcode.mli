@@ -194,6 +194,8 @@ type t =
 | GETDYNMET
 | STOP
 
+val all                : t list
+    
 val push_retaddr       : t * t * t
 val closure            : t * t * t
 val closurerec         : t * t * t

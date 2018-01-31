@@ -47,24 +47,6 @@ let nexts code pc =
   | SWITCH (_, ptrs) ->
     Array.to_list ptrs
 
-let rec mark_living code living_code read_globals written_globals pc =
-  assert (pc >= 0 && pc < Array.length code);
-  if not living_code.(pc) then (
-    living_code.(pc) <- true;
-    begin
-      match code.(pc) with
-      | GETGLOBAL n | PUSHGETGLOBAL n | GETGLOBALFIELD (n, _) | PUSHGETGLOBALFIELD (n, _) ->
-        assert (n >= 0 && n < Array.length read_globals);
-        read_globals.(n) <- true;
-      | SETGLOBAL n ->
-        assert (n >= 0 && n < Array.length written_globals);
-        written_globals.(n) <- true;
-      | _ ->
-        ()
-    end;
-    List.iter (mark_living code living_code read_globals written_globals) (nexts code pc)
-  )
-
 let code_ptrs_of_value v =
   let rec loop acc v =
     match v with
@@ -79,6 +61,25 @@ let code_ptrs_of_value v =
       pc :: acc in
   loop [] v
     
+let rec mark_living code living_code globals read_globals written_globals pc =
+  assert (pc >= 0 && pc < Array.length code);
+  if not living_code.(pc) then (
+    living_code.(pc) <- true;
+    begin
+      match code.(pc) with
+      | GETGLOBAL n | PUSHGETGLOBAL n | GETGLOBALFIELD (n, _) | PUSHGETGLOBALFIELD (n, _) ->
+        assert (n >= 0 && n < Array.length read_globals);
+        read_globals.(n) <- true;
+        List.iter (mark_living code living_code globals read_globals written_globals) (code_ptrs_of_value globals.(n));
+      | SETGLOBAL n ->
+        assert (n >= 0 && n < Array.length written_globals);
+        written_globals.(n) <- true;
+      | _ ->
+        ()
+    end;
+    List.iter (mark_living code living_code globals read_globals written_globals) (nexts code pc)
+  )
+
 let clean_set_globals code living_code read_globals written_globals =
   let wbnr_globals = Array.map2 (fun r w -> w && not r) read_globals written_globals in
   Array.iteri (fun i instr ->
@@ -236,10 +237,9 @@ let clean arch prims globals code =
   let living_code = Array.map (fun _ -> false) code in
   let read_globals = Array.map (fun _ -> false) globals in
   let written_globals = Array.map (fun _ -> false) globals in
-  let mark = mark_living code living_code read_globals written_globals in
+  let mark pc = mark_living code living_code globals read_globals written_globals pc in
   List.iter mark (code_ptrs_of_value accu);
   List.iter (fun v -> List.iter mark (code_ptrs_of_value v)) stack;
-  Array.iter (fun v -> List.iter mark (code_ptrs_of_value v)) globals;
   mark pc;
 
   clean_set_globals code living_code read_globals written_globals;

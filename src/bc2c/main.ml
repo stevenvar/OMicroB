@@ -1,20 +1,21 @@
-open OByteLib
 open! Analyser
 
 (******************************************************************************)
 
-let stack_size = ref 64
-let total_heap_size = ref 256
-let gc = ref "MAC"
-let arch = ref Arch.A32
-let output_path = ref None
-let local = ref false
-let debug = ref false
-let verbose = ref false
-let bytecode_path = ref None
-let lincludes = ref []
-let gincludes = ref []
-let rusage = ref (fun () -> assert false)
+let stack_size       = ref 64
+let total_heap_size  = ref 256
+let gc               = ref "MAC"
+let arch             = ref Arch.A32
+let output_path      = ref None
+let local            = ref false
+let debug            = ref false
+let verbose          = ref false
+let no_clean_interp  = ref false
+let no_shortcut_init = ref false
+let bytecode_path    = ref None
+let lincludes        = ref []
+let gincludes        = ref []
+let rusage           = ref (fun () -> assert false)
 
 (******************************************************************************)
 
@@ -43,6 +44,10 @@ let spec = [
    Printf.sprintf "<gc-algo> Set garbage collector algorithm Stop&Copy or Mark&Compact (default: %s)" !gc);
   ("-arch", Arg.Int (fun n -> arch := Arch.of_int n),
    Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %s)" (Arch.to_string !arch));
+  ("-no-clean-interpreter", Arg.Set no_clean_interp,
+   " Do not remove unused VM instructions, compile and link all of them");
+  ("-no-shortcut-initialization", Arg.Set no_shortcut_init,
+   " Do not improve starting time by evaluating the program initialization at compile time");
   ("-debug", Arg.Set debug,
    " Generate code in debug mode");
   ("-verbose", Arg.Set verbose,
@@ -124,6 +129,8 @@ let stack_size       = !stack_size
 let arch             = !arch
 let local            = !local
 let debug            = !debug
+let no_clean_interp  = !no_clean_interp
+let no_shortcut_init = !no_shortcut_init
 
 let () =
   if total_heap_size <= 0 then usage_error (Printf.sprintf "invalid heap size: %d" total_heap_size);
@@ -152,8 +159,10 @@ let error msg =
 let () =
   try
     Tools.with_oc output_path (fun oc ->
-      let bytefile = Bytefile.read bytecode_path in
-      let ooid, accu, stack, globals, prims, code = Cleaner.clean arch bytefile.Bytefile.prim bytefile.Bytefile.data bytefile.Bytefile.code in
+      let bytefile = OByteLib.Bytefile.read bytecode_path in
+      let ooid, accu, stack, globals, prims, code =
+        if no_shortcut_init then 0, T.Int 0, [], Interp.import_globals bytefile.OByteLib.Bytefile.data, bytefile.OByteLib.Bytefile.prim, bytefile.OByteLib.Bytefile.code
+        else Cleaner.clean arch bytefile.OByteLib.Bytefile.prim bytefile.OByteLib.Bytefile.data bytefile.OByteLib.Bytefile.code in
       let ram_globals, flash_globals, code = Datagen.split_globals arch globals code in
       let bytecode, opcodes, codemap = Codegen.export code in
       let atom0, exceptions, accu_data, stack_data, ram_global_data, flash_global_data, static_heap_data, flash_heap_data = Datagen.export arch codemap accu stack ram_globals flash_globals in
@@ -167,6 +176,8 @@ let () =
         if sz < 0 then error (Printf.sprintf "too huge global data (%d words) for the defined heap size (%d words), out of memory before start" static_heap_size total_heap_size);
         sz in
 
+      let opcodes = if no_clean_interp then Opcode.all else opcodes in
+      
       (* Defined Constants *)
       Printf.fprintf oc "#define OCAML_STACK_WOSIZE          %8d\n" stack_size;
       Printf.fprintf oc "#define OCAML_STATIC_HEAP_WOSIZE    %8d\n" static_heap_size;

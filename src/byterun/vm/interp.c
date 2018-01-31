@@ -102,6 +102,22 @@ int32_t read_int32(void) {
   return (int32_t) read_uint32();
 }
 
+uint64_t read_uint64(void) {
+  uint8_t n7 = read_uint8();
+  uint8_t n6 = read_uint8();
+  uint8_t n5 = read_uint8();
+  uint8_t n4 = read_uint8();
+  uint8_t n3 = read_uint8();
+  uint8_t n2 = read_uint8();
+  uint8_t n1 = read_uint8();
+  uint8_t n0 = read_uint8();
+  return ((uint64_t) n7 << 56) | ((uint64_t) n6 << 48) | ((uint64_t) n5 << 40) | ((uint64_t) n4 << 32) | ((uint64_t) n3 << 24) | ((uint64_t) n2 << 16) | ((uint64_t) n1 << 8) | n0;
+}
+
+int64_t read_int64(void) {
+  return (int64_t) read_uint64();
+}
+
 code_t read_ptr_1B(void) {
   int8_t ofs = read_int8();
   return pc - 2 + ofs;

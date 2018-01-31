@@ -11,5 +11,5 @@ value caml_sys_const_int_size(value unit) {
 }
 
 value caml_sys_const_max_wosize(value unit) {
-  return Val_int(((uint32_t) 1 << Hd_size_bitcnt) - 1);
+  return Val_int(((uvalue) 1 << Hd_size_bitcnt) - 1);
 }

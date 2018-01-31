@@ -44,13 +44,13 @@ OCaml values:
 
 #ifndef TYPES
 #define TYPES
-typedef int32_t value;
+typedef int32_t  value;
 typedef uint32_t uvalue;
 typedef uint32_t mlsize_t;
-typedef int32_t header_t;
-typedef uint8_t tag_t;
-typedef uint8_t color_t;
-typedef uint8_t opcode_t;
+typedef int32_t  header_t;
+typedef uint8_t  tag_t;
+typedef uint8_t  color_t;
+typedef uint8_t  opcode_t;
 
 #if OCAML_BYTECODE_BSIZE < 0x100
 typedef uint8_t code_t;
@@ -61,10 +61,12 @@ typedef uint32_t code_t;
 #endif
 #endif
 
+#define PRIflag ""
+
 /******************************************************************************/
 /* Value classification */
 
-// Is a block in one of the trhee heaps?
+// Is a block in one of the three heaps?
 #define Is_block(x)                 (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 22) == 0x01FF)
 // Is an int, a float or a code pointer?
 #define Is_int(x)                   (((uint8_t) (x) & 0x1) == 0x01)
@@ -83,7 +85,7 @@ typedef uint32_t code_t;
 #define Is_in_ram(x)                ((((uint8_t) ((uint32_t) (x) >> 16)) & 0x20) == 0x00)
 
 // (x) is assumed to be an integer, can it be a code pointer? (pretty-printing purpose)
-#define Maybe_code_pointer(x)       (((uint32_t) (x) >> 30) == 0x2)
+#define Maybe_code_pointer(x)       (Is_int(x) && ((uint32_t) (x) >> 30) == 0x2)
 
 /******************************************************************************/
 /* Conversions */
@@ -156,7 +158,7 @@ union float_or_value { float f; value v; };
 #define Make_header(size, tag, color) ((value) ((((uvalue) (tag)) << 24) | (((uvalue) (size)) << 2) | ((uvalue) (color))))
 
 #define Tag_hd(h) ((tag_t) ((header_t) (h) >> 24))
-#define Wosize_hd(h) ((mlsize_t) (((header_t) (h) >> 2) & 0x3FFFFF))
+#define Wosize_hd(h) ((mlsize_t) (((header_t) (h) >> 2) & 0x003FFFFF))
 #define Color_hd(h) ((color_t) ((header_t) (h) & 0x3))
 
 #define Wosize_val(val) Wosize_hd(Hd_val(val))

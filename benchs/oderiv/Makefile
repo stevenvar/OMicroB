@@ -1,17 +1,17 @@
 include ../../etc/Makefile.conf
 
-SOURCES := test.ml
-TARGETS := test.byte test.c test.elf test.avr test.hex
+SOURCES := oderiv.ml
+TARGETS := oderiv.byte oderiv.c oderiv.elf oderiv.avr oderiv.hex
 
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -arch 64 -v $^ -mlopt -verbose
+	$(BIN)/omicrob -v $^ -mlopt -verbose
 
-flash: test.hex
+flash: oderiv.hex
 	$(BIN)/omicrob -flash -sudo $<
 
-simul: test.elf
+simul: oderiv.elf
 	./$<
 
 clean:

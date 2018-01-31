@@ -1,3 +1,7 @@
+val import_globals :
+  OByteLib.Data.t ->
+  T.globals
+
 val run :
   Arch.t          ->
   OByteLib.Prim.t ->

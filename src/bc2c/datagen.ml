@@ -66,11 +66,14 @@ let float_bytes arch x =
   )
   | Arch.A64 -> (
     if classify_float x = FP_nan then (
-      [ 0x7F; 0xFF; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ]
+      [ 0x7F; 0xF4; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ]
     ) else (
       let n = Int64.bits_of_float x in
       let (n7, n6, n5, n4, n3, n2, n1, n0) = int64_bytes n in
-      [ n7; n6; n5; n4; n3; n2; n1; n0 ]
+      if n7 land 0x80 <> 0 then
+        [ n7 lxor 0x7F; n6 lxor 0xFF; n5 lxor 0xFF; n4 lxor 0xFF; n3 lxor 0xFF; n2 lxor 0xFF; n1 lxor 0xFF; n0 lxor 0xFF ]
+      else
+        [ n7; n6; n5; n4; n3; n2; n1; n0 ]
     )
   )
     

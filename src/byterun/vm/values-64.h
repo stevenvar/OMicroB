@@ -1,18 +1,39 @@
 /*
-  Version 64 bits
+  64 bits version of values:
 
-  Codage des valeurs par du Nan boxing 64 bits avec :
+Floatting point values: ieee754 with only one NaN
+                          NaN : 0111 1111 1111 0100  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
+                         +inf : 0111 1111 1111 0000  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
+                         -inf : 1000 0000 0000 1111  1111 1111 1111 1111  1111 1111 1111 1111  1111 1111 1111 1111 (unique)
+        other positive floats : 0eee eeee eeee mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm (as is, collide int)
+        other negative floats : 1eee eeee eeee mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm (with exponant and mantiss inverted, collide int and code pointer)
 
-          float : tels quels avec 1 seul Nan 0111 1111 1111 1000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
-           int  : 1 bit de marque à la fin
-       pointeur : 1111 1111 1111 1xxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx x000  (alignement)
-pointeurs flash : tels quels mais limités à 2^63-2^51 en évitant ainsi d'avoir que des 1 dans la zone Nan
+Integers, constant variants, etc:
+                        int   : xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxx1 (collide float and code pointer)
 
-        int64_t : entiers sur 64 bits (stdint.h)
-          value : la représentation uniforme d'une valeur ocaml
-           bloc : une valeur allouée : 1 entête suivi de champs ou d'octets (alignée sur la taille des champs)
-          champ : une valeur (value)
+dynamic heap pointers   (ram) : 0111 1111 1111 100x  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx x000 (unique)
+ static heap pointers   (ram) : 0111 1111 1111 101x  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx x000 (unique)
+        heap pointers (flash) : 0111 1111 1111 110x  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx x000 (unique)
+
+                            ? : 0111 1111 1111 111x  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx x000 (unique)
+
+        code pointers (flash) : 10xx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxx1 (collide float and int)
+
+                 white header : tttt tttt ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ss00
+                   red header : tttt tttt ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ss01
+                 black header : tttt tttt ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ss10
+                 brown header : tttt tttt ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ssss  ssss ssss ssss ss11
+
+              unaligned_block : 0111 1111 1111 1yyx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx  xxxx xxxx xxxx x010
+
+OCaml values:
+                        value : uniform representation of an OCaml value
+                        block : OCaml value with multiple fields: 1 header followed by fields
+                 block header : tag (8 bits) | size (54bits) | color (2 bits)
 */
+
+#ifndef VALUES_64_H
+#define VALUES_64_H
 
 #include <stdint.h>
 
@@ -21,125 +42,162 @@ pointeurs flash : tels quels mais limités à 2^63-2^51 en évitant ainsi d'avoi
 /******************************************************************************/
 /* Types */
 
-typedef int64_t value;
+#ifndef TYPES
+#define TYPES
+typedef int64_t  value;
 typedef uint64_t uvalue;
 typedef uint64_t mlsize_t;
-typedef uint64_t header_t;
-typedef uint8_t tag_t;
-typedef uint8_t opcode_t;
-typedef uint64_t code_t;
+typedef int64_t  header_t;
+typedef uint8_t  tag_t;
+typedef uint8_t  color_t;
+typedef uint8_t  opcode_t;
+
+#if OCAML_BYTECODE_BSIZE < 0x100
+typedef uint8_t code_t;
+#elif OCAML_BYTECODE_BSIZE < 0x10000
+typedef uint16_t code_t;
+#else
+typedef uint32_t code_t;
+#endif
+#endif
+
+#define PRIflag "l"
 
 /******************************************************************************/
 /* Value classification */
 
-#define Is_int(x) (((x) & 1) != 0)
-#define Is_block(x) (((value) (x) & 1) == 0 && ((value) (x) >> 51) == 0x1FFF)
+// Is a block in one of the three heaps?
+#define Is_block(x)                 (((uint8_t) (x) & 0x7) == 0x00 && (uint16_t) ((uint64_t) (x) >> 51) == 0x0FFF)
+// Is an int, a float or a code pointer?
+#define Is_int(x)                   (((uint8_t) (x) & 0x1) == 0x01)
+
+// Is an exceptions that crossed FFI or a blacken header at the marking stage of a Mark&Compact
+#define Is_unaligned_block(x)       (((uint8_t) (x) & 0x7) == 0x02 && (uint16_t) ((uint64_t) (x) >> 51) == 0x0FFF)
+
+// Is a block in the dynamic heap
+#define Is_block_in_dynamic_heap(x) (((uint8_t) (x) & 0x7) == 0x00 && (uint16_t) ((uint64_t) (x) >> 49) == 0x3FFC)
+// Is a block in the static heap
+#define Is_block_in_static_heap(x)  (((uint8_t) (x) & 0x7) == 0x00 && (uint16_t) ((uint64_t) (x) >> 49) == 0x3FFD)
+// Is a block in the flash heap
+#define Is_block_in_flash_heap(x)   (((uint8_t) (x) & 0x7) == 0x00 && (uint16_t) ((uint64_t) (x) >> 49) == 0x3FFE)
+
+// (x) is assumed to be a block, is it in one of the ram heaps?
+#define Is_in_ram(x)                ((((uint8_t) ((uint64_t) (x) >> 48)) & 0x04) == 0x00)
+
+// (x) is assumed to be an integer, can it be a code pointer? (pretty-printing purpose)
+#define Maybe_code_pointer(x)       (Is_int(x) && ((uint64_t) (x) >> 62) == 0x2)
 
 /******************************************************************************/
 /* Conversions */
 
-#define Val_int(x) (((value) (x) << 1) | 1)
-#define Int_val(x) ((value) (x) >> 1)
+#define Val_dynamic_block(x) ((value) ((char *) (x) - (char *)   ocaml_ram_heap) | (value) 0x7FF8000000000000)
+#define Val_static_block(x)  ((value) ((char *) (x) - (char *)   ocaml_ram_heap) | (value) 0x7FFA000000000000)
+#define Val_flash_block(x)   ((value) ((char *) (x) - (char *) ocaml_flash_heap) | (value) 0x7FFC000000000000)
 
-#define Val_block(x) ((value) ((x - ocaml_heap) << 3) | ((value) 0x1FFF << 51))
-#define Block_val(x) (ocaml_heap + (((x) ^ ((value) 0x1FFF << 51)) >> 3))
+#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + (((int64_t) (x) << 15) >> 15)))
+#define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((int64_t) (x) & 0x0001FFFFFFFFFFFF)))
 
-#define Val_bool(x) Val_int((x) != 0)
-#define Bool_val(x) Int_val(x)
+#define Val_int(x) ((value) (((uint64_t) (int64_t) (x) << 1) | 1))
+#define Int_val(x) ((int64_t) ((value) (x) >> 1))
 
-#define Val_float(x) ((double) x != (double) x ? Val_nan : ((union { double d; value n; }) (double) (x)).n)
-#define Float_val(v) (((union { double d; value n; }) (value) (v)).d)
+#define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
+#define Bool_val(x) (((uint8_t) (x) & 2) != 0)
+
+union float_or_value { double f; value v; };
+
+#define bitwise_value_of_float(x) (((union float_or_value) { .f = (x) }).v)
+#define bitwise_float_of_value(x) (((union float_or_value) { .v = (x) }).f)
+
+#define Val_float(x) ((double) (x) != (double) (x) ? Val_nan : (bitwise_value_of_float((double) (x)) < 0 ? bitwise_value_of_float((double) (x)) ^ 0x7FFFFFFFFFFFFFFF : bitwise_value_of_float((double) (x))))
+#define Float_val(x) ((value) (x) < 0 ? bitwise_float_of_value((value) (x) ^ 0x7FFFFFFFFFFFFFFF) : bitwise_float_of_value((value) (x)))
+
+#define Val_codeptr(x) ((value) (((uint64_t) (x) << 1) | 0x8000000000000001))
+#define Codeptr_val(x) (((uint64_t) (x) >> 1) & 0x7FFFFFFFFFFFFFFF)
+
+#define Hd_size_bitcnt 54
 
 /******************************************************************************/
 /* Constants */
 
-#define Val_false Val_int(0)
-#define Val_true  Val_int(1)
-#define Val_unit  Val_int(0)
-#define Val_nan   0x7FF8000000000000
+#define Val_false ((value) 0x1)
+#define Val_true  ((value) 0x3)
+#define Val_unit  ((value) 0x1)
+#define Val_nan   ((value) 0x7FF4000000000000)
 
 /******************************************************************************/
 /* Blocks */
 
-#define Field(val, i) (Block_val(val)[i])
-#define StringVal(val) ((char *) Block_val(val))
-#define StringField(val, i) (StringVal(val)[i])
+#define Ram_field(val, i) (Ram_block_val(val)[i])
+#define Ram_string_field(val, i) (((char *) Ram_block_val(val))[i])
+
+#ifdef __AVR__
+#define Flash_field(val, i) (pgm_read_dword_near(Flash_block_val(val) + i))
+#define Flash_string_field(val, i) ((char) pgm_read_byte_near((char *) Flash_block_val(val) + i))
+#else
+#define Flash_field(val, i) (Flash_block_val(val)[i])
+#define Flash_string_field(val, i) (((char *) Flash_block_val(val))[i])
+#endif
+
+#define Field(val, i) (Is_in_ram(val) ? Ram_field(val, i) : Flash_field(val, i))
+#define String_field(val, i) (Is_in_ram(val) ? Ram_string_field(val, i) : Flash_string_field(val, i))
+
+#define Ram_hd_val(val) Ram_field(val, -1)
+#define Ram_string_val(val) ((char *) Ram_block_val(val))
 
 #define Hd_val(val) Field(val, -1)
-#define Hd_val(val) Field(val, -1)
-#define Code_val(val) Field(val, 0)
 
-#define Make_string_data(c7, c6, c5, c4, c3, c2, c1, c0)                                       \
-  (((value) (c0) << 56) | ((value) (c1) << 48) | ((value) (c2) << 40) | ((value) (c3) << 32) | \
-   ((value) (c4) << 24) | ((value) (c5) << 16) | ((value) (c6) <<  8) | ((value) (c7)))
+#define Make_string_data(c7, c6, c5, c4, c3, c2, c1, c0) (((value) (c0) << 56) | ((value) (c1) << 48) | ((value) (c2) << 40) | ((value) (c3) << 32) | ((value) (c4) << 24) | ((value) (c5) << 16) | ((value) (c6) << 8) | ((value) (c7)))
 
-#define Make_custom_data(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
+#define Make_custom_data(b0, b1, b2, b3, b4, b5, b6, b7) Make_string_data(b0, b1, b2, b3, b4, b5, b6, b7)
 
-#define Make_float(b7, b6, b5, b4, b3, b2, b1, b0) Make_string_data(b7, b6, b5, b4, b3, b2, b1, b0)
+#define Make_float(b0, b1, b2, b3, b4, b5, b6, b7) Make_string_data(b0, b1, b2, b3, b4, b5, b6, b7)
 
-#define Make_header(wosize, tag) (((value) (wosize) << 10) | tag)
+#define Bsize_wsize(sz) ((sz) << 3)
+#define Wsize_bsize(sz) ((sz) >> 3)
 
-#define Bsize_wsize(sz) ((sz) * sizeof (value))
-#define Wsize_bsize(sz) ((sz) / sizeof (value))
+#define Make_header(size, tag, color) ((value) ((((uvalue) (tag)) << 56) | (((uvalue) (size)) << 2) | ((uvalue) (color))))
 
-#define Wosize_val(val) ((mlsize_t) (Hd_val(val) >> 10))
-#define Bosize_val(val) (Bsize_wsize (Wosize_val (val)))
+#define Tag_hd(h) ((tag_t) ((header_t) (h) >> 56))
+#define Wosize_hd(h) ((mlsize_t) (((header_t) (h) >> 2) & 0x003FFFFFFFFFFFFF))
+#define Color_hd(h) ((color_t) ((header_t) (h) & 0x3))
 
-#define Color_val(val) ((Hd_val(val) >> 8) & 1)
-#define Tag_val(val) (Hd_val(val) & 0xFF)
+#define Wosize_val(val) Wosize_hd(Hd_val(val))
+#define Color_val(val) Color_hd(Hd_val(val))
+#define Tag_val(val) Tag_hd(Hd_val(val))
 
-#define Tag_hd(hd) (hd & 0xFF)
-#define Wosize_hd(hd) (hd >> 10)
-#define Bosize_hd(hd) (Bsize_wsize (Wosize_hd(hd)))
+#define Bosize_hd(h) Bsize_wsize(Wosize_hd(h))
+#define Bosize_val(val) Bsize_wsize(Wosize_val(val))
 
-#define Color_white 0
-#define Color_black 1
+                       /* Mark&Compact color descriptions: */
+#define Color_white 0  /* At runtime: color of all blocks, after marking: color of dead blocks, after updating pointers: color of alive blocks */
+#define Color_red   1  /* Color of infix headers at any time, even when moved at marking stage                                                 */
+#define Color_black 2  /* After marking: color of alive blocks, after updating pointers: color of dead blocks                                  */
+#define Color_brown 3  /* During marking stage: color of block headers moved at an infix location                                              */
+                       /* (-: Red paint + Black paint -> Brown paint :-)                                                                       */
 
-#define Is_black_val(val) ((Hd_val(val) >> 8) & Color_black)
-#define Is_black_hd(hd) (((hd) >> 8) & Color_black)
-
-#define Set_black_hd(hd) ((hd | (Color_black << 8)))
 /******************************************************************************/
 /* Tags */
 
 #define Lazy_tag     246
 #define Closure_tag  247
 #define Object_tag   248
-
-
 #define Infix_tag    249
 #define Forward_tag  250
 #define Abstract_tag 251
+#define No_scan_tag  251
 #define String_tag   252
 #define Custom_tag   255
 
-#define No_scan_tag  251 // ??
-
-/* Closure_tag 247 */
-//#define Code_val(val) (((code_t *) (val)) [0])
-
 /* Object_tag 248 */
-#define Class_val(val) Field((val), 0)
-#define Oid_val(val) Int_val(Field((val), 1))
+#define Class_val(val) Field(val, 0)
+#define Oid_val(val) Int_val(Field(val, 1))
 
 /* Infix_tag 249 */
-#define Infix_offset_hd(hd) (Bosize_hd(hd))
+#define Infix_offset_hd(hd) Bosize_hd(hd)
 #define Infix_offset_val(v) Infix_offset_hd(Hd_val(v))
 
-
-/* Forward_tag 250 */
-#define Forward_val(v) Field(v, 0)
-
-/* Custom_tag 255 */
-#define Data_custom_val(v) ((void *) &Field((v), 1))
-
-/******************************************************************************/
-/* Custom operations */
-
-extern void *int32_custom_operations;
-extern void *int64_custom_operations;
-extern void *nativeint_custom_operations;
-
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+#endif

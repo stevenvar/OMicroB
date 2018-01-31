@@ -55,27 +55,29 @@ let is_substring str ~sub =
 (******************************************************************************)
 (* Variables fead during parsing of command line arguments *)
     
-let output_files = ref []
-let compile_only = ref false
-let infer_interf = ref false
-let just_print   = ref false
-let trace        = ref 0
-let sudo         = ref false
-let simul        = ref false
-let flash        = ref false
-let verbose      = ref false
-let local        = ref false
+let output_files     = ref []
+let compile_only     = ref false
+let infer_interf     = ref false
+let just_print       = ref false
+let trace            = ref 0
+let sudo             = ref false
+let simul            = ref false
+let flash            = ref false
+let verbose          = ref false
+let local            = ref false
 
-let stack_size   = ref None
-let heap_size    = ref None
-let gc           = ref None
-let arch         = ref None
+let stack_size       = ref None
+let heap_size        = ref None
+let gc               = ref None
+let arch             = ref None
+let no_clean_interp  = ref false
+let no_shortcut_init = ref false
 
-let mlopts       = ref []
-let cxxopts      = ref []
-let avrcxxopts   = ref []
-let avrobjcopts  = ref []
-let avrdudeopts  = ref []
+let mlopts           = ref []
+let cxxopts          = ref []
+let avrcxxopts       = ref []
+let avrobjcopts      = ref []
+let avrdudeopts      = ref []
 
 (******************************************************************************)
 (* Specification of command line options *)
@@ -127,6 +129,10 @@ let spec =
      Printf.sprintf "<gc-algo> Set garbage collector algorithm Stop&Copy or Mark&Compact (default: %s)" default_gc);
     ("-arch", Arg.Int (fun n -> arch := Some n),
      Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %d)\n" default_arch);
+    ("-no-clean-interpreter", Arg.Set no_clean_interp,
+     " Do not remove unused VM instructions, compile and link all of them");
+    ("-no-shortcut-initialization", Arg.Set no_shortcut_init,
+     " Do not improve starting time by evaluating the program initialization at compile time");
 
     ("-mlopt", Arg.String (fun opt -> mlopts := opt :: !mlopts),
      "<option> Pass the given option to the OCaml compiler");
@@ -278,43 +284,45 @@ let () =
 (******************************************************************************)
 (* Fix parsed options *)
 
-let compile_only = !compile_only
-let infer_interf = !infer_interf
-let just_print   = !just_print
-let trace        = !trace
-let sudo         = !sudo
-let simul        = !simul
-let flash        = !flash
-let local        = !local
-let verbose      = !verbose
+let compile_only     = !compile_only
+let infer_interf     = !infer_interf
+let just_print       = !just_print
+let trace            = !trace
+let sudo             = !sudo
+let simul            = !simul
+let flash            = !flash
+let local            = !local
+let verbose          = !verbose
 
-let stack_size   = !stack_size
-let heap_size    = !heap_size
-let gc           = !gc
-let arch         = !arch
+let stack_size       = !stack_size
+let heap_size        = !heap_size
+let gc               = !gc
+let arch             = !arch
+let no_clean_interp  = !no_clean_interp
+let no_shortcut_init = !no_shortcut_init
 
-let mlopts       = List.rev !mlopts
-let cxxopts      = List.rev !cxxopts
-let avrcxxopts   = List.rev !avrcxxopts
-let avrobjcopts  = List.rev !avrobjcopts
-let avrdudeopts  = List.rev !avrdudeopts
+let mlopts           = List.rev !mlopts
+let cxxopts          = List.rev !cxxopts
+let avrcxxopts       = List.rev !avrcxxopts
+let avrobjcopts      = List.rev !avrobjcopts
+let avrdudeopts      = List.rev !avrdudeopts
 
-let input_files  = List.rev !input_files
-let input_mls    = List.rev !input_mls
-let input_cmos   = List.rev !input_cmos
-let input_cs     = List.rev !input_cs
-let input_byte   = !input_byte
-let input_avr    = !input_avr
-let input_elf    = !input_elf
-let input_hex    = !input_hex
+let input_files      = List.rev !input_files
+let input_mls        = List.rev !input_mls
+let input_cmos       = List.rev !input_cmos
+let input_cs         = List.rev !input_cs
+let input_byte       = !input_byte
+let input_avr        = !input_avr
+let input_elf        = !input_elf
+let input_hex        = !input_hex
 
-let input_prgms  = List.rev !input_prgms
+let input_prgms      = List.rev !input_prgms
 
-let output_byte  = !output_byte
-let output_c     = !output_c
-let output_elf   = !output_elf
-let output_avr   = !output_avr
-let output_hex   = !output_hex
+let output_byte      = !output_byte
+let output_c         = !output_c
+let output_elf       = !output_elf
+let output_avr       = !output_avr
+let output_hex       = !output_hex
 
 let libdir =
   if local then Filename.concat Config.builddir "lib"
@@ -445,6 +453,8 @@ let () =
     should_be_none_incomp "-c" "-heap-size" heap_size;
     should_be_none_incomp "-c" "-gc" gc;
     should_be_none_incomp "-c" "-arch" arch;
+    should_be_false "-c" "-no-clean-interpreter" no_clean_interp;
+    should_be_false "-c" "-no-shortcut-initialization" no_shortcut_init;
     should_be_empty_options "-cxxopt" cxxopts;
     should_be_empty_options "-avrcxxopts" avrcxxopts;
     should_be_empty_options "-avrobjcopts" avrobjcopts;
@@ -483,6 +493,8 @@ let () =
     should_be_none_incomp "-i" "-heap-size" heap_size;
     should_be_none_incomp "-i" "-gc" gc;
     should_be_none_incomp "-i" "-arch" arch;
+    should_be_false "-i" "-no-clean-interpreter" no_clean_interp;
+    should_be_false "-i" "-no-shortcut-initialization" no_shortcut_init;
     should_be_empty_options "-cxxopt" cxxopts;
     should_be_empty_options "-avrcxxopts" avrcxxopts;
     should_be_empty_options "-avrobjcopts" avrobjcopts;
@@ -602,6 +614,8 @@ let () =
       "-gc"; gc;
       "-arch"; string_of_int arch;
     ] in
+    let cmd = if no_clean_interp then cmd @ [ "-no-clean-interpreter" ] else cmd in
+    let cmd = if no_shortcut_init then cmd @ [ "-no-shortcut-initialization" ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun path -> [ "-i"; path ]) input_cs) in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd

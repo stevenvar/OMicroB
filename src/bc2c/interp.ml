@@ -51,6 +51,10 @@ let make_import_value () =
       result in
   import_value
 
+let import_globals globals =
+  let import_value = make_import_value () in
+  Array.map import_value globals
+    
 (******************************************************************************)
 (* Value tools. *)
 
@@ -313,6 +317,15 @@ let ccall arch ooid prim args =
   | "caml_abs_float", [ Float x ] -> Float (abs_float x)
   | "caml_acos_float", [ Float x ] -> Float (acos x)
   | "caml_add_float", [ Float x; Float y ] -> Float (x +. y)
+  | "caml_sub_float", [ Float x; Float y ] -> Float (x -. y)
+  | "caml_mul_float", [ Float x; Float y ] -> Float (x *. y)
+  | "caml_div_float", [ Float x; Float y ] -> Float (x /. y)
+  | "caml_ge_float",  [ Float x; Float y ] -> Int (if x >= y then 1 else 0)
+  | "caml_le_float",  [ Float x; Float y ] -> Int (if x <= y then 1 else 0)
+  | "caml_lt_float",  [ Float x; Float y ] -> Int (if x <  y then 1 else 0)
+  | "caml_gt_float",  [ Float x; Float y ] -> Int (if x >  y then 1 else 0)
+  | "caml_eq_float",  [ Float x; Float y ] -> Int (if x =  y then 1 else 0)
+  | "caml_neq_float", [ Float x; Float y ] -> Int (if x <> y then 1 else 0)
   | "caml_array_append", [ Block (_mut0, 0, v0); Block (_mut1, 0, v1) ] -> Block (Mutable, 0, Array.append v0 v1)
   | "caml_array_blit", [ Block (_mut0, 0, v0); Int s0; Block (mut1, 0, v1); Int s1; Int len ] -> assert (mut1 = Mutable); Array.blit v0 s0 v1 s1 len; Int 0
   | "caml_array_concat", [ lst ] -> caml_array_concat lst
@@ -415,8 +428,7 @@ let ccall arch ooid prim args =
 (******************************************************************************)
 
 let exec arch prims globals code cycle_limit =
-  let import_value = make_import_value () in
-  let globals = Array.map import_value globals in
+  let globals = import_globals globals in
   let code_size = Array.length code in
 
   let ooid = ref 0 in

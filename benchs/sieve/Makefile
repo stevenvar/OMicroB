@@ -1,17 +1,17 @@
 include ../../etc/Makefile.conf
 
-SOURCES := test.ml
-TARGETS := test.byte test.c test.elf test.avr test.hex
+SOURCES := sieve.ml
+TARGETS := sieve.byte sieve.c sieve.elf sieve.avr sieve.hex
 
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -arch 64 -v $^ -mlopt -verbose
+	$(BIN)/omicrob -v $^ -mlopt -verbose
 
-flash: test.hex
+flash: sieve.hex
 	$(BIN)/omicrob -flash -sudo $<
 
-simul: test.elf
+simul: sieve.elf
 	./$<
 
 clean:
