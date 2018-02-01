@@ -1,4 +1,4 @@
-open Avr
+(* open Avr *)
 
 (* Generated code *)
 let rising_edge in_f =
@@ -18,22 +18,22 @@ let button_led button_pinin =
   button_led_step
 (* . *)
 
-let bool_of_level = function
-  | LOW -> false
-  | HIGH -> true
-
-let level_of_bool = function
-  | false -> LOW
-  | true -> HIGH
+(* let bool_of_level = function
+ *   | LOW -> false
+ *   | HIGH -> true
+ * 
+ * let level_of_bool = function
+ *   | false -> LOW
+ *   | true -> HIGH *)
 
 let () =
-  let r = PIN9 in
-  pin_mode r OUTPUT;
-  let button = PIN7 in
+  (* let r = PIN9 in *)
+  (* pin_mode r OUTPUT; *)
+  (* let button = PIN7 in *)
   let bl = button_led false in
-  while true do
-    let bval = digital_read button in
-    let rv = bl (bool_of_level bval) in
-    digital_write r (level_of_bool rv)
+  for i = 0 to 10 do
+    (* let bval = digital_read button in *)
+    ignore (bl true)
+    (* digital_write r (level_of_bool rv) *)
   done
   
