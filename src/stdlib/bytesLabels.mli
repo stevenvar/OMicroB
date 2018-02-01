@@ -44,7 +44,7 @@ val make : int -> char -> bytes
 
     Raise [Invalid_argument] if [n < 0] or [n > ]{!Sys.max_string_length}. *)
 
-val init : int -> f:(int -> char) -> bytes
+val init : int -> (int -> char) -> bytes
 (** [init n f] returns a fresh byte sequence of length [n],
     with character [i] initialized to the result of [f i].
 
@@ -65,7 +65,7 @@ val to_string : bytes -> string
 (** Return a new string that contains the same bytes as the given byte
     sequence. *)
 
-val sub : bytes -> pos:int -> len:int -> bytes
+val sub : bytes -> int -> int -> bytes
 (** [sub s start len] returns a new byte sequence of length [len],
     containing the subsequence of [s] that starts at position [start]
     and has length [len].

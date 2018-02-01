@@ -25,11 +25,11 @@ $(LIB)/stdlib.cma: $(CMOS)
 %.cmi: $(SRC)/stdlib/%.mli
 	$(OCAMLC) -nostdlib -nopervasives -c -w @a $<
 
-%.cmo: $(SRC)/stdlib/%.ml $(CMIS)
-	$(OCAMLC) -nostdlib -c -w @a $<
-
 %Labels.cmo: $(SRC)/stdlib/%Labels.ml $(CMIS)
 	$(OCAMLC) -nostdlib -nolabels -c -w @a $<
+
+%.cmo: $(SRC)/stdlib/%.ml $(CMIS)
+	$(OCAMLC) -nostdlib -c -w @a $<
 
 pervasives.cmi: pervasives.mli
 	$(OCAMLC) -nostdlib -nopervasives -c -w @a $<
