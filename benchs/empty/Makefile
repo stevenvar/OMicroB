@@ -6,7 +6,7 @@ TARGETS := test.byte test.c test.elf test.avr test.hex
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -arch 64 -v $^ -mlopt -verbose -no-shortcut-initialization
+	$(BIN)/omicrob -arch 32 -v $^ -mlopt -verbose -no-shortcut-initialization
 
 flash: test.hex
 	$(BIN)/omicrob -flash -sudo $<

@@ -67,18 +67,19 @@ let string_of_dword dword =
     Printf.bprintf buf ")";
     Buffer.contents buf in
   let print_tag tag =
-         if tag = Obj.lazy_tag then "Lazy_tag"
-    else if tag = Obj.closure_tag then "Closure_tag"
-    else if tag = Obj.object_tag then "Object_tag"
-    else if tag = Obj.infix_tag then "Infix_tag"
-    else if tag = Obj.forward_tag then "Forward_tag"
-    else if tag = Obj.abstract_tag then "Abstract_tag"
-    else if tag = Obj.string_tag then "String_tag"
-    else if tag = Obj.double_tag then "Double_tag"
+         if tag = Obj.lazy_tag         then "Lazy_tag"
+    else if tag = Obj.closure_tag      then "Closure_tag"
+    else if tag = Obj.object_tag       then "Object_tag"
+    else if tag = Obj.infix_tag        then "Infix_tag"
+    else if tag = Obj.forward_tag      then "Forward_tag"
+    else if tag = Obj.abstract_tag     then "Abstract_tag"
+    else if tag = Obj.string_tag       then "String_tag"
+    else if tag = Obj.double_tag       then "Double_tag"
     else if tag = Obj.double_array_tag then "Double_array_tag"
-    else if tag = Obj.custom_tag then "Custom_tag"
+    else if tag = Obj.custom_tag       then "Custom_tag"
     else string_of_int tag in
   match dword with
+  | INT 0              -> Printf.sprintf "Val_unit"
   | INT n              -> Printf.sprintf "Val_int(%d)" n
   | FLOAT bytes        -> print_bytes "Make_float" bytes
   | CHARS chars        -> print_chars chars

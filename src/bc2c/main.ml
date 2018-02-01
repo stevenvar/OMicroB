@@ -166,7 +166,6 @@ let () =
       let ram_globals, flash_globals, code = Datagen.split_globals arch globals code in
       let bytecode, opcodes, codemap = Codegen.export code in
       let atom0, exceptions, accu_data, stack_data, ram_global_data, flash_global_data, static_heap_data, flash_heap_data = Datagen.export arch codemap accu stack ram_globals flash_globals in
-      let stack_data = Datagen.reverse_stack stack_size stack_data in
 
       let flash_heap_size = List.length flash_heap_data in
       let static_heap_size = List.length static_heap_data in
@@ -177,6 +176,8 @@ let () =
         sz in
 
       let opcodes = if no_clean_interp then Opcode.all else opcodes in
+
+      assert (List.for_all ((=) (T.INT 0)) ram_global_data);
       
       (* Defined Constants *)
       Printf.fprintf oc "#define OCAML_STACK_WOSIZE          %8d\n" stack_size;
@@ -205,22 +206,25 @@ let () =
       Printer.print_opcodes oc opcodes;
       Printf.fprintf oc "\n";
 
-      (* Define heaps, acc, stack and global data *)
-      Printf.fprintf oc "PROGMEM extern const value ocaml_flash_heap[OCAML_FLASH_HEAP_WOSIZE];\n";
+      (* Declare heap variables *)
+      Printf.fprintf oc "value ocaml_stack[OCAML_STACK_WOSIZE];\n";
+      Printf.fprintf oc "value ocaml_ram_global_data[OCAML_RAM_GLOBDATA_NUMBER];\n";
+      Printf.fprintf oc "value ocaml_ram_heap[OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE];\n";
       Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "value" "ocaml_ram_heap" "OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE" static_heap_data;
-      Printf.fprintf oc "\n";
+
+      (* Define initial heaps, intial stack and initial global data *)
       Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_heap" "OCAML_FLASH_HEAP_WOSIZE" flash_heap_data;
       Printf.fprintf oc "\n";
-      Printf.fprintf oc "value acc = %s;\n" (Printer.string_of_dword accu_data);
+      Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_initial_static_heap" "OCAML_STATIC_HEAP_WOSIZE" static_heap_data;
       Printf.fprintf oc "\n";
-      Printf.fprintf oc "value env = Val_unit;\n";
-      Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "value" "ocaml_stack" "OCAML_STACK_WOSIZE" stack_data;
-      Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "value" "ocaml_ram_global_data" "OCAML_RAM_GLOBDATA_NUMBER" ram_global_data;
+      Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_initial_stack" "OCAML_STACK_INITIAL_WOSIZE" stack_data;
       Printf.fprintf oc "\n";
       Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_global_data" "OCAML_FLASH_GLOBDATA_NUMBER" flash_global_data;
+      Printf.fprintf oc "\n";
+
+      (* Define acc and env *)
+      Printf.fprintf oc "value acc = %s;\n" (Printer.string_of_dword accu_data);
+      Printf.fprintf oc "value env = Val_unit;\n";
       Printf.fprintf oc "\n";
 
       (* Define exceptions *)

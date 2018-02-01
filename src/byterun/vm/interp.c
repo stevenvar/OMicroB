@@ -32,7 +32,7 @@ PROGMEM extern void * const ocaml_primitives[];
 /******************************************************************************/
 /* Read tools for program memory */
 
-void *get_primitive(uint8_t prim_ind) {
+static inline void *get_primitive(uint8_t prim_ind) {
 #ifdef __AVR__
   return (void *) pgm_read_word_near(ocaml_primitives + prim_ind);
 #else
@@ -40,7 +40,7 @@ void *get_primitive(uint8_t prim_ind) {
 #endif
 }
 
-value read_flash_global_data_1B(uint8_t glob_ind) {
+static inline value read_flash_global_data_1B(uint8_t glob_ind) {
 #ifdef __AVR__
   value v = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
   return v;
@@ -49,7 +49,7 @@ value read_flash_global_data_1B(uint8_t glob_ind) {
 #endif
 }
 
-value read_flash_global_data_2B(uint16_t glob_ind) {
+static inline value read_flash_global_data_2B(uint16_t glob_ind) {
 #ifdef __AVR__
   return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
 #else
@@ -57,7 +57,7 @@ value read_flash_global_data_2B(uint16_t glob_ind) {
 #endif
 }
 
-char read_byte(void) {
+static inline char read_byte(void) {
   char c;
 #ifdef __AVR__
   c = pgm_read_byte_near(ocaml_bytecode + pc);
@@ -68,29 +68,29 @@ char read_byte(void) {
   return c;
 }
 
-opcode_t read_opcode(void) {
+static inline opcode_t read_opcode(void) {
   return (opcode_t) read_byte();
 }
 
-uint8_t read_uint8(void) {
+static inline uint8_t read_uint8(void) {
   return (uint8_t) read_byte();
 }
 
-int8_t read_int8(void) {
+static inline int8_t read_int8(void) {
   return (int8_t) read_byte();
 }
 
-uint16_t read_uint16(void) {
+static inline uint16_t read_uint16(void) {
   uint8_t n1 = read_uint8();
   uint8_t n0 = read_uint8();
   return ((uint16_t) n1 << 8) | n0;
 }
 
-int16_t read_int16(void) {
+static inline int16_t read_int16(void) {
   return (int16_t) read_uint16();
 }
 
-uint32_t read_uint32(void) {
+static inline uint32_t read_uint32(void) {
   uint8_t n3 = read_uint8();
   uint8_t n2 = read_uint8();
   uint8_t n1 = read_uint8();
@@ -98,11 +98,11 @@ uint32_t read_uint32(void) {
   return ((uint32_t) n3 << 24) | ((uint32_t) n2 << 16) | ((uint32_t) n1 << 8) | n0;
 }
 
-int32_t read_int32(void) {
+static inline int32_t read_int32(void) {
   return (int32_t) read_uint32();
 }
 
-uint64_t read_uint64(void) {
+static inline uint64_t read_uint64(void) {
   uint8_t n7 = read_uint8();
   uint8_t n6 = read_uint8();
   uint8_t n5 = read_uint8();
@@ -114,21 +114,21 @@ uint64_t read_uint64(void) {
   return ((uint64_t) n7 << 56) | ((uint64_t) n6 << 48) | ((uint64_t) n5 << 40) | ((uint64_t) n4 << 32) | ((uint64_t) n3 << 24) | ((uint64_t) n2 << 16) | ((uint64_t) n1 << 8) | n0;
 }
 
-int64_t read_int64(void) {
+static inline int64_t read_int64(void) {
   return (int64_t) read_uint64();
 }
 
-code_t read_ptr_1B(void) {
+static inline code_t read_ptr_1B(void) {
   int8_t ofs = read_int8();
   return pc - 2 + ofs;
 }
 
-code_t read_ptr_2B(void) {
+static inline code_t read_ptr_2B(void) {
   int16_t ofs = read_int16();
   return pc - 3 + ofs;
 }
 
-code_t read_ptr_4B(void) {
+static inline code_t read_ptr_4B(void) {
   int32_t ofs = read_int32();
   return pc - 5 + ofs;
 }
@@ -136,11 +136,11 @@ code_t read_ptr_4B(void) {
 /******************************************************************************/
 /* Stack tools */
 
-value peek(int n) {
+static inline value peek(int n) {
   return sp[n];
 }
 
-void push(value x) {
+static inline void push(value x) {
   if(sp <= ocaml_stack) {
     caml_raise_stack_overflow();
   } else {
@@ -148,19 +148,49 @@ void push(value x) {
   }
 }
 
-value pop(void) {
-  return *(sp++);
+static inline value pop(void) {
+  return *(sp ++);
 }
 
-void pop_n(int n) {
+static inline void pop_n(int n) {
   sp += n;
 }
 
 /******************************************************************************/
 /* Initialization */
 
-void interp_init(void) {
+static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, uint16_t size) {
+  uint16_t ind = 0;
+  for (ind = 0; ind < size; ind ++) {
+#ifdef __AVR__
+    uint8_t byte = pgm_read_byte_near(&((uint8_t *) flash_ptr)[ind]);
+#else
+    uint8_t byte = ((uint8_t *) flash_ptr)[ind];
+#endif
+    ((uint8_t *) ram_ptr)[ind] = byte;
+  }
+}
+
+static inline void init_stack(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
+  copy_flash_to_ram(sp, ocaml_initial_stack, OCAML_STACK_INITIAL_WOSIZE * sizeof(value));
+}
+
+static inline void init_global_data(void) {
+  uint16_t ind = 0;
+  for (ind = 0; ind < OCAML_RAM_GLOBDATA_NUMBER; ind ++) {
+    ocaml_ram_global_data[ind] = Val_unit;
+  }
+}
+
+static inline void init_static_heap(void) {
+  copy_flash_to_ram(ocaml_ram_heap, ocaml_initial_static_heap, OCAML_STATIC_HEAP_WOSIZE * sizeof(value));
+}
+
+static inline void interp_init(void) {
+  init_stack();
+  init_global_data();
+  init_static_heap();
   trapSp = Val_int(-1);
   env = Val_unit;
   extra_args = 0;
@@ -170,7 +200,7 @@ void interp_init(void) {
 /******************************************************************************/
 /* Interpretation */
 
-void interp(void) {
+static inline void interp(void) {
   if (setjmp(caml_exception_jmp_buf)) {
     goto ocaml_raise;
   }

@@ -385,17 +385,3 @@ let export arch codemap accu stack ram_globals flash_globals =
 (******************************************************************************)
 (******************************************************************************)
 (******************************************************************************)
-
-let reverse_stack stack_size stackdata =
-  let len = ref (List.length stackdata) in
-  let result = ref stackdata in
-  if !len > stack_size then failwith (Printf.sprintf "too small stack: %d words (%d words required after initialisation)" stack_size !len);
-  while !len < stack_size do
-    result := INT 0 :: !result;
-    incr len;
-  done;
-  !result
-
-(******************************************************************************)
-(******************************************************************************)
-(******************************************************************************)
