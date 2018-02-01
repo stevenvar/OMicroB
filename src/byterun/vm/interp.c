@@ -42,8 +42,14 @@ static inline void *get_primitive(uint8_t prim_ind) {
 
 static inline value read_flash_global_data_1B(uint8_t glob_ind) {
 #ifdef __AVR__
-  value v = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-  return v;
+#if OCAML_VIRTUAL_ARCH == 16
+#elif OCAML_VIRTUAL_ARCH == 32
+  return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
+#elif OCAML_VIRTUAL_ARCH == 64
+  value v1 = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
+  value v2 = pgm_read_dword_near((char *) (ocaml_flash_global_data + glob_ind) + 4);
+  return (v2 << 32) | v1;
+#endif
 #else
   return ocaml_flash_global_data[glob_ind];
 #endif
@@ -51,7 +57,14 @@ static inline value read_flash_global_data_1B(uint8_t glob_ind) {
 
 static inline value read_flash_global_data_2B(uint16_t glob_ind) {
 #ifdef __AVR__
+#if OCAML_VIRTUAL_ARCH == 16
+#elif OCAML_VIRTUAL_ARCH == 32
   return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
+#elif OCAML_VIRTUAL_ARCH == 64
+  value v1 = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
+  value v2 = pgm_read_dword_near((char *) (ocaml_flash_global_data + glob_ind) + 4);
+  return (v2 << 32) | v1;
+#endif
 #else
   return ocaml_flash_global_data[glob_ind];
 #endif

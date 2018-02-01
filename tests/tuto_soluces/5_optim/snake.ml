@@ -100,7 +100,7 @@ let rec game_loop dir=
   Oled.draw xh yh true;
   Oled.display ();
   collides_with_itself ();
-  delay(100 - !size);
+  (*delay(100 - !size);*)
   game_loop new_dir
 
 let () = 
