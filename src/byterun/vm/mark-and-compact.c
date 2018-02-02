@@ -150,6 +150,11 @@ static void wipe_dead_blocks() {
       p += size + 1;
       while (p < heap_ptr && Color_hd((h = *p)) == Color_white) {
         p += Wosize_hd(h) + 1;                     /* Skip the dead block                     */
+        if ((mlsize_t) (p - start - 1) >=          /* Check size overflow                     */
+            (mlsize_t) 1 << Hd_size_bitcnt) {
+          p -= Wosize_hd(h) + 1;                   /* Backtrack one block                     */
+          break;
+        }
       }
       *start = Make_header(p - start - 1, String_tag, Color_white);
     } else {
@@ -303,6 +308,11 @@ void gc(void) {
   printf("#################### MARK & COMPACT ####################\n");
 #endif
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("&acc = %p\n", &acc);
+  printf("&env = %p\n", &env);
+  printf("acc = "); print_value(acc);
+  printf("env = "); print_value(env);
+  printf("\n");
   print_dynamic_heap();
   print_static_heap();
   print_flash_heap();
@@ -316,6 +326,11 @@ void gc(void) {
   compact_blocks();
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
   printf("END OF MARK & COMPACT\n");
+  printf("&acc = %p\n", &acc);
+  printf("&env = %p\n", &env);
+  printf("acc = "); print_value(acc);
+  printf("env = "); print_value(env);
+  printf("\n");
   print_dynamic_heap();
   print_static_heap();
   print_flash_heap();

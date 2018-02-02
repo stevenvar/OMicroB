@@ -39,10 +39,10 @@ OCaml values:
 
 #ifndef TYPES
 #define TYPES
-typedef int32_t  value;
-typedef uint32_t uvalue;
-typedef uint32_t mlsize_t;
-typedef int32_t  header_t;
+typedef int16_t  value;
+typedef uint16_t uvalue;
+typedef uint8_t  mlsize_t;
+typedef int16_t  header_t;
 typedef uint8_t  tag_t;
 typedef uint8_t  color_t;
 typedef uint8_t  opcode_t;
@@ -61,55 +61,55 @@ typedef uint32_t code_t;
 /******************************************************************************/
 /* Value classification */
 
+#define ROUND_RAM_WOSIZE (((uvalue) OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE + 1) & ~((uvalue) 1))
+
 // Is a block in one of the three heaps?
-#define Is_block(x)                 (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 22) == 0x01FF)
+#define Is_block(x)                 (((uint8_t) (x) & 0x3) == 0x00 && (uvalue) (x) < (((uvalue) ROUND_RAM_WOSIZE + OCAML_FLASH_HEAP_WOSIZE) << 2))
 // Is an int, a float or a code pointer?
 #define Is_int(x)                   (((uint8_t) (x) & 0x1) == 0x01)
 
 // Is an exceptions that crossed FFI or a blacken header at the marking stage of a Mark&Compact
-#define Is_unaligned_block(x)       (((uint8_t) (x) & 0x3) == 0x02 && (uint16_t) ((uint32_t) (x) >> 22) == 0x01FF)
+#define Is_unaligned_block(x)       (((uint8_t) (x) & 0x3) == 0x02 && (uvalue) (x) < (((uvalue) ROUND_RAM_WOSIZE + OCAML_FLASH_HEAP_WOSIZE) << 2))
 
 // Is a block in the dynamic heap
-#define Is_block_in_dynamic_heap(x) (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 20) == 0x07FC)
+#define Is_block_in_dynamic_heap(x) (((uint8_t) (x) & 0x3) == 0x00 && (uvalue) (x) - ((uvalue) OCAML_STATIC_HEAP_WOSIZE << 2) < ((uvalue) OCAML_DYNAMIC_HEAP_WOSIZE << 2))
 // Is a block in the static heap
-#define Is_block_in_static_heap(x)  (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 20) == 0x07FD)
+#define Is_block_in_static_heap(x)  (((uint8_t) (x) & 0x3) == 0x00 && (uvalue) (x) < ((uvalue) OCAML_STATIC_HEAP_WOSIZE << 2))
 // Is a block in the flash heap
-#define Is_block_in_flash_heap(x)   (((uint8_t) (x) & 0x3) == 0x00 && (uint16_t) ((uint32_t) (x) >> 20) == 0x07FE)
+#define Is_block_in_flash_heap(x)   (((uint8_t) (x) & 0x3) == 0x00 && (uvalue) (x) - ((uvalue) ROUND_RAM_WOSIZE << 2) < ((uvalue) OCAML_FLASH_HEAP_WOSIZE) << 2)
 
 // (x) is assumed to be a block, is it in one of the ram heaps?
-#define Is_in_ram(x)                ((((uint8_t) ((uint32_t) (x) >> 16)) & 0x20) == 0x00)
+#define Is_in_ram(x)                ((uvalue) (x) < (((uvalue) OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE) << 2))
 
 // (x) is assumed to be an integer, can it be a code pointer? (pretty-printing purpose)
-#define Maybe_code_pointer(x)       (Is_int(x) && ((uint32_t) (x) >> 30) == 0x2)
+#define Maybe_code_pointer(x)       ((uvalue) (x) >= (((uvalue) ROUND_RAM_WOSIZE + OCAML_FLASH_HEAP_WOSIZE) << 2))
 
 /******************************************************************************/
 /* Conversions */
 
-#define Val_dynamic_block(x) ((value) ((char *) (x) - (char *)   ocaml_ram_heap) | (value) 0x7FC00000)
-#define Val_static_block(x)  ((value) ((char *) (x) - (char *)   ocaml_ram_heap) | (value) 0x7FD00000)
-#define Val_flash_block(x)   ((value) ((char *) (x) - (char *) ocaml_flash_heap) | (value) 0x7FE00000)
+#define Val_dynamic_block(x) ((value) ((char *) (x) - (char *) ocaml_ram_heap) << 1)
+#define Val_static_block(x)  ((value) ((char *) (x) - (char *) ocaml_ram_heap) << 1)
+#define Val_flash_block(x)   ((value) ((char *) (x) - (char *) ocaml_flash_heap + (ROUND_RAM_WOSIZE << 1)) << 1)
 
-#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + (((int32_t) (x) << 12) >> 12)))
-#define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((int32_t) (x) & 0x000FFFFF)))
+#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + ((value) (x) >> 1)))
+#define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((uvalue) (x) >> 1) - (ROUND_RAM_WOSIZE << 1)))
 
-#define Val_int(x) ((value) (((uint32_t) (int32_t) (x) << 1) | 1))
-#define Int_val(x) ((int32_t) ((value) (x) >> 1))
+#define Val_int(x) ((value) (((uint16_t) (int16_t) (x) << 1) | 1))
+#define Int_val(x) ((int16_t) ((value) (x) >> 1))
 
 #define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)
 
-union float_or_value { float f; value v; };
+extern value value_of_float(float x);
+extern float float_of_value(value v);
 
-#define bitwise_value_of_float(x) (((union float_or_value) { .f = (x) }).v)
-#define bitwise_float_of_value(x) (((union float_or_value) { .v = (x) }).f)
+#define Val_float(x) (value_of_float(x))
+#define Float_val(x) (float_of_value(x))
 
-#define Val_float(x) ((float) (x) != (float) (x) ? Val_nan : (bitwise_value_of_float((float) (x)) < 0 ? bitwise_value_of_float((float) (x)) ^ 0x7FFFFFFF : bitwise_value_of_float((float) (x))))
-#define Float_val(x) ((value) (x) < 0 ? bitwise_float_of_value((value) (x) ^ 0x7FFFFFFF) : bitwise_float_of_value((value) (x)))
+#define Val_codeptr(x) ((value) (((uint16_t) (x) << 1) | 1))
+#define Codeptr_val(x) ((uint16_t) (x) >> 1)
 
-#define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
-#define Codeptr_val(x) (((uint32_t) (x) >> 1) & 0x7FFFFFFF)
-
-#define Hd_size_bitcnt 22
+#define Hd_size_bitcnt 6
 
 /******************************************************************************/
 /* Constants */
@@ -117,7 +117,7 @@ union float_or_value { float f; value v; };
 #define Val_false ((value) 0x1)
 #define Val_true  ((value) 0x3)
 #define Val_unit  ((value) 0x1)
-#define Val_nan   ((value) 0x7FA00000)
+#define Val_nan   ((value) 0x7C01)
 
 /******************************************************************************/
 /* Blocks */
@@ -141,20 +141,20 @@ union float_or_value { float f; value v; };
 
 #define Hd_val(val) Field(val, -1)
 
-#define Make_string_data(c3, c2, c1, c0) (((value) (c0) << 24) | ((value) (c1) << 16) | ((value) (c2) << 8) | ((value) (c3)))
+#define Make_string_data(c1, c0) (((value) (c0) << 8) | ((value) (c1)))
 
-#define Make_custom_data(b0, b1, b2, b3) Make_string_data(b0, b1, b2, b3)
+#define Make_custom_data(b0, b1) Make_string_data(b0, b1)
 
-#define Make_float(b0, b1, b2, b3) Make_string_data(b0, b1, b2, b3)
+#define Make_float(b0, b1) Make_string_data(b0, b1)
 
-#define Bsize_wsize(sz) ((sz) << 2)
-#define Wsize_bsize(sz) ((sz) >> 2)
+#define Bsize_wsize(sz) ((sz) << 1)
+#define Wsize_bsize(sz) ((sz) >> 1)
 
-#define Make_header(size, tag, color) ((value) ((((uvalue) (tag)) << 24) | (((uvalue) (size)) << 2) | ((uvalue) (color))))
+#define Make_header(size, tag, color) ((value) ((((uvalue) (tag)) << 8) | (((uvalue) (size)) << 2) | ((uvalue) (color))))
 
-#define Tag_hd(h) ((tag_t) ((header_t) (h) >> 24))
-#define Wosize_hd(h) ((mlsize_t) (((header_t) (h) >> 2) & 0x003FFFFF))
-#define Color_hd(h) ((color_t) ((header_t) (h) & 0x3))
+#define Tag_hd(h) ((tag_t) ((header_t) (h) >> 8))
+#define Wosize_hd(h) ((uint8_t) (h) >> 2)
+#define Color_hd(h) ((color_t) ((uint8_t) (h) & 0x3))
 
 #define Wosize_val(val) Wosize_hd(Hd_val(val))
 #define Color_val(val) Color_hd(Hd_val(val))

@@ -1,5 +1,17 @@
 #include "values.h"
 
+#if OCAML_VIRTUAL_ARCH == 16
+
+value value_of_float(float x) {
+  return ((uint16_t) (x) << 1) | 1;
+}
+
+float float_of_value(value v) {
+  return (float) ((uint16_t) (v) >> 1);
+}
+
+#endif
+
 value caml_neq_float(value v1, value v2) {
   return Val_bool(Float_val(v1) != Float_val(v2));
 }

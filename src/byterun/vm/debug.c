@@ -4,6 +4,7 @@
 
 #ifdef __PC__
 #include <stdio.h>
+#include <inttypes.h>
 #endif
 
 #ifdef __AVR__
@@ -77,10 +78,9 @@ void debug_blink_pause(void) {
 #ifdef __PC__
 
 void print_value(value v) {
-  float f = ((union float_or_value) { .v = v }).f;
   printf("0x%08" PRIflag "x / ", v);
   if (Is_int(v)) {
-    printf("(int = %" PRIflag "d / float = %" PRIflag "f)", Int_val(v), f);
+    printf("(int = %" PRIflag "d / float = %" PRIflag "f)", Int_val(v), Float_val(v));
   } else if (Is_block_in_dynamic_heap(v)) {
     printf("@(%p) (block in dynamic heap)", Ram_block_val(v));
   } else if (Is_block_in_static_heap(v)) {
@@ -91,19 +91,19 @@ void print_value(value v) {
     printf("NULL");
   } else if (Maybe_code_pointer(v)) {
     printf("code pointer %" PRIflag "d", Codeptr_val(v));
-  } else if (f >= -1e6 && f <= 1e6) {
-    printf("(maybe %f)", f);
+  } else if (Float_val(v) >= -1e6 && Float_val(v) <= 1e6) {
+    printf("(maybe %f)", Float_val(v));
   } else {
     printf("(?)");
   }
   printf("\n");
 }
 
-static void print_table(const char *name, const value *table, mlsize_t table_wosize) {
+static void print_table(const char *name, const value *table, uint32_t table_wosize) {
   const value *ptr;
   int i;
 
-  printf("%s (starts at %p, ends at %p, size = %" PRIflag "d words) : \n", name, table, table + table_wosize, table_wosize);
+  printf("%s (starts at %p, ends at %p, size = %" PRIu32 "d words) : \n", name, table, table + table_wosize, table_wosize);
 
   for (ptr = table, i = 0; ptr < table + table_wosize; ptr ++, i ++) {
 #ifdef OCAML_GC_STOP_AND_COPY

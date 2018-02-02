@@ -43,6 +43,7 @@ static inline void *get_primitive(uint8_t prim_ind) {
 static inline value read_flash_global_data_1B(uint8_t glob_ind) {
 #ifdef __AVR__
 #if OCAML_VIRTUAL_ARCH == 16
+  return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
 #elif OCAML_VIRTUAL_ARCH == 32
   return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
 #elif OCAML_VIRTUAL_ARCH == 64
@@ -58,6 +59,7 @@ static inline value read_flash_global_data_1B(uint8_t glob_ind) {
 static inline value read_flash_global_data_2B(uint16_t glob_ind) {
 #ifdef __AVR__
 #if OCAML_VIRTUAL_ARCH == 16
+  return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
 #elif OCAML_VIRTUAL_ARCH == 32
   return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
 #elif OCAML_VIRTUAL_ARCH == 64
@@ -545,6 +547,8 @@ static inline void interp(void) {
 #ifdef OCAML_APPLY1
     case OCAML_APPLY1 : {
       TRACE_INSTRUCTION("APPLY1");
+      assert(Is_block(acc));
+      assert(Tag_val(acc) == Closure_tag || Tag_val(acc) == Infix_tag);
       value arg1 = pop();
       push(Val_int(extra_args));
       push(env);
@@ -1591,6 +1595,18 @@ static inline void interp(void) {
           printf("%c", c);
           i ++;
           c = String_field(str, i);
+        }
+        if (Is_block(acc) && Tag_val(acc) == 0 && Wosize_val(acc) > 1 && Is_block(Field(acc, 1)) && Tag_val(Field(acc, 1)) == String_tag) {
+          printf(" \"");
+          str = Field(acc, 1);
+          i = 0;
+          c = String_field(str, 0);
+          while (c != '\0') {
+            printf("%c", c);
+            i ++;
+            c = String_field(str, i);
+          }
+          printf("\"");
         }
         printf("\n");
         return;
