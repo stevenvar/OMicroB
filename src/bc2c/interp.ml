@@ -343,8 +343,8 @@ let ccall arch ooid prim args =
   | "caml_copysign_float", [ Float x; Float y ] -> Float (copysign x y)
   | "caml_cos_float", [ Float x ] -> Float (cos x)
   | "caml_cosh_float", [ Float x ] -> Float (cosh x)
-  | "caml_create_bytes", [ Int size ] -> Bytes (Mutable, Bytes.create size)
-  | "caml_create_string", [ Int size ] -> Bytes (Immutable, Bytes.create size)
+  | "caml_create_bytes", [ Int size ] -> Bytes (Mutable, Bytes.make size '\x00')
+  | "caml_create_string", [ Int size ] -> Bytes (Immutable, Bytes.make size '\x00')
   | "caml_exp_float", [ Float x ] -> Float (exp x)
   | "caml_expm1_float", [ Float x ] -> Float (expm1 x)
   | ("caml_fill_bytes" | "caml_fill_string"), [ Bytes (mut, b); Int ofs; Int len; Int c ] -> assert (mut = Mutable); Bytes.fill b ofs len (char_of_int c); Int 0

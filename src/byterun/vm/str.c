@@ -59,7 +59,7 @@ value caml_blit_bytes(value ml_s, value ml_sofs, value ml_b, value ml_bofs, valu
 value caml_fill_bytes(value ml_b, value ml_ofs, value ml_len, value ml_c) {
   mlsize_t ofs = Int_val(ml_ofs);
   mlsize_t len = Int_val(ml_len);
-  char c = (char) Int_val(ml_c);
+  uint8_t c = (uint8_t) Int_val(ml_c);
   mlsize_t i;
   assert(Is_block(ml_b));
   assert(Is_in_ram(ml_b));
@@ -119,7 +119,21 @@ value caml_string_get(value s, value i) {
   mlsize_t idx = Int_val(i);
   mlsize_t len = string_length(s);
   if (idx >= len) caml_raise_index_out_of_bounds();
-  return Val_int(String_field(s, i));
+  return Val_int(String_field(s, idx));
+}
+
+value caml_bytes_get(value b, value i) {
+  return caml_string_get(b, i);
+}
+
+value caml_bytes_set(value b, value i, value c) {
+  assert(Is_block(b));
+  assert(Is_in_ram(b));
+  mlsize_t idx = Int_val(i);
+  mlsize_t len = string_length(b);
+  if (idx >= len) caml_raise_index_out_of_bounds();
+  Ram_string_field(b, idx) = Int_val(c);
+  return Val_unit;
 }
 
 value caml_string_of_int(value v) {

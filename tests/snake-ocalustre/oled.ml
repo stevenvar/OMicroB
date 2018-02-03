@@ -8,14 +8,14 @@ external get_byte_buffer : unit -> int = "caml_buffer_get_byte"
 
 let boot_program =
   [|
-    0xD5 ; 0xF0 ; (* Set display clock divisor = 0xF0 *)
-    0x8D ; 0x14; (* Enable charge Pump *)
-    0xA1 ; (* Set segment re-map *)
-    0xC8 ; (* Set COM Output scan direction *)
+    0xD5; 0xF0; (* Set display clock divisor = 0xF0 *)
+    0x8D; 0x14; (* Enable charge Pump *)
+    0xA1;       (* Set segment re-map *)
+    0xC8;       (* Set COM Output scan direction *)
     0x81; 0xCF; (* Set contrast = 0xCF *)
     0xD9; 0xF1; (* Set precharge = 0xF1 *)
-    0xAF; (* Display ON *)
-    0x20; 0x00 (* Set display mode = horizontal addressing mode *)
+    0xAF;       (* Display ON *)
+    0x20; 0x00; (* Set display mode = horizontal addressing mode *)
   |]
 
 let transfer_program prog =

@@ -123,21 +123,21 @@ extern float float_of_value(value v);
 /* Blocks */
 
 #define Ram_field(val, i) (Ram_block_val(val)[i])
-#define Ram_string_field(val, i) (((char *) Ram_block_val(val))[i])
+#define Ram_string_field(val, i) (((uint8_t *) Ram_block_val(val))[i])
 
 #ifdef __AVR__
 #define Flash_field(val, i) (pgm_read_dword_near(Flash_block_val(val) + i))
-#define Flash_string_field(val, i) ((char) pgm_read_byte_near((char *) Flash_block_val(val) + i))
+#define Flash_string_field(val, i) ((uint8_t) pgm_read_byte_near((uint8_t *) Flash_block_val(val) + i))
 #else
 #define Flash_field(val, i) (Flash_block_val(val)[i])
-#define Flash_string_field(val, i) (((char *) Flash_block_val(val))[i])
+#define Flash_string_field(val, i) (((uint8_t *) Flash_block_val(val))[i])
 #endif
 
 #define Field(val, i) (Is_in_ram(val) ? Ram_field(val, i) : Flash_field(val, i))
 #define String_field(val, i) (Is_in_ram(val) ? Ram_string_field(val, i) : Flash_string_field(val, i))
 
 #define Ram_hd_val(val) Ram_field(val, -1)
-#define Ram_string_val(val) ((char *) Ram_block_val(val))
+#define Ram_string_val(val) ((uint8_t *) Ram_block_val(val))
 
 #define Hd_val(val) Field(val, -1)
 
