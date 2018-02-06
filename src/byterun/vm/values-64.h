@@ -5,6 +5,8 @@ Floatting point values: ieee754 with only one NaN
                           NaN : 0111 1111 1111 0100  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
                          +inf : 0111 1111 1111 0000  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
                          -inf : 1000 0000 0000 1111  1111 1111 1111 1111  1111 1111 1111 1111  1111 1111 1111 1111 (unique)
+                          +0. : 0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
+                          -0. : 1111 1111 1111 1111  1111 1111 1111 1111  1111 1111 1111 1111  1111 1111 1111 1111 (unique)
         other positive floats : 0eee eeee eeee mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm (as is, collide int)
         other negative floats : 1eee eeee eeee mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm (with exponant and mantiss inverted, collide int and code pointer)
 
@@ -84,7 +86,7 @@ typedef uint32_t code_t;
 // (x) is assumed to be a block, is it in one of the ram heaps?
 #define Is_in_ram(x)                ((((uint8_t) ((uint64_t) (x) >> 48)) & 0x04) == 0x00)
 
-// (x) is assumed to be an integer, can it be a code pointer? (pretty-printing purpose)
+// Is a value can be a code pointer? (pretty-printing purpose)
 #define Maybe_code_pointer(x)       (Is_int(x) && ((uint64_t) (x) >> 62) == 0x2)
 
 /******************************************************************************/
@@ -103,13 +105,11 @@ typedef uint32_t code_t;
 #define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)
 
-union float_or_value { double f; value v; };
+extern value value_of_double(double x);
+extern double double_of_value(value v);
 
-#define bitwise_value_of_float(x) (((union float_or_value) { .f = (x) }).v)
-#define bitwise_float_of_value(x) (((union float_or_value) { .v = (x) }).f)
-
-#define Val_float(x) ((double) (x) != (double) (x) ? Val_nan : (bitwise_value_of_float((double) (x)) < 0 ? bitwise_value_of_float((double) (x)) ^ 0x7FFFFFFFFFFFFFFF : bitwise_value_of_float((double) (x))))
-#define Float_val(x) ((value) (x) < 0 ? bitwise_float_of_value((value) (x) ^ 0x7FFFFFFFFFFFFFFF) : bitwise_float_of_value((value) (x)))
+#define Val_float(x) (value_of_double(x))
+#define Float_val(x) (double_of_value(x))
 
 #define Val_codeptr(x) ((value) (((uint64_t) (x) << 1) | 0x8000000000000001))
 #define Codeptr_val(x) (((uint64_t) (x) >> 1) & 0x7FFFFFFFFFFFFFFF)
@@ -123,6 +123,10 @@ union float_or_value { double f; value v; };
 #define Val_true  ((value) 0x3)
 #define Val_unit  ((value) 0x1)
 #define Val_nan   ((value) 0x7FF4000000000000)
+#define Val_inf   ((value) 0x7FF0000000000000)
+#define Val_ninf  ((value) 0x800FFFFFFFFFFFFF)
+#define Val_zero  ((value) 0x0000000000000000)
+#define Val_nzero ((value) 0xFFFFFFFFFFFFFFFF)
 
 /******************************************************************************/
 /* Blocks */

@@ -1,5 +1,6 @@
 /* Structural comparison */
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "values.h"
@@ -24,8 +25,8 @@ static int8_t compare_customs(uint8_t flag, value v1, value v2) {
 
 /******************************************************************************/
 
-static int8_t compare_val(value v1, value v2) {
-  if (v1 == v2) {
+static int8_t compare_val(value v1, value v2, bool total) {
+  if (v1 == v2 && total) {
     return 0;
   }
 
@@ -67,10 +68,10 @@ static int8_t compare_val(value v1, value v2) {
         if (sz1 > sz2) return 1;
         if (sz1 == 0) return 0;
         for (i = 0; i < sz1 - 1; i ++) {
-          res = compare_val(Field(v1, i), Field(v2, i));
+          res = compare_val(Field(v1, i), Field(v2, i), total);
           if (res != 0) return res;
         }
-        return compare_val(Field(v1, sz1 - 1), Field(v2, sz2 - 1));
+        return compare_val(Field(v1, sz1 - 1), Field(v2, sz2 - 1), total);
       }
       }
     } else {
@@ -85,44 +86,44 @@ static int8_t compare_val(value v1, value v2) {
   } else if (v2 == Val_nan) {
     return 1;
   } else {
-    return v1 < v2 ? -1 : 1;
+    return v1 < v2 ? -1 : v1 > v2 ? 1 : 0;
   }
 }
 
 /******************************************************************************/
 
 value caml_equal(value v1, value v2) {
-  int res = compare_val(v1, v2);
+  int res = compare_val(v1, v2, false);
   return Val_int(res == 0);
 }
 
 value caml_notequal(value v1, value v2) {
-  int res = compare_val(v1, v2);
+  int res = compare_val(v1, v2, false);
   return Val_int(res != 0);
 }
 
 value caml_lessthan(value v1, value v2) {
-  int res = compare_val(v1, v2);
+  int res = compare_val(v1, v2, false);
   return Val_int(res < 0);
 }
 
 value caml_lessequal(value v1, value v2) {
-  int res = compare_val(v1, v2);
+  int res = compare_val(v1, v2, false);
   return Val_int(res <= 0);
 }
 
 value caml_greaterthan(value v1, value v2) {
-  int res = compare_val(v1, v2);
+  int res = compare_val(v1, v2, false);
   return Val_int(res > 0);
 }
 
 value caml_greaterequal(value v1, value v2) {
-  int res = compare_val(v1, v2);
+  int res = compare_val(v1, v2, false);
   return Val_int(res >= 0);
 }
 
 value caml_compare(value v1, value v2) {
-  return Val_int(compare_val(v1, v2));
+  return Val_int(compare_val(v1, v2, true));
 }
 
 /******************************************************************************/

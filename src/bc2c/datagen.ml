@@ -50,7 +50,7 @@ let nativeint_bytes n =
 let float_bytes arch x =
   match arch with
   | Arch.A16 -> (
-    let   nan15 = [ 0x7E; 0x01 ] in
+    let   nan15 = [ 0xFF; 0xFC ] in
     let  zero15 = [ 0x00; 0x01 ] in
     let nzero15 = [ 0xFF; 0xFF ] in
     let   inf15 = [ 0x7C; 0x01 ] in

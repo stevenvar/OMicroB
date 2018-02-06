@@ -2,9 +2,11 @@
   16 bits version of values:
 
 Floatting point values: only one NaN
-                          NaN : 0111 1110 0000 0001 (unique)
+                          NaN : 1111 1111 1111 1100 (unique)
                          +inf : 0111 1100 0000 0001 (unique)
                          -inf : 1000 0011 1111 1111 (unique)
+                          +0. : 0000 0000 0000 0001 (unique)
+                          -0. : 1111 1111 1111 1111 (unique)
                  other floats : seee eemm mmmm mmm1 (as is, collide int and code pointer)
 
 Integers, constant variants, etc:
@@ -20,6 +22,8 @@ dynamic heap pointers   (ram) : xxxx xxxx xxxx xx00 (range [ #static .. #static 
                    red header : tttt tttt ssss ss01
                  black header : tttt tttt ssss ss10
                  brown header : tttt tttt ssss ss11
+
+              unaligned_block : xxxx xxxx xxxx xx10
 
 OCaml values:
                         value : uniform representation of an OCaml value
@@ -81,8 +85,8 @@ typedef uint32_t code_t;
 // (x) is assumed to be a block, is it in one of the ram heaps?
 #define Is_in_ram(x)                ((uvalue) (x) < (((uvalue) OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE) << 2))
 
-// (x) is assumed to be an integer, can it be a code pointer? (pretty-printing purpose)
-#define Maybe_code_pointer(x)       ((uvalue) (x) >= (((uvalue) ROUND_RAM_WOSIZE + OCAML_FLASH_HEAP_WOSIZE) << 2))
+// Is a value can be a code pointer? (pretty-printing purpose)
+#define Maybe_code_pointer(x)       Is_int(x)
 
 /******************************************************************************/
 /* Conversions */
@@ -117,7 +121,11 @@ extern float float_of_value(value v);
 #define Val_false ((value) 0x1)
 #define Val_true  ((value) 0x3)
 #define Val_unit  ((value) 0x1)
-#define Val_nan   ((value) 0x7E01)
+#define Val_nan   ((value) 0xFFFC)
+#define Val_inf   ((value) 0x7C01)
+#define Val_ninf  ((value) 0x83FF)
+#define Val_zero  ((value) 0x0001)
+#define Val_nzero ((value) 0xFFFF)
 
 /******************************************************************************/
 /* Blocks */

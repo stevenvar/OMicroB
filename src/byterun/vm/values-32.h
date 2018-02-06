@@ -5,6 +5,8 @@ Floatting point values: ieee754 with only one NaN
                           NaN : 0111 1111 1010 0000 0000 0000 0000 0000 (unique)
                          +inf : 0111 1111 1000 0000 0000 0000 0000 0000 (unique)
                          -inf : 1000 0000 0111 1111 1111 1111 1111 1111 (unique)
+                          +0. : 0000 0000 0000 0000 0000 0000 0000 0000 (unique)
+                          -0. : 1111 1111 1111 1111 1111 1111 1111 1111 (unique)
         other positive floats : 0eee eeee emmm mmmm mmmm mmmm mmmm mmmm (as is, collide int)
         other negative floats : 1eee eeee emmm mmmm mmmm mmmm mmmm mmmm (with exponant and mantiss inverted, collide int and code pointer)
 
@@ -84,7 +86,7 @@ typedef uint32_t code_t;
 // (x) is assumed to be a block, is it in one of the ram heaps?
 #define Is_in_ram(x)                ((((uint8_t) ((uint32_t) (x) >> 16)) & 0x20) == 0x00)
 
-// (x) is assumed to be an integer, can it be a code pointer? (pretty-printing purpose)
+// Is a value can be a code pointer? (pretty-printing purpose)
 #define Maybe_code_pointer(x)       (Is_int(x) && ((uint32_t) (x) >> 30) == 0x2)
 
 /******************************************************************************/
@@ -103,13 +105,11 @@ typedef uint32_t code_t;
 #define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)
 
-union float_or_value { float f; value v; };
+extern value value_of_float(float x);
+extern float float_of_value(value v);
 
-#define bitwise_value_of_float(x) (((union float_or_value) { .f = (x) }).v)
-#define bitwise_float_of_value(x) (((union float_or_value) { .v = (x) }).f)
-
-#define Val_float(x) ((float) (x) != (float) (x) ? Val_nan : (bitwise_value_of_float((float) (x)) < 0 ? bitwise_value_of_float((float) (x)) ^ 0x7FFFFFFF : bitwise_value_of_float((float) (x))))
-#define Float_val(x) ((value) (x) < 0 ? bitwise_float_of_value((value) (x) ^ 0x7FFFFFFF) : bitwise_float_of_value((value) (x)))
+#define Val_float(x) (value_of_float(x))
+#define Float_val(x) (float_of_value(x))
 
 #define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
 #define Codeptr_val(x) (((uint32_t) (x) >> 1) & 0x7FFFFFFF)
@@ -123,6 +123,10 @@ union float_or_value { float f; value v; };
 #define Val_true  ((value) 0x3)
 #define Val_unit  ((value) 0x1)
 #define Val_nan   ((value) 0x7FA00000)
+#define Val_inf   ((value) 0x7F900000)
+#define Val_ninf  ((value) 0x807FFFFF)
+#define Val_zero  ((value) 0x00000000)
+#define Val_nzero ((value) 0xFFFFFFFF)
 
 /******************************************************************************/
 /* Blocks */

@@ -9,15 +9,26 @@ let mktbl =
     else loop (i - 1) (Array.append [| 1. /. float_of_int i |] acc) in
   fun i -> loop i [||]
 
-let test_cmp x y =
-  trace ("compare " ^ string_of_float x ^ " " ^ string_of_float y ^ " = " ^ string_of_int (compare x y))
+let generic_cmp x y = compare x y
+let generic_eq x y = x = y
+
+let test_float_cmp x y =
+  trace ("Float.compare " ^ string_of_float x ^ " " ^ string_of_float y ^ " = " ^ string_of_int (compare x y))
+
+let test_pervasives_cmp x y =
+  trace ("Pervasives.compare " ^ string_of_float x ^ " " ^ string_of_float y ^ " = " ^ string_of_int (generic_cmp x y))
 
 let test_op name op x y =
   trace (string_of_float x ^ name ^ string_of_float y ^ " = " ^ string_of_bool (op x y))
 
 let test_all xys =
+  trace "################################";
   List.iter (fun (x, y) ->
-    test_cmp x y;
+    test_float_cmp x y;
+  ) xys;
+  trace "################################";
+  List.iter (fun (x, y) ->
+    test_pervasives_cmp x y;
   ) xys;
   List.iter (fun (name, op) ->
     trace "################################";
@@ -25,12 +36,12 @@ let test_all xys =
       test_op name op x y;
     ) xys;
   ) [
-    (" < ", (<));
-    (" > ", (>));
-    (" <= ", (<=));
-    (" >= ", (>=));
-    (" = ", (=));
-    (" <> ", (<>));
+    (" < "  , ( <  ));
+    (" > "  , ( >  ));
+    (" <= " , ( <= ));
+    (" >= " , ( >= ));
+    (" = "  , ( =  ));
+    (" <> " , ( <> ));
   ]
     
 let () =
@@ -43,10 +54,13 @@ let () =
   trace (string_of_float 3.14);
   trace (string_of_float (-3.14));
   trace (string_of_float (prod (mktbl 4)));
+  trace (if generic_eq 16128 16128 then "OK" else "Ouch!");
   test_all [
     (3.14, 6.99);
     (-19.8, 983.);
     (-3., -17.);
+    ((if true then 0. else 0.), 0.);
+    (-0., 0.);
     (nan, -123.);
     (nan, 0.);
     (nan, 123.);
