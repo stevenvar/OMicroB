@@ -51,10 +51,10 @@ let float_bytes arch x =
   match arch with
   | Arch.A16 -> (
     let   nan15 = [ 0xFF; 0xFC ] in
-    let  zero15 = [ 0x00; 0x01 ] in
-    let nzero15 = [ 0xFF; 0xFF ] in
     let   inf15 = [ 0x7C; 0x01 ] in
     let  ninf15 = [ 0x83; 0xFF ] in
+    let  zero15 = [ 0x00; 0x01 ] in
+    let nzero15 = [ 0xFF; 0xF8 ] in
     match classify_float x with
     | FP_nan       -> nan15
     | FP_subnormal -> if copysign 1. x > 0. then zero15 else nzero15
@@ -83,9 +83,17 @@ let float_bytes arch x =
     )
   )
   | Arch.A32 -> (
-    if classify_float x = FP_nan then (
-      [ 0x7F; 0xA0; 0x00; 0x00 ]
-    ) else (
+    let   nan32 = [ 0x7F; 0xA0; 0x00; 0x00 ] in
+    let   inf32 = [ 0x7F; 0x80; 0x00; 0x00 ] in
+    let  ninf32 = [ 0x80; 0x7F; 0xFF; 0xFF ] in
+    let  zero32 = [ 0x00; 0x00; 0x00; 0x00 ] in
+    let nzero32 = [ 0x7F; 0xB0; 0x00; 0x00 ] in
+    match classify_float x with
+    | FP_nan       -> nan32
+    | FP_subnormal -> if copysign 1. x > 0. then zero32 else nzero32
+    | FP_zero      -> if copysign 1. x > 0. then zero32 else nzero32
+    | FP_infinite  -> if x > 0. then inf32 else ninf32
+    | FP_normal -> (
       let n = Int32.bits_of_float x in
       let (n3, n2, n1, n0) = int32_bytes n in
       if n3 land 0x80 <> 0 then
@@ -95,9 +103,17 @@ let float_bytes arch x =
     )
   )
   | Arch.A64 -> (
-    if classify_float x = FP_nan then (
-      [ 0x7F; 0xF4; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ]
-    ) else (
+    let   nan64 = [ 0x7F; 0xF4; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ] in
+    let   inf64 = [ 0x7F; 0xF0; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ] in
+    let  ninf64 = [ 0x80; 0x0F; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF; 0xFF ] in
+    let  zero64 = [ 0x00; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ] in
+    let nzero64 = [ 0x7F; 0xF6; 0x00; 0x00; 0x00; 0x00; 0x00; 0x00 ] in
+    match classify_float x with
+    | FP_nan       -> nan64
+    | FP_subnormal -> if copysign 1. x > 0. then zero64 else nzero64
+    | FP_zero      -> if copysign 1. x > 0. then zero64 else nzero64
+    | FP_infinite  -> if x > 0. then inf64 else ninf64
+    | FP_normal -> (
       let n = Int64.bits_of_float x in
       let (n7, n6, n5, n4, n3, n2, n1, n0) = int64_bytes n in
       if n7 land 0x80 <> 0 then

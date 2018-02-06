@@ -25,6 +25,8 @@ static int8_t compare_customs(uint8_t flag, value v1, value v2) {
 
 /******************************************************************************/
 
+#define UNORDERED 2
+
 static int8_t compare_val(value v1, value v2, bool total) {
   if (v1 == v2 && total) {
     return 0;
@@ -82,9 +84,11 @@ static int8_t compare_val(value v1, value v2, bool total) {
     if (Tag_val(v2) == Custom_tag) return compare_customs(Field(v2, 0), v1, v2);
     return -1;
   } else if (v1 == Val_nan) {
-    return -1;
+    return total ? -1 : UNORDERED;
   } else if (v2 == Val_nan) {
-    return 1;
+    return total ?  1 : UNORDERED;
+  } else if ((v1 == Val_nzero && v2 == Val_zero) || (v2 == Val_zero && v2 == Val_nzero)) {
+    return 0;
   } else {
     return v1 < v2 ? -1 : v1 > v2 ? 1 : 0;
   }
@@ -93,37 +97,38 @@ static int8_t compare_val(value v1, value v2, bool total) {
 /******************************************************************************/
 
 value caml_equal(value v1, value v2) {
-  int res = compare_val(v1, v2, false);
+  int8_t res = compare_val(v1, v2, false);
   return Val_int(res == 0);
 }
 
 value caml_notequal(value v1, value v2) {
-  int res = compare_val(v1, v2, false);
-  return Val_int(res != 0);
+  int8_t res = compare_val(v1, v2, false);
+  return Val_int(res != 0); // Warning: UNORDERED is considered as not equal
 }
 
 value caml_lessthan(value v1, value v2) {
-  int res = compare_val(v1, v2, false);
+  int8_t res = compare_val(v1, v2, false);
   return Val_int(res < 0);
 }
 
 value caml_lessequal(value v1, value v2) {
-  int res = compare_val(v1, v2, false);
+  int8_t res = compare_val(v1, v2, false);
   return Val_int(res <= 0);
 }
 
 value caml_greaterthan(value v1, value v2) {
-  int res = compare_val(v1, v2, false);
-  return Val_int(res > 0);
+  int8_t res = compare_val(v1, v2, false);
+  return Val_int(res > 0 && res != UNORDERED);
 }
 
 value caml_greaterequal(value v1, value v2) {
-  int res = compare_val(v1, v2, false);
-  return Val_int(res >= 0);
+  int8_t res = compare_val(v1, v2, false);
+  return Val_int(res >= 0 && res != UNORDERED);
 }
 
 value caml_compare(value v1, value v2) {
-  return Val_int(compare_val(v1, v2, true));
+  int8_t res = compare_val(v1, v2, true);
+  return Val_int(res);
 }
 
 /******************************************************************************/

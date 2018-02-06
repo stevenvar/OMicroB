@@ -17,6 +17,8 @@ value value_of_float(float x) {
     return Val_inf;
   } else if (x == -INFINITY) {
     return Val_ninf;
+  } else if (x == 0.) {
+    return copysignf(1., x) > 0 ? Val_zero : Val_nzero;
   } else {
     union float_or_uint32 fou = { .f = x };
     uint32_t n = fou.n;
@@ -30,8 +32,13 @@ value value_of_float(float x) {
     } else if (exponent < 0x90) {
       uint8_t b1 = (sign << 7) | ((exponent & 0x80) >> 1) | ((exponent & 0x0F) << 2) | ((uint8_t) (m15 >> 7));
       uint8_t b0 = ((m15 << 1) & 0xFF) | 1;
-      if (sign == 0) return ((uint16_t) b1 << 8) | ((uint16_t) b0);
-      else return (((uint16_t) b1 ^ 0x7F) << 8) | ((uint16_t) b0 ^ 0xFE);
+      if (b1 == 0x80 && b0 == 0x01) {
+        return Val_nzero;
+      } else if (sign == 0) {
+        return ((uint16_t) b1 << 8) | ((uint16_t) b0);
+      } else {
+        return (((uint16_t) b1 ^ 0x7F) << 8) | ((uint16_t) b0 ^ 0xFE);
+      }
     } else if (sign == 0) {
       return Val_inf;
     } else {
@@ -78,6 +85,8 @@ union float_or_value { float f; value v; };
 value value_of_float(float x) {
   if (x != x) {
     return Val_nan;
+  } else if (x == 0.) {
+    return copysignf(1., x) > 0 ? Val_zero : Val_nzero;
   } else {
     value v = bitwise_value_of_float(x);
     if (v < 0) {
@@ -89,7 +98,9 @@ value value_of_float(float x) {
 }
 
 float float_of_value(value v) {
-  if (v < 0) {
+  if (v == Val_nzero) {
+    return -0.;
+  } else if (v < 0) {
     return bitwise_float_of_value(v ^ 0x7FFFFFFF);
   } else {
     return bitwise_float_of_value(v);
@@ -110,6 +121,8 @@ union double_or_value { double f; value v; };
 value value_of_double(double x) {
   if (x != x) {
     return Val_nan;
+  } else if (x == 0.l) {
+    return copysign(1., x) > 0 ? Val_zero : Val_nzero;
   } else {
     value v = bitwise_value_of_double(x);
     if (v < 0) {
@@ -121,7 +134,9 @@ value value_of_double(double x) {
 }
 
 double double_of_value(value v) {
-  if (v < 0) {
+  if (v == Val_nzero) {
+    return -0.l;
+  } else if (v < 0) {
     return bitwise_double_of_value(v ^ 0x7FFFFFFFFFFFFFFF);
   } else {
     return bitwise_double_of_value(v);

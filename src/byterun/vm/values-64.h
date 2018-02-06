@@ -6,7 +6,7 @@ Floatting point values: ieee754 with only one NaN
                          +inf : 0111 1111 1111 0000  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
                          -inf : 1000 0000 0000 1111  1111 1111 1111 1111  1111 1111 1111 1111  1111 1111 1111 1111 (unique)
                           +0. : 0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
-                          -0. : 1111 1111 1111 1111  1111 1111 1111 1111  1111 1111 1111 1111  1111 1111 1111 1111 (unique)
+                          -0. : 0111 1111 1111 0110  0000 0000 0000 0000  0000 0000 0000 0000  0000 0000 0000 0000 (unique)
         other positive floats : 0eee eeee eeee mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm (as is, collide int)
         other negative floats : 1eee eeee eeee mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm  mmmm mmmm mmmm mmmm (with exponant and mantiss inverted, collide int and code pointer)
 
@@ -126,7 +126,7 @@ extern double double_of_value(value v);
 #define Val_inf   ((value) 0x7FF0000000000000)
 #define Val_ninf  ((value) 0x800FFFFFFFFFFFFF)
 #define Val_zero  ((value) 0x0000000000000000)
-#define Val_nzero ((value) 0xFFFFFFFFFFFFFFFF)
+#define Val_nzero ((value) 0x7FF6000000000000)
 
 /******************************************************************************/
 /* Blocks */

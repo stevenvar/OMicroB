@@ -10,7 +10,12 @@ let mktbl =
   fun i -> loop i [||]
 
 let generic_cmp x y = compare x y
-let generic_eq x y = x = y
+let generic_eq  x y = x =  y
+let generic_neq x y = x <> y
+let generic_lt  x y = x <  y
+let generic_gt  x y = x >  y
+let generic_le  x y = x <= y
+let generic_ge  x y = x >= y
 
 let test_float_cmp x y =
   trace ("Float.compare " ^ string_of_float x ^ " " ^ string_of_float y ^ " = " ^ string_of_int (compare x y))
@@ -30,6 +35,7 @@ let test_all xys =
   List.iter (fun (x, y) ->
     test_pervasives_cmp x y;
   ) xys;
+  trace "################################";
   List.iter (fun (name, op) ->
     trace "################################";
     List.iter (fun (x, y) ->
@@ -42,6 +48,20 @@ let test_all xys =
     (" >= " , ( >= ));
     (" = "  , ( =  ));
     (" <> " , ( <> ));
+  ];
+  trace "################################";
+  List.iter (fun (name, op) ->
+    trace "################################";
+    List.iter (fun (x, y) ->
+      test_op name op x y;
+    ) xys;
+  ) [
+    (" < "  , generic_lt);
+    (" > "  , generic_gt);
+    (" <= " , generic_le);
+    (" >= " , generic_ge);
+    (" = "  , generic_eq);
+    (" <> " , generic_neq);
   ]
     
 let () =

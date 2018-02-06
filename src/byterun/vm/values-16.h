@@ -6,7 +6,7 @@ Floatting point values: only one NaN
                          +inf : 0111 1100 0000 0001 (unique)
                          -inf : 1000 0011 1111 1111 (unique)
                           +0. : 0000 0000 0000 0001 (unique)
-                          -0. : 1111 1111 1111 1111 (unique)
+                          -0. : 1111 1111 1111 1000 (unique)
                  other floats : seee eemm mmmm mmm1 (as is, collide int and code pointer)
 
 Integers, constant variants, etc:
@@ -125,7 +125,7 @@ extern float float_of_value(value v);
 #define Val_inf   ((value) 0x7C01)
 #define Val_ninf  ((value) 0x83FF)
 #define Val_zero  ((value) 0x0001)
-#define Val_nzero ((value) 0xFFFF)
+#define Val_nzero ((value) 0xFFF8)
 
 /******************************************************************************/
 /* Blocks */
