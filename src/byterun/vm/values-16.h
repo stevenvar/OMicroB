@@ -117,7 +117,7 @@ extern float float_of_value(value v);
 #define Val_false ((value) 0x1)
 #define Val_true  ((value) 0x3)
 #define Val_unit  ((value) 0x1)
-#define Val_nan   ((value) 0x7C01)
+#define Val_nan   ((value) 0x7E01)
 
 /******************************************************************************/
 /* Blocks */
@@ -141,7 +141,7 @@ extern float float_of_value(value v);
 
 #define Hd_val(val) Field(val, -1)
 
-#define Make_string_data(c1, c0) (((value) (c0) << 8) | ((value) (c1)))
+#define Make_string_data(c1, c0) ((value) (((value) (c0) << 8) | ((value) (c1))))
 
 #define Make_custom_data(b0, b1) Make_string_data(b0, b1)
 

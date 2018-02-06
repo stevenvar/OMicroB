@@ -51,4 +51,5 @@ type dword =
 type cword =
 | SBYTE  of int
 | UBYTE  of int
+| XBYTE  of int
 | OPCODE of Opcode.t

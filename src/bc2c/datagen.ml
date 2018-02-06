@@ -50,7 +50,37 @@ let nativeint_bytes n =
 let float_bytes arch x =
   match arch with
   | Arch.A16 -> (
-    assert false (* TODO *)
+    let   nan15 = [ 0x7E; 0x01 ] in
+    let  zero15 = [ 0x00; 0x01 ] in
+    let nzero15 = [ 0xFF; 0xFF ] in
+    let   inf15 = [ 0x7C; 0x01 ] in
+    let  ninf15 = [ 0x83; 0xFF ] in
+    match classify_float x with
+    | FP_nan       -> nan15
+    | FP_subnormal -> if copysign 1. x > 0. then zero15 else nzero15
+    | FP_zero      -> if copysign 1. x > 0. then zero15 else nzero15
+    | FP_infinite  -> if x > 0. then inf15 else ninf15
+    | FP_normal -> (
+      let n = Int32.bits_of_float x in
+      let (n3, n2, n1, n0) = int32_bytes n in
+      let sign = n3 lsr 7 in
+      let exponent = ((n3 land 0x7F) lsl 1) lor (n2 lsr 7) in
+      let mantissa = ((n2 land 0x7F) lsl 16) lor (n1 lsl 8) lor n0 in
+      let m15 = mantissa lsr 14 in
+      let m15 = if m15 <> 0x1FF && mantissa land 0x2000 <> 0 then m15 + 1 else m15 in
+      if exponent < 0b0111_0000 then (
+        if copysign 1. x > 0. then zero15 else nzero15
+      ) else if exponent < 0b1001_0000 then (
+        let b1 = (sign lsl 7) lor ((exponent land 0b1000_0000) lsr 1) lor ((exponent land 0b1111) lsl 2) lor (m15 lsr 7) in
+        let b0 = ((m15 lsl 1) land 0xFF) lor 1 in
+        if sign = 0 then [ b1; b0 ]
+        else [ b1 lxor 0x7F; b0 lxor 0xFE ]
+      ) else if sign = 0 then (
+        inf15
+      ) else (
+        ninf15
+      )
+    )
   )
   | Arch.A32 -> (
     if classify_float x = FP_nan then (

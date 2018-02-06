@@ -23,6 +23,11 @@ let export_code_from_codemap code codemap =
     bytecode := UBYTE n :: !bytecode;
     incr pc in
 
+  let export_xint8 n =
+    assert (n >= 0 && n < 0x100);
+    bytecode := XBYTE n :: !bytecode;
+    incr pc in
+
   let export_uint16 n =
     assert (n >= 0 && n < 0x10000);
     export_uint8 (n lsr 8);
@@ -511,10 +516,10 @@ let export_code_from_codemap code codemap =
       export_uint8 idx;
     | CONSTFLOAT bytes ->
       export_opcode Opcode.CONSTFLOAT;
-      List.iter export_uint8 bytes;
+      List.iter export_xint8 bytes;
     | PUSHCONSTFLOAT bytes ->
       export_opcode Opcode.PUSHCONSTFLOAT;
-      List.iter export_uint8 bytes;
+      List.iter export_xint8 bytes;
     | STD CONST0 | STD (CONSTINT 0) ->
       export_opcode Opcode.CONST0;
     | STD CONST1 | STD (CONSTINT 1) ->
@@ -699,7 +704,7 @@ let opcodes_of_bytecode bytecode =
   let htbl = Hashtbl.create 16 in
   List.iter (fun word ->
     match word with
-    | SBYTE _ | UBYTE _ -> ()
+    | SBYTE _ | UBYTE _ | XBYTE _ -> ()
     | OPCODE op -> Hashtbl.replace htbl op ()
   ) bytecode;
   let lst = Hashtbl.fold (fun op () acc -> op :: acc) htbl [] in

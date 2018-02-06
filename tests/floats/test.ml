@@ -35,8 +35,14 @@ let test_all xys =
     
 let () =
   pin_mode PIN9 OUTPUT;
-  trace (string_of_float (prod (mktbl 4)));
+  trace (string_of_float infinity);
+  trace (string_of_float neg_infinity);
+  trace (string_of_float 0.);
+  trace (string_of_float (-0.));
   trace (string_of_float nan);
+  trace (string_of_float 3.14);
+  trace (string_of_float (-3.14));
+  trace (string_of_float (prod (mktbl 4)));
   test_all [
     (3.14, 6.99);
     (-19.8, 983.);

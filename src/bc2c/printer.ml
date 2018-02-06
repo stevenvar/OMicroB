@@ -32,11 +32,14 @@ let print_codegen_word_array oc ty name size data =
     | UBYTE byte ->
       assert (byte >= 0 && byte < 0x100);
       string_of_int byte;
+    | XBYTE byte ->
+      assert (byte >= 0 && byte < 0x100);
+      Printf.sprintf "0x%02X" byte;
     | OPCODE opcode ->
       "OCAML_" ^ Opcode.to_string opcode
   and nl word =
     match word with
-    | SBYTE _ | UBYTE _ -> false
+    | SBYTE _ | UBYTE _ | XBYTE _ -> false
     | OPCODE _ -> true in
   print_c_array oc ty name size data pp nl
 
