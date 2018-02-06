@@ -48,18 +48,19 @@ let nexts code pc =
     Array.to_list ptrs
 
 let code_ptrs_of_value v =
-  let rec loop acc v =
-    match v with
-    | Int _ | Int32 _ | Int64 _ | Nativeint _
-    | Float _ | Float_array _ | Bytes _ ->
-      acc
-    | Object (_mut, vs) | Block (_mut, _, vs) ->
-      Array.fold_left loop acc vs
-    | Closure { ofs = _; ptrs; env } ->
-      Array.fold_left loop (Array.to_list ptrs @ acc) env
-    | CodePtr pc ->
-      pc :: acc in
-  loop [] v
+  let rec loop ((seen, ptrs) as acc) v =
+    if List.memq v seen then acc else
+      match v with
+      | Int _ | Int32 _ | Int64 _ | Nativeint _
+      | Float _ | Float_array _ | Bytes _ ->
+        acc
+      | Object (_mut, vs) | Block (_mut, _, vs) ->
+        Array.fold_left loop (v :: seen, ptrs) vs
+      | Closure { ofs = _; ptrs = new_ptrs; env } ->
+        Array.fold_left loop (v :: seen, Array.to_list new_ptrs @ ptrs) env
+      | CodePtr pc ->
+        (v :: seen, pc :: ptrs) in
+  snd (loop ([], []) v)
     
 let rec mark_living code living_code globals read_globals written_globals pc =
   assert (pc >= 0 && pc < Array.length code);

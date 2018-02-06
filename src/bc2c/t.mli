@@ -9,7 +9,7 @@ type value =
 | Float_array of mutability * float array
 | Bytes       of mutability * bytes
 | Object      of mutability * value array
-| Block       of mutability * int * value array
+| Block       of mutability * int ref * value array
 | Closure     of closure
 | CodePtr     of code_ptr
 

@@ -20,7 +20,7 @@ let rec bprint_value buf v =
   | Float_array (m, xs) -> Printf.bprintf buf "[%a|" bprint_mutability m; Array.iter (Printf.bprintf buf " %F;") xs; Printf.bprintf buf " |]"
   | Bytes        (m, b) -> Printf.bprintf buf "(%a) %S" bprint_mutability m (Bytes.unsafe_to_string b)
   | Object      (m, vs) -> Printf.bprintf buf "<%a|" bprint_mutability m; Array.iter (Printf.bprintf buf " %a;" bprint_value) vs; Printf.bprintf buf " >"
-  | Block  (m, tag, vs) -> Printf.bprintf buf "[%a|%d|" bprint_mutability m tag; Array.iter (Printf.bprintf buf " %a;" bprint_value) vs; Printf.bprintf buf " ]"
+  | Block  (m, tag, vs) -> Printf.bprintf buf "[%a|%d|" bprint_mutability m !tag; Array.iter (Printf.bprintf buf " %a;" bprint_value) vs; Printf.bprintf buf " ]"
   | Closure           _ -> Printf.bprintf buf "<fun>"
   | CodePtr          cp -> Printf.bprintf buf "#%d" cp
 
@@ -46,7 +46,7 @@ let make_import_value () =
         | OByteLib.Value.Float_array  xs -> Float_array (Immutable, Array.copy xs)
         | OByteLib.Value.String        s -> Bytes (Immutable, Bytes.of_string s)
         | OByteLib.Value.Object       vs -> Object (Immutable, Array.map import_value vs)
-        | OByteLib.Value.Block (tag, vs) -> Block (Immutable, tag, Array.map import_value vs) in
+        | OByteLib.Value.Block (tag, vs) -> Block (Immutable, ref tag, Array.map import_value vs) in
       Qhtbl.put qhtbl v result;
       result in
   import_value
@@ -192,7 +192,7 @@ let find_object_method obj meth =
       else bin_search tbl meth mi hi
   in
   assert (Array.length obj > 0);
-  let tbl = match obj.(0) with Block (_mut, 0, tbl) -> tbl | _ -> assert false in
+  let tbl = match obj.(0) with Block (_mut, { contents = 0 }, tbl) -> tbl | _ -> assert false in
   let hi = match tbl.(0) with Int hi -> (hi lsl 1) lor 1 | _ -> assert false in
   bin_search tbl meth 3 hi
 
@@ -207,11 +207,11 @@ let caml_array_concat lst =
   let rec to_list acc lst =
     match lst with
     | Int 0 -> acc
-    | Block (_mut0, 0, [| Block (_mut1, 0, v); rest |]) -> to_list (v :: acc) rest
+    | Block (_mut0, { contents = 0 }, [| Block (_mut1, { contents = 0 }, v); rest |]) -> to_list (v :: acc) rest
     | _ -> assert false in
   let l = List.rev (to_list [] lst) in
   let tbl = Array.concat l in
-  Block (Mutable, 0, tbl)
+  Block (Mutable, ref 0, tbl)
 
 let caml_hash =
   let trunc n = Int64.logand n 0xFFFF_FFFFL in
@@ -257,7 +257,7 @@ let caml_hash =
         | Int i -> decr limit; add (mul h 223L) (Int64.of_int (2 * i + 1))
         | _ -> assert false (* Impossible *)
       )
-      | Block (_mut, tag, tbl) ->
+      | Block (_mut, { contents = tag }, tbl) ->
         let sz = Array.length tbl in
         let h = add (mul h 223L) (Int64.of_int tag) in
         let rec loop h i =
@@ -326,13 +326,13 @@ let ccall arch ooid prim args =
   | "caml_gt_float",  [ Float x; Float y ] -> Int (if x >  y then 1 else 0)
   | "caml_eq_float",  [ Float x; Float y ] -> Int (if x =  y then 1 else 0)
   | "caml_neq_float", [ Float x; Float y ] -> Int (if x <> y then 1 else 0)
-  | "caml_array_append", [ Block (_mut0, 0, v0); Block (_mut1, 0, v1) ] -> Block (Mutable, 0, Array.append v0 v1)
-  | "caml_array_blit", [ Block (_mut0, 0, v0); Int s0; Block (mut1, 0, v1); Int s1; Int len ] -> assert (mut1 = Mutable); Array.blit v0 s0 v1 s1 len; Int 0
+  | "caml_array_append", [ Block (_mut0, { contents = 0 }, v0); Block (_mut1, { contents = 0 }, v1) ] -> Block (Mutable, ref 0, Array.append v0 v1)
+  | "caml_array_blit", [ Block (_mut0, { contents = 0 }, v0); Int s0; Block (mut1, { contents = 0 }, v1); Int s1; Int len ] -> assert (mut1 = Mutable); Array.blit v0 s0 v1 s1 len; Int 0
   | "caml_array_concat", [ lst ] -> caml_array_concat lst
-  | "caml_array_sub", [ Block (_mut, 0, v); Int ofs; Int len ] -> Block (Mutable, 0, Array.sub v ofs len)
-  | "caml_array_get_addr", [ Block (_mut, 0, tbl); Int ind ] -> Array.get tbl ind
-  | "caml_array_set_addr", [ Block (_mut, 0, tbl); Int ind; v ] -> Array.set tbl ind v; Int 0
-  | "caml_array_make_vect", [ Int len; init ] -> Block (Mutable, 0, Array.make len init)
+  | "caml_array_sub", [ Block (_mut, { contents = 0 }, v); Int ofs; Int len ] -> Block (Mutable, ref 0, Array.sub v ofs len)
+  | "caml_array_get_addr", [ Block (_mut, { contents = 0 }, tbl); Int ind ] -> Array.get tbl ind
+  | "caml_array_set_addr", [ Block (_mut, { contents = 0 }, tbl); Int ind; v ] -> Array.set tbl ind v; Int 0
+  | "caml_array_make_vect", [ Int len; init ] -> Block (Mutable, ref 0, Array.make len init)
   | "caml_asin_float", [ Float x ] -> Float (asin x)
   | "caml_atan2_float", [ Float x; Float y ] -> Float (atan2 x y)
   | "caml_atan_float", [ Float x ] -> Float (atan x)
@@ -355,9 +355,9 @@ let ccall arch ooid prim args =
   | "caml_string_of_float", [ Float x ] -> Bytes (Immutable, Bytes.of_string (format_float "%.3g" x))
   | "format_int", [ Bytes (_mut, b); Int i ] -> Bytes (Immutable, Bytes.of_string (format_int (Bytes.to_string b) i))
   | "string_of_int", [ Int i ] -> Bytes (Immutable, Bytes.of_string (format_int "%d" i))
-  | "caml_frexp_float", [ Float x ] -> let y, i = frexp x in Block (Immutable, 0, [| Float y; Int i |])
+  | "caml_frexp_float", [ Float x ] -> let y, i = frexp x in Block (Immutable, ref 0, [| Float y; Int i |])
   | "caml_gc_compaction", [ Int 0 ] -> Gc.compact (); Int 0
-  | "caml_gc_counters", [ Int 0 ] -> let x, y, z = Gc.counters () in Block (Immutable, 0, [| Float x; Float y; Float z |])
+  | "caml_gc_counters", [ Int 0 ] -> let x, y, z = Gc.counters () in Block (Immutable, ref 0, [| Float x; Float y; Float z |])
   | "caml_gc_full_major", [ Int 0 ] -> Gc.full_major (); Int 0
   | "caml_gc_huge_fallback_count", [ Int 0 ] -> Int (Gc.huge_fallback_count ())
   | "caml_gc_major", [ Int 0 ] -> Gc.major (); Int 0
@@ -390,10 +390,10 @@ let ccall arch ooid prim args =
   | "caml_log1p_float", [ Float x ] -> Float (log1p x)
   | "caml_log_float", [ Float x ] -> Float (log x)
   | "caml_make_float_vect", [ Int i ] -> Float_array (Mutable, Array.create_float i)
-  | "caml_make_vect", [ Int 0; _ ] -> Block (Mutable, 0, [||])
+  | "caml_make_vect", [ Int 0; _ ] -> Block (Mutable, ref 0, [||])
   | "caml_make_vect", [ Int i; Float x ] -> Float_array (Mutable, Array.make i x)
-  | "caml_make_vect", [ Int i; v ] -> Block (Mutable, 0, Array.make i v)
-  | "caml_modf_float", [ Float x ] -> let y, z = modf x in Block (Immutable, 0, [| Float y; Float z |])
+  | "caml_make_vect", [ Int i; v ] -> Block (Mutable, ref 0, Array.make i v)
+  | "caml_modf_float", [ Float x ] -> let y, z = modf x in Block (Immutable, ref 0, [| Float y; Float z |])
   | "caml_nativeint_format", [ Bytes (_mut, b); Nativeint i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Nativeint.format (Bytes.unsafe_to_string b) i))
   | "caml_nativeint_of_float", [ Float x ] -> Nativeint (Nativeint.of_float x)
   | "caml_nativeint_of_string", [ Bytes (_mut, b) ] -> Nativeint (Nativeint.of_string (Bytes.unsafe_to_string b))
@@ -406,7 +406,7 @@ let ccall arch ooid prim args =
   | "caml_tan_float", [ Float x ] -> Float (tan x)
   | "caml_tanh_float", [ Float x ] -> Float (tanh x)
   | "caml_fresh_oo_id", [ Int 0 ] -> Int (incr ooid; pred !ooid)
-  | "caml_obj_dup", [ Block (_mut, tag, tbl) ] -> Block (Mutable, tag, Array.copy tbl)
+  | "caml_obj_dup", [ Block (_mut, { contents = tag }, tbl) ] -> Block (Mutable, ref tag, Array.copy tbl)
   | "caml_unsafe_string_of_bytes", [ Bytes (_mut, b) ] -> Bytes (Immutable, Bytes.copy b)
   | "caml_unsafe_bytes_of_string", [ Bytes (_mut, b) ] -> Bytes (Mutable, Bytes.copy b)
   | "caml_sys_const_big_endian", [ Int 0 ] -> Int 0
@@ -415,6 +415,9 @@ let ccall arch ooid prim args =
   | "caml_sys_const_max_wosize", [ Int 0 ] -> Int (1 lsl (Arch.hd_size_bitcnt arch) - 1)
   | "caml_random_bits", [ Int 0 ] -> Int (Random.bits ())
   | "caml_compare", [ v0; v1 ] -> Int (caml_compare v0 v1)
+  | "caml_alloc_dummy", [ Int sz ] -> Block (Mutable, ref 0, Array.make sz (Int 0))
+  | "caml_update_dummy", [ Block (_mut1, tag1, tbl1); Block (_mut2, tag2, tbl2) ] -> assert (Array.length tbl1 = Array.length tbl1); tag1 := !tag2; Array.blit tbl2 0 tbl1 0 (Array.length tbl1); Int 0
+  | "caml_gc_run", [ Int 0 ] -> Int 0
   | _ ->
     begin
       match prim with
@@ -735,38 +738,38 @@ let exec arch prims globals code cycle_limit =
         incr pc;
 
       | ATOM0 ->
-        accu := Block (Immutable, 0, [||]);
+        accu := Block (Immutable, ref 0, [||]);
         incr pc;
       | ATOM tag ->
-        accu := Block (Immutable, tag, [||]);
+        accu := Block (Immutable, ref tag, [||]);
         incr pc;
       | PUSHATOM0 ->
         push stack !accu;
-        accu := Block (Immutable, 0, [||]);
+        accu := Block (Immutable, ref 0, [||]);
         incr pc;
       | PUSHATOM tag ->
         push stack !accu;
-        accu := Block (Immutable, tag, [||]);
+        accu := Block (Immutable, ref tag, [||]);
         incr pc;
 
       | MAKEBLOCK (tag, sz) ->
         let blk = Array.make sz !accu in
         for i = 1 to sz - 1 do blk.(i) <- pop stack done;
-        accu := Block (Mutable, tag, blk);
+        accu := Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEBLOCK1 tag ->
         let blk = [| !accu |] in
-        accu := Block (Mutable, tag, blk);
+        accu := Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEBLOCK2 tag ->
         let blk = [| !accu; pop stack |] in
-        accu := Block (Mutable, tag, blk);
+        accu := Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEBLOCK3 tag ->
         let v1 = pop stack in
         let v2 = pop stack in
         let blk = [| !accu; v1; v2 |] in
-        accu := Block (Mutable, tag, blk);
+        accu := Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEFLOATBLOCK sz ->
         let blk = Array.make sz (float_of_value !accu) in
@@ -851,7 +854,7 @@ let exec arch prims globals code cycle_limit =
         let ind =
           match !accu with
           | Int i -> i
-          | Block (_mut, tag, _values) -> tag + n land 0xFFFF
+          | Block (_mut, { contents = tag }, _values) -> tag + n land 0xFFFF
           | _ -> assert false in
         assert (ind >= 0 && ind < Array.length ptrs);
         pc := ptrs.(ind);
@@ -1012,7 +1015,7 @@ let exec arch prims globals code cycle_limit =
         incr pc;
       | OFFSETREF ofs -> (
         match !accu with
-        | Block (mut, 0, ([| n |] as tbl)) -> assert (mut = Mutable); tbl.(0) <- Int (int_of_value n + ofs)
+        | Block (mut, { contents = 0 }, ([| n |] as tbl)) -> assert (mut = Mutable); tbl.(0) <- Int (int_of_value n + ofs)
         | _ -> assert false
       )
 

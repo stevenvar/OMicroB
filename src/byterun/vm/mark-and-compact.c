@@ -26,7 +26,7 @@ void gc_init(void) {
 /******************************************************************************/
 /* GC: marking algorithm */
 
-#define UNIQUE_MARK Val_dynamic_block(ocaml_ram_heap)
+#define UNIQUE_MARK (Val_dynamic_block(ocaml_ram_heap) | Color_black)
 
 /* Mark a block as alive (with a Black color mark) and          */
 /* all blocks reachable from it, directy or indirectly.         */
@@ -54,7 +54,7 @@ static void mark_block(value *p) {
       header_t h = Ram_hd_val(v);
       tag_t tag = Tag_hd(h);
       if (tag == Infix_tag) {                                 /* Is infix?                               */
-        value *pstart = Ram_block_val(v)-Wosize_hd(h)-1;      /* Pointer to the beginning of the block   */
+        value *pstart = Ram_block_val(v) - Wosize_hd(h) - 1;  /* Pointer to the beginning of the block   */
         header_t hstart = *pstart;                            /* Main header of the block                */
         if (Color_hd(hstart) == Color_white) {                /* Not already marked as alive?            */
           *p = h;                                             /* Store the (red) infix header            */

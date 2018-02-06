@@ -242,7 +242,7 @@ let export arch codemap accu stack ram_globals flash_globals =
     | Float_array (mut, tbl) -> export_float_array mut tbl
     | Bytes (mut, str) -> export_bytes mut str
     | Object (mut, fields) -> export_block mut Obj.object_tag fields
-    | Block (mut, tag, fields) -> export_block mut tag fields
+    | Block (mut, { contents = tag }, fields) -> export_block mut tag fields
     | Closure closure -> export_closure closure
     | CodePtr pc -> export_code_ptr pc
 
@@ -414,11 +414,11 @@ let export arch codemap accu stack ram_globals flash_globals =
   and export_code_ptr code_ptr =
     CODEPTR codemap.(code_ptr) in
 
-  let atom0 = export_value (Block (Immutable, 0, [||])) in
+  let atom0 = export_value (Block (Immutable, ref 0, [||])) in
   
   let exceptions =
     List.map (fun (name, id) ->
-      let block = Block (Immutable, Obj.object_tag, [| Bytes (Immutable, Bytes.of_string name); Int id |]) in
+      let block = Block (Immutable, ref Obj.object_tag, [| Bytes (Immutable, Bytes.of_string name); Int id |]) in
       (name, export_value block)
     ) exception_list in
   
