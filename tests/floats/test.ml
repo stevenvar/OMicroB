@@ -64,20 +64,8 @@ let test_all xys =
     (" <> " , generic_neq);
   ]
 
-let rec l1 = 42. :: l1
-let rec l2 = 42. :: l2
-
 let () =
   pin_mode PIN9 OUTPUT;
-  Gc.run ();
-  begin
-    match l1, l2 with
-    | x :: _, y :: _ ->
-      trace (string_of_float x);
-      trace (string_of_float y);
-    | _ ->
-      trace "Ouch!"
-  end;
   trace (string_of_float infinity);
   trace (string_of_float neg_infinity);
   trace (string_of_float 0.);

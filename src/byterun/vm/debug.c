@@ -103,7 +103,7 @@ static void print_table(const char *name, const value *table, uint32_t table_wos
   const value *ptr;
   int i;
 
-  printf("%s (starts at %p, ends at %p, size = %" PRIu32 "d words) : \n", name, table, table + table_wosize, table_wosize);
+  printf("%s (starts at %p, ends at %p, size = %" PRIu32 " words) : \n", name, table, table + table_wosize, table_wosize);
 
   for (ptr = table, i = 0; ptr < table + table_wosize; ptr ++, i ++) {
 #ifdef OCAML_GC_STOP_AND_COPY
@@ -129,8 +129,10 @@ void print_ram_global_data(void) {
   print_table("RAM GLOBAL DATA", ocaml_ram_global_data, OCAML_RAM_GLOBDATA_NUMBER);
 }
 
+extern value *sp;
+
 void print_stack(void) {
-  print_table("STACK", ocaml_stack, OCAML_STACK_WOSIZE);
+  print_table("STACK", sp, OCAML_STACK_WOSIZE - (sp - ocaml_stack));
 }
 
 void print_flash_heap(void) {

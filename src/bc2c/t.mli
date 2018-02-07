@@ -14,9 +14,9 @@ type value =
 | CodePtr     of code_ptr
 
 and closure = {
-  ofs  : int;
-  ptrs : code_ptr array;
-  env  : value array;
+  mutable ofs  : int;
+  mutable ptrs : code_ptr array;
+  mutable env  : value array;
 }
 
 and ooid     = int

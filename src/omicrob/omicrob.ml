@@ -373,7 +373,7 @@ let run ?(vars=[]) strs =
     Buffer.add_string buf (quote_if_needed str);
   ) strs;
   let cmd = Buffer.contents buf in
-  if verbose then Printf.printf "+ %s\n%!" cmd;
+  if verbose then Printf.eprintf "+ %s\n%!" cmd;
   if not just_print then (
     match Sys.command cmd with
     | 0 -> ()

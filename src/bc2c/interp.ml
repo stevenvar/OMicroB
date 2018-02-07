@@ -13,9 +13,9 @@ let bprint_mutability buf mut =
 let rec bprint_value buf v =
   match v with
   | Int               i -> Printf.bprintf buf "%d"  i
-  | Int32             i -> Printf.bprintf buf "%ld" i
-  | Int64             i -> Printf.bprintf buf "%Ld" i
-  | Nativeint         i -> Printf.bprintf buf "%nd" i
+  | Int32             i -> Printf.bprintf buf "%ldl" i
+  | Int64             i -> Printf.bprintf buf "%LdL" i
+  | Nativeint         i -> Printf.bprintf buf "%ndn" i
   | Float             x -> Printf.bprintf buf "%F"  x
   | Float_array (m, xs) -> Printf.bprintf buf "[%a|" bprint_mutability m; Array.iter (Printf.bprintf buf " %F;") xs; Printf.bprintf buf " |]"
   | Bytes        (m, b) -> Printf.bprintf buf "(%a) %S" bprint_mutability m (Bytes.unsafe_to_string b)
@@ -29,6 +29,56 @@ let pprint_value v =
   bprint_value buf v;
   Buffer.contents buf
 
+let rec bprint_exception_arg buf arg =
+  match arg with
+  | Int        i -> Printf.bprintf buf "%d" i
+  | Int32      i -> Printf.bprintf buf "%ldl" i
+  | Int64      i -> Printf.bprintf buf "%LdL" i
+  | Nativeint  i -> Printf.bprintf buf "%ndn" i
+  | Float      f -> Printf.bprintf buf "%F" f
+  | Bytes (_, b) -> Printf.bprintf buf "%S" (Bytes.to_string b)
+  | Block (Immutable, { contents = 0 }, vs) ->
+    Buffer.add_char buf '(';
+    Array.iteri (fun i arg ->
+      if i > 0 then Buffer.add_string buf ", ";
+      bprint_exception_arg buf arg;
+    ) vs;
+    Buffer.add_char buf ')';
+  | Block (Mutable, { contents = 0 }, vs) ->
+    Buffer.add_string buf "[| ";
+    Array.iteri (fun i arg ->
+      if i > 0 then Buffer.add_string buf "; ";
+      bprint_exception_arg buf arg;
+    ) vs;
+    Buffer.add_string buf " |]";
+  | _ -> bprint_value buf arg
+    
+let pprint_exception_args name args =
+  match args with
+  | [] ->
+    name
+  | [ arg ] ->
+    let buf = Buffer.create 16 in
+    Printf.bprintf buf "%s %a" name bprint_exception_arg arg;
+    Buffer.contents buf
+  | arg0 :: rest ->
+    let buf = Buffer.create 16 in
+    Printf.bprintf buf "%s (%a" name bprint_exception_arg arg0;
+    List.iter (fun arg -> Printf.bprintf buf ", %a" bprint_exception_arg arg) rest;
+    Printf.bprintf buf ")";
+    Buffer.contents buf
+    
+let pprint_exception v =
+  match v with
+  | Object (_, [| Bytes (_, name); Int _ |]) ->
+    Bytes.to_string name
+  | Block (_, { contents = 0 }, tbl) -> (
+    match Array.to_list tbl with
+    | Object (_, [| Bytes (_, name); Int _ |]) :: args -> pprint_exception_args (Bytes.to_string name) args
+    | _ -> pprint_value v
+  )
+  | _ -> pprint_value v
+    
 (******************************************************************************)
 (* Conversion from OByteLib.Value.t to value. *)
 
@@ -416,7 +466,9 @@ let ccall arch ooid prim args =
   | "caml_random_bits", [ Int 0 ] -> Int (Random.bits ())
   | "caml_compare", [ v0; v1 ] -> Int (caml_compare v0 v1)
   | "caml_alloc_dummy", [ Int sz ] -> Block (Mutable, ref 0, Array.make sz (Int 0))
-  | "caml_update_dummy", [ Block (_mut1, tag1, tbl1); Block (_mut2, tag2, tbl2) ] -> assert (Array.length tbl1 = Array.length tbl1); tag1 := !tag2; Array.blit tbl2 0 tbl1 0 (Array.length tbl1); Int 0
+  | "caml_alloc_dummy_function", [ Int sz; Int _ ] -> Closure { ofs = 0; ptrs = [||]; env = Array.make sz (Int 0) }
+  | "caml_update_dummy", [ Block (_mut1, tag1, tbl1); Block (_mut2, tag2, tbl2) ] -> assert (Array.length tbl1 = Array.length tbl2); tag1 := !tag2; Array.blit tbl2 0 tbl1 0 (Array.length tbl1); Int 0
+  | "caml_update_dummy", [ Closure dummy; Closure newval ] -> dummy.ofs <- newval.ofs; dummy.ptrs <- Array.copy newval.ptrs; dummy.env <- Array.copy newval.env; Int 0
   | "caml_gc_run", [ Int 0 ] -> Int 0
   | _ ->
     begin
@@ -755,21 +807,21 @@ let exec arch prims globals code cycle_limit =
       | MAKEBLOCK (tag, sz) ->
         let blk = Array.make sz !accu in
         for i = 1 to sz - 1 do blk.(i) <- pop stack done;
-        accu := Block (Mutable, ref tag, blk);
+        accu := if tag = Obj.object_tag then Object (Mutable, blk) else Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEBLOCK1 tag ->
         let blk = [| !accu |] in
-        accu := Block (Mutable, ref tag, blk);
+        accu := if tag = Obj.object_tag then Object (Mutable, blk) else Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEBLOCK2 tag ->
         let blk = [| !accu; pop stack |] in
-        accu := Block (Mutable, ref tag, blk);
+        accu := if tag = Obj.object_tag then Object (Mutable, blk) else Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEBLOCK3 tag ->
         let v1 = pop stack in
         let v2 = pop stack in
         let blk = [| !accu; v1; v2 |] in
-        accu := Block (Mutable, ref tag, blk);
+        accu := if tag = Obj.object_tag then Object (Mutable, blk) else Block (Mutable, ref tag, blk);
         incr pc;
       | MAKEFLOATBLOCK sz ->
         let blk = Array.make sz (float_of_value !accu) in
@@ -875,7 +927,7 @@ let exec arch prims globals code cycle_limit =
         popn stack 4;
         incr pc;
       | RAISE | RERAISE | RAISE_NOTRACE -> 
-        if !trap_sp = -1 then failwith (Printf.sprintf "Evaluation failed: uncaught exception: %s.\n" (pprint_value !accu));
+        if !trap_sp = -1 then failwith (Printf.sprintf "Evaluation failed: uncaught exception: %s.\n" (pprint_exception !accu));
         let ofs = List.length !stack - !trap_sp in
         popn stack ofs;
         pc         := code_ptr_of_value (pop stack);
