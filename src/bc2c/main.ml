@@ -12,6 +12,8 @@ let debug            = ref false
 let verbose          = ref false
 let no_clean_interp  = ref false
 let no_shortcut_init = ref false
+let no_flash_heap    = ref false
+let no_flash_globals = ref false
 let bytecode_path    = ref None
 let lincludes        = ref []
 let gincludes        = ref []
@@ -36,6 +38,7 @@ let spec = [
    "<file.c> Include this local file into the generated file (with #include \"...\")");
   ("-I", Arg.String (fun path -> gincludes := path :: !gincludes),
    "<file.c> Include this global file into the generated file (with #include <...>)");
+
   ("-stack-size", Arg.Set_int stack_size,
    Printf.sprintf "<word-nb> Set stack size (default: %d)" !stack_size);
   ("-heap-size", Arg.Set_int total_heap_size,
@@ -44,16 +47,23 @@ let spec = [
    Printf.sprintf "<gc-algo> Set garbage collector algorithm Stop&Copy or Mark&Compact (default: %s)" !gc);
   ("-arch", Arg.Int (fun n -> arch := Arch.of_int n),
    Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %s)" (Arch.to_string !arch));
+
   ("-no-clean-interpreter", Arg.Set no_clean_interp,
    " Do not remove unused VM instructions, compile and link all of them");
   ("-no-shortcut-initialization", Arg.Set no_shortcut_init,
    " Do not improve starting time by evaluating the program initialization at compile time");
+  ("-no-flash-heap", Arg.Set no_flash_heap,
+   " Do not use flash to store immutable data from the heap known at compile time");
+  ("-no-flash-globals", Arg.Set no_flash_globals,
+   " Do not use flash to store immutable entries of the global data table");
+
   ("-debug", Arg.Set debug,
    " Generate code in debug mode");
   ("-verbose", Arg.Set verbose,
    " Increase verbosity");
   ("-version", Arg.Unit (fun () -> print_endline Config.version ; exit 0),
    " Print version and exit");
+
   ("-help", Arg.Unit (fun () -> !rusage ()),
    "");
   ("--help", Arg.Unit (fun () -> !rusage ()),
@@ -131,6 +141,8 @@ let local            = !local
 let debug            = !debug
 let no_clean_interp  = !no_clean_interp
 let no_shortcut_init = !no_shortcut_init
+let no_flash_heap    = !no_flash_heap
+let no_flash_globals = !no_flash_globals
 
 let () =
   if total_heap_size <= 0 then usage_error (Printf.sprintf "invalid heap size: %d" total_heap_size);
@@ -163,9 +175,9 @@ let () =
       let ooid, accu, stack, globals, prims, code =
         if no_shortcut_init then 0, T.Int 0, [], Interp.import_globals bytefile.OByteLib.Bytefile.data, bytefile.OByteLib.Bytefile.prim, bytefile.OByteLib.Bytefile.code
         else Cleaner.clean arch bytefile.OByteLib.Bytefile.prim bytefile.OByteLib.Bytefile.data bytefile.OByteLib.Bytefile.code in
-      let ram_globals, flash_globals, code = Datagen.split_globals arch globals code in
+      let ram_globals, flash_globals, code = Datagen.split_globals no_flash_globals arch globals code in
       let bytecode, opcodes, codemap = Codegen.export code in
-      let atom0, exceptions, accu_data, stack_data, ram_global_data, flash_global_data, static_heap_data, flash_heap_data = Datagen.export arch codemap accu stack ram_globals flash_globals in
+      let atom0, exceptions, accu_data, stack_data, ram_global_data, flash_global_data, static_heap_data, flash_heap_data = Datagen.export no_flash_heap arch codemap accu stack ram_globals flash_globals in
 
       let flash_heap_size = List.length flash_heap_data in
       let static_heap_size = List.length static_heap_data in
@@ -176,8 +188,6 @@ let () =
         sz in
 
       let opcodes = if no_clean_interp then Opcode.all else opcodes in
-
-      assert (List.for_all ((=) (T.INT 0)) ram_global_data);
       
       (* Defined Constants *)
       Printf.fprintf oc "#define OCAML_STACK_WOSIZE          %8d\n" stack_size;
@@ -191,6 +201,8 @@ let () =
       Printf.fprintf oc "#define OCAML_PRIMITIVE_NUMBER      %8d\n" (Array.length prims);
       Printf.fprintf oc "#define OCAML_VIRTUAL_ARCH          %8s\n" (Arch.to_string arch);
       Printf.fprintf oc "#define OCAML_STARTING_OOID         %8d\n" ooid;
+      Printf.fprintf oc "#define OCAML_NO_FLASH_HEAP         %8d\n" (if no_flash_heap then 1 else 0);
+      Printf.fprintf oc "#define OCAML_NO_FLASH_GLOBALS      %8d\n" (if no_flash_globals then 1 else 0);
       Printf.fprintf oc "\n";
 
       (* Defined Variables *)
@@ -208,8 +220,14 @@ let () =
 
       (* Declare heap variables *)
       Printf.fprintf oc "value ocaml_stack[OCAML_STACK_WOSIZE];\n";
-      Printf.fprintf oc "value ocaml_ram_global_data[OCAML_RAM_GLOBDATA_NUMBER];\n";
       Printf.fprintf oc "value ocaml_ram_heap[OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE];\n";
+      if no_flash_globals then (
+        Printf.fprintf oc "\n";
+        Printer.print_datagen_word_array oc "value" "ocaml_ram_global_data" "OCAML_RAM_GLOBDATA_NUMBER" ram_global_data;
+      ) else (
+        assert (List.for_all ((=) (T.INT 0)) ram_global_data);
+        Printf.fprintf oc "value ocaml_ram_global_data[OCAML_RAM_GLOBDATA_NUMBER];\n";
+      );
       Printf.fprintf oc "\n";
 
       (* Define initial heaps, intial stack and initial global data *)

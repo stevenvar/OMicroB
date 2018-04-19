@@ -127,7 +127,7 @@ let float_bytes arch x =
 (******************************************************************************)
 (******************************************************************************)
 
-let split_globals arch globals code =
+let split_globals no_flash_globals arch globals code =
   let open OByteLib.Instr in
   let global_nb = Array.length globals in
   let is_get_tbl = Array.make global_nb false in
@@ -149,7 +149,7 @@ let split_globals arch globals code =
   let flash_ind = ref 0 in
 
   for i = 0 to global_nb - 1 do
-    if is_set_tbl.(i) then (
+    if no_flash_globals || is_set_tbl.(i) then (
       global_map.(i) <- `Ram !ram_ind;
       ram_lst := globals.(i) :: !ram_lst;
       incr ram_ind;
@@ -220,13 +220,13 @@ let split_globals arch globals code =
 (******************************************************************************)
 (******************************************************************************)
 
-let export arch codemap accu stack ram_globals flash_globals =
+let export no_flash_heap arch codemap accu stack ram_globals flash_globals =
   let sharer = Sharer.create () in
 
   let static_heap = Heap.create () in
-  let flash_heap = Heap.create () in
+  let flash_heap = if no_flash_heap then static_heap else Heap.create () in
   let static_pointer () = SPOINTER (Heap.pointer static_heap) in
-  let flash_pointer () = FPOINTER (Heap.pointer flash_heap) in
+  let flash_pointer () = if no_flash_heap then static_pointer () else FPOINTER (Heap.pointer flash_heap) in
   let heap_pointer_of_mutability mut =
     match mut with
     | Mutable -> static_heap, static_pointer
@@ -426,7 +426,7 @@ let export arch codemap accu stack ram_globals flash_globals =
   let stack = List.map export_value stack in
   let ram_global_data = Array.map export_value ram_globals in
   let flash_global_data = Array.map export_value flash_globals in
-  (atom0, exceptions, accu, stack, Array.to_list ram_global_data, Array.to_list flash_global_data, Heap.contents static_heap, Heap.contents flash_heap)
+  (atom0, exceptions, accu, stack, Array.to_list ram_global_data, Array.to_list flash_global_data, Heap.contents static_heap, if no_flash_heap then [] else Heap.contents flash_heap)
 
 (******************************************************************************)
 (******************************************************************************)

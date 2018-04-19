@@ -72,6 +72,8 @@ let gc               = ref None
 let arch             = ref None
 let no_clean_interp  = ref false
 let no_shortcut_init = ref false
+let no_flash_heap    = ref false
+let no_flash_globals = ref false
 
 let mlopts           = ref []
 let cxxopts          = ref []
@@ -133,6 +135,10 @@ let spec =
      " Do not remove unused VM instructions, compile and link all of them");
     ("-no-shortcut-initialization", Arg.Set no_shortcut_init,
      " Do not improve starting time by evaluating the program initialization at compile time");
+    ("-no-flash-heap", Arg.Set no_flash_heap,
+     " Do not use flash to store immutable data from the heap known at compile time");
+    ("-no-flash-globals", Arg.Set no_flash_globals,
+     " Do not use flash to store immutable entries of the global data table");
 
     ("-mlopt", Arg.String (fun opt -> mlopts := opt :: !mlopts),
      "<option> Pass the given option to the OCaml compiler");
@@ -300,6 +306,8 @@ let gc               = !gc
 let arch             = !arch
 let no_clean_interp  = !no_clean_interp
 let no_shortcut_init = !no_shortcut_init
+let no_flash_heap    = !no_flash_heap
+let no_flash_globals = !no_flash_globals
 
 let mlopts           = List.rev !mlopts
 let cxxopts          = List.rev !cxxopts
@@ -455,6 +463,8 @@ let () =
     should_be_none_incomp "-c" "-arch" arch;
     should_be_false "-c" "-no-clean-interpreter" no_clean_interp;
     should_be_false "-c" "-no-shortcut-initialization" no_shortcut_init;
+    should_be_false "-c" "-no-flash-heap" no_flash_heap;
+    should_be_false "-c" "-no-flash-globals" no_flash_globals;
     should_be_empty_options "-cxxopt" cxxopts;
     should_be_empty_options "-avrcxxopts" avrcxxopts;
     should_be_empty_options "-avrobjcopts" avrobjcopts;
@@ -495,6 +505,8 @@ let () =
     should_be_none_incomp "-i" "-arch" arch;
     should_be_false "-i" "-no-clean-interpreter" no_clean_interp;
     should_be_false "-i" "-no-shortcut-initialization" no_shortcut_init;
+    should_be_false "-i" "-no-flash-heap" no_flash_heap;
+    should_be_false "-i" "-no-flash-globals" no_flash_globals;
     should_be_empty_options "-cxxopt" cxxopts;
     should_be_empty_options "-avrcxxopts" avrcxxopts;
     should_be_empty_options "-avrobjcopts" avrobjcopts;
@@ -616,6 +628,8 @@ let () =
     ] in
     let cmd = if no_clean_interp then cmd @ [ "-no-clean-interpreter" ] else cmd in
     let cmd = if no_shortcut_init then cmd @ [ "-no-shortcut-initialization" ] else cmd in
+    let cmd = if no_flash_heap then cmd @ [ "-no-flash-heap" ] else cmd in
+    let cmd = if no_flash_globals then cmd @ [ "-no-flash-globals" ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun path -> [ "-i"; path ]) input_cs) in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd

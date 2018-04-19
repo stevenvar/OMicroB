@@ -83,7 +83,7 @@ typedef uint32_t code_t;
 #define Is_block_in_flash_heap(x)   (((uint8_t) (x) & 0x3) == 0x00 && (uvalue) ((uvalue) (x) - ((uvalue) ROUND_RAM_WOSIZE << 2) - 1) < (uvalue) ((((uvalue) OCAML_FLASH_HEAP_WOSIZE) << 2) - 1))
 
 // (x) is assumed to be a block, is it in one of the ram heaps?
-#define Is_in_ram(x)                ((uvalue) ((uvalue) (x) - 1) < (uvalue) ((((uvalue) OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE) << 2) - 1))
+#define Is_in_ram(x)                (OCAML_NO_FLASH_HEAP || (uvalue) ((uvalue) (x) - 1) < (uvalue) ((((uvalue) OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE) << 2) - 1))
 
 // Is a value can be a code pointer? (pretty-printing purpose)
 #define Maybe_code_pointer(x)       Is_int(x)

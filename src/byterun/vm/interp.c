@@ -192,10 +192,12 @@ static inline void init_stack(void) {
 }
 
 static inline void init_global_data(void) {
+#if OCAML_NO_FLASH_GLOBALS == 0
   uint16_t ind = 0;
   for (ind = 0; ind < OCAML_RAM_GLOBDATA_NUMBER; ind ++) {
     ocaml_ram_global_data[ind] = Val_unit;
   }
+#endif
 }
 
 static inline void init_static_heap(void) {
@@ -230,6 +232,8 @@ static inline void interp(void) {
       print_static_heap();
       print_flash_heap();
       print_stack();
+      print_ram_global_data();
+      print_flash_global_data();
       printf("acc = "); print_value(acc);
       printf("env = "); print_value(env);
       printf("pc = %d\n", pc);
