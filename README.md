@@ -27,3 +27,32 @@ An article describing our generic virtual machine approach has been published on
 ```console
 ./configure && make && make install
 ```
+
+
+## Compiling an OCaml program
+
+OMicroB is, at the moment, tied to the AVR C compiler. In order to compile an OCaml file for an AVR microcontroller, run
+
+```
+omicrob <file.ml>
+```
+
+that will generate a ```<file.hex>``` executable.
+
+(The ```omicrob -help``` command will display the various available options, such as setting the stack size, the garbage collector algorithm, etc)
+
+
+## Flashing on a microcontroller
+
+```console
+omicrob -flash <file.hex>
+```
+
+## Simulator
+
+OMicroB comes with a circuit simulator, for example running
+
+```console
+make simul
+```
+in the ```tests/snake-mustard``` folder will simulate an [Arduboy]([https://arduboy.com) device on your computer, running the Snake game described in this folder.
