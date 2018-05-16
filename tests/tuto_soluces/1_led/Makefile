@@ -6,7 +6,8 @@ TARGETS := led.byte led.c led.elf led.avr led.hex
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -mlopt -verbose -stack-size 32 -heap-size 32 -arch 64 -avrcxxopt -Os
+	$(BIN)/omicrob  -v $^ -mlopt -verbose -stack-size 64 -heap-size 300 -arch 32
+
 
 flash: led.hex
 	$(BIN)/omicrob -flash -sudo $<
