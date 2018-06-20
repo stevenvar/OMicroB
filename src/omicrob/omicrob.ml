@@ -12,10 +12,10 @@ let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequenc
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 
-let default_mmcu  = "atmega32u4"
-let default_avr   = "avr109"
-let default_baud  = 57_600
-let default_clock = 16_000_000
+let default_mmcu  = Avr_config.default_mmcu
+let default_avr   = Avr_config.default_avr
+let default_baud  = Avr_config.default_baud
+let default_clock = Avr_config.default_clock
 
 (******************************************************************************)
 (******************************************************************************)
@@ -49,12 +49,12 @@ let is_substring str ~sub =
     false
   with Exit ->
     true
-      
+
 (******************************************************************************)
 (******************************************************************************)
 (******************************************************************************)
 (* Variables fead during parsing of command line arguments *)
-    
+
 let output_files     = ref []
 let compile_only     = ref false
 let infer_interf     = ref false
@@ -83,7 +83,7 @@ let avrdudeopts      = ref []
 
 (******************************************************************************)
 (* Specification of command line options *)
-  
+
 let help =
   ref (fun () -> assert false)
 
@@ -94,7 +94,7 @@ let () =
     let my_stats = Unix.stat Sys.argv.(0) in
     if build_stats.Unix.st_ino = my_stats.Unix.st_ino then local := true;
   with _ -> ()
-  
+
 let spec =
   Arg.align (
   [
@@ -190,7 +190,7 @@ let spec =
 
 (******************************************************************************)
 (* Documentation of command line options *)
-    
+
 let usage =
   let me = Sys.argv.(0) in
   Printf.sprintf "\
@@ -209,7 +209,7 @@ Options:" me me me me me me me me me
 
 (******************************************************************************)
 (* Error and help tools *)
-    
+
 let error fmt =
   Printf.ksprintf (fun msg ->
     Printf.eprintf "Error: %s\n" msg;
@@ -227,7 +227,7 @@ let () =
 (* Parsing of input and output files *)
 
 let input_files  = ref []
-    
+
 let input_mls    = ref []
 let input_cmos   = ref []
 let input_cs     = ref []
@@ -243,14 +243,14 @@ let output_c     = ref None
 let output_elf   = ref None
 let output_avr   = ref None
 let output_hex   = ref None
-    
+
 (***)
 
 let set_file kind ext r path =
   match !r with
   | None -> r := Some path
   | Some _ -> error "multiple %s files with extension %s" kind ext
-  
+
 (***)
 
 let push_input_file path =
@@ -266,7 +266,7 @@ let push_input_file path =
   | ".elf"         -> set_file "input" ".elf"  input_elf  path
   | ".hex"         -> set_file "input" ".hex"  input_hex  path
   | _              -> error "don't know what to do with input file %S" path
-     
+
 let push_output_file path =
   match Filename.extension path with
   | ".byte" -> set_file "output" ".byte" output_byte path
@@ -339,14 +339,14 @@ let libdir =
 let libexecdir =
   if local then Filename.concat Config.builddir "bin"
   else Config.libexecdir
-    
+
 let bc2c =
   if local then Filename.concat (Filename.concat Config.builddir "bin") "bc2c"
   else Filename.concat Config.bindir "bc2c"
 
 let () =
   if sudo && not flash then error "the option -sudo is meaningless without -flash"
-  
+
 (******************************************************************************)
 (******************************************************************************)
 (******************************************************************************)
@@ -387,10 +387,10 @@ let run ?(vars=[]) strs =
     | 0 -> ()
     | errcode -> exit errcode
   )
-    
+
 (******************************************************************************)
 (* Unexpected argument tools *)
-    
+
 let should_be_empty_options opt lst =
   match lst with
   | [] -> ()
@@ -418,7 +418,7 @@ let should_be_none_option opt_name opt =
   match opt with
   | None -> ()
   | Some _ -> error "don't know what to do with option %S" opt_name
-  
+
 (******************************************************************************)
 (* Default file name computing *)
 
@@ -532,7 +532,7 @@ let () =
       run ~vars cmd;
       exit 0;
   )
-  
+
 (******************************************************************************)
 (* Compile .mli, .ml, .cmo and .c into a .byte *)
 
@@ -555,7 +555,7 @@ let () =
         | ".mli" | ".ml" | ".cmo" | ".c" -> true
         | _ -> false
       ) input_files in
-    
+
     let output_path =
       get_first_defined [
         output_byte;
@@ -581,12 +581,12 @@ let () =
   )
 
 let available_byte = !available_byte
-    
+
 (******************************************************************************)
 (* Compile a .byte into a .c *)
 
 let available_c = ref input_c
-  
+
 let () =
   if (
     available_byte <> None
@@ -606,7 +606,7 @@ let () =
       match available_byte with
       | None -> error "no input file to generate a .c"
       | Some path -> path in
-    
+
     let output_path =
       get_first_defined [
         output_c;
@@ -617,7 +617,7 @@ let () =
       ] ".c" in
 
     available_c := Some output_path;
-    
+
     let cmd = [ bc2c ] in
     let cmd = if local then cmd @ [ "-local" ] else cmd in
     let cmd = cmd @ [
@@ -640,14 +640,14 @@ let () =
     should_be_none_option "-gc" gc;
     should_be_none_option "-arch" arch;
   )
-    
+
 let available_c = !available_c
 
 (******************************************************************************)
 (* Compile a .c into a .elf *)
 
 let available_elf = ref input_elf
-  
+
 let () =
   if available_c <> None && (simul || output_elf <> None || no_output_requested) then (
     should_be_none_file input_avr;
@@ -668,7 +668,7 @@ let () =
       ] ".elf" in
 
     available_elf := Some output_path;
-    
+
     let cmd = [ Config.cxx ] @ default_cxx_options @ cxxopts in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
@@ -676,12 +676,12 @@ let () =
   )
 
 let available_elf = !available_elf
-    
+
 (******************************************************************************)
 (* Compile a .c into a .avr *)
 
 let available_avr = ref input_avr
-    
+
 let () =
   if available_c <> None && (flash || output_avr <> None || no_output_requested) then (
     should_be_none_file input_avr;
@@ -714,12 +714,12 @@ let () =
   )
 
 let available_avr = !available_avr
-    
+
 (******************************************************************************)
 (* Compile a .avr into a .hex *)
 
 let available_hex = ref input_hex
-  
+
 let () =
   if available_avr <> None && (flash || output_hex <> None || no_output_requested) then (
     should_be_none_file input_hex;
@@ -738,7 +738,7 @@ let () =
       ] ".hex" in
 
     available_hex := Some output_path;
-    
+
     let cmd = [ Config.avr_objcopy; "-O"; "ihex"; "-R"; ".eeprom" ] @ avrobjcopts @ [ input_path; output_path ] in
     run cmd
   ) else (
@@ -746,7 +746,7 @@ let () =
   )
 
 let available_hex = !available_hex
-    
+
 (******************************************************************************)
 (* Simul *)
 
