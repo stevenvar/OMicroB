@@ -50,6 +50,14 @@ function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
 
+function select_avr () {
+    check_directory "avrs/$1"
+    ln -sf "../../avrs/$1/avr.mli" "src/stdlib/avr.mli"
+    ln -sf "../../avrs/$1/avr.ml" "src/stdlib/avr.ml"
+    ln -sf "../../avrs/$1/avr_config.ml" "src/omicrob/avr_config.ml"
+    ln -sf "../../../avrs/$1/avrlib.c" "src/byterun/avr/avrlib.c"
+}
+
 ################################################################################
 
 check_command "gcc"
@@ -184,6 +192,10 @@ let avr_objcopy = \"$AVR_OBJCOPY\"
 let avrdude     = \"$AVRDUDE\"
 let version     = \"$VERSION\"
 " > etc/config.ml
+
+################################################################################
+
+select_avr "arduboy"
 
 ################################################################################
 

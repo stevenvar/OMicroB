@@ -4,7 +4,7 @@ TARGETS := $(BIN)/omicrob
 
 omicrob: $(TARGETS)
 
-$(BIN)/omicrob: config.ml omicrob.ml
+$(BIN)/omicrob: avr_config.ml config.ml omicrob.ml
 	$(OCAMLOPT) -w @a -safe-string -strict-formats -strict-sequence unix.cmxa $^ -o $@
 
 config.ml: $(ETC)/config.ml
