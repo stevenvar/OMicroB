@@ -221,7 +221,7 @@ static inline void interp(void) {
   if (setjmp(caml_exception_jmp_buf)) {
     goto ocaml_raise;
   }
-  
+
   while (1) {
 
 #if defined(__PC__) && DEBUG >= 4 // DUMP STACK AND HEAP
@@ -827,7 +827,7 @@ static inline void interp(void) {
         Ram_field(acc, 2 * i) = Val_codeptr(read_ptr_2B() - 2 * i - 2);
       }
       /* pop v elems into the closure */
-      for (; i < v; i ++) {
+      for (i = 0; i < v; i ++) {
         Ram_field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
@@ -854,7 +854,7 @@ static inline void interp(void) {
         Ram_field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_white);
         Ram_field(acc, 2 * i) = Val_codeptr(read_ptr_4B() - 4 * i - 2);
       }
-      for (; i < v; i ++) {
+      for (i = 0 ; i < v; i ++) {
         Ram_field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
@@ -966,7 +966,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_PUSHGETFLASHGLOBAL_1B
     case OCAML_PUSHGETFLASHGLOBAL_1B : {
       TRACE_INSTRUCTION("PUSHGETFLASHGLOBAL1B");
@@ -985,7 +985,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_PUSHGETRAMGLOBAL_2B
     case OCAML_PUSHGETRAMGLOBAL_2B : {
       TRACE_INSTRUCTION("PUSHGETRAMGLOBAL2B");
@@ -1004,7 +1004,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_PUSHGETFLASHGLOBAL_2B
     case OCAML_PUSHGETFLASHGLOBAL_2B : {
       TRACE_INSTRUCTION("PUSHGETFLASHGLOBAL2B");
@@ -1023,7 +1023,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_PUSHGETRAMGLOBALFIELD_1B
     case OCAML_PUSHGETRAMGLOBALFIELD_1B : {
       TRACE_INSTRUCTION("PUSHGETRAMGLOBALFIELD1B");
@@ -1044,7 +1044,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_PUSHGETFLASHGLOBALFIELD_1B
     case OCAML_PUSHGETFLASHGLOBALFIELD_1B : {
       TRACE_INSTRUCTION("PUSHGETFLASHGLOBALFIELD1B");
@@ -1065,7 +1065,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_PUSHGETRAMGLOBALFIELD_2B
     case OCAML_PUSHGETRAMGLOBALFIELD_2B : {
       TRACE_INSTRUCTION("PUSHGETRAMGLOBALFIELD2B");
@@ -1086,7 +1086,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_PUSHGETFLASHGLOBALFIELD_2B
     case OCAML_PUSHGETFLASHGLOBALFIELD_2B : {
       TRACE_INSTRUCTION("PUSHGETFLASHGLOBALFIELD2B");
@@ -1107,7 +1107,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_SETRAMGLOBAL_1B
     case OCAML_SETRAMGLOBAL_1B : {
       TRACE_INSTRUCTION("SETRAMGLOBAL1B");
@@ -1125,7 +1125,7 @@ static inline void interp(void) {
     }
 #endif
 
-      
+
 #ifdef OCAML_PUSHATOM0
     case OCAML_PUSHATOM0 : {
       TRACE_INSTRUCTION("PUSHATOM0");
@@ -1144,7 +1144,7 @@ static inline void interp(void) {
       }
 #endif
 
-      
+
 #ifdef OCAML_MAKEBLOCK_1B
     case OCAML_MAKEBLOCK_1B : {
       TRACE_INSTRUCTION("MAKEBLOCK1B");

@@ -12,7 +12,7 @@
 #if DEBUG > 0
 #define assert(x) do { if (!(x)) debug_blink_error();  } while(0);
 #else
-#define assert(x) 
+#define assert(x)
 #endif
 
 void debug_blink_error(void);

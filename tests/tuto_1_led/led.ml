@@ -1,17 +1,12 @@
 open Avr
 
+let l = ref [ 1; 2; 3; 4 ]
+let m = Array.make_matrix 10 10 1
 let _ =
-(*   R (red) connectée à PIN10 (alias PORTB[6])
- * G (green) connectée à PIN11 (alias PORTB[7]) B (blue) connecté à PIN9 (alias PORTB[5]) *)
-  (* pin_mode PIN9 OUTPUT; *)
-  (* pin_mode PIN10 OUTPUT; *)
-  (* pin_mode PIN11 OUTPUT; *)
-  (* digital_write PIN9 LOW; *)
-  (* digital_write PIN10 HIGH; *)
-  (* digital_write PIN11 HIGH *)
-  let r = PIN10 in
-  let g = PIN11 in
-  let b = PIN9 in
-  write_register DDRB 0b11100000;
-  write_register PORTB 0b11000000
-  
+  write_register DDRB 0b1111111;
+  (* write_register PORTB (Array.length m); *)
+  for i = 0 to 9 do
+    m.(0).(i) <- 2
+  done;
+  l := 8::!l;
+  write_register PORTB (m.(0).(1))

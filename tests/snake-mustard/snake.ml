@@ -5,7 +5,7 @@ type direction = North | South | East | West
 
 let width  = 128
 let height = 64
-    
+
 type t = {
   positions : int array;
   length    : int;
@@ -21,7 +21,7 @@ let cell pos = pos land 0xFFF8         (* Compute an integer representing the 8-
 let mask pos = 1 lsl (pos land 0b111)  (* Compute a mask for one of the 8 pixels of a cell *)
 let line cell = (cell lsr 3) land 0x1F (* Compute the line of a cell (from 0 to 7) *)
 let column cell = cell lsr 8           (* Compute the column of a cell (from 0 to 63) *)
-  
+
 let next pos direction =
   let x = getx pos and y = gety pos in
   match direction with
@@ -29,7 +29,7 @@ let next pos direction =
   | South -> merge x (if y = height - 1 then 0 else y + 1)
   | East  -> merge (if x = 0 then width - 1 else x - 1) y
   | West  -> merge (if x = width - 1 then 0 else x + 1) y
-  
+
 let create length x y init_len direction =
   let positions = Array.make length 0 in
   let head = init_len in
@@ -157,7 +157,7 @@ let draw_first_apple apple =
 let snake_length snake =
   let len = snake.head + snake.length - snake.tail in
   if len > snake.length then len - snake.length else len
-    
+
 let play () =
   let total_len = 40 in
   let init_x    = 14 in
@@ -176,15 +176,15 @@ let play () =
   with
   | Win  -> Avr.(digital_write Arduboy.g LOW)
   | Lose -> Avr.(digital_write Arduboy.r LOW)
-    
+
 let () =
   Arduboy.init ();
-  play ();
+  play ()
   (*
-  Arduboy.init ();
-  Arduboy.write_at 3 3 0xAA;
-  Arduboy.write_at 3 4 0x55;
-  Arduboy.write_at 3 5 0xAA;
-  Arduboy.write_at 3 6 0x55;
-  Arduboy.write_at 4 9 0x99;
-  *)
+  Arduboy.init ();*)
+  (* Arduboy.write_at 3 3 0xAA; *)
+  (* Arduboy.write_at 3 4 0x55; *)
+  (* Arduboy.write_at 3 5 0xAA; *)
+  (* Arduboy.write_at 3 6 0x55; *)
+  (* Arduboy.write_at 4 9 0x99; *)
+  (* *\) *)
