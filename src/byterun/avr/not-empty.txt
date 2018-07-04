@@ -1,0 +1,1 @@
+This needs to be there, or else git wouldn't commit the empty avr/directory
