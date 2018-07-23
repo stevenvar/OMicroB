@@ -6,6 +6,6 @@
 void debug_trace_open(void);
 void debug_trace_char(char c);
 void debug_trace_close(void);
-void debug_trace_int(int32_t n);
+void debug_trace_int(long n);
 
 #endif

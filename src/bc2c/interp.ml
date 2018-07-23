@@ -1006,40 +1006,42 @@ let exec arch prims globals code cycle_limit =
         incr pc;
 
       | NEGINT ->
-        accu := Int (- (int_of_value !accu));
+        accu := Int (Arch.normalize_int arch (- (int_of_value !accu)));
         incr pc;
       | ADDINT ->
-        accu := Int (int_of_value !accu + int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu + int_of_value (pop stack)));
         incr pc;
       | SUBINT ->
-        accu := Int (int_of_value !accu - int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu - int_of_value (pop stack)));
         incr pc;
       | MULINT ->
-        accu := Int (int_of_value !accu * int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu * int_of_value (pop stack)));
         incr pc;
       | DIVINT ->
-        accu := Int (int_of_value !accu / int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu / int_of_value (pop stack)));
         incr pc;
       | MODINT ->
-        accu := Int (int_of_value !accu mod int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu mod int_of_value (pop stack)));
         incr pc;
       | ANDINT ->
-        accu := Int (int_of_value !accu land int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu land int_of_value (pop stack)));
         incr pc;
       | ORINT ->
-        accu := Int (int_of_value !accu lor int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu lor int_of_value (pop stack)));
         incr pc;
       | XORINT ->
-        accu := Int (int_of_value !accu lxor int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu lxor int_of_value (pop stack)));
         incr pc;
       | LSLINT ->
-        accu := Int (int_of_value !accu lsl int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu lsl int_of_value (pop stack)));
         incr pc;
       | LSRINT ->
-        accu := Int (int_of_value !accu lsr int_of_value (pop stack));
+        let n = int_of_value !accu in
+        let n = match arch with Arch.A16 -> n land 0x7F_FF | Arch.A32 -> n land 0x7FFF_FFFF | Arch.A64 -> n in
+        accu := Int (Arch.normalize_int arch (n lsr int_of_value (pop stack)));
         incr pc;
       | ASRINT ->
-        accu := Int (int_of_value !accu asr int_of_value (pop stack));
+        accu := Int (Arch.normalize_int arch (int_of_value !accu asr int_of_value (pop stack)));
         incr pc;
 
       | EQ ->
@@ -1063,11 +1065,14 @@ let exec arch prims globals code cycle_limit =
         incr pc;
 
       | OFFSETINT ofs ->
-        accu := Int (int_of_value !accu + ofs);
+        accu := Int (Arch.normalize_int arch (int_of_value !accu + ofs));
         incr pc;
       | OFFSETREF ofs -> (
         match !accu with
-        | Block (mut, { contents = 0 }, ([| n |] as tbl)) -> assert (mut = Mutable); tbl.(0) <- Int (int_of_value n + ofs)
+        | Block (mut, { contents = 0 }, ([| n |] as tbl)) ->
+          assert (mut = Mutable);
+          tbl.(0) <- Int (Arch.normalize_int arch (int_of_value n + ofs));
+          incr pc;
         | _ -> assert false
       )
 

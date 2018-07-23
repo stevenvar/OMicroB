@@ -23,8 +23,8 @@ void debug_trace_close(void) {
 #endif
 }
 
-void debug_trace_int(int32_t i) {
+void debug_trace_int(long i) {
 #ifndef __AVR__
-  printf("TRACE: %d\n", i);
+  printf("TRACE: %ld\n", i);
 #endif
 }
