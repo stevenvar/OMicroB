@@ -113,6 +113,7 @@ extern float float_of_value(value v);
 #define Val_codeptr(x) ((value) (((uint16_t) (x) << 1) | 1))
 #define Codeptr_val(x) ((uint16_t) (x) >> 1)
 
+#define Offsetclosure_delta 8
 #define Hd_size_bitcnt 6
 
 /******************************************************************************/

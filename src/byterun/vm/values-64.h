@@ -114,6 +114,7 @@ extern double double_of_value(value v);
 #define Val_codeptr(x) ((value) (((uint64_t) (x) << 1) | 0x8000000000000001))
 #define Codeptr_val(x) (((uint64_t) (x) >> 1) & 0x7FFFFFFFFFFFFFFF)
 
+#define Offsetclosure_delta 16
 #define Hd_size_bitcnt 54
 
 /******************************************************************************/

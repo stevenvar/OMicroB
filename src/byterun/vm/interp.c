@@ -803,9 +803,10 @@ static inline void interp(void) {
         Ram_field(acc, i + 2 * f - 1) = pop();
       }
       push(acc);
-      for (i = 1; i < f; i ++){
-        push(Ram_field(acc, 2 * i));
+      for (i = 1; i < f; i ++) {
+        push(acc + Offsetclosure_delta * i);
       }
+
       break;
     }
 #endif
@@ -881,7 +882,7 @@ static inline void interp(void) {
       {
         /* value + header */
         TRACE_INSTRUCTION("OFFSETCLOSUREM2");
-        acc = env - 4 * sizeof(value);
+        acc = env - Offsetclosure_delta;
         break;
       }
 #endif
@@ -921,7 +922,7 @@ static inline void interp(void) {
 #if defined(OCAML_PUSHOFFSETCLOSURE2) || defined(OCAML_OFFSETCLOSURE2)
       {
         TRACE_INSTRUCTION("OFFSETCLOSURE2");
-        acc = env + 4 * sizeof(value);
+        acc = env + Offsetclosure_delta;
         break;
       }
 #endif
@@ -942,7 +943,7 @@ static inline void interp(void) {
       {
         TRACE_INSTRUCTION("OFFSETCLOSURE");
         int n = read_int8();
-        acc = env + 2 * sizeof(value) * n;
+        acc = env + Offsetclosure_delta / 2 * n;
         break;
       }
 #endif
