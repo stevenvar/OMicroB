@@ -112,7 +112,7 @@ extern double double_of_value(value v);
 #define Float_val(x) (double_of_value(x))
 
 #define Val_codeptr(x) ((value) (((uint64_t) (x) << 1) | 0x8000000000000001))
-#define Codeptr_val(x) (((uint64_t) (x) >> 1) & 0x7FFFFFFFFFFFFFFF)
+#define Codeptr_val(x) (((uint64_t) (x) >> 1) & 0x3FFFFFFFFFFFFFFF)
 
 #define Offsetclosure_delta 16
 #define Hd_size_bitcnt 54

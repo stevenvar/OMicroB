@@ -79,24 +79,25 @@ void debug_blink_pause(void) {
 
 void print_value(value v) {
   printf("0x%08" PRIflag "x / ", v);
-  if (Is_int(v)) {
+  if (OCAML_VIRTUAL_ARCH != 16 && Maybe_code_pointer(v)) {
+    printf("@%" PRIflag "d (code pointer)", Codeptr_val(v));
+  } else if (Is_int(v)) {
     printf("(int = %" PRIflag "d / float = %" PRIflag "f)", Int_val(v), Float_val(v));
   } else if (Is_block_in_dynamic_heap(v)) {
-    printf("@(%p) (block in dynamic heap)", Ram_block_val(v));
+    printf("@%p (block in dynamic heap)", Ram_block_val(v));
   } else if (Is_block_in_static_heap(v)) {
-    printf("@(%p) (block in static heap)", Ram_block_val(v));
+    printf("@%p (block in static heap)", Ram_block_val(v));
   } else if (Is_block_in_flash_heap(v)) {
-    printf("@(%p) (block in flash heap)", Flash_block_val(v));
+    printf("@%p (block in flash heap)", Flash_block_val(v));
   } else if (v == 0) {
     printf("NULL");
-  } else if (Maybe_code_pointer(v)) {
-    printf("code pointer %" PRIflag "d", Codeptr_val(v));
   } else if (Float_val(v) >= -1e6 && Float_val(v) <= 1e6) {
     printf("(maybe %f)", Float_val(v));
   } else {
     printf("(?)");
   }
   printf("\n");
+  fflush(stdout);
 }
 
 static void print_table(const char *name, const value *table, uint32_t table_wosize) {

@@ -64,11 +64,15 @@ static void mark_block(value *p) {
         } else {
           p --;                                               /* Already marked -> go back one field     */
         }
-      } else if (tag < No_scan_tag &&                         /* Is this block scannable?                */
-                 Color_hd(h) == Color_white) {                /* Is this block non-already scanned?      */
-        *p = h | Color_black;                                 /* Store the (blacken) header              */
-        Ram_hd_val(v) = Val_dynamic_block(p) | Color_black;   /* Store the (blacken) backward pointer    */
-        p = &Ram_field(v, Wosize_hd(h) - 1);                  /* Go to the forward block                 */
+      } else if (Color_hd(h) == Color_white) {                /* Is this block non-already scanned?      */
+        if (tag < No_scan_tag) {                              /* If this block is scannable              */
+          *p = h | Color_black;                               /* Store the (blacken) header              */
+          Ram_hd_val(v) = Val_dynamic_block(p) | Color_black; /* Store the (blacken) backward pointer    */
+          p = &Ram_field(v, Wosize_hd(h) - 1);                /* Go to the forward block                 */
+        } else {                                              /* Else if this block is no-scannable      */
+          Ram_hd_val(v) = h | Color_black;                    /* Blacken the non-scannable block         */
+          p --;                                               /* Go back one field in the current block  */
+        }
       } else {
         p --;                                                 /* Go back one field in the current block  */
       }
@@ -313,6 +317,7 @@ void gc(void) {
   printf("acc = "); print_value(acc);
   printf("env = "); print_value(env);
   printf("\n");
+  print_ram_global_data();
   print_dynamic_heap();
   print_static_heap();
   print_flash_heap();
@@ -331,6 +336,7 @@ void gc(void) {
   printf("acc = "); print_value(acc);
   printf("env = "); print_value(env);
   printf("\n");
+  print_ram_global_data();
   print_dynamic_heap();
   print_static_heap();
   print_flash_heap();

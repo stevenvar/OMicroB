@@ -112,7 +112,7 @@ extern float float_of_value(value v);
 #define Float_val(x) (float_of_value(x))
 
 #define Val_codeptr(x) ((value) (((uint32_t) (x) << 1) | 0x80000001))
-#define Codeptr_val(x) (((uint32_t) (x) >> 1) & 0x7FFFFFFF)
+#define Codeptr_val(x) (((uint32_t) (x) >> 1) & 0x3FFFFFFF)
 
 #define Offsetclosure_delta 8
 #define Hd_size_bitcnt 22
