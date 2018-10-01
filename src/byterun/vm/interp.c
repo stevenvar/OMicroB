@@ -708,7 +708,7 @@ static inline void interp(void) {
         OCamlAlloc(acc, extra_args + 3, Closure_tag);
         Ram_field(acc, 0) = Val_codeptr(pc - 3);
         Ram_field(acc, 1) = env;
-        for (i = 0 ; i < n; i ++) {
+        for (i = 0 ; i <= extra_args; i ++) {
           Ram_field(acc, i + 2) = pop();
         }
         pc = Codeptr_val(pop());
@@ -1339,7 +1339,6 @@ static inline void interp(void) {
       assert(Is_block(acc));
       assert(Is_in_ram(acc));
       assert(Is_int(ind));
-      assert(Is_int(val));
       Ram_field(acc, Int_val(ind)) = val;
       acc = Val_unit;
       break;
@@ -1648,7 +1647,7 @@ static inline void interp(void) {
     case OCAML_C_CALL2 : {
       TRACE_INSTRUCTION("CCALL2");
       acc = ((value (*)(value, value)) (get_primitive(read_uint8())))(acc, sp[0]);
-      pop();
+      pop_n(1);
       break;
     }
 #endif
@@ -1657,8 +1656,7 @@ static inline void interp(void) {
     case OCAML_C_CALL3 : {
       TRACE_INSTRUCTION("CCALL3");
       acc = ((value (*)(value, value, value)) (get_primitive(read_uint8())))(acc, sp[0], sp[1]);
-      pop();
-      pop();
+      pop_n(2);
       break;
     }
 #endif
@@ -1667,9 +1665,7 @@ static inline void interp(void) {
     case OCAML_C_CALL4 : {
       TRACE_INSTRUCTION("CCALL4");
       acc = ((value (*)(value, value, value, value)) (get_primitive(read_uint8())))(acc, sp[0], sp[1], sp[2]);
-      pop();
-      pop();
-      pop();
+      pop_n(3);
       break;
     }
 #endif
@@ -1678,10 +1674,7 @@ static inline void interp(void) {
     case OCAML_C_CALL5 : {
       TRACE_INSTRUCTION("CCALL5");
       acc = ((value (*)(value, value, value, value, value)) (get_primitive(read_uint8())))(acc, sp[0], sp[1], sp[2], sp[3]);
-      pop();
-      pop();
-      pop();
-      pop();
+      pop_n(4);
       break;
     }
 #endif
@@ -2399,9 +2392,9 @@ static inline void interp(void) {
     {
       value meths = Field(peek(0), 0);
       int li = 3, hi = Field(meths, 0), mi;
-      while (li < hi){
+      while (li < hi) {
         mi = ((li + hi) >> 1) | 1;
-        if (acc < Field(meths, mi)) hi = mi-2;
+        if ((int32_t) acc < (int32_t) Field(meths, mi)) hi = mi - 2;
         else li = mi;
       }
       acc = Field(meths, li - 1);

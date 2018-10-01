@@ -184,7 +184,7 @@ let set_global globals i v =
 
 let get_field blk i =
   match blk with
-  | Block (_mut, _tag, values) ->
+  | Block (_mut, _, values) | Object (_mut, values) ->
     assert (i >= 0 && i < Array.length values);
     values.(i)
   | _ ->
@@ -192,10 +192,10 @@ let get_field blk i =
 
 let set_field blk i v =
   match blk with
-  | Block (mut, _tag, values) ->
+  | Block (mut, _, values) | Object (mut, values) ->
     assert (mut = Mutable);
     assert (i >= 0 && i < Array.length values);
-    values.(i) <- v
+    values.(i) <- v;
   | _ ->
     assert false
 
@@ -380,8 +380,9 @@ let ccall arch ooid prim args =
   | "caml_array_blit", [ Block (_mut0, { contents = 0 }, v0); Int s0; Block (mut1, { contents = 0 }, v1); Int s1; Int len ] -> assert (mut1 = Mutable); Array.blit v0 s0 v1 s1 len; Int 0
   | "caml_array_concat", [ lst ] -> caml_array_concat lst
   | "caml_array_sub", [ Block (_mut, { contents = 0 }, v); Int ofs; Int len ] -> Block (Mutable, ref 0, Array.sub v ofs len)
-  | "caml_array_get_addr", [ Block (_mut, { contents = 0 }, tbl); Int ind ] -> Array.get tbl ind
-  | "caml_array_set_addr", [ Block (_mut, { contents = 0 }, tbl); Int ind; v ] -> Array.set tbl ind v; Int 0
+  | ("caml_array_get_addr" | "caml_array_unsafe_get" | "caml_array_get"), [ Block (_mut, { contents = 0 }, tbl); Int ind ] -> Array.get tbl ind
+  | ("caml_array_set_addr" | "caml_array_unsafe_set" | "caml_array_set"), [ Block (_mut, { contents = 0 }, tbl); Int ind; v ] -> Array.set tbl ind v; Int 0
+  | "caml_array_unsafe_set", [ Object (_mut, values); Int ind; v ] -> Array.set values ind v; Int 0
   | "caml_array_make_vect", [ Int len; init ] -> Block (Mutable, ref 0, Array.make len init)
   | "caml_asin_float", [ Float x ] -> Float (asin x)
   | "caml_atan2_float", [ Float x; Float y ] -> Float (atan2 x y)
@@ -395,6 +396,8 @@ let ccall arch ooid prim args =
   | "caml_cosh_float", [ Float x ] -> Float (cosh x)
   | "caml_create_bytes", [ Int size ] -> Bytes (Mutable, Bytes.make size '\x00')
   | "caml_create_string", [ Int size ] -> Bytes (Immutable, Bytes.make size '\x00')
+  | "caml_ml_string_length", [ Bytes (_mut, b) ] -> Int (Bytes.length b)
+  | "caml_string_get", [ Bytes (_mut, b); Int n ] -> Int (int_of_char (Bytes.get b n))
   | "caml_exp_float", [ Float x ] -> Float (exp x)
   | "caml_expm1_float", [ Float x ] -> Float (expm1 x)
   | ("caml_fill_bytes" | "caml_fill_string"), [ Bytes (mut, b); Int ofs; Int len; Int c ] -> assert (mut = Mutable); Bytes.fill b ofs len (char_of_int c); Int 0
@@ -404,7 +407,7 @@ let ccall arch ooid prim args =
   | "caml_format_float", [ Bytes (_mut, b); Float x ] -> Bytes (Immutable, Bytes.of_string (format_float (Bytes.to_string b) x))
   | "caml_string_of_float", [ Float x ] -> Bytes (Immutable, Bytes.of_string (format_float "%.3g" x))
   | "format_int", [ Bytes (_mut, b); Int i ] -> Bytes (Immutable, Bytes.of_string (format_int (Bytes.to_string b) i))
-  | "string_of_int", [ Int i ] -> Bytes (Immutable, Bytes.of_string (format_int "%d" i))
+  | ("caml_string_of_int" | "string_of_int"), [ Int i ] -> Bytes (Immutable, Bytes.of_string (format_int "%d" i))
   | "caml_frexp_float", [ Float x ] -> let y, i = frexp x in Block (Immutable, ref 0, [| Float y; Int i |])
   | "caml_gc_compaction", [ Int 0 ] -> Gc.compact (); Int 0
   | "caml_gc_counters", [ Int 0 ] -> let x, y, z = Gc.counters () in Block (Immutable, ref 0, [| Float x; Float y; Float z |])
@@ -456,7 +459,9 @@ let ccall arch ooid prim args =
   | "caml_tan_float", [ Float x ] -> Float (tan x)
   | "caml_tanh_float", [ Float x ] -> Float (tanh x)
   | "caml_fresh_oo_id", [ Int 0 ] -> Int (incr ooid; pred !ooid)
+  | "caml_set_oo_id", [ Object (_mut, values) as obj ] -> values.(1) <- Int !ooid; incr ooid; obj
   | "caml_obj_dup", [ Block (_mut, { contents = tag }, tbl) ] -> Block (Mutable, ref tag, Array.copy tbl)
+  | "caml_obj_block", [ Int tag; Int size ] -> if tag = Obj.object_tag then Object (Mutable, Array.make size (Int 0)) else Block (Mutable, ref tag, Array.make size (Int 0))
   | "caml_unsafe_string_of_bytes", [ Bytes (_mut, b) ] -> Bytes (Immutable, Bytes.copy b)
   | "caml_unsafe_bytes_of_string", [ Bytes (_mut, b) ] -> Bytes (Mutable, Bytes.copy b)
   | "caml_sys_const_big_endian", [ Int 0 ] -> Int 0
@@ -465,6 +470,9 @@ let ccall arch ooid prim args =
   | "caml_sys_const_max_wosize", [ Int 0 ] -> Int (1 lsl (Arch.hd_size_bitcnt arch) - 1)
   | "caml_random_bits", [ Int 0 ] -> Int (Random.bits ())
   | "caml_compare", [ v0; v1 ] -> Int (caml_compare v0 v1)
+  | "caml_string_compare", [ Bytes (_mut1, b1); Bytes (_mut2, b2) ] -> Int (Bytes.compare b1 b2)
+  | "caml_string_notequal", [ Bytes (_mut1, b1); Bytes (_mut2, b2) ] -> if Bytes.equal b1 b2 then Int 0 else Int 1
+  | "caml_int_compare", [ Int n1; Int n2 ] -> Int (Pervasives.compare n1 n2)
   | "caml_alloc_dummy", [ Int sz ] -> Block (Mutable, ref 0, Array.make sz (Int 0))
   | "caml_alloc_dummy_function", [ Int sz; Int _ ] -> Closure { ofs = 0; ptrs = [||]; env = Array.make sz (Int 0) }
   | "caml_update_dummy", [ Block (_mut1, tag1, tbl1); Block (_mut2, tag2, tbl2) ] -> assert (Array.length tbl1 = Array.length tbl2); tag1 := !tag2; Array.blit tbl2 0 tbl1 0 (Array.length tbl1); Int 0
@@ -477,7 +485,19 @@ let ccall arch ooid prim args =
       | "caml_avr_write_register" | "caml_avr_read_register"
       | "caml_debug_trace" | "caml_debug_tracei"
       | "caml_random_init" | "caml_random_bits" | "caml_random_bool" -> ()
-      | _ -> Printf.eprintf "Warning: unknown primitive %S.\n%!" prim
+      | _ ->
+        let print_arg arg =
+          let buf = Buffer.create 16 in
+          bprint_value buf arg;
+          Buffer.output_buffer stderr buf in
+        let rec print_args args =
+          match args with
+          | [] -> ()
+          | [ last ] -> print_arg last
+          | arg :: rest -> print_arg arg; Printf.eprintf ", "; print_args rest in
+        Printf.eprintf "Warning: unknown primitive %S(" prim;
+        print_args args;
+        Printf.eprintf ").\n%!"
     end;
     raise Exit
 

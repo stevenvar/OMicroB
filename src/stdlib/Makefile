@@ -4,7 +4,7 @@ MODULES :=                                                       \
   std_exit pervasives char bytes bytesLabels string stringLabels \
   list listLabels map array arrayLabels uchar sys buffer random  \
   complex gc int32 int64 obj hashtbl set moreLabels queue sort   \
-  stack stdLabels avr liquidCrystal
+  stack stdLabels camlinternalOO avr liquidCrystal
 
 MLS  := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
@@ -36,6 +36,11 @@ pervasives.cmi: pervasives.mli
 
 pervasives.cmo: pervasives.ml pervasives.cmi
 	$(OCAMLC) -nostdlib -nopervasives -c -w @a $<
+
+camlinternalOO.cmo: camlinternalOO.ml obj.cmi
+	$(OCAMLC) -nostdlib -c -w @a-41 $<
+
+obj.cmo: int32.cmi
 
 $(LIB)/%.mli: %.mli
 	cp $< $@

@@ -20,6 +20,25 @@ value caml_obj_dup(value arg) {
   }
 }
 
+value caml_obj_block(value tag, value size) {
+  value res;
+  mlsize_t sz, i;
+  tag_t tg;
+
+  sz = Int_val(size);
+  tg = Int_val(tag);
+  if (sz == 0) {
+    assert(tag == 0);
+    return OCAML_atom0;
+  } else {
+    OCamlAlloc(res, sz, tg);
+    for (i = 0; i < sz; i++) {
+      Ram_field(res, i) = Val_int(0);
+    }
+    return res;
+  }
+}
+
 value caml_alloc_dummy(value ml_size) {
   mlsize_t size = Int_val(ml_size);
   if (size == 0) {

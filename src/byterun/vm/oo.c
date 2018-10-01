@@ -8,3 +8,9 @@ value caml_fresh_oo_id (value v) {
   oo_last_id += 2;
   return v;
 }
+
+value caml_set_oo_id(value obj) {
+  Ram_field(obj, 1) = oo_last_id;
+  oo_last_id += 2;
+  return obj;
+}

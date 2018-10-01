@@ -686,7 +686,7 @@ let export_code_from_codemap code codemap =
       export ofs;
     | STD (GETPUBMET (htag, _cache)) ->
       export_opcode Opcode.GETPUBMET;
-      export_uint32 htag;
+      export_uint32 (htag land 0x7FFF_FFFF);
     | STD GETDYNMET ->
       export_opcode Opcode.GETDYNMET;
     | STD STOP ->

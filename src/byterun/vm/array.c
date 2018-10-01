@@ -78,3 +78,11 @@ value caml_array_append(value tbl1, value tbl2) {
   }
   return result;
 }
+
+value caml_array_blit(value tbl1, value ml_ofs1, value tbl2, value ml_ofs2, value ml_n) {
+  value i, n = Int_val(ml_n), ofs1 = Int_val(ml_ofs1), ofs2 = Int_val(ml_ofs2);
+  for (i = 0; i < n; i ++) {
+    Ram_field(tbl2, ofs2 + i) = Field(tbl1, ofs1 + i);
+  }
+  return Val_unit;
+}
