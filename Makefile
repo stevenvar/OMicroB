@@ -3,6 +3,7 @@ include etc/Makefile.conf
 all: config
 	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
+	$(call compile, src/h15ppx)
 	$(call compile, src/simulators/lcd)
 	$(call compile, src/simulators/dip)
 	$(call compile, src/simulators/circuit)	
@@ -26,6 +27,7 @@ install: all
 	mkdir -p "$(MAN1DIR)"
 	mkdir -p "$(MAN3DIR)"
 	cp bin/bc2c "$(BINDIR)/bc2c"
+	cp bin/h15ppx "$(BINDIR)/h15ppx"
 	cp bin/omicrob "$(BINDIR)/omicrob"
 	cp bin/*_simulator "$(LIBEXECDIR)/"
 	cp doc/bc2c.1 "$(MAN1DIR)/bc2c.1"
@@ -44,6 +46,7 @@ install: all
 
 uninstall:
 	-rm -f "$(BINDIR)/bc2c"
+	-rm -f "$(BINDIR)/h15ppx"
 	-rm -f "$(BINDIR)/omicrob"
 	-rm -f "$(MAN1DIR)/omicrob.1"
 	-rm -f "$(MAN1DIR)/bc2c.1"
@@ -83,6 +86,7 @@ tests: all
 clean:
 	@rm -f *~ */*~ */*/*~ */*/*/*~
 	$(call clean, src/bc2c)
+	$(call clean, src/h15ppx)
 	$(call clean, src/byterun)
 	$(call clean, src/simulators/dip)
 	$(call clean, src/simulators/lcd)

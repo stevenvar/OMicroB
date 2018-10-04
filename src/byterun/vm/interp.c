@@ -2394,8 +2394,11 @@ static inline void interp(void) {
       int li = 3, hi = Field(meths, 0), mi;
       while (li < hi) {
         mi = ((li + hi) >> 1) | 1;
-        if ((int32_t) acc < (int32_t) Field(meths, mi)) hi = mi - 2;
-        else li = mi;
+        #if OCAML_VIRTUAL_ARCH == 16
+        if ((int16_t) acc < (int16_t) Field(meths, mi)) hi = mi - 2; else li = mi;
+        #else
+        if ((int32_t) acc < (int32_t) Field(meths, mi)) hi = mi - 2; else li = mi;
+        #endif
       }
       acc = Field(meths, li - 1);
       break;

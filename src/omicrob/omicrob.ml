@@ -344,6 +344,11 @@ let bc2c =
   if local then Filename.concat (Filename.concat Config.builddir "bin") "bc2c"
   else Filename.concat Config.bindir "bc2c"
 
+let ppx_options =
+  if arch <> Some 16 then []
+  else if local then [ "-ppx"; Filename.concat (Filename.concat Config.builddir "bin") "h15ppx" ]
+  else [ "-ppx"; Filename.concat Config.bindir "h15ppx" ]
+
 let () =
   if sudo && not flash then error "the option -sudo is meaningless without -flash"
 
@@ -485,7 +490,7 @@ let () =
     | [] -> error "no input file"
     | _ ->
       let vars = [ ("CAMLLIB", libdir) ] in
-      let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-c" ] @ mlopts @ input_mls in
+      let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ ppx_options @ [ "-c" ] @ mlopts @ input_mls in
       run ~vars cmd;
       exit 0;
   )
@@ -528,7 +533,7 @@ let () =
     | _ :: _ :: _ -> error "too many input files"
     | [ path ] ->
       let vars = [ ("CAMLLIB", libdir) ] in
-      let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-i" ] @ mlopts @ [ path ] in
+      let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ ppx_options @ [ "-i" ] @ mlopts @ [ path ] in
       run ~vars cmd;
       exit 0;
   )
@@ -568,7 +573,7 @@ let () =
     available_byte := Some output_path;
 
     let vars = [ ("CAMLLIB", libdir) ] in
-    let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ [ "-custom" ] @ mlopts in
+    let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ ppx_options @ [ "-custom" ] @ mlopts in
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
