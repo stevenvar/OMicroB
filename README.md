@@ -20,7 +20,8 @@ An article describing our generic virtual machine approach has been published on
 - ocamlclean (on OPAM)
 - ocamlbuild (on OPAM)
 - gcc (for simulation)
-- avr-gcc and avrdude (for flashing to an AVR microcontroller)
+- avr-gcc, avr-libc (for AVR microcontrollers)
+- avrdude (for flashing to an AVR)
 
 ## Installing
 
