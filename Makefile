@@ -6,7 +6,7 @@ all: config
 	$(call compile, src/h15ppx)
 	$(call compile, src/simulators/lcd)
 	$(call compile, src/simulators/dip)
-	$(call compile, src/simulators/circuit)	
+	$(call compile, src/simulators/circuit)
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
@@ -88,6 +88,7 @@ tests: all
 
 clean:
 	@rm -f *~ */*~ */*/*~ */*/*/*~
+	@rm -f bin/*
 	$(call clean, src/bc2c)
 	$(call clean, src/h15ppx)
 	$(call clean, src/byterun)
