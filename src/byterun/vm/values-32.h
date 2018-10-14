@@ -6,12 +6,12 @@ Floatting point values: ieee754 with only one NaN
                          +inf : 0111 1111 1000 0000 0000 0000 0000 0000 (unique)
                          -inf : 1000 0000 0111 1111 1111 1111 1111 1111 (unique)
                           +0. : 0000 0000 0000 0000 0000 0000 0000 0000 (unique)
-                          -0. : 0111 1111 1011 0000 0000 0000 0000 0000 (unique)
-        other positive floats : 0eee eeee emmm mmmm mmmm mmmm mmmm mmmm (as is, collide int)
-        other negative floats : 1eee eeee emmm mmmm mmmm mmmm mmmm mmmm (with exponant and mantiss inverted, collide int and code pointer)
+                          -0. : 1111 1111 1111 1111 1111 1111 1111 1111 (collides int (-1))
+        other positive floats : 0eee eeee emmm mmmm mmmm mmmm mmmm mmmm (as is, collides int)
+        other negative floats : 1eee eeee emmm mmmm mmmm mmmm mmmm mmmm (with exponant and mantiss inverted, collides int and code pointer)
 
 Integers, constant variants, etc:
-                        int   : xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxx1 (collide float and code pointer)
+                        int   : xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxx1 (collides float and code pointer)
 
 dynamic heap pointers   (ram) : 0111 1111 1100 xxxx xxxx xxxx xxxx xx00 (unique)
  static heap pointers   (ram) : 0111 1111 1101 xxxx xxxx xxxx xxxx xx00 (unique)
@@ -19,7 +19,7 @@ dynamic heap pointers   (ram) : 0111 1111 1100 xxxx xxxx xxxx xxxx xx00 (unique)
 
                             ? : 0111 1111 1110 xxxx xxxx xxxx xxxx xx00 (unique)
 
-        code pointers (flash) : 10xx xxxx xxxx xxxx xxxx xxxx xxxx xxx1 (collide float and int)
+        code pointers (flash) : 10xx xxxx xxxx xxxx xxxx xxxx xxxx xxx1 (collides float and int)
 
                  white header : tttt tttt ssss ssss ssss ssss ssss ss00
                    red header : tttt tttt ssss ssss ssss ssss ssss ss01
@@ -127,7 +127,7 @@ extern float float_of_value(value v);
 #define Val_inf   ((value) 0x7F800000)
 #define Val_ninf  ((value) 0x807FFFFF)
 #define Val_zero  ((value) 0x00000000)
-#define Val_nzero ((value) 0x7FB00000)
+#define Val_nzero ((value) 0xFFFFFFFF)
 
 /******************************************************************************/
 /* Blocks */
