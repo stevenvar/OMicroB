@@ -17,7 +17,7 @@ dynamic heap pointers   (ram) : 0111 1111 1100 xxxx xxxx xxxx xxxx xx00 (unique)
  static heap pointers   (ram) : 0111 1111 1101 xxxx xxxx xxxx xxxx xx00 (unique)
         heap pointers (flash) : 0111 1111 1110 xxxx xxxx xxxx xxxx xx00 (unique)
 
-                            ? : 0111 1111 1110 xxxx xxxx xxxx xxxx xx00 (unique)
+                            ? : 0111 1111 1111 xxxx xxxx xxxx xxxx xx00 (unique)
 
         code pointers (flash) : 10xx xxxx xxxx xxxx xxxx xxxx xxxx xxx1 (collides float and int)
 
