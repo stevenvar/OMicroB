@@ -1,6 +1,7 @@
-let () =
-  trace "Hello"
+let () = trace "Hello"
 
+(******************************************************************************)
+    
 class virtual node = object
   method virtual to_string : string
 end
@@ -22,3 +23,23 @@ let () =
   let b3 = new bin_node (b1 :> node) (b2 :> node) in
   let str = b3#to_string in
   trace str
+
+(******************************************************************************)
+    
+class point (x:int) (y:int) =
+object (_)
+  val mutable x = x
+  val mutable y = y
+  method get_x () = x
+  method get_y () = y
+end
+  
+let _ =
+  let p1 = new point 3 4 in
+  p1#get_x
+  
+(******************************************************************************)
+
+let () = trace "Bye"
+    
+(******************************************************************************)

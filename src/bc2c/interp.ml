@@ -80,6 +80,35 @@ let pprint_exception v =
   | _ -> pprint_value v
     
 (******************************************************************************)
+
+let rec value_equal v1 v2 =
+  match v1, v2 with
+  | Int i1, Int i2 -> i1 = i2
+  | Int32 i1, Int32 i2 -> Int32.equal i1 i2
+  | Int64 i1, Int64 i2 -> Int64.equal i1 i2
+  | Nativeint i1, Nativeint i2 -> Nativeint.equal i1 i2
+  | Float x1, Float x2 -> x1 = x2
+  | Float_array (_, xs1), Float_array (_, xs2) -> xs1 = xs2
+  | Bytes (_, b1), Bytes (_, b2) -> b1 = b2
+  | Object (_, vs1), Object (_, vs2) -> values_equal vs1 vs2
+  | Block (_, tag1, vs1), Block (_, tag2, vs2) -> tag1 = tag2 && values_equal vs1 vs2
+  | Closure cl1, Closure cl2 -> cl1.ofs = cl2.ofs && cl1.ptrs = cl2.ptrs && values_equal cl1.env cl2.env
+  | CodePtr ptr1, CodePtr ptr2 -> ptr1 = ptr2
+  | _ -> false
+
+and values_equal vs1 vs2 =
+  let len1 = Array.length vs1 and len2 = Array.length vs2 in
+  if len1 <> len2 then false else (
+    try
+      for i = 0 to len1 - 1 do
+        if not (value_equal vs1.(i) vs2.(i)) then raise Exit;
+      done;
+      true
+    with Exit ->
+      false
+  )
+  
+(******************************************************************************)
 (* Conversion from OByteLib.Value.t to value. *)
 
 let make_import_value () =
@@ -478,6 +507,7 @@ let ccall arch ooid prim args =
   | "caml_update_dummy", [ Block (_mut1, tag1, tbl1); Block (_mut2, tag2, tbl2) ] -> assert (Array.length tbl1 = Array.length tbl2); tag1 := !tag2; Array.blit tbl2 0 tbl1 0 (Array.length tbl1); Int 0
   | "caml_update_dummy", [ Closure dummy; Closure newval ] -> dummy.ofs <- newval.ofs; dummy.ptrs <- Array.copy newval.ptrs; dummy.env <- Array.copy newval.env; Int 0
   | "caml_gc_run", [ Int 0 ] -> Int 0
+  | "caml_equal", [ v1; v2 ] -> if value_equal v1 v2 then Int 1 else Int 0
   | _ ->
     begin
       match prim with
