@@ -28,7 +28,7 @@ value caml_obj_block(value tag, value size) {
   sz = Int_val(size);
   tg = Int_val(tag);
   if (sz == 0) {
-    assert(tag == 0);
+    assert(tg == 0);
     return OCAML_atom0;
   } else {
     OCamlAlloc(res, sz, tg);
