@@ -78,7 +78,7 @@ val lookup_tables : tables -> closure array -> tables
 
 (** {1 Builtins to reduce code size} *)
 
-(*
+
 val get_const : t -> closure
 val get_var : int -> closure
 val get_env : int -> int -> closure
@@ -103,7 +103,6 @@ val send_const : tag -> obj -> int -> closure
 val send_var : tag -> int -> int -> closure
 val send_env : tag -> int -> int -> int -> closure
 val send_meth : tag -> label -> int -> closure
-*)
 
 type impl =
     GetConst
