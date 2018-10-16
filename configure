@@ -52,10 +52,11 @@ function remove_trailing_slash () {
 
 function select_avr () {
     check_directory "avrs/$1"
-    ln -sf "../../avrs/$1/avr.mli" "src/stdlib/avr.mli"
-    ln -sf "../../avrs/$1/avr.ml" "src/stdlib/avr.ml"
-    ln -sf "../../avrs/$1/avr_config.ml" "src/omicrob/avr_config.ml"
-    ln -sf "../../../avrs/$1/avrlib.c" "src/byterun/avr/avrlib.c"
+    rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
+    cp -f "avrs/$1/avr.mli" "src/stdlib/avr.mli"
+    cp -f "avrs/$1/avr.ml" "src/stdlib/avr.ml"
+    cp -f "avrs/$1/avr_config.ml" "src/omicrob/avr_config.ml"
+    cp -f "avrs/$1/avrlib.c" "src/byterun/avr/avrlib.c"
 }
 
 ################################################################################

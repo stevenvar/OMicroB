@@ -43,6 +43,7 @@ install: all
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
 	cp -a src/byterun/avr "$(INCLUDEDIR)/"
+	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:
 	-rm -f "$(BINDIR)/bc2c"
@@ -62,6 +63,7 @@ uninstall:
 	-rm -f "$(INCLUDEDIR)/prims/"*
 	-rm -f "$(INCLUDEDIR)/simul/"*
 	-rm -f "$(INCLUDEDIR)/avr/"*
+	-rm -f "$(INCLUDEDIR)/stdlib/"*
 	@for mod in $(MAN_3P_BASES); do \
 	  rm -f "$(MAN3DIR)/"$$mod.3p;	\
 	done
@@ -74,6 +76,7 @@ uninstall:
 	@if [ -d "$(INCLUDEDIR)/prims" ]; then rmdir "$(INCLUDEDIR)/prims"; fi
 	@if [ -d "$(INCLUDEDIR)/simul" ]; then rmdir "$(INCLUDEDIR)/simul"; fi
 	@if [ -d "$(INCLUDEDIR)/avr" ]; then rmdir "$(INCLUDEDIR)/avr"; fi
+	@if [ -d "$(INCLUDEDIR)/stdlib" ]; then rmdir "$(INCLUDEDIR)/stdlib"; fi
 	@if [ -d "$(INCLUDEDIR)" ]; then rmdir "$(INCLUDEDIR)"; fi
 
 etc/Makefile.conf:
