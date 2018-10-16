@@ -68,7 +68,6 @@ let rec expr_mapper mapper expr =
   | Pexp_variant (label, arg) ->
     { expr with pexp_desc = Pexp_variant (mangle_name label, map_opt (expr_mapper mapper) arg) }
   | Pexp_send (obj, meth) ->
-    Printf.printf "meth = %S @ %d, %d\n%!" meth.txt meth.loc.loc_start.Lexing.pos_lnum (meth.Location.loc.loc_start.Lexing.pos_cnum - meth.Location.loc.loc_start.Lexing.pos_bol);
     { expr with pexp_desc = Pexp_send (expr_mapper mapper obj, mangle_label meth) } 
   | _ ->
     default_mapper.expr mapper expr
