@@ -33,17 +33,20 @@ let data_mode cs dc =
 
 let draw x y color =
   write_buffer x y color
-    
-let clear() =
- for _i = 0 to 1023 do
-   Spi.transfer(0x00)
- done
+
 
 let display () =
   for _i = 0 to 1023 do
     Spi.transfer(get_byte_buffer());
   done
-  
+
+
+let clear() =
+  for i = 0 to 127 do
+    for j = 0 to 63 do
+      write_buffer i j false
+    done
+  done
 
 let boot ~cs ~dc ~rst =
   digital_write rst HIGH;

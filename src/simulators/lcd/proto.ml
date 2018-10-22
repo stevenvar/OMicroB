@@ -23,6 +23,7 @@ let refresh display =
         Mutex.unlock mutex;
         if b then (
           Ddram.to_matrix display;
+          (* Ddram.print_matrix display; *)
           Display.show display
         );
         Thread.delay 0.01;
@@ -50,13 +51,13 @@ let exec cs dc _rst display =
 
 let register display =
   let refresh = refresh display in
-  
+
   let handler () =
     let cs_val = Simul.test_pin display.cs in
     let dc_val = Simul.test_pin display.dc in
     let rst_val = Simul.test_pin display.rst in
     exec cs_val dc_val rst_val display in
-  
+
   let set_display_clock_divisor _ = () in (* TODO *)
   let enable_charge_pump _ = () in (* TODO *)
   let set_contrast _ = () in (* TODO *)

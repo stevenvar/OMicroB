@@ -26,7 +26,7 @@ let create_display x y cs dc rst column_nb line_nb =
     max_col = column_nb-1;
     matrix = Array.make_matrix column_nb (8*line_nb) false;
     ddram = Ddram.create ();
-    mode = Data
+    mode = Command
   }
 
 let sync_display =
@@ -61,9 +61,10 @@ let init_graphics display =
 
 
 let set_pixel x y display =
-  let y = 63 - y in (* must invert because of Graphics y positions ... *)
+  let y = (display.height - 1) - y in (* must invert because of Graphics y positions ... *)
   (* in the physical screen, pixels are white when on *)
   set_color white;
+  (* Format.printf "X = %d ; Y = %d \n" (x) (y); *)
   fill_rect (display.x+x*2) (display.y+y*2) 1 1
 
 let clear_pixel _x _y =

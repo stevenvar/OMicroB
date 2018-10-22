@@ -44,9 +44,15 @@ uint8_t* ptr = sBuffer;
 int total = 0;
 
 int i = 0;
-int j = 0; 
+int j = 0;
 
 uint8_t buffer_get_byte(){
+  /* if (total==0){ */
+  /*   printf("\n\n"); */
+  /* } */
+  /* if (total%64==0){ */
+  /*   printf("\n"); */
+  /* } */
   uint8_t val = *ptr;
   ptr++;
   total++;
@@ -54,6 +60,7 @@ uint8_t buffer_get_byte(){
     ptr = sBuffer;
     total = 0;
   }
+  /* printf("%d ",val); */
   return val;
 }
 

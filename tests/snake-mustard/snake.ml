@@ -160,8 +160,8 @@ let snake_length snake =
 
 let play () =
   let total_len = 40 in
-  let init_x    = 14 in
-  let init_y    =  3 in
+  let init_x    = 0 in
+  let init_y    = 0 in
   let init_len  = 10 in
   let init_dir  = South in
   let snake = create total_len init_x init_y init_len init_dir in

@@ -15,6 +15,8 @@ let translate_position col page display =
 let write, set_line, set_column_low, set_column_high =
   let i = ref 0 in
   let write c display =
+    (* if c <> 0 then *)
+      (* Printf.printf "i = %d , c = %d " !i c; *)
     display.ddram.(!i) <- c;
     incr i;
     i := !i mod size
@@ -59,10 +61,10 @@ let print_matrix display =
     | false -> '_'
   in
   let matrix = display.matrix in
-  for i = 0 to 64 - 1 do
-    for j = 0 to 128 - 1 do
+  for i = 0 to display.height - 1 do
+    for j = 0 to display.width - 1 do
       Printf.fprintf oc "%c" (char_of_bool matrix.(j).(i))
     done;
-    Printf.fprintf oc  "\n"
+    Printf.fprintf  oc "\n"
   done;
   close_out oc

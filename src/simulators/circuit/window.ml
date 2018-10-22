@@ -42,8 +42,8 @@ let init_graphics () =
     Graphics.set_window_title t;
     Graphics.set_color c;
     Graphics.fill_rect 0 0 w h;
-    Graphics.set_color Color.black;
-    Graphics.draw_rect 0 0 (w - 1) (h - 1);
+    (* Graphics.set_color Color.black; *)
+    (* Graphics.draw_rect 0 0 (w - 1) (h - 1); *)
     Graphics.display_mode false;
     Graphics.auto_synchronize false;
 ;;

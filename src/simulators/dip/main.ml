@@ -131,18 +131,18 @@ let vals = Array.make 44 false;;
 let mem_vals = Array.make 44 true;;
 
 let grew = rgb 200 200 200;;
-open_graph " 800x800";;
+open_graph " 740x420";;
 set_window_title "pin simulator";;
 display_mode false;;
 set_color grew;
-fill_rect 0 0 820 820;;
+fill_rect 0 0 770 420;;
 set_color black;;
-fill_rect 50 50 690 690;;
+fill_rect 50 50 630 320;;
 for i = 0 to 10 do
-  let x1 = (156 + (508 * i) / 10) in
-  let x2 = (156 + (508 * i) / 10) in
+  let x1 = (100 + (508 * i) / 10) in
+  let x2 = (100 + (508 * i) / 10) in
   let y1 = 38 in
-  let y2 = 740 in
+  let y2 = 370 in
   draw_rect x1 y1 12 12;
   draw_rect x2 y2 12 12;
   pins.(i) <- (x1, y1);
@@ -150,9 +150,9 @@ for i = 0 to 10 do
 done;;
 for i = 0 to 10 do
   let x2 = 38 in
-  let x1 = 740 in
-  let y1 = (156 + (508 * i) / 10) in
-  let y2 = (156 + (508 * i) / 10) in
+  let x1 = 680 in
+  let y1 = (100 + (220 * i) / 10) in
+  let y2 = (100 + (220 * i) / 10) in
   draw_rect x1 y1 12 12;
   draw_rect x2 y2 12 12;
   pins.(i+11) <- (x1, y1);
@@ -162,11 +162,11 @@ done;;
   (* pins.(39-i) <- (x2, y2); *)
 (* done;; *)
 set_color (rgb 100 100 100);;
-fill_circle 85 85 8;;
+fill_circle 65 65 8;;
 (* draw_circle 68 74 4;; *)
 (* fill_circle 49 115 8;; *)
 set_color white;;
-moveto 370 400;
+moveto 330 200;
 draw_string (Printf.sprintf "ATmega32U4");
 for i = 0 to 43 do
   (try

@@ -138,6 +138,7 @@ static void send_write(char cmnd, int port, unsigned char val){
 }
 
 static void send_write_port(int port, unsigned char val){
+  /* printf("sending write %d = %d \n", port, val); */
   send_write('W', port, val);
 }
 
