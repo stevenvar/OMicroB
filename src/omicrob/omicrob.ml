@@ -1,3 +1,5 @@
+open Avr_config
+
 (******************************************************************************)
 (******************************************************************************)
 (******************************************************************************)
@@ -12,10 +14,7 @@ let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequenc
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 
-let default_mmcu  = Avr_config.default_mmcu
-let default_avr   = Avr_config.default_avr
-let default_baud  = Avr_config.default_baud
-let default_clock = Avr_config.default_clock
+let default_config = ref Avr_config.arduboyConfig
 
 (******************************************************************************)
 (******************************************************************************)
@@ -122,6 +121,13 @@ let spec =
      " Execute the program in simulation mode on the computer");
     ("-flash", Arg.Set flash,
      " Transfer the program to the micro-controller with avrdude\n");
+
+    ("-device", Arg.String (fun name -> default_config := Avr_config.get_config name),
+     "<device-name> Set the device to compile for; see -list-devices");
+    ("-list-devices", Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
+                                   (Avr_config.all_config_names ());
+                                 exit 0),
+     " List available devices\n");
 
     ("-stack-size", Arg.Int (fun sz -> stack_size := Some sz),
      Printf.sprintf "<word-nb> Set stack size (default: %d)" default_stack_size);
@@ -714,8 +720,8 @@ let () =
     available_avr := Some output_path;
 
     let cmd = [ Config.avr_cxx ] @ default_avr_cxx_options @ avrcxxopts in
-    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ default_mmcu ] in
-    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int default_clock ] in
+    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ !default_config.mmcu ] in
+    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int !default_config.clock ] in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "/avr" ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
@@ -822,12 +828,12 @@ let () =
 
     let cmd = if sudo then [ "sudo" ] else [] in
     let cmd = cmd @ [ Config.avrdude ] in
-    let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; default_avr ] in
+    let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; !default_config.avr ] in
     let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
-    let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; default_mmcu ] in
+    let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; !default_config.mmcu ] in
     let _reset_cmd = cmd in
     let _reset_cmd = _reset_cmd @ [ "-b" ; "1200" ] in
-    let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int default_baud ] in
+    let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int !default_config.baud ] in
     let cmd = cmd @ avrdudeopts @ [ "-v"; "-D"; "-U"; "flash:w:" ^ path ^ ":i" ] in
     (* run reset_cmd; *)
     run cmd
