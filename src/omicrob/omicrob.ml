@@ -127,7 +127,7 @@ let spec =
     ("-flash", Arg.Set flash,
      " Transfer the program to the micro-controller with avrdude\n");
 
-    ("-device", Arg.String (fun name -> default_config := Device_config.get_config name),
+    ("-device", Arg.String set_config,
      "<device-name> Set the device to compile for; see -list-devices");
     ("-list-devices", Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
                                    (Device_config.all_config_names ());
@@ -592,6 +592,7 @@ let () =
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
+    let cmd = cmd @ [ "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ] in
     run ~vars cmd;
 
     let cmd = [ Config.ocamlclean; output_path; "-o"; output_path ] in

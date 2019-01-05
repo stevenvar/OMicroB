@@ -50,24 +50,6 @@ function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
 
-function target_avr () {
-    check_command "avr-g++"
-    check_command "avr-objcopy"
-    check_command "avrdude"
-    check_directory "targets/avrs"
-
-    # rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
-    cp -f "targets/avrs/arduino_uno/avr.mli" "src/stdlib/avr.mli" # TODO
-    cp -f "targets/avrs/arduino_uno/avr.ml" "src/stdlib/avr.ml" # TODO
-    cp -f "targets/avrs/device_config.ml" "src/omicrob/device_config.ml"
-    mkdir -p "src/byterun/avr"
-    cp -f "targets/avrs/arch-specific.c" "src/byterun/avr/"
-    cp -f "targets/avrs/arch-specific.h" "src/byterun/avr/"
-    cp -fr "targets/avrs/arduboy" "src/byterun/avr/"
-    cp -fr "targets/avrs/arduino_uno" "src/byterun/avr/"
-    cp -fr "targets/avrs/arduino_mega_2560" "src/byterun/avr/"
-}
-
 ################################################################################
 
 check_command "gcc"
@@ -95,9 +77,9 @@ check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam i
 ################################################################################
 
 GXX="$(which g++)"
-AVR_GXX="$(which avr-g++)"
-AVR_OBJCOPY="$(which avr-objcopy)"
-AVRDUDE="$(which avrdude)"
+AVR_GXX="$(which avr-g++ 2> /dev/null)"
+AVR_OBJCOPY="$(which avr-objcopy 2> /dev/null)"
+AVRDUDE="$(which avrdude 2> /dev/null)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -201,6 +183,29 @@ let version     = \"$VERSION\"
 " > etc/config.ml
 
 ################################################################################
+
+# Refresh targets files
+rm -f "src/omicrob/device_config.ml"
+rm -rf "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/byterun/avr/"
+
+function target_avr () {
+    check_command "avr-g++"
+    check_command "avr-objcopy"
+    check_command "avrdude"
+    check_directory "targets/avrs"
+
+    cp -f "targets/avrs/avr.mli" "src/stdlib/avr.mli"
+    cp -f "targets/avrs/avr.ml" "src/stdlib/avr.ml"
+    cp -f "targets/avrs/device_config.ml" "src/omicrob/device_config.ml"
+    mkdir -p "src/byterun/avr"
+    cp -f "targets/avrs/arch-specific.c" "src/byterun/avr/"
+    cp -f "targets/avrs/arch-specific.h" "src/byterun/avr/"
+    for f in "arduboy" "arduino_uno" "arduino_mega_2560"
+    do
+        mkdir -p "src/byterun/avr/$f/"
+        cp -f "targets/avrs/$f/avrlib.c" "src/byterun/avr/$f/"
+    done
+}
 
 target_avr
 

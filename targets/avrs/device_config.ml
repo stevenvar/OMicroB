@@ -10,6 +10,7 @@ type config = {
   clock: int;
   device_def: string;
   folder: string;
+  pins_module: string;
 }
 
 let arduboyConfig: config = {
@@ -20,6 +21,7 @@ let arduboyConfig: config = {
   clock = 16_000_000;
   device_def = "DEVICE_ARDUBOY";
   folder = "arduboy";
+  pins_module = "ArduboyPins";
 }
 
 let arduinoMegaConfig: config = {
@@ -30,6 +32,7 @@ let arduinoMegaConfig: config = {
   clock = 16_000_000;
   device_def = "DEVICE_ARDUINO_MEGA";
   folder = "arduino_mega_2560";
+  pins_module = "ArduinoMegaPins";
 }
 
 let arduinoUnoConfig: config = {
@@ -40,6 +43,7 @@ let arduinoUnoConfig: config = {
   clock = 16_000_000;
   device_def = "DEVICE_ARDUINO_UNO";
   folder = "arduino_uno";
+  pins_module = "ArduinoUnoPins";
 }
 
 (** Choose se correct config according to name *)
