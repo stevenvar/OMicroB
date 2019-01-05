@@ -643,6 +643,12 @@ let () =
     let cmd = if no_flash_globals then cmd @ [ "-no-flash-globals" ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun path -> [ "-i"; path ]) input_cs) in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
+    run cmd;
+
+    (* Add the device definition to the start of the file *)
+    let cmd = [ "sed"; "-i";
+                Printf.sprintf "1s/^/#define %s\\n/" !default_config.device_def;
+                output_path] in
     run cmd
 
   ) else (
