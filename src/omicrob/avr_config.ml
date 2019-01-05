@@ -5,6 +5,7 @@ type config = {
   baud: int;
   clock: int;
   device_def: string;
+  pins_module: string;
 }
 
 let arduboyConfig: config = {
@@ -13,6 +14,7 @@ let arduboyConfig: config = {
   baud = 115_200;
   clock = 16_000_000;
   device_def = "DEVICE_ARDUBOY";
+  pins_module = "ArduboyPins";
 }
 
 let arduinoMegaConfig: config = {
@@ -21,6 +23,7 @@ let arduinoMegaConfig: config = {
   baud = 115_200;
   clock = 16_000_000;
   device_def = "DEVICE_ARDUINO_MEGA";
+  pins_module = "ArduinoMegaPins";
 }
 
 let arduinoUnoConfig: config = {
@@ -29,6 +32,7 @@ let arduinoUnoConfig: config = {
   baud  = 115_200;
   clock = 16_000_000;
   device_def = "DEVICE_ARDUINO_UNO";
+  pins_module = "ArduinoUnoPins";
 }
 
 (** Choose se correct config according to name *)

@@ -5,24 +5,24 @@
 
 #ifdef DEVICE_ARDUBOY
 volatile uint8_t *get_reg_addr(uint8_t reg) {
-  if (reg ==  0) return &PORTB;
-  if (reg ==  1) return &PORTC;
-  if (reg ==  2) return &PORTD;
-  if (reg ==  3) return &PORTE;
-  if (reg ==  4) return &PORTF;
-  if (reg ==  5) return &DDRB;
-  if (reg ==  6) return &DDRC;
-  if (reg ==  7) return &DDRD;
-  if (reg ==  8) return &DDRE;
-  if (reg ==  9) return &DDRF;
-  if (reg == 10) return &PINB;
-  if (reg == 11) return &PINC;
-  if (reg == 12) return &PIND;
-  if (reg == 13) return &PINE;
-  if (reg == 14) return &PINF;
-  if (reg == 15) return &SPCR;
-  if (reg == 16) return &SPSR;
-  if (reg == 17) return &SPDR;
+  if (reg ==  1) return &PORTB;
+  if (reg ==  2) return &PORTC;
+  if (reg ==  3) return &PORTD;
+  if (reg ==  4) return &PORTE;
+  if (reg ==  5) return &PORTF;
+  if (reg ==  12) return &DDRB;
+  if (reg ==  13) return &DDRC;
+  if (reg ==  14) return &DDRD;
+  if (reg ==  15) return &DDRE;
+  if (reg ==  16) return &DDRF;
+  if (reg == 23) return &PINB;
+  if (reg == 24) return &PINC;
+  if (reg == 25) return &PIND;
+  if (reg == 26) return &PINE;
+  if (reg == 27) return &PINF;
+  if (reg == 33) return &SPCR;
+  if (reg == 34) return &SPSR;
+  if (reg == 35) return &SPDR;
   return NULL;
 }
 #endif
@@ -71,18 +71,18 @@ volatile uint8_t *get_reg_addr(uint8_t reg) {
 
 #ifdef DEVICE_ARDUINO_UNO
 volatile uint8_t *get_reg_addr(uint8_t reg) {
-  if (reg ==  0) return &PORTB;
-  if (reg ==  1) return &PORTC;
-  if (reg ==  2) return &PORTD;
-  if (reg ==  3) return &DDRB;
-  if (reg ==  4) return &DDRC;
-  if (reg ==  5) return &DDRD;
-  if (reg ==  6) return &PINB;
-  if (reg ==  7) return &PINC;
-  if (reg ==  8) return &PIND;
-  if (reg ==  9) return &SPCR;
-  if (reg == 10) return &SPSR;
-  if (reg == 11) return &SPDR;
+  if (reg ==  1) return &PORTB;
+  if (reg ==  2) return &PORTC;
+  if (reg ==  3) return &PORTD;
+  if (reg ==  12) return &DDRB;
+  if (reg ==  13) return &DDRC;
+  if (reg ==  14) return &DDRD;
+  if (reg ==  23) return &PINB;
+  if (reg ==  24) return &PINC;
+  if (reg ==  25) return &PIND;
+  if (reg ==  33) return &SPCR;
+  if (reg == 34) return &SPSR;
+  if (reg == 35) return &SPDR;
   return NULL;
 }
 #endif

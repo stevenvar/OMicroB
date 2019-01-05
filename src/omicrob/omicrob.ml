@@ -15,6 +15,11 @@ let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 
 let default_config = ref Avr_config.arduboyConfig
+let set_config name =
+  try default_config := Avr_config.get_config name
+  with _ ->
+    Printf.printf "Error: device %s is not recognized\n" name;
+    exit 1
 
 (******************************************************************************)
 (******************************************************************************)
@@ -122,7 +127,7 @@ let spec =
     ("-flash", Arg.Set flash,
      " Transfer the program to the micro-controller with avrdude\n");
 
-    ("-device", Arg.String (fun name -> default_config := Avr_config.get_config name),
+    ("-device", Arg.String set_config,
      "<device-name> Set the device to compile for; see -list-devices");
     ("-list-devices", Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
                                    (Avr_config.all_config_names ());
@@ -583,6 +588,7 @@ let () =
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
+    let cmd = cmd @ [ "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ] in
     run ~vars cmd;
 
     let cmd = [ Config.ocamlclean; output_path; "-o"; output_path ] in
