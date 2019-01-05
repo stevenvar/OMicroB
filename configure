@@ -50,21 +50,27 @@ function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
 
-function select_target () {
-    check_directory "targets/$1"
-    rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
-    cp -f "targets/$1/avr.mli" "src/stdlib/avr.mli"
-    cp -f "targets/$1/avr.ml" "src/stdlib/avr.ml"
-    cp -f "targets/$1/avr_config.ml" "src/omicrob/avr_config.ml"
-    cp -f "targets/$1/avrlib.c" "src/byterun/avr/avrlib.c"
+function target_avr () {
+    check_command "avr-g++"
+    check_command "avr-objcopy"
+    check_command "avrdude"
+    check_directory "targets/avrs"
+
+    # rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
+    cp -f "targets/avrs/arduino_uno/avr.mli" "src/stdlib/avr.mli" # TODO
+    cp -f "targets/avrs/arduino_uno/avr.ml" "src/stdlib/avr.ml" # TODO
+    cp -f "targets/avrs/avr_config.ml" "src/omicrob/avr_config.ml"
+    mkdir -p "src/byterun/avr"
+    cp -f "targets/avrs/arch-specific.c" "src/byterun/avr/"
+    cp -f "targets/avrs/arch-specific.h" "src/byterun/avr/"
+    cp -fr "targets/avrs/arduboy" "src/byterun/avr/"
+    cp -fr "targets/avrs/arduino_uno" "src/byterun/avr/"
+    cp -fr "targets/avrs/arduino_mega_2560" "src/byterun/avr/"
 }
 
 ################################################################################
 
 check_command "gcc"
-check_command "avr-g++"
-check_command "avr-objcopy"
-check_command "avrdude"
 check_command "ocaml"
 check_command "ocamlc"
 check_command "ocamlopt"
@@ -196,8 +202,7 @@ let version     = \"$VERSION\"
 
 ################################################################################
 
-# select_avr "arduboy"
-select_target "avrs/arduino_mega_2560"
+target_avr
 
 ################################################################################
 

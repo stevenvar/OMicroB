@@ -4,6 +4,8 @@ type config = {
   avr: string;
   baud: int;
   clock: int;
+  device_def: string;
+  folder: string;
 }
 
 let arduboyConfig: config = {
@@ -11,6 +13,8 @@ let arduboyConfig: config = {
   avr = "avr109";
   baud = 115_200;
   clock = 16_000_000;
+  device_def = "DEVICE_ARDUBOY";
+  folder = "arduboy";
 }
 
 let arduinoMegaConfig: config = {
@@ -18,6 +22,8 @@ let arduinoMegaConfig: config = {
   avr = "avrispmkii";
   baud = 115_200;
   clock = 16_000_000;
+  device_def = "DEVICE_ARDUINO_MEGA";
+  folder = "arduino_mega_2560";
 }
 
 let arduinoUnoConfig: config = {
@@ -25,6 +31,8 @@ let arduinoUnoConfig: config = {
   avr   = "arduino";
   baud  = 115_200;
   clock = 16_000_000;
+  device_def = "DEVICE_ARDUINO_UNO";
+  folder = "arduino_uno";
 }
 
 (** Choose se correct config according to name *)
