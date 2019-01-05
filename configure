@@ -50,13 +50,6 @@ function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
 
-function select_avr () {
-    check_directory "avrs/$1"
-    rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml"
-    cp -f "avrs/$1/avr.mli" "src/stdlib/avr.mli"
-    cp -f "avrs/$1/avr.ml" "src/stdlib/avr.ml"
-}
-
 ################################################################################
 
 check_command "gcc"
@@ -191,10 +184,6 @@ let avr_objcopy = \"$AVR_OBJCOPY\"
 let avrdude     = \"$AVRDUDE\"
 let version     = \"$VERSION\"
 " > etc/config.ml
-
-################################################################################
-
-select_avr "arduino_mega_2560"
 
 ################################################################################
 
