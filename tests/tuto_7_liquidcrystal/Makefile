@@ -6,10 +6,10 @@ TARGETS := lcdexample.byte lcdexample.c lcdexample.elf lcdexample.avr lcdexample
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -heap-size 256
+	$(BIN)/omicrob -v $^ -device arduino-uno -heap-size 256
 
 flash: lcdexample.hex
-	$(BIN)/omicrob -flash -sudo $<
+	$(BIN)/omicrob -device arduino-uno -flash -sudo $<
 
 simul: lcdexample.elf
 	./$<

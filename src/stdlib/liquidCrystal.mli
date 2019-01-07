@@ -9,77 +9,78 @@
 
 open Avr
 
-type ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
+module type Writeable = sig
+  val pin_mode: pin -> mode -> unit
+  val digital_write: pin -> level -> unit
+end
 
-(** Initialise a LCD in 4-bit mode : [create_4bitmode rs enable d0 d1 d2 d3] *)
-val create4bitmode : ('a register, 'b register, 'c register) pin ->
-  ('d register, 'e register, 'f register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
+module type LCD = sig
+  type lcd
 
-(** Initialise a LCD in 8-bit mode : [create_8bitmode rs enable d0 d1 d2 d3 d4 d5 d6 d7] *)
-val create8bitmode :  ('a register, 'b register, 'c register) pin ->
-  ('d register, 'e register, 'f register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
+  (** Initialise a LCD in 4-bit mode : [create_4bitmode rs enable d0 d1 d2 d3] *)
+  val create4bitmode : pin -> pin -> pin -> pin -> pin -> pin -> lcd
 
-(** Start the LCD display with c columns and l lines : [lcdBegin lcd c l]. Was named [begin] in the C library, but is renamed because begin is a keyword in OCaml *)
-val lcdBegin : _ lcd -> int -> int -> unit
+  (** Initialise a LCD in 8-bit mode : [create_8bitmode rs enable d0 d1 d2 d3 d4 d5 d6 d7] *)
+  val create8bitmode :  pin -> pin -> pin -> pin -> pin -> pin ->
+    pin -> pin -> pin -> pin -> lcd
 
-(** Clear the LCD display *)
-val clear : _ lcd -> unit
+  (** Start the LCD display with c columns and l lines : [lcdBegin lcd c l]. Was named [begin] in the C library, but is renamed because begin is a keyword in OCaml *)
+  val lcdBegin : lcd -> int -> int -> unit
 
-(** Set the cursor to home position *)
-val home : _ lcd -> unit
+  (** Clear the LCD display *)
+  val clear : lcd -> unit
 
-(** Turn off the LCD display, without loosing it's text *)
-val noDisplay : _ lcd -> unit
+  (** Set the cursor to home position *)
+  val home : lcd -> unit
 
-(** Turn on the LCD display *)
-val display : _ lcd -> unit
+  (** Turn off the LCD display, without loosing it's text *)
+  val noDisplay : lcd -> unit
 
-(** Turn off the blinking cursor *)
-val noBlink : _ lcd -> unit
+  (** Turn on the LCD display *)
+  val display : lcd -> unit
 
-(** Turn on the blinking cursor *)
-val blink : _ lcd -> unit
+  (** Turn off the blinking cursor *)
+  val noBlink : lcd -> unit
 
-(** Turn off the cursor *)
-val noCursor : _ lcd -> unit
+  (** Turn on the blinking cursor *)
+  val blink : lcd -> unit
 
-(** Turn on the cursor *)
-val cursor : _ lcd -> unit
+  (** Turn off the cursor *)
+  val noCursor : lcd -> unit
 
-(** Scroll the content (text and cursor) of display one space to the left *)
-val scrollDisplayLeft : _ lcd -> unit
+  (** Turn on the cursor *)
+  val cursor : lcd -> unit
 
-(** Scroll the content (text and cursor) of display one space to the right *)
-val scrollDisplayRight : _ lcd -> unit
+  (** Scroll the content (text and cursor) of display one space to the left *)
+  val scrollDisplayLeft : lcd -> unit
 
-(** Write from left to right (default) *)
-val leftToRight : _ lcd -> unit
+  (** Scroll the content (text and cursor) of display one space to the right *)
+  val scrollDisplayRight : lcd -> unit
 
-(** Write from right to left *)
-val rightToLeft : _ lcd -> unit
+  (** Write from left to right (default) *)
+  val leftToRight : lcd -> unit
 
-(** Turn on autoscroll *)
-val autoscroll : _ lcd -> unit
+  (** Write from right to left *)
+  val rightToLeft : lcd -> unit
 
-(** Turn off autoscroll *)
-val noAutoscroll : _ lcd -> unit
+  (** Turn on autoscroll *)
+  val autoscroll : lcd -> unit
 
-(** Set the cursor to column c and row r : [setCursor lcd c r]*)
-val setCursor : _ lcd -> int -> int -> unit
+  (** Turn off autoscroll *)
+  val noAutoscroll : lcd -> unit
 
-(** Write a character to the LCD display *)
-val write : _ lcd -> int -> unit
+  (** Set the cursor to column c and row r : [setCursor lcd c r]*)
+  val setCursor : lcd -> int -> int -> unit
 
-(** Print text to the LCD display *)
-val print : _ lcd -> string -> unit
+  (** Write a character to the LCD display *)
+  val write : lcd -> int -> unit
 
-(** Create a special character in one of the 8 CGRAM locations : [createChar lcd loc data] where loc is a number between 0 and 7, and data is an int array of size 7. Use before begin ! *)
-val createChar : _ lcd -> int -> int array -> unit
+  (** Print text to the LCD display *)
+  val print : lcd -> string -> unit
+
+  (** Create a special character in one of the 8 CGRAM locations : [createChar lcd loc data] where loc is a number between 0 and 7, and data is an int array of size 7. Use before begin ! *)
+  val createChar : lcd -> int -> int array -> unit
+end
+
+(** Creates an LCD module, given a Writable interface *)
+module MakeLCD(W: Writeable): LCD

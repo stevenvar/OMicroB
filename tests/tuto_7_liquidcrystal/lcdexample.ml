@@ -1,5 +1,9 @@
 open Avr
-open LiquidCrystal
+module LCD = LiquidCrystal.MakeLCD(struct
+    let pin_mode = pin_mode
+    let digital_write = digital_write
+  end)
+open LCD
 
 let () =
   let lcd = create4bitmode PIN12 PIN11 PIN5 PIN4 PIN3 PIN2 in
