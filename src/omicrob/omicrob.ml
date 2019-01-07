@@ -592,7 +592,10 @@ let () =
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
-    let cmd = cmd @ [ "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ] in
+    let cmd = cmd @ match !default_config.typeD with
+      | AVR -> [ "-open"; Printf.sprintf "Avr";
+                 "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ]
+    in
     run ~vars cmd;
 
     let cmd = [ Config.ocamlclean; output_path; "-o"; output_path ] in
