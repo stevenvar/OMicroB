@@ -650,13 +650,6 @@ let () =
     let cmd = cmd @ List.flatten (List.map (fun path -> [ "-i"; path ]) input_cs) in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd;
-
-    (* Add the device definition to the start of the file *)
-    let cmd = [ "sed"; "-i";
-                Printf.sprintf "1s/^/#define %s\\n/" !default_config.device_def;
-                output_path] in
-    run cmd
-
   ) else (
     should_be_none_option "-stack-size" stack_size;
     should_be_none_option "-heap-size" heap_size;
@@ -730,6 +723,7 @@ let () =
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ !default_config.mmcu ] in
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int !default_config.clock ] in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
+    let cmd = cmd @ [ "-D" ^ !default_config.device_def ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   ) else (
