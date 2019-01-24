@@ -1,5 +1,9 @@
+(** Type of device *)
+type device_type = AVR
+
 (** Config for a given avr device *)
 type config = {
+  typeD: device_type;
   mmcu: string;
   avr: string;
   baud: int;
@@ -9,6 +13,7 @@ type config = {
 }
 
 let arduboyConfig: config = {
+  typeD = AVR;
   mmcu = "atmega32u4";
   avr = "avr109";
   baud = 115_200;
@@ -18,6 +23,7 @@ let arduboyConfig: config = {
 }
 
 let arduinoMegaConfig: config = {
+  typeD = AVR;
   mmcu = "atmega2560";
   avr = "avrispmkii";
   baud = 115_200;
@@ -27,6 +33,7 @@ let arduinoMegaConfig: config = {
 }
 
 let arduinoUnoConfig: config = {
+  typeD = AVR;
   mmcu  = "atmega328p";
   avr   = "arduino";
   baud  = 115_200;

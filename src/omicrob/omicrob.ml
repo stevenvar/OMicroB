@@ -1,4 +1,4 @@
-open Avr_config
+open Device_config
 
 (******************************************************************************)
 (******************************************************************************)
@@ -14,9 +14,9 @@ let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequenc
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 
-let default_config = ref Avr_config.arduboyConfig
+let default_config = ref Device_config.arduboyConfig
 let set_config name =
-  try default_config := Avr_config.get_config name
+  try default_config := Device_config.get_config name
   with _ ->
     Printf.printf "Error: device %s is not recognized\n" name;
     exit 1
@@ -130,7 +130,7 @@ let spec =
     ("-device", Arg.String set_config,
      "<device-name> Set the device to compile for; see -list-devices");
     ("-list-devices", Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
-                                   (Avr_config.all_config_names ());
+                                   (Device_config.all_config_names ());
                                  exit 0),
      " List available devices\n");
 
@@ -699,7 +699,7 @@ let available_elf = !available_elf
 let available_avr = ref input_avr
 
 let () =
-  if available_c <> None && (flash || output_avr <> None || no_output_requested) then (
+  if !default_config.typeD = AVR && (available_c <> None && (flash || output_avr <> None || no_output_requested)) then (
     should_be_none_file input_avr;
     should_be_none_file input_elf;
     should_be_none_file input_hex;
@@ -738,7 +738,7 @@ let available_avr = !available_avr
 let available_hex = ref input_hex
 
 let () =
-  if available_avr <> None && (flash || output_hex <> None || no_output_requested) then (
+  if !default_config.typeD = AVR && (available_avr <> None && (flash || output_hex <> None || no_output_requested)) then (
     should_be_none_file input_hex;
 
     let input_path =
@@ -761,6 +761,12 @@ let () =
   ) else (
     should_be_empty_options "-avrobjcopts" avrobjcopts;
   )
+
+(******************************************************************************)
+(* Compile a .c into a .arm.elf TODO *)
+
+(******************************************************************************)
+(* Compile a .arm.elf into a .hex targetting microbit TODO *)
 
 let available_hex = !available_hex
 
