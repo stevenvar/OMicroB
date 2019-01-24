@@ -59,7 +59,7 @@ function target_avr () {
     # rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
     cp -f "targets/avrs/arduino_uno/avr.mli" "src/stdlib/avr.mli" # TODO
     cp -f "targets/avrs/arduino_uno/avr.ml" "src/stdlib/avr.ml" # TODO
-    cp -f "targets/avrs/avr_config.ml" "src/omicrob/avr_config.ml"
+    cp -f "targets/avrs/device_config.ml" "src/omicrob/device_config.ml"
     mkdir -p "src/byterun/avr"
     cp -f "targets/avrs/arch-specific.c" "src/byterun/avr/"
     cp -f "targets/avrs/arch-specific.h" "src/byterun/avr/"
