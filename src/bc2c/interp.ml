@@ -52,7 +52,7 @@ let rec bprint_exception_arg buf arg =
     ) vs;
     Buffer.add_string buf " |]";
   | _ -> bprint_value buf arg
-    
+
 let pprint_exception_args name args =
   match args with
   | [] ->
@@ -67,7 +67,7 @@ let pprint_exception_args name args =
     List.iter (fun arg -> Printf.bprintf buf ", %a" bprint_exception_arg arg) rest;
     Printf.bprintf buf ")";
     Buffer.contents buf
-    
+
 let pprint_exception v =
   match v with
   | Object (_, [| Bytes (_, name); Int _ |]) ->
@@ -78,7 +78,7 @@ let pprint_exception v =
     | _ -> pprint_value v
   )
   | _ -> pprint_value v
-    
+
 (******************************************************************************)
 
 let rec value_equal v1 v2 =
@@ -107,7 +107,7 @@ and values_equal vs1 vs2 =
     with Exit ->
       false
   )
-  
+
 (******************************************************************************)
 (* Conversion from OByteLib.Value.t to value. *)
 
@@ -133,7 +133,7 @@ let make_import_value () =
 let import_globals globals =
   let import_value = make_import_value () in
   Array.map import_value globals
-    
+
 (******************************************************************************)
 (* Value tools. *)
 
@@ -248,6 +248,9 @@ let set_float_field blk i v =
 let get_size blk =
   match blk with
   | Block (_mut, _tag, values) -> Array.length values
+  | Float_array (_mut,values) ->
+     Array.length values
+     (* Printf.printf "float array is error"; assert false *)
   | _ -> assert false
 
 (******************************************************************************)
@@ -410,7 +413,10 @@ let ccall arch ooid prim args =
   | "caml_array_concat", [ lst ] -> caml_array_concat lst
   | "caml_array_sub", [ Block (_mut, { contents = 0 }, v); Int ofs; Int len ] -> Block (Mutable, ref 0, Array.sub v ofs len)
   | ("caml_array_get_addr" | "caml_array_unsafe_get" | "caml_array_get"), [ Block (_mut, { contents = 0 }, tbl); Int ind ] -> Array.get tbl ind
+  | ("caml_array_get_addr" | "caml_array_unsafe_get" | "caml_array_get"), [ Float_array (_mut, tbl); Int ind ] -> Float (Array.get tbl ind)
   | ("caml_array_set_addr" | "caml_array_unsafe_set" | "caml_array_set"), [ Block (_mut, { contents = 0 }, tbl); Int ind; v ] -> Array.set tbl ind v; Int 0
+  | ("caml_floatarray_set"), [ Float_array (_mut, tbl); Int ind; (Float v) ] -> Array.set tbl ind v; Int 0
+  | ("caml_floatarray_get"), [ Float_array (_mut, tbl); Int ind ] -> Float (Array.get tbl ind)
   | "caml_array_unsafe_set", [ Object (_mut, values); Int ind; v ] -> Array.set values ind v; Int 0
   | "caml_array_make_vect", [ Int len; init ] -> Block (Mutable, ref 0, Array.make len init)
   | "caml_asin_float", [ Float x ] -> Float (asin x)
@@ -477,6 +483,7 @@ let ccall arch ooid prim args =
   | "caml_make_vect", [ Int i; v ] -> Block (Mutable, ref 0, Array.make i v)
   | "caml_modf_float", [ Float x ] -> let y, z = modf x in Block (Immutable, ref 0, [| Float y; Float z |])
   | "caml_nativeint_format", [ Bytes (_mut, b); Nativeint i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Nativeint.format (Bytes.unsafe_to_string b) i))
+  | "caml_int_of_float", [ Float x ] -> Int (int_of_float x)
   | "caml_nativeint_of_float", [ Float x ] -> Nativeint (Nativeint.of_float x)
   | "caml_nativeint_of_string", [ Bytes (_mut, b) ] -> Nativeint (Nativeint.of_string (Bytes.unsafe_to_string b))
   | "caml_nativeint_to_float", [ Nativeint i ] -> Float (Nativeint.to_float i)
@@ -976,7 +983,7 @@ let exec arch prims globals code cycle_limit =
         trap_sp := int_of_value (acc stack 1);
         popn stack 4;
         incr pc;
-      | RAISE | RERAISE | RAISE_NOTRACE -> 
+      | RAISE | RERAISE | RAISE_NOTRACE ->
         if !trap_sp = -1 then failwith (Printf.sprintf "Evaluation failed: uncaught exception: %s.\n" (pprint_exception !accu));
         let ofs = List.length !stack - !trap_sp in
         popn stack ofs;

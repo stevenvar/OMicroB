@@ -32,11 +32,9 @@ let rec do_list f l = match l with
        []   -> ()
   |  (a::q) -> f a; do_list f q
 
-
-
 let _ =
   Avr.(pin_mode PIN9 OUTPUT);
   (* let r = ref (fun x -> 0) in *)
   for x = 0 to 100 do
-    do_list (fun n -> ()) (sieve 10);
+    do_list (fun n -> ()) (sieve 100);
   done;

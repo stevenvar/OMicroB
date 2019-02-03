@@ -52,6 +52,15 @@ value caml_array_set(value array, value index, value val) {
   return caml_array_set_addr(array, index, val); // OK since floats are not boxed
 }
 
+value caml_floatarray_set(value array, value index, value val) {
+  return caml_array_set_addr(array, index, val); // OK since floats are not boxed
+}
+
+value caml_floatarray_get(value array, value index) {
+  return caml_array_get_addr(array, index); // OK since floats are not boxed
+}
+
+
 value caml_array_sub(value array, value ml_ofs, value ml_len) {
   mlsize_t ofs = Int_val(ml_ofs);
   mlsize_t len = Int_val(ml_len);

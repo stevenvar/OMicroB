@@ -6,7 +6,7 @@ TARGETS := sieve.byte sieve.c sieve.elf sieve.avr sieve.hex
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -mlopt -verbose
+	$(BIN)/omicrob -v $^ -mlopt -verbose -heap-size 2000 -stack-size 2000
 
 flash: sieve.hex
 	$(BIN)/omicrob -flash -sudo $<
