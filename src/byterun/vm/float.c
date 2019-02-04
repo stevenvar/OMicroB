@@ -189,8 +189,17 @@ value caml_cos_float(value v) {
 value caml_sin_float(value v) {
   return Val_float(sin(Float_val(v)));
 }
+
 value caml_abs_float(value v) {
   return Val_float(fabs(Float_val(v)));
+}
+
+value caml_sqrt_float(value v) {
+  return Val_float(sqrt(Float_val(v)));
+}
+
+value caml_atan2_float(value v, value w) {
+  return Val_float(atan2(Float_val(v), Float_val(w)));
 }
 
 value caml_neg_float(value v) {

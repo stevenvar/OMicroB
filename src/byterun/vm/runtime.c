@@ -14,6 +14,7 @@
 #include "oo.c"
 #include "str.c"
 #include "sys.c"
+#include "stack.c"
 #include "gc.c"
 #include "hash.c"
 #include "int32.c"

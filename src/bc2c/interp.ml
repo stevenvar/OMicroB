@@ -437,6 +437,8 @@ let ccall arch ooid prim args =
   | "caml_expm1_float", [ Float x ] -> Float (expm1 x)
   | ("caml_fill_bytes" | "caml_fill_string"), [ Bytes (mut, b); Int ofs; Int len; Int c ] -> assert (mut = Mutable); Bytes.fill b ofs len (char_of_int c); Int 0
   | "caml_float_of_string", [ Bytes (_mut, b) ] -> Float (float_of_string (Bytes.unsafe_to_string b))
+  | "caml_float_of_int", [ Int i ] -> Float (float_of_int i)
+  | "caml_neg_float", [ Float f ] -> Float (-. f)
   | "caml_floor_float", [ Float x ] -> Float (floor x)
   | "caml_fmod_float", [ Float x; Float y ] -> Float (mod_float x y)
   | "caml_format_float", [ Bytes (_mut, b); Float x ] -> Bytes (Immutable, Bytes.of_string (format_float (Bytes.to_string b) x))
