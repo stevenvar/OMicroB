@@ -2408,6 +2408,9 @@ static inline void interp(void) {
 #ifdef OCAML_STOP
     case OCAML_STOP : {
       TRACE_INSTRUCTION("STOP");
+      #ifndef __PC__
+      while(1){ /* This is needed to easily soft reset the AVR  */}
+      #endif
       return;
     }
 #endif
@@ -2430,6 +2433,26 @@ extern const char **global_argv; // used by simulator
 int main(int argc, const char **argv) {
 #ifdef __PC__
   global_argv = argv;
+#endif
+
+#ifdef __AVR__
+
+#include <avr/interrupt.h>
+  unsigned long ctc_match_overflow;
+
+  ctc_match_overflow = ((F_CPU / 1000) / 8); //when timer1 is this value, 1ms has passed
+
+  // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 8)
+  TCCR1B |= (1 << WGM12) | (1 << CS11);
+
+  // high byte first, then low byte
+  OCR1AH = (ctc_match_overflow >> 8);
+  OCR1AL = ctc_match_overflow;
+
+  // Enable the compare match interrupt
+TIMSK1 |= (1 << OCIE1A);
+  sei();
+
 #endif
 
   interp_init();

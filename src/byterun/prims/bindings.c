@@ -32,6 +32,10 @@ value caml_avr_delay(value ms) {
   return Val_unit;
 }
 
+value caml_avr_millis(value unit) {
+  return Val_int(avr_millis());
+}
+
 /******************************************************************************/
 
 value caml_avr_write_register(value reg, value val) {

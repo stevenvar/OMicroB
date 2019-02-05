@@ -297,6 +297,13 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
   may_sleep();
 }
 
+/* TODO : move these  */
+
+int avr_millis(){
+  printf("millis()\n");
+  return 0;
+}
+
 int avr_random(int max){
   return 0;
 }
@@ -528,11 +535,11 @@ void avr_serial_init(){
   printf("serial init\n");
 }
 
-int avr_serial_read(){
+char avr_serial_read(){
   printf("serial read\n");
-  return 0;
+  return '0';
 }
 
-void avr_serial_write(int c){
+void avr_serial_write(char c){
   printf("serial write(%d)",c);
 }

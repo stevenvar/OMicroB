@@ -160,6 +160,7 @@ external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit"
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
   [@@noalloc]
 external delay : int -> unit = "caml_avr_delay" [@@noalloc]
+external millis : unit -> int = "caml_avr_millis" [@@noalloc]
 val pin_mode : ('a register, 'b register, 'c register) pin -> mode -> unit
 val digital_write :
   ('a register, 'b register, 'c register) pin -> level -> unit
@@ -167,6 +168,6 @@ val digital_read : ('a register, 'b register, 'c register) pin -> level
 module Serial :
   sig
     external init : unit -> unit = "caml_avr_serial_init" [@@noalloc]
-    external read : unit -> int = "caml_avr_serial_read" [@@noalloc]
-    external write : int -> unit = "caml_avr_serial_write" [@@noalloc]
+    external read : unit -> char = "caml_avr_serial_read" [@@noalloc]
+    external write : char -> unit = "caml_avr_serial_write" [@@noalloc]
   end

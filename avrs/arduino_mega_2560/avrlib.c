@@ -59,6 +59,8 @@ bool avr_read_bit(uint8_t reg, uint8_t bit) {
 
 /******************************************************************************/
 
+#include <avr/io.h>
+#include <inttypes.h>
 #include <avr/interrupt.h>
 
 void avr_write_register(uint8_t reg, uint8_t val) {
@@ -74,6 +76,33 @@ int avr_random(int max){
   r = (r*109+89)%max;
   return r;
 }
+
+
+/* milli function from https://github.com/monoclecat/avr-millis-function */
+#include <util/atomic.h>
+#include <avr/interrupt.h>
+
+
+volatile int timer1_millis;
+
+ISR(TIMER1_COMPA_vect)
+{
+  timer1_millis++;
+}
+
+int avr_millis() {
+  int millis_return;
+
+  // Ensure this cannot be disrupted
+  ATOMIC_BLOCK(ATOMIC_FORCEON) {
+    millis_return = timer1_millis;
+  }
+  return millis_return;
+
+}
+
+
+
 
 /******************************************************************************/
 
@@ -117,10 +146,10 @@ void avr_serial_init(){
   stdin = stdout = &serial_str;
 }
 
-void avr_serial_write(int val){
-  printf("%d",val);
+void avr_serial_write(char val){
+  printf("%c",val);
 }
 
-int avr_serial_read(){
-  return getchar();
+char avr_serial_read(){
+  return (char)getchar();
 }

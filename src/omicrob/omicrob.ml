@@ -819,8 +819,11 @@ let () =
     let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; default_avr ] in
     let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
     let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; default_mmcu ] in
+    let _reset_cmd = cmd in
+    let _reset_cmd = _reset_cmd @ [ "-b" ; "1200" ] in
     let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int default_baud ] in
     let cmd = cmd @ avrdudeopts @ [ "-v"; "-D"; "-U"; "flash:w:" ^ path ^ ":i" ] in
+    (* run reset_cmd; *)
     run cmd
   ) else (
     should_be_empty_options "-avrdudeopts" avrdudeopts;

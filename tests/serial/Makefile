@@ -10,7 +10,8 @@ $(TARGETS): $(SOURCES)
 	$(BIN)/omicrob -v $^
 
 flash: serial.hex
-	$(BIN)/omicrob -flash -sudo $<
+	sudo ./reset.py /dev/ttyACM*
+	$(BIN)/omicrob -v -flash -sudo $<
 
 clean:
 	@rm -f *.cmo *.cmi
