@@ -523,3 +523,16 @@ void exec_instr(char *instr, int size){
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
+
+void avr_serial_init(){
+  printf("serial init\n");
+}
+
+int avr_serial_read(){
+  printf("serial read\n");
+  return 0;
+}
+
+void avr_serial_write(int c){
+  printf("serial write(%d)",c);
+}

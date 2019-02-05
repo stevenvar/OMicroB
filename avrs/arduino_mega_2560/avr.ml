@@ -630,3 +630,12 @@ let digital_read p =
   match read_bit input ibit with
   | true -> HIGH
   | false -> LOW
+
+
+module Serial = struct
+
+  external init: unit -> unit = "caml_avr_serial_init" [@@noalloc]
+  external read : unit -> int = "caml_avr_serial_read" [@@noalloc]
+  external write : int -> unit = "caml_avr_serial_write" [@@noalloc]
+
+end

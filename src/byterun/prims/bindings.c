@@ -45,6 +45,25 @@ value caml_avr_read_register(value reg) {
 
 /******************************************************************************/
 
+
+value caml_avr_serial_init(value unit){
+  avr_serial_init();
+  return Val_unit;
+}
+
+value caml_avr_serial_write(value val){
+  avr_serial_write(Int_val(val));
+  return Val_unit;
+}
+
+
+value caml_avr_serial_read(value unit){
+  return Val_int(avr_serial_read());
+}
+
+
+/******************************************************************************/
+
 value caml_random_init(value n) {
   random_init(Int_val(n));
   return Val_unit;
