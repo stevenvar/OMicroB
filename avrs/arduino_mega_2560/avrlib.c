@@ -109,8 +109,6 @@ int serial_read(FILE *stream) {
     return UDR0;
 }
 
-
-
 FILE serial_str;
 
 void avr_serial_init(){
