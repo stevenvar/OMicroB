@@ -24,7 +24,7 @@ external make: int -> 'a -> 'a array = "caml_make_vect"
 external create: int -> 'a -> 'a array = "caml_make_vect"
 external unsafe_sub : 'a array -> int -> int -> 'a array = "caml_array_sub"
 external append_prim : 'a array -> 'a array -> 'a array = "caml_array_append"
-external concat : 'a array list -> 'a array = "caml_array_concat"
+(* external concat : 'a array list -> 'a array = "caml_array_concat" *)
 external unsafe_blit :
   'a array -> int -> 'a array -> int -> int -> unit = "caml_array_blit"
 external create_float: int -> float array = "caml_make_float_vect"
@@ -33,8 +33,6 @@ let make_float = create_float
 let init l f =
   if l = 0 then [||] else
   if l < 0 then invalid_arg "Array.init"
-  (* See #6575. We could also check for maximum array size, but this depends
-     on whether we create a float array or a regular one... *)
   else
    let res = create l (f 0) in
    for i = 1 to pred l do
@@ -59,6 +57,14 @@ let append a1 a2 =
   if l1 = 0 then copy a2
   else if length a2 = 0 then unsafe_sub a1 0 l1
   else append_prim a1 a2
+
+(* here we make concat an ocaml function rather than a C primitive :
+   the result is slower, but easier to implement, and safer
+ *)
+let rec concat l =
+  match l with
+    | [] -> [| |]
+    | t::ts -> append t (concat ts)
 
 let sub a ofs len =
   if ofs < 0 || len < 0 || ofs > length a - len
