@@ -82,15 +82,17 @@ int avr_random(int max){
 #define BAUD 9600
 #endif
 #include <util/setbaud.h>
-#include <stdio.h>
-#include <avr/io.h>
 
 void serial_init(void) {
-    UBRR0H = UBRRH_VALUE;
-    UBRR0L = UBRRL_VALUE;
-    UCSR0A &= ~(_BV(U2X0));
-    UCSR0C = _BV(UCSZ01) | _BV(UCSZ00);
-    UCSR0B = _BV(RXEN0) | _BV(TXEN0);
+  /* set SERIAL speed */
+  UBRR0H = UBRRH_VALUE;
+  UBRR0L = UBRRL_VALUE;
+  /* don't use double speed */
+  UCSR0A &= ~(_BV(U2X0));
+  /* set data size (8 bits) */
+  UCSR0C = _BV(UCSZ01) | _BV(UCSZ00);
+  /* enable RX and TX */
+  UCSR0B = _BV(RXEN0) | _BV(TXEN0);
 }
 
 int serial_write(char c, FILE *stream) {
