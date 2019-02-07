@@ -14,8 +14,4 @@ let _ =
      | LOW -> digital_write g LOW; digital_write r HIGH
      | HIGH -> digital_write g HIGH; digital_write r LOW);
     delay 100
-  done;
-  if 3 < 2 then
-    digital_write g HIGH
-  else
-    digital_write r HIGH
+  done

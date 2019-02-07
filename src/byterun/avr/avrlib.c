@@ -150,7 +150,7 @@ int avr_millis() {
 
 /******************************************************************************/
 
-
+#if defined(DEVICE_ARDUINO_MEGA) || defined(DEVICE_ARDUINO_UNO)
 #ifndef BAUD
 #define BAUD 9600
 #endif
@@ -197,3 +197,5 @@ void avr_serial_write(char val){
 char avr_serial_read(){
   return (char)getchar();
 }
+
+#endif
