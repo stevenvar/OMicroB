@@ -541,5 +541,5 @@ char avr_serial_read(){
 }
 
 void avr_serial_write(char c){
-  printf("serial write(%d)",c);
+  printf("serial write(%c)\n",c);
 }

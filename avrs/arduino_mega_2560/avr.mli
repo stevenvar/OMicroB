@@ -170,4 +170,6 @@ module Serial :
     external init : unit -> unit = "caml_avr_serial_init" [@@noalloc]
     external read : unit -> char = "caml_avr_serial_read" [@@noalloc]
     external write : char -> unit = "caml_avr_serial_write" [@@noalloc]
+    val write_string : string -> unit
+    val write_int : int -> unit
   end

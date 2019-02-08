@@ -27,6 +27,12 @@ value *sp;
 value trapSp;
 uint8_t extra_args;
 
+
+#if defined(__PC__) && DEBUG >= 2
+    unsigned int cpt_instr = 0;
+#endif
+
+
 PROGMEM extern void * const ocaml_primitives[];
 
 /******************************************************************************/
@@ -245,12 +251,15 @@ static inline void interp(void) {
 
 #ifdef __AVR__
     //debug_blink_message(0);
+
+    /* debug_blink_message(pc / 100); */
     /*
-    debug_blink_message(pc / 100);
-    debug_blink_message((pc / 10) % 10);
+      debug_blink_message((pc / 10) % 10);
     debug_blink_message(pc % 10);
     debug_blink_pause();
     */
+    /* avr_serial_init(); */
+    /* avr_serial_write('!'); */
 #endif
 
     switch(read_opcode()){
@@ -2458,6 +2467,12 @@ TIMSK1 |= (1 << OCIE1A);
   interp_init();
   gc_init();
   interp();
+
+
+#if defined(__PC__) && DEBUG >= 2
+  printf("# of instructions =%d\n", cpt_instr);
+#endif
+
 
 #ifdef __AVR__
   while(1) _delay_ms(10);

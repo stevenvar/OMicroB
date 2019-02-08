@@ -10,6 +10,7 @@
 #ifdef __AVR__
 #include <avr/io.h>
 #include <util/delay.h>
+#include "../prims/prims.h"
 #endif
 
 #include "debug.h"

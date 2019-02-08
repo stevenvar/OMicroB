@@ -639,4 +639,10 @@ module Serial = struct
   external read : unit -> char = "caml_avr_serial_read" [@@noalloc]
   external write : char -> unit = "caml_avr_serial_write" [@@noalloc]
 
+  let write_string s =
+    String.iter write s
+
+  let write_int n =
+    write_string (string_of_int n)
+
 end
