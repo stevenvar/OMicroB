@@ -7,7 +7,8 @@ ATTY := /dev/tty.usbmodem*
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -gc MAC -stack-size 300 -heap-size 1000
+	$(BIN)/omicrob -v $^ -gc MAC -stack-size 300 -heap-size 800
+	# $(BIN)/omicrob -v $^ -gc SC -stack-size 300 -heap-size 800
 
 flash: serial.hex
 	sudo ./reset.py $(ATTY)

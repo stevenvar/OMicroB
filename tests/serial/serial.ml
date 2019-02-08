@@ -27,13 +27,15 @@ let _ =
   let n = millis () in
   begin
     try
-      for i = 0 to 10 do
-        for i = 0 to 50 do
+        for i = 0 to 100 do
           Serial.write_int i;
           Serial.write '-';
-          ignore(sieve 50)
+          ignore(sieve 30);
+          Serial.write_int (Gc.collections ());
+          Serial.write '-';
+          Serial.write_int (Gc.used_stack_size ());
+            Serial.write '\n';
         done
-      done
   with Stack_overflow -> Serial.write_string "STACKOVERFLOW\n"
      | Out_of_memory -> Serial.write_string "OUTOFMEMORY\n"
      | _ -> Serial.write '?'
