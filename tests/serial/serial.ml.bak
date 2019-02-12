@@ -1,6 +1,11 @@
+(* Eratosthene's sieve *)
+
+(* interval min max = [min; min+1; ...; max-1; max] *)
+
 let rec interval min max =
   if min > max then [] else min :: interval (min + 1) max
 
+(* Application: removing all numbers multiple of n from a list of integers *)
 
 let remove_multiples_of n =
   List.filter (fun m -> not ((m mod n) = 0))
@@ -15,7 +20,6 @@ let sieve max =
   in
     filter_again (interval 2 max)
 
-
 let _ =
   let open Avr in
   Serial.init ();
@@ -23,20 +27,18 @@ let _ =
   let n = millis () in
   begin
     try
-        for i = 0 to 1 do
+        for i = 0 to 100 do
           (* Serial.write_int i; *)
           (* Serial.write '-'; *)
           (* Gc.run (); *)
-          Serial.write_int (Gc.live_words ());
-          let l = sieve 30 in
-          List.iter (fun x -> Serial.write_int x ; Serial.write ',') l;
+          ignore(sieve 30);
+          (* Serial.write_int (Gc.collections ()); *)
           (* Serial.write '-'; *)
           (* Serial.write_int (Gc.used_stack_size ()); *)
             (* Serial.write '\n'; *)
         done
   with Stack_overflow -> Serial.write_string "STACKOVERFLOW\n"
-     | Out_of_memory ->
-        Serial.write_string "OUTOFMEMORY\n";
+     | Out_of_memory -> Serial.write_string "OUTOFMEMORY\n"
      | _ -> Serial.write '?'
 end;
 let n' = millis () in

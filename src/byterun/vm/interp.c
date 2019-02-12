@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <setjmp.h>
-
+#include <stdio.h>
+#include <stdlib.h>
 #ifdef __PC__
 #include <stdlib.h>
 #endif
@@ -247,20 +248,24 @@ static inline void interp(void) {
     }
 #endif
 
-    assert(pc >= 0 && pc < OCAML_BYTECODE_BSIZE);
+
 
 #ifdef __AVR__
-    //debug_blink_message(0);
-
-    /* debug_blink_message(pc / 100); */
-    /*
-      debug_blink_message((pc / 10) % 10);
-    debug_blink_message(pc % 10);
-    debug_blink_pause();
-    */
-    /* avr_serial_init(); */
-    /* avr_serial_write('!'); */
+#if DEBUG >=3
+    /* char str[20]; */
+    /* itoa( pc, str, 10); */
+    /* avr_serial_write('['); */
+    /* for(int i = 0; i < 20; i++){ */
+      /* if(str[i]=='\0') break; */
+      /* avr_serial_write(str[i]); */
+    /* } */
+    /* avr_serial_write(']'); */
+    /* avr_serial_write('\n'); */
+    /* printf("[%d]",pc); */
 #endif
+#endif
+
+    assert(pc >= 0 && pc < OCAML_BYTECODE_BSIZE);
 
     switch(read_opcode()){
 #ifdef OCAML_ACC0
@@ -2462,6 +2467,7 @@ int main(int argc, const char **argv) {
 TIMSK1 |= (1 << OCIE1A);
   sei();
 
+avr_serial_init();
 #endif
 
   interp_init();

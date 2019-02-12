@@ -8,6 +8,7 @@
 #endif
 
 #ifdef __AVR__
+#include <stdio.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include "../prims/prims.h"
@@ -153,8 +154,57 @@ void print_flash_global_data(void) {
 
 #ifdef __AVR__
 
-void print_dynamic_heap(void) {}
-void print_static_heap(void) {}
+
+void print_value(value v) {
+  printf("0x%08" PRIflag "x / ", v);
+  if (OCAML_VIRTUAL_ARCH != 16 && Maybe_code_pointer(v)) {
+    printf("@%" PRIflag "d (code pointer)", Codeptr_val(v));
+  } else if (Is_int(v)) {
+    printf("(int = %" PRIflag "d / float = %" PRIflag "f)", Int_val(v), Float_val(v));
+  } else if (Is_block_in_dynamic_heap(v)) {
+    printf("@%p (block in dynamic heap)", Ram_block_val(v));
+  } else if (Is_block_in_static_heap(v)) {
+    printf("@%p (block in static heap)", Ram_block_val(v));
+  } else if (Is_block_in_flash_heap(v)) {
+    printf("@%p (block in flash heap)", Flash_block_val(v));
+  } else if (v == 0) {
+    printf("NULL");
+  } else if (Float_val(v) >= -1e6 && Float_val(v) <= 1e6) {
+    printf("(maybe %f)", Float_val(v));
+  } else {
+    printf("(?)");
+  }
+  printf("\n");
+  fflush(stdout);
+}
+
+static void print_table(const char *name, const value *table, uint32_t table_wosize) {
+  const value *ptr;
+  int i;
+
+  printf("%s (starts at %p, ends at %p, size = %" PRIu32 " words) : \n", name, table, table + table_wosize, table_wosize);
+
+  for (ptr = table, i = 0; ptr < table + table_wosize; ptr ++, i ++) {
+#ifdef OCAML_GC_STOP_AND_COPY
+    if (ptr == ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE / 2) {
+      printf("======================================================\n");
+    }
+#endif
+    printf("%d  @%p : ", i, ptr);
+    print_value(*ptr);
+  }
+  printf("\n\n\n");
+}
+void print_dynamic_heap(void) {
+  print_table("DYNAMIC HEAP", ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE, OCAML_DYNAMIC_HEAP_WOSIZE);
+}
+
+void print_static_heap(void) {
+  print_table("STATIC HEAP", ocaml_ram_heap, OCAML_STATIC_HEAP_WOSIZE);
+}
+
+/* void print_dynamic_heap(void) {} */
+/* void print_static_heap(void) {} */
 void print_flash_heap(void) {}
 void print_ram_global_data(void) {}
 void print_flash_global_data(void) {}

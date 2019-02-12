@@ -49,7 +49,7 @@ static void mark_block(value *p) {
         *old_p = Val_dynamic_block(p + 1);                    /* Restore the forward pointer             */
         p = old_p - 1;                                        /* Return to the backward block            */
       }
-      
+
     } else if (Is_block_in_dynamic_heap(v)) {
       header_t h = Ram_hd_val(v);
       tag_t tag = Tag_hd(h);
@@ -176,7 +176,9 @@ static void wipe_dead_blocks() {
 static void reverse_pointer(value *p) {
   value v = *p;
   if (Is_block_in_dynamic_heap(v)) {         /* Is v point to heap?    */
+    printf("Reverse %p (value = 0x%08x ) ", v , Val_dynamic_block(p));
     *p = Ram_hd_val(v) | Color_red;          /* Yes -> reverse pointer */
+    printf("with %p \n", Ram_hd_val(v) );
     Ram_hd_val(v) = Val_dynamic_block(p) | Color_black;
   }
 }
@@ -250,7 +252,8 @@ static void update_pointers(void) {
   value *alloc_pos = p;                                       /* Initialize a "virtual allocation pointer"                                       */
   while (p < heap_ptr) {                                      /* Loop over the whole heap in block order                                         */
     value v = *p;
-    if (Color_hd(v) == Color_black) {                         /* Is the header contains a reversed pointer (equivalent to "is the block alive")? */
+    /* printf("Checking %p\n",p); */
+    if (Color_hd(v) == Color_black) {                         /* Does the header contain a reversed pointer (equivalent to "is the block alive")? */
       do {                                                    /* Loop over the reversed pointer list                                             */
         v ^= Color_black;
         value next = *Ram_block_val(v) & ~Color_red;
@@ -260,11 +263,12 @@ static void update_pointers(void) {
       *p = v;                                                 /* Restore the White original header                                               */
       mlsize_t size = Wosize_hd(v) + 1;
       if (Tag_hd(v) == Closure_tag) {                         /* Is this block a closure?                                                        */
+        /* printf("is closure !\n"); */
         value *end = p + size;
         mlsize_t i = 2;
         for (p ++; p < end; p ++, i ++) {                     /* Loop over fields and restore pointers to destination infix sub-block            */
           value v = *p;
-          if (Color_hd(v) == Color_black) {                   /* Is an infix location?                                                           */
+          if (Color_hd(v) == Color_black) {                   /* Is it an infix location?                                                           */
             do {                                              /* Loop over the reversed pointer list                                             */
               v ^= Color_black;                               /* Restore pointers to this infix block                                            */
               value next = *Ram_block_val(v) & ~Color_red;
@@ -308,6 +312,12 @@ static void compact_blocks(void) {
 
 void gc(void) {
   gc_count ++;
+#if defined(__AVR__) && DEBUG >= 3
+  printf("#################### MARK & COMPACT ####################\n");
+  print_dynamic_heap();
+#endif
+
+
 #if defined(__PC__) && DEBUG >= 1 // TRACE GC RUNS
   printf("#################### MARK & COMPACT ####################\n");
 #endif
@@ -325,10 +335,71 @@ void gc(void) {
 #endif
   mark_roots();
   wipe_dead_blocks();
+
+#if defined(__AVR__) && DEBUG >= 3
+  printf("#################### MARK AFTER WIPE ####################\n");
+  print_dynamic_heap();
+#endif
+
+
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("MARK AFTER WIPE \n");
+  print_dynamic_heap();
+#endif
+
+
   reverse_root_pointers();
+
+
+#if defined(__AVR__) && DEBUG >= 3
+  printf("#################### MARK BEFORE REVERSE HEAP ####################\n");
+  print_dynamic_heap();
+#endif
+
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("MARK BEFORE REVERSE HEAP\n");
+  print_dynamic_heap();
+#endif
+
+
   reverse_heap_pointers();
+
+
+#if defined(__AVR__) && DEBUG >= 3
+  printf("#################### MARK BEFORE UPDATE ####################\n");
+  print_dynamic_heap();
+#endif
+
+
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("MARK BEFORE UPDATE\n");
+  print_dynamic_heap();
+#endif
+
+
   update_pointers();
+
+
+#if defined(__AVR__) && DEBUG >= 3
+  printf("#################### MARK BEFORE COMPACT ####################\n");
+  print_dynamic_heap();
+#endif
+
+
+#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("MARK BEFORE COMPACT\n");
+  print_dynamic_heap();
+#endif
+
+
   compact_blocks();
+
+#if defined(__AVR__) && DEBUG >= 3
+  printf("#################### AFTER MARK & COMPACT ####################\n");
+  print_dynamic_heap();
+#endif
+
+
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
   printf("END OF MARK & COMPACT\n");
   printf("&acc = %p\n", &acc);
