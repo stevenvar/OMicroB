@@ -1,6 +1,4 @@
-open Circuits
-
-module MyLed = MakeLed(struct include Connection let connectedPin = PIN8 end)
+let%connection MyLed = Circuits.MakeLed(connectedPin = PIN8)
 
 let _ =
   MyLed.init ();

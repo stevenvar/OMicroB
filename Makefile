@@ -4,6 +4,7 @@ all: config
 	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
 	$(call compile, src/h15ppx)
+	$(call compile, src/circuitppx)
 	$(call compile, src/simulators/lcd)
 	$(call compile, src/simulators/dip)
 	$(call compile, src/simulators/circuit)
@@ -28,6 +29,7 @@ install: all
 	mkdir -p "$(MAN3DIR)"
 	cp bin/bc2c "$(BINDIR)/bc2c"
 	cp bin/h15ppx "$(BINDIR)/h15ppx"
+	cp bin/circuitppx "$(BINDIR)/circuitppx"
 	cp bin/omicrob "$(BINDIR)/omicrob"
 	cp bin/*_simulator "$(LIBEXECDIR)/"
 	cp doc/bc2c.1 "$(MAN1DIR)/bc2c.1"

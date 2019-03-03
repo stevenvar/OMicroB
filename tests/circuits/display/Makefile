@@ -1,10 +1,10 @@
 include ../../../etc/Makefile.conf
 
 microbit: display.ml
-	$(BIN)/omicrob -v -device=microbit $^ -o display.combined_hex
+	$(BIN)/omicrob -v -device=microbit -circuitppx $^ -o display.combined_hex
 
 uno: display.ml
-	$(BIN)/omicrob -v -device=arduino-uno $^ -o display.hex
+	$(BIN)/omicrob -v -device=arduino-uno -circuitppx $^ -o display.hex
 
 flash-uno: uno
 	$(BIN)/omicrob -v -device=arduino-uno -flash -sudo display.hex

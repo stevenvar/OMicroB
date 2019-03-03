@@ -4,15 +4,14 @@
 (* module MyDisp = MicroBit.Screen *)
 
 (* Use an external, LiquidCrystal type screen *)
-module MyDisp = LiquidCrystal.MakeLCD(struct
-    include Connection
-    let rsPin = PIN12
-    let enablePin = PIN11
-    let d4Pin = PIN5
-    let d5Pin = PIN4
-    let d6Pin = PIN3
-    let d7Pin = PIN2
-  end)
+let%connection MyDisp = LiquidCrystal.MakeLCD(
+    rsPin = PIN12;
+    enablePin = PIN11;
+    d4Pin = PIN5;
+    d5Pin = PIN4;
+    d6Pin = PIN3;
+    d7Pin = PIN2;
+)
 
 let smiley = [[LOW;HIGH;LOW;HIGH;LOW];
               [LOW;HIGH;LOW;HIGH;LOW];
