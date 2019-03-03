@@ -198,6 +198,7 @@ module ArduboyPins: AvrPins = struct
     let digital_read = digital_read
     let digital_write = digital_write
     let pin_mode = pin_mode
+    let delay = delay
   end
 end
 
@@ -524,6 +525,7 @@ module ArduinoMegaPins: AvrPins = struct
     let digital_read = digital_read
     let digital_write = digital_write
     let pin_mode = pin_mode
+    let delay = delay
   end
 end
 
@@ -670,5 +672,6 @@ module ArduinoUnoPins: AvrPins = struct
     let digital_read = digital_read
     let digital_write = digital_write
     let pin_mode = pin_mode
+    let delay = delay
   end
 end

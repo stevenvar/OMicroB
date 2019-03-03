@@ -16,6 +16,7 @@ module type Connection = sig
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
   val pin_mode: pin -> mode -> unit
+  val delay: int -> unit
 end
 
 (*******************************************************************************)
@@ -36,4 +37,17 @@ module MakeLed(LC: LedConnection): Led = struct
   let init () = LC.pin_mode LC.connectedPin LC.output_mode
   let on () = LC.digital_write LC.connectedPin LC.high
   let off () = LC.digital_write LC.connectedPin LC.low
+end
+
+(*******************************************************************************)
+
+module type Display = sig
+  type level
+  val init: unit -> unit
+  val print_int: int -> unit
+  val print_string: string -> unit
+  val print_newline: unit -> unit
+  val print_image: level list list -> unit
+  val set_pixel: int -> int -> level -> unit
+  val clear_screen: unit -> unit
 end
