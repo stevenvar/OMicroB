@@ -15,9 +15,13 @@ type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
          | MISO | SCK | MOSI | SS
          | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5 | PINA6 | PINA7 | PINA8
          | PINA9 | PINA10 | PINA11 | PINA12 | PINA13 | PINA14 | PINA15
+type _pin = pin
 
 type level = HIGH | LOW
+type _level = level
+
 type mode = INPUT | OUTPUT | INPUT_PULLUP
+type _mode = mode
 
 type bit = B0 | B1 | B2 | B3 | B4 | B5 | B6 | B7
 type register = PORTA | PORTB | PORTC | PORTD | PORTE | PORTF
@@ -36,6 +40,10 @@ module type AvrPins = sig
   val pin_mode: pin -> mode -> unit
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
+  module Connection: Circuits.Connection
+    with type pin = pin
+    with type mode = mode
+    with type level = level
 end
 
 external write_register : register -> int -> unit = "caml_avr_write_register" [@@noalloc]
@@ -178,6 +186,19 @@ module ArduboyPins: AvrPins = struct
     match read_bit input bit with
     | true -> HIGH
     | false -> LOW
+
+  module Connection = struct
+    type pin = _pin
+    type mode = _mode
+    type level = _level
+    let high = HIGH
+    let low = LOW
+    let input_mode = OUTPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let pin_mode = pin_mode
+  end
 end
 
 module ArduinoMegaPins: AvrPins = struct
@@ -491,6 +512,19 @@ module ArduinoMegaPins: AvrPins = struct
     match read_bit input bit with
     | true -> HIGH
     | false -> LOW
+
+  module Connection = struct
+    type pin = _pin
+    type mode = _mode
+    type level = _level
+    let high = HIGH
+    let low = LOW
+    let input_mode = OUTPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let pin_mode = pin_mode
+  end
 end
 
 module ArduinoUnoPins: AvrPins = struct
@@ -624,4 +658,17 @@ module ArduinoUnoPins: AvrPins = struct
     match read_bit input bit with
     | true -> HIGH
     | false -> LOW
+
+  module Connection = struct
+    type pin = _pin
+    type level = _level
+    type mode = _mode
+    let high = HIGH
+    let low = LOW
+    let input_mode = OUTPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let pin_mode = pin_mode
+  end
 end

@@ -41,6 +41,10 @@ module type AvrPins = sig
   val pin_mode: pin -> mode -> unit
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
+  module Connection: Circuits.Connection
+    with type pin = pin
+    with type mode = mode
+    with type level = level
 end
 
 external write_register : register -> int -> unit = "caml_avr_write_register" [@@noalloc]
