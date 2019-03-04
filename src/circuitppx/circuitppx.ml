@@ -3,12 +3,12 @@ open Asttypes
 open Parsetree
 open Longident
 
-(* We always include the "Connection" module, which gives us pin, level, digital_write, digital_read, ... *)
-let create_connectionMod_include () = {
+(* We always include the "MCUConnection" module, which gives us pin, level, digital_write, digital_read, ... *)
+let create_mcuConnectionMod_include () = {
   pstr_desc = Pstr_include {
       pincl_mod = {
         pmod_desc = Pmod_ident {
-            txt = Lident "Connection";
+            txt = Lident "MCUConnection";
             loc = Location.none;
           };
         pmod_loc = Location.none;
@@ -52,14 +52,14 @@ let create_pmod_apply funct bindings =
       pmod_loc = Location.none;
       pmod_attributes = [];
     }, {
-        pmod_desc = Pmod_structure ((create_connectionMod_include ())::
+        pmod_desc = Pmod_structure ((create_mcuConnectionMod_include ())::
                                     (create_pstr_value_of_sequence bindings.pexp_desc));
         pmod_loc = bindings.pexp_loc;
         pmod_attributes = [];    })
 
 let create_node mapper str =
   match str.pstr_desc with
-  | Pstr_extension (({txt="connection";loc}, pstr), _) ->
+  | Pstr_extension (({txt="component";loc}, pstr), _) ->
     (match pstr with
      | PStr [{pstr_desc = Pstr_value (Nonrecursive, [binding]);pstr_loc}]->
        [{
@@ -86,11 +86,11 @@ let create_node mapper str =
      | _ -> failwith "Invalid syntax")
   | _ -> [default_mapper.structure_item mapper str]
 
-let connection_mapper _ = {
+let component_mapper _ = {
   default_mapper with structure =
                         fun mapper st ->
                           let stl = List.map (create_node mapper) st in
                           List.flatten stl
 }
 
-let () = register "connection" connection_mapper
+let () = register "component" component_mapper

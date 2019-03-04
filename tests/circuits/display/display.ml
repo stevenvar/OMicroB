@@ -4,7 +4,7 @@
 (* module MyDisp = MicroBit.Screen *)
 
 (* Use an external, LiquidCrystal type screen *)
-let%connection MyDisp = LiquidCrystal.MakeLCD(
+let%component MyDisp = LiquidCrystal.MakeLCD(
     rsPin = PIN12;
     enablePin = PIN11;
     d4Pin = PIN5;

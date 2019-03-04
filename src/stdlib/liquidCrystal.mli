@@ -89,7 +89,7 @@
 module type LCDConnection = sig
   type pin
   type level
-  include Circuits.Connection with type pin := pin with type level := level
+  include Circuits.MCUConnection with type pin := pin with type level := level
   val rsPin: pin
   val enablePin: pin
   val d4Pin: pin

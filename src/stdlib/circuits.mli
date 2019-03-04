@@ -7,7 +7,7 @@
 
 (** Connection between a micro-controller (via it's pins).
     Should be implemented for each specific MCU. *)
-module type Connection = sig
+module type MCUConnection = sig
   type pin
   type level
   type mode
@@ -33,7 +33,7 @@ end
 (** Used to connect a led to the MCU *)
 module type LedConnection = sig
   type pin
-  include Connection with type pin := pin
+  include MCUConnection with type pin := pin
   val connectedPin: pin
 end
 

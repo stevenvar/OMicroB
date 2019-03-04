@@ -5,7 +5,7 @@
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
 
-module type Connection = sig
+module type MCUConnection = sig
   type pin
   type level
   type mode
@@ -29,7 +29,7 @@ end
 
 module type LedConnection = sig
   type pin
-  include Connection with type pin := pin
+  include MCUConnection with type pin := pin
   val connectedPin: pin
 end
 

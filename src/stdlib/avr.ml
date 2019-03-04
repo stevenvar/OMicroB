@@ -40,7 +40,7 @@ module type AvrPins = sig
   val pin_mode: pin -> mode -> unit
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
-  module Connection: Circuits.Connection
+  module MCUConnection: Circuits.MCUConnection
     with type pin = pin
     with type mode = mode
     with type level = level
@@ -187,7 +187,7 @@ module ArduboyPins: AvrPins = struct
     | true -> HIGH
     | false -> LOW
 
-  module Connection = struct
+  module MCUConnection = struct
     type pin = _pin
     type mode = _mode
     type level = _level
@@ -514,7 +514,7 @@ module ArduinoMegaPins: AvrPins = struct
     | true -> HIGH
     | false -> LOW
 
-  module Connection = struct
+  module MCUConnection = struct
     type pin = _pin
     type mode = _mode
     type level = _level
@@ -661,7 +661,7 @@ module ArduinoUnoPins: AvrPins = struct
     | true -> HIGH
     | false -> LOW
 
-  module Connection = struct
+  module MCUConnection = struct
     type pin = _pin
     type level = _level
     type mode = _mode

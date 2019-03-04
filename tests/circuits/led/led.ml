@@ -1,4 +1,4 @@
-let%connection MyLed = Circuits.MakeLed(connectedPin = PIN8)
+let%component MyLed = Circuits.MakeLed(connectedPin = PIN8)
 
 let _ =
   MyLed.init ();
