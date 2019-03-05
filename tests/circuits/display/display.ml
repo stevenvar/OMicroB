@@ -24,4 +24,4 @@ let _ =
   MyDisp.print_string "OMicroB ";
   MyDisp.print_int 42; MyDisp.print_newline ();
   MyDisp.print_string "Yay ! ";
-  MyDisp.print_image smiley
+  MyDisp.print_image smiley;

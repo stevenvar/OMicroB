@@ -10,9 +10,9 @@ let lcd_cleardisplay = 0x01
 (* and lcd_returnhome = 0x02 *)
 and lcd_entrymodeset = 0x04
 and lcd_displaycontrol = 0x08
-(* and lcd_cursorshift = 0x10 *)
+and lcd_cursorshift = 0x10
 and lcd_functionset = 0x20
-(* and lcd_setcgramaddr = 0x40 *)
+and lcd_setcgramaddr = 0x40
 and lcd_setddramaddr = 0x80
 
 (* Flags for display on / off control *)
@@ -32,8 +32,8 @@ and lcd_entryshiftdecrement = 0x00
 (* Flags for display/cursor move *)
 (* let lcd_displaymove = 0x08 *)
 (* and lcd_cursormove = 0x00 *)
-(* and lcd_moveright = 0x04
- * and lcd_moveleft = 0x00 *)
+let lcd_moveright = 0x04
+and lcd_moveleft = 0x00
 
 (* Flags for function set *)
 let lcd_4bitmode = 0x00
@@ -54,10 +54,11 @@ module type LCDConnection = sig
   val d7Pin: pin
 end
 
-module MakeLCD(L: LCDConnection): Circuits.Display with type level = L.level = struct
+module MakeLCD(L: LCDConnection) = struct
   type level = L.level
 
   let cursorLine = ref 0
+  let cursorColumn = ref 0
 
   (********************** Low level data pushing commands ************************)
 
@@ -87,6 +88,20 @@ module MakeLCD(L: LCDConnection): Circuits.Display with type level = L.level = s
   let command value = send value L.low
 
   let write value = send value L.high
+
+  (**************************** Char creation and display ************************)
+
+  let create_char loc l =
+    if (loc > 7) then invalid_arg "create_char: i";
+    if (List.length l > 8) then invalid_arg "create_char: l";
+    let vals = List.rev_map (fun l ->
+        if (List.length l <> 5) then invalid_arg "create_char: l";
+        List.fold_left (fun a v -> (a lsl 1) + (if v = L.high then 1 else 0)) 0 l
+      ) (List.rev l) in
+    command (lcd_setcgramaddr lor (loc lsl 3));
+    List.iter (fun c -> write c) (vals@(List.init (8 - (List.length vals)) (fun _ -> 0)))
+
+  let print_char loc = write loc; cursorColumn := !cursorColumn + 1
 
   (*********************** High level, user exposed commands *********************)
 
@@ -125,15 +140,25 @@ module MakeLCD(L: LCDConnection): Circuits.Display with type level = L.level = s
     (* Set entry mode *)
     command (lcd_entrymodeset lor lcd_entryleft lor lcd_entryshiftdecrement)
 
-  let print_string s = String.iter (fun c -> write (int_of_char c)) s
+  let print_string s = String.iter (fun c -> write (int_of_char c)) s;
+    cursorColumn := !cursorColumn + (String.length s)
+
   let print_int i = print_string (string_of_int i)
 
   let print_newline () =
     if !cursorLine > 0 then clear_screen ();
     cursorLine := (!cursorLine + 1) mod 2;
-    command (lcd_setddramaddr lor if (!cursorLine = 0) then 0x00 else 0x40)
+    command (lcd_setddramaddr lor if (!cursorLine = 0) then 0x00 else 0x40);
+    cursorColumn := 0
 
-  let print_image _ = ()
+  let print_image img =
+    create_char 0 img;
+    (* The commands below are necessary for some reason *)
+    command (lcd_cursorshift lor lcd_moveleft); command (lcd_cursorshift lor lcd_moveright);
+    for _ = !cursorColumn to 7 do command (lcd_cursorshift lor lcd_moveleft) done;
+    tracei !cursorColumn;
+    for _ = 8 to !cursorColumn-1 do command (lcd_cursorshift lor lcd_moveright) done;
+    print_char 0
 
   let set_pixel _ _ _ = ()
 end
