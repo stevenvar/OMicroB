@@ -23,6 +23,19 @@ end
 
 (*******************************************************************************)
 
+(** Generic digital sensor *)
+module type Sensor = sig
+  val is_on: unit -> bool
+end
+
+(** Generic digital actuator *)
+module type Actuator = sig
+  val on: unit -> unit
+  val off: unit -> unit
+end
+
+(*******************************************************************************)
+
 (** Simple Led *)
 module type Led = sig
   val init: unit -> unit
@@ -39,6 +52,24 @@ end
 
 (** Make a Led from a LedConnection *)
 module MakeLed(LC: LedConnection): Led
+
+(*******************************************************************************)
+
+(** Simple button-like input *)
+module type Button = sig
+  val init: unit -> unit
+  val is_on: unit -> bool
+end
+
+(** Used to connect a switch to the MCU *)
+module type ButtonConnection = sig
+  type pin
+  include MCUConnection with type pin := pin
+  val connectedPin: pin
+end
+
+(** Make a Switch from a SwitchConnection *)
+module MakeButton(BC: ButtonConnection): Button
 
 (*******************************************************************************)
 

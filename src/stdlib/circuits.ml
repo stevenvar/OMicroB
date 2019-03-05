@@ -21,6 +21,17 @@ end
 
 (*******************************************************************************)
 
+module type Sensor = sig
+  val is_on: unit -> bool
+end
+
+module type Actuator = sig
+  val on: unit -> unit
+  val off: unit -> unit
+end
+
+(*******************************************************************************)
+
 module type Led = sig
   val init: unit -> unit
   val on: unit -> unit
@@ -37,6 +48,25 @@ module MakeLed(LC: LedConnection): Led = struct
   let init () = LC.pin_mode LC.connectedPin LC.output_mode
   let on () = LC.digital_write LC.connectedPin LC.high
   let off () = LC.digital_write LC.connectedPin LC.low
+end
+
+(*******************************************************************************)
+
+module type Button = sig
+  val init: unit -> unit
+  val is_on: unit -> bool
+end
+
+module type ButtonConnection = sig
+  type pin
+  include MCUConnection with type pin := pin
+  val connectedPin: pin
+end
+
+module MakeButton(BC: ButtonConnection): Button = struct
+  let init () = BC.pin_mode BC.connectedPin BC.input_mode
+  let is_on () =
+    if (BC.digital_read BC.connectedPin) = BC.high then true else false
 end
 
 (*******************************************************************************)
