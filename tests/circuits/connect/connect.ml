@@ -6,7 +6,8 @@ let%component MyRedLed = MakeLed(connectedPin = PIN8)
 let%component MyButton1 = MakeButton(connectedPin = PIN9)
 let%component MyButton2 = MakeButton(connectedPin = PIN10)
 
-module MyOr = Or(MyButton1)(MyButton2)
+let%gate MyOr = Or(MyButton1;MyButton2)
+let%gate MyNot = Not(MyOr)
 
 module MyMultiAct = MultiAct(MyGreenLed)(MyRedLed)
 
