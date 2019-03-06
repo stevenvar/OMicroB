@@ -11,7 +11,7 @@ let%gate MyNot = Not(MyOr)
 
 module MyMultiAct = MultiAct(MyGreenLed)(MyRedLed)
 
-module MyConnect = Connect(MyOr)(MyMultiAct)
+let%connect MyConnect = Connect(MyOr;MyMultiAct)
 
 let _ =
   MyGreenLed.init (); MyRedLed.init ();

@@ -14,6 +14,8 @@ let create_node mapper str = match str.pstr_desc with
     Component.create_node pstr loc
   | Pstr_extension ((({txt="gate";loc}, pstr), _)) ->
     Gate.create_node pstr loc
+  | Pstr_extension ((({txt="connect";loc}, pstr), _)) ->
+    Connect.create_node pstr loc
   | _ -> [default_mapper.structure_item mapper str]
 
 let circuit_mapper _ = {
