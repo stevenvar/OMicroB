@@ -73,6 +73,33 @@ module MakeButton(BC: ButtonConnection): Button
 
 (*******************************************************************************)
 
+(** And gate *)
+module And(SL: Sensor)(SR: Sensor):Sensor
+
+(** Or gate *)
+module Or(SL: Sensor)(SR: Sensor):Sensor
+
+(** Not gate *)
+module Not(S: Sensor):Sensor
+
+(*******************************************************************************)
+
+(** Connect multiple actuators *)
+module MultiAct(AL: Actuator)(AR: Actuator): Actuator
+
+(*******************************************************************************)
+
+(** Whole circuit, that can be updated
+    (propagate the signals through the circuit) *)
+module type Circuit = sig
+  val update: unit -> unit
+end
+
+(** Connect a sensor to an actuator *)
+module Connect(S: Sensor)(A: Actuator): Circuit
+
+(*******************************************************************************)
+
 (** Display that can be printed on *)
 module type Display = sig
   type level

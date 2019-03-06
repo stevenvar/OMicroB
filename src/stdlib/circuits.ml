@@ -71,6 +71,37 @@ end
 
 (*******************************************************************************)
 
+module And(SL: Sensor)(SR: Sensor) = struct
+  let is_on () = SL.is_on () && SR.is_on ()
+end
+
+module Or(SL: Sensor)(SR: Sensor) = struct
+  let is_on () = SL.is_on () || SR.is_on ()
+end
+
+module Not(S: Sensor) = struct
+  let is_on () = not (S.is_on ())
+end
+
+(*******************************************************************************)
+
+module MultiAct(AL: Actuator)(AR: Actuator) = struct
+  let on () = AL.on (); AR.on ()
+  let off () = AL.off (); AR.off ()
+end
+
+(*******************************************************************************)
+
+module type Circuit = sig
+  val update: unit -> unit
+end
+
+module Connect(S: Sensor)(A: Actuator) = struct
+  let update () = if S.is_on () then A.on () else A.off ()
+end
+
+(*******************************************************************************)
+
 module type Display = sig
   type level
   val init: unit -> unit

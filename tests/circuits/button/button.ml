@@ -1,7 +1,7 @@
 let%component MyLed = Circuits.MakeLed(connectedPin = PIN8)
 
 (* let%component MyButton = Circuits.MakeButton(connectedPin = PIN9) *) (* External button *)
-module MyButton = ButtonA
+module MyButton = ButtonA % (* Button on the MicroBit *)
 
 let _ =
   MyLed.init ();
