@@ -16,6 +16,8 @@ let create_node mapper str = match str.pstr_desc with
     Gate.create_node pstr loc
   | Pstr_extension ((({txt="connect";loc}, pstr), _)) ->
     Connect.create_node pstr loc
+  | Pstr_extension ((({txt="multiact";loc}, pstr), _)) ->
+    Multiact.create_node pstr loc
   | _ -> [default_mapper.structure_item mapper str]
 
 let circuit_mapper _ = {
