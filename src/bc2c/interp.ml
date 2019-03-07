@@ -946,10 +946,10 @@ let exec arch prims globals code cycle_limit =
         accu := unit;
         incr pc;
 
-      | GETSTRINGCHAR ->
+      | GETBYTESCHAR | GETSTRINGCHAR ->
         accu := Int (int_of_char (Bytes.get (bytes_of_value !accu) (int_of_value (pop stack))));
         incr pc;
-      | SETSTRINGCHAR ->
+      | SETBYTESCHAR ->
         let i = pop stack in
         let c = pop stack in
         Bytes.set (bytes_of_value !accu) (int_of_value i) (char_of_value c);

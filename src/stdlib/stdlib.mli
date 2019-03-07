@@ -13,6 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+module Pervasives : sig
 (** The initially opened module.
 
    This module provides the basic operations over the built-in types
@@ -724,3 +725,37 @@ external trace : string -> unit = "caml_debug_trace"
   
 external tracei : int -> unit = "caml_debug_tracei"
 (** Trace execution with a integer message *)
+
+end
+
+include module type of struct include Pervasives end
+
+module ArrayLabels    = Stdlib__arrayLabels
+module Array          = Stdlib__array
+module Avr            = Stdlib__avr
+module Buffer         = Stdlib__buffer
+module BytesLabels    = Stdlib__bytesLabels
+module Bytes          = Stdlib__bytes
+module Camlinternaloo = Stdlib__camlinternaloo
+module Char           = Stdlib__char
+module Complex        = Stdlib__complex
+module Gc             = Stdlib__gc
+module Hashtbl        = Stdlib__hashtbl
+module Int32          = Stdlib__int32
+module Int64          = Stdlib__int64
+module LiquidCrystal  = Stdlib__liquidCrystal
+module ListLabels     = Stdlib__listLabels
+module List           = Stdlib__list
+module Map            = Stdlib__map
+module Morelabels     = Stdlib__morelabels
+module Obj            = Stdlib__obj
+module Queue          = Stdlib__queue
+module Random         = Stdlib__random
+module Set            = Stdlib__set
+module Sort           = Stdlib__sort
+module Stack          = Stdlib__stack
+module StdLabels      = Stdlib__stdLabels
+module StringLabels   = Stdlib__stringlabels
+module String         = Stdlib__string
+module Sys            = Stdlib__sys
+module Uchar          = Stdlib__uchar
