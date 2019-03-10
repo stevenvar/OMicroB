@@ -17,6 +17,7 @@ module type MCUConnection = sig
   val digital_read: pin -> level
   val pin_mode: pin -> mode -> unit
   val delay: int -> unit
+  val millis: unit -> int
 end
 
 (*******************************************************************************)
@@ -67,6 +68,17 @@ module MakeButton(BC: ButtonConnection): Button = struct
   let init () = BC.pin_mode BC.connectedPin BC.input_mode
   let is_on () =
     if (BC.digital_read BC.connectedPin) = BC.high then true else false
+end
+
+(*******************************************************************************)
+
+module type ClockConnection = sig
+  include MCUConnection
+  val period: int
+end
+
+module MakeClock(C: ClockConnection) = struct
+  let is_on () = if (C.millis () mod C.period) < C.period/2 then true else false
 end
 
 (*******************************************************************************)

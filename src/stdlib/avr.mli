@@ -53,6 +53,7 @@ external set_bit : register -> bit -> unit = "caml_avr_set_bit" [@@noalloc]
 external clear_bit : register -> bit -> unit = "caml_avr_clear_bit" [@@noalloc]
 external read_bit : register -> bit -> bool = "caml_avr_read_bit" [@@noalloc]
 external delay : int -> unit = "caml_avr_delay" [@@noalloc]
+external millis : unit -> int = "caml_avr_millis" [@@noalloc]
 
 (** Pin layout of the Arduboy *)
 module ArduboyPins: AvrPins

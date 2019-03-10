@@ -52,6 +52,7 @@ external set_bit : register -> bit -> unit = "caml_avr_set_bit" [@@noalloc]
 external clear_bit : register -> bit -> unit = "caml_avr_clear_bit" [@@noalloc]
 external read_bit : register -> bit -> bool = "caml_avr_read_bit" [@@noalloc]
 external delay: int -> unit = "caml_avr_delay" [@@noalloc]
+external millis : unit -> int = "caml_avr_millis" [@@noalloc]
 
 exception PinNotPresentOnThisDevice of pin
 
@@ -199,6 +200,7 @@ module ArduboyPins: AvrPins = struct
     let digital_write = digital_write
     let pin_mode = pin_mode
     let delay = delay
+    let millis = millis
   end
 end
 
@@ -526,6 +528,7 @@ module ArduinoMegaPins: AvrPins = struct
     let digital_write = digital_write
     let pin_mode = pin_mode
     let delay = delay
+    let millis = millis
   end
 end
 
@@ -673,5 +676,6 @@ module ArduinoUnoPins: AvrPins = struct
     let digital_write = digital_write
     let pin_mode = pin_mode
     let delay = delay
+    let millis = millis
   end
 end

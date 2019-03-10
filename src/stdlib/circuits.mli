@@ -19,6 +19,7 @@ module type MCUConnection = sig
   val digital_read: pin -> level
   val pin_mode: pin -> mode -> unit
   val delay: int -> unit
+  val millis: unit -> int
 end
 
 (*******************************************************************************)
@@ -73,14 +74,25 @@ module MakeButton(BC: ButtonConnection): Button
 
 (*******************************************************************************)
 
+(** Connect a clock to the MCU *)
+module type ClockConnection = sig
+  include MCUConnection
+  val period: int
+end
+
+(** Simple clock *)
+module MakeClock(C: ClockConnection): Sensor
+
+(*******************************************************************************)
+
 (** And gate *)
-module And(SL: Sensor)(SR: Sensor):Sensor
+module And(SL: Sensor)(SR: Sensor): Sensor
 
 (** Or gate *)
-module Or(SL: Sensor)(SR: Sensor):Sensor
+module Or(SL: Sensor)(SR: Sensor): Sensor
 
 (** Not gate *)
-module Not(S: Sensor):Sensor
+module Not(S: Sensor): Sensor
 
 (*******************************************************************************)
 
