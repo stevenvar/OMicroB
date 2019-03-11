@@ -14,32 +14,32 @@ let remove_multiples_of n =
 
 let sieve max =
   let rec filter_again = function
-     [] -> []
+      [] -> []
     | n::r as l ->
       if n*n > max then l else n :: filter_again (remove_multiples_of n r)
   in
-    filter_again (interval 2 max)
+  filter_again (interval 2 max)
 
 let _ =
-  let open Avr in
   Serial.init ();
-  Serial.write_string "START";
+  Serial.write "START";
+  Serial.write "\n";
   let n = millis () in
   begin
     try
-        for i = 0 to 100 do
-          Serial.write_int i;
-          Serial.write '-';
-          ignore(sieve 30);
-          Serial.write_int (Gc.collections ());
-          Serial.write '-';
-          Serial.write_int (Gc.used_stack_size ());
-            Serial.write '\n';
-        done
-  with Stack_overflow -> Serial.write_string "STACKOVERFLOW\n"
-     | Out_of_memory -> Serial.write_string "OUTOFMEMORY\n"
-     | _ -> Serial.write '?'
-end;
-let n' = millis () in
-Serial.write_int (n'-n);
-Serial.write_string "STOP";
+      for i = 0 to 100 do
+        Serial.write (string_of_int i);
+        Serial.write "-";
+        ignore(sieve 30);
+        Serial.write (string_of_int (Gc.collections ()));
+        Serial.write "-";
+        Serial.write (string_of_int (Gc.used_stack_size ()));
+        Serial.write "\n";
+      done
+    with Stack_overflow -> Serial.write "STACKOVERFLOW\n"
+       | Out_of_memory -> Serial.write "OUTOFMEMORY\n"
+       | _ -> Serial.write "?"
+  end;
+  let n' = millis () in
+  Serial.write (string_of_int (n'-n));
+  Serial.write "STOP";

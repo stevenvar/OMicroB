@@ -63,3 +63,10 @@ module ArduinoMegaPins: AvrPins
 
 (** Pin layout of the Arduino Uno *)
 module ArduinoUnoPins: AvrPins
+
+(** Serial communication *)
+module Serial: sig
+  val init: unit -> unit
+  val write: string -> unit
+  val read: unit -> string
+end

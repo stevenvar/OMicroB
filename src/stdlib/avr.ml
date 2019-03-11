@@ -679,3 +679,20 @@ module ArduinoUnoPins: AvrPins = struct
     let millis = millis
   end
 end
+
+module Serial = struct
+  external init: unit -> unit = "caml_avr_serial_init" [@@noalloc]
+
+  external write_char: char -> unit = "caml_avr_serial_write" [@@noalloc]
+  let write s = String.iter write_char s
+
+  external read_char: unit -> char = "caml_avr_serial_read" [@@noalloc]
+  let read () =
+    let s = ref ""
+    and c = ref (read_char ()) in
+    while((int_of_char !c) <> 0) do
+      s := (!s^(String.make 1 !c));
+      c := (read_char ())
+    done;
+    if(String.length !s > 0) then String.sub !s 0 ((String.length !s)-1) else !s
+end
