@@ -47,7 +47,13 @@ end
 (** Used to connect a led to the MCU *)
 module type LedConnection = sig
   type pin
-  include MCUConnection with type pin := pin
+  type level
+  type mode
+  val high: level
+  val low: level
+  val output_mode: mode
+  val pin_mode: pin -> mode -> unit
+  val digital_write: pin -> level -> unit
   val connectedPin: pin
 end
 
@@ -65,7 +71,13 @@ end
 (** Used to connect a switch to the MCU *)
 module type ButtonConnection = sig
   type pin
-  include MCUConnection with type pin := pin
+  type level
+  type mode
+  val high: level
+  val low: level
+  val input_mode: mode
+  val pin_mode: pin -> mode -> unit
+  val digital_read: pin -> level
   val connectedPin: pin
 end
 
@@ -76,7 +88,7 @@ module MakeButton(BC: ButtonConnection): Button
 
 (** Connect a clock to the MCU *)
 module type ClockConnection = sig
-  include MCUConnection
+  val millis: unit -> int
   val period: int
 end
 
