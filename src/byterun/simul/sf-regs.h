@@ -19,6 +19,10 @@ int avr_random(int max);
 int avr_millis();
 
 
+
+void avr_adc_init();
+uint16_t avr_analog_read(uint8_t ch);
+
 void avr_serial_init();
 char avr_serial_read();
 void avr_serial_write(char c);

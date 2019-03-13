@@ -1,17 +1,16 @@
 include ../../etc/Makefile.conf
 
-SOURCES := serial.ml
-TARGETS := serial.byte serial.c serial.elf serial.avr serial.hex
+SOURCES := light.ml
+TARGETS := light.byte light.c light.elf light.avr light.hex
 ATTY := /dev/tty.usbmodem*
 
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -trace 3 -gc MAC -arch 16 -no-flash-heap -stack-size 300 -heap-size 800
-	# $(BIN)/omicrob -v $^ -gc MAC -arch 32 -trace 3 -no-flash-heap -no-flash-globals -stack-size 300 -heap-size 300 -cxxopt -DDEBUG -avrcxxopt -DDEBUG
+	$(BIN)/omicrob -v $^ -gc MAC -arch 16 -no-flash-heap -stack-size 300 -heap-size 800
 	# $(BIN)/omicrob -v $^ -gc SC -arch 16 -no-flash-heap -no-flash-globals -stack-size 300 -heap-size 800
 
-flash: serial.hex
+flash: light.hex
 	sudo ./reset.py $(ATTY)
 	$(BIN)/omicrob -v -flash -sudo $<
 

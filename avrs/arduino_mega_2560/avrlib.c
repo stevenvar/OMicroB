@@ -71,12 +71,40 @@ uint8_t avr_read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
+/******************************************************************************/
+
+void avr_adc_init(){
+   // AREF = AVcc
+  ADMUX = (1<<REFS0);
+
+  // ADC Enable and prescaler of 128
+  // 16000000/128 = 125000
+  ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+}
+
+uint16_t avr_analog_read(uint8_t ch) {
+  ch &= 0b00000111;  // AND operation with 7
+  ADMUX = (ADMUX & 0xF8)|ch; // clears the bottom 3 bits before ORing
+  // start single convertion
+  // write ’1′ to ADSC
+  ADCSRA |= (1<<ADSC);
+  // wait for conversion to complete
+  // ADSC becomes ’0′ again
+  // till then, run loop continuously
+  while(ADCSRA & (1<<ADSC));
+  return (ADC);
+}
+
+/******************************************************************************/
+
 int r = 0;
 int avr_random(int max){
   r = (r*109+89)%max;
   return r;
 }
 
+
+/******************************************************************************/
 
 /* milli function from https://github.com/monoclecat/avr-millis-function */
 #include <util/atomic.h>

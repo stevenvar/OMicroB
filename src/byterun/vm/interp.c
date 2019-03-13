@@ -225,6 +225,9 @@ static inline void interp_init(void) {
 /* Interpretation */
 
 static inline void interp(void) {
+
+  int opcode;
+
   if (setjmp(caml_exception_jmp_buf)) {
     goto ocaml_raise;
   }
@@ -266,8 +269,8 @@ static inline void interp(void) {
 #endif
 
     assert(pc >= 0 && pc < OCAML_BYTECODE_BSIZE);
-
-    switch(read_opcode()){
+    opcode = read_opcode();
+    switch(opcode){
 #ifdef OCAML_ACC0
     case OCAML_ACC0 : {
       TRACE_INSTRUCTION("ACC0");
@@ -1359,9 +1362,9 @@ static inline void interp(void) {
     }
 #endif
 
-#ifdef OCAML_GETSTRINGCHAR
-    case OCAML_GETSTRINGCHAR : {
-      TRACE_INSTRUCTION("GETSTRINGCHAR");
+#ifdef OCAML_GETBYTESCHAR
+    case OCAML_GETBYTESCHAR : {
+      TRACE_INSTRUCTION("GETBYTESCHAR");
       value ind = pop();
       assert(Is_block(acc));
       assert(Is_int(ind));
@@ -1370,9 +1373,9 @@ static inline void interp(void) {
     }
 #endif
 
-#ifdef OCAML_SETSTRINGCHAR
-    case OCAML_SETSTRINGCHAR : {
-      TRACE_INSTRUCTION("SETSTRINGCHAR");
+#ifdef OCAML_SETBYTESCHAR
+    case OCAML_SETBYTESCHAR : {
+      TRACE_INSTRUCTION("SETBYTESCHAR");
       value ind = pop();
       value val = pop();
       assert(Is_block(acc));
@@ -2430,6 +2433,10 @@ static inline void interp(void) {
 #endif
 
     default:
+
+#if defined(__PC__) && DEBUG >= 2
+      printf("UNKNOWN INSTRUCTION %d", opcode);
+#endif
       assert(0);
       break;
     }

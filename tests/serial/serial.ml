@@ -20,25 +20,25 @@ let _ =
   let open Avr in
   Serial.init ();
   Serial.write_string "START";
-  let n = millis () in
-  begin
-    try
-        for i = 0 to 1 do
-          (* Serial.write_int i; *)
-          (* Serial.write '-'; *)
-          (* Gc.run (); *)
-          Serial.write_int (Gc.live_words ());
-          let l = sieve 30 in
-          List.iter (fun x -> Serial.write_int x ; Serial.write ',') l;
-          (* Serial.write '-'; *)
-          (* Serial.write_int (Gc.used_stack_size ()); *)
-            (* Serial.write '\n'; *)
-        done
-  with Stack_overflow -> Serial.write_string "STACKOVERFLOW\n"
-     | Out_of_memory ->
-        Serial.write_string "OUTOFMEMORY\n";
-     | _ -> Serial.write '?'
-end;
-let n' = millis () in
-Serial.write_int (n'-n);
+(*   let n = millis () in
+ *   begin
+ *     try
+ *         for i = 0 to 1 do
+ *           (\* Serial.write_int i; *\)
+ *           (\* Serial.write '-'; *\)
+ *           (\* Gc.run (); *\)
+ *           Serial.write_int (Gc.live_words ());
+ *           let l = sieve 30 in
+ *           List.iter (fun x -> Serial.write_int x ; Serial.write ',') l;
+ *           (\* Serial.write '-'; *\)
+ *           (\* Serial.write_int (Gc.used_stack_size ()); *\)
+ *             (\* Serial.write '\n'; *\)
+ *         done
+ *   with Stack_overflow -> Serial.write_string "STACKOVERFLOW\n"
+ *      | Out_of_memory ->
+ *         Serial.write_string "OUTOFMEMORY\n";
+ *      | _ -> Serial.write '?'
+ * end;
+ * let n' = millis () in
+ * Serial.write_int (n'-n); *)
 Serial.write_string "STOP";

@@ -165,6 +165,8 @@ val pin_mode : ('a register, 'b register, 'c register) pin -> mode -> unit
 val digital_write :
   ('a register, 'b register, 'c register) pin -> level -> unit
 val digital_read : ('a register, 'b register, 'c register) pin -> level
+external adc_init : unit -> unit = "caml_avr_adc_init"
+external analog_read : int -> int = "caml_avr_analog_read"
 module Serial :
   sig
     external init : unit -> unit = "caml_avr_serial_init" [@@noalloc]

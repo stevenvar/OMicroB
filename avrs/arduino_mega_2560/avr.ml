@@ -632,6 +632,15 @@ let digital_read p =
   | true -> HIGH
   | false -> LOW
 
+external adc_init : unit -> unit = "caml_avr_adc_init"
+
+external analog_read : int -> int = "caml_avr_analog_read"
+  (* ADMUX = (ADMUX & OxF8) | ch; *)
+  (* ADCSRA |= (1<< ADSC); *)
+  (* while (ADCSRA land (1 lsl ADSC)); *)
+    (* ADC *)
+
+
 
 module Serial = struct
 

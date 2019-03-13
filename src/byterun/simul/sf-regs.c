@@ -531,6 +531,16 @@ void exec_instr(char *instr, int size){
 /******************************************************************************/
 /******************************************************************************/
 
+
+void avr_adc_init(){
+  printf("adc init\n");
+}
+
+uint16_t avr_analog_read(uint8_t ch){
+  printf("analog read (%d)\n", ch);
+  return 0;
+}
+
 void avr_serial_init(){
   printf("serial init\n");
 }

@@ -15,6 +15,11 @@ bool avr_read_bit(uint8_t reg, uint8_t bit);
 
 /******************************************************************************/
 
+void avr_adc_init();
+uint16_t avr_analog_read(uint8_t);
+
+/******************************************************************************/
+
 void avr_serial_init();
 void avr_serial_write(char val);
 char avr_serial_read();
