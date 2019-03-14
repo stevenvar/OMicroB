@@ -59,7 +59,7 @@ static int is_slow;
 void init_regs(int n, int slow){
   int i;
   regs = (unsigned char *) alloc_shm(NB_REG * sizeof(unsigned char));
-  /* analogs = (unsigned int *) alloc_shm(16 * sizeof(unsigned int)); */
+  analogs = (unsigned int *) alloc_shm(16 * sizeof(unsigned int));
   sync_counter = (int *) alloc_shm(sizeof(int));
   *sync_counter = 0;
   is_slow = slow;
@@ -538,8 +538,13 @@ void avr_adc_init(){
 
 }
 
+#include <unistd.h>
+
 uint16_t avr_analog_read(uint8_t ch){
-  printf("analog read (%d)\n", ch);
+  /* printf("analog read (%d)\n", ch); */
+  out_set_analog(ch,0b11111111);
+  usleep(50000);
+  out_set_analog(ch,0);
   return 0;
 }
 
@@ -549,11 +554,19 @@ void avr_serial_init(){
   avr_set_bit(DDRD,3);
 }
 
+
+
 char avr_serial_read(){
   printf("serial read\n");
+  avr_set_bit(PORTD,2);
+  usleep(10000);
+  avr_clear_bit(PORTD,2);
   return '0';
 }
 
 void avr_serial_write(char c){
   printf("serial write(%c)\n",c);
+  avr_set_bit(PORTD,3);
+  usleep(10000);
+  avr_clear_bit(PORTD,3);
 }

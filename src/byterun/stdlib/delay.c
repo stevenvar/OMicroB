@@ -6,7 +6,7 @@ void delay(int count){
   }
   #endif
   #ifdef __PC__
-  printf("delay(%d)", count);
+  printf("delay(%d)\n", count);
   usleep((useconds_t) count * 1000);
   #endif
 }
