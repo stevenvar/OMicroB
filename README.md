@@ -15,8 +15,8 @@ An article describing our generic virtual machine approach has been published in
 
 ## Requirements
 
-- OPAM + OCaml (>= 4.03 && < 4.07)
-  (OCaml versions since 4.07 are not supported at the moment because of changes in the bytecode instructions and in the structure of the standard library of the language)
+- OPAM2 + OCaml (>= 4.07)
+  (OCaml versions prior to 4.07 are not supported at the moment because of changes in the bytecode instructions and in the structure of the standard library of the language since v. 4.07)
 - obytelib (on OPAM)
 - ocamlclean (on OPAM)
 - ocamlbuild (on OPAM)

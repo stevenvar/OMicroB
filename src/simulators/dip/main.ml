@@ -89,8 +89,8 @@ let name_of_num num =
   | 16 -> "XTAL1"
   | 17 -> "PIN3"
   | 18 -> "PIN2"
-  | 19 -> "PIN0"
-  | 20 -> "PIN1"
+  | 19 -> "PIN0/RX"
+  | 20 -> "PIN1/TX"
   | 21 -> "TXLED"
   | 22 -> "GND"
   | 23 -> "AVCC"
@@ -350,5 +350,5 @@ while true do
       | ISync -> print_endline (string_of_output ODone)
       | IStop -> exit 0
     with Error -> Printf.eprintf "Invalid command: %s\n%!" line
-  with Graphic_failure _ -> exit 0
+  with Graphic_failure _ -> Printf.eprintf "Graphical failure"; exit 0
 done

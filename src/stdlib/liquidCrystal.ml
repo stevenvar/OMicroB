@@ -45,9 +45,9 @@ and lcd_2line = 0x08 and lcd_1line = 0x00
 
 type ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd = {
   is4bitmode : bool;
-  rsPin : ('a register, 'b register, 'c register) pin;
-  enablePin : ('d register, 'e register, 'f register) pin;
-  dpins : ('g register, 'h register, 'i register) pin array;
+  rsPin : ('a register, 'b register, 'c register, no analog_pin) pin;
+  enablePin : ('d register, 'e register, 'f register, no analog_pin) pin;
+  dpins : ('g register, 'h register, 'i register, no analog_pin) pin array;
   mutable displayFunction : int;
   mutable displayMode : int;
   mutable displayControl : int;

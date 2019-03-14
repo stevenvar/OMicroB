@@ -32,16 +32,16 @@ stdlib__%.cmi: $(SRC)/stdlib/%.mli stdlib.cmi
 	$(OCAMLC) -absname -nostdlib -c -w @a $< -o $@
 
 stdlib__%Labels.cmo: $(SRC)/stdlib/%Labels.ml $(CMIS)
-	$(OCAMLC) -absname -nostdlib -nolabels -c -w @a $< -o $@
+	$(OCAMLC) -absname -nostdlib -nolabels -c -w @a-4 $< -o $@
 
 stdlib__%.cmo: $(SRC)/stdlib/%.ml $(CMIS)
 	$(OCAMLC) -absname -nostdlib -c -w @a $< -o $@
 
 stdlib.cmi: stdlib.mli
-	$(OCAMLC) -absname -no-alias-deps -nostdlib -nopervasives -c -w @a-49 $<
+	$(OCAMLC) -absname -no-alias-deps -nostdlib -nopervasives -c -w @a-49-4 $<
 
 stdlib.cmo: stdlib.ml stdlib.cmi
-	$(OCAMLC) -absname -no-alias-deps -nostdlib -nopervasives -c -w @a-49 $<
+	$(OCAMLC) -absname -no-alias-deps -nostdlib -nopervasives -c -w @a-49-4 $<
 
 camlinternalOO.cmo: camlinternalOO.ml camlinternalOO.cmi
 	$(OCAMLC) -nostdlib -c -w @a-41 $<

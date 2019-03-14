@@ -534,6 +534,8 @@ void exec_instr(char *instr, int size){
 
 void avr_adc_init(){
   printf("adc init\n");
+  init_simulator();
+
 }
 
 uint16_t avr_analog_read(uint8_t ch){
@@ -542,7 +544,9 @@ uint16_t avr_analog_read(uint8_t ch){
 }
 
 void avr_serial_init(){
+  init_simulator();
   printf("serial init\n");
+  avr_set_bit(DDRD,3);
 }
 
 char avr_serial_read(){

@@ -71,85 +71,304 @@ type 'a register =
   | SPCR : spcr_bit register
   | SPSR : spsr_bit register
   | SPDR : spsr_bit register
-type ('a, 'b, 'c) pin =
-    PIN0 : (porte_bit register, ddre_bit register, pine_bit register) pin
-  | PIN1 : (porte_bit register, ddre_bit register, pine_bit register) pin
-  | PIN2 : (porte_bit register, ddre_bit register, pine_bit register) pin
-  | PIN3 : (porte_bit register, ddre_bit register, pine_bit register) pin
-  | PIN4 : (portg_bit register, ddrg_bit register, ping_bit register) pin
-  | PIN5 : (porte_bit register, ddre_bit register, pine_bit register) pin
-  | PIN6 : (porth_bit register, ddrh_bit register, pinh_bit register) pin
-  | PIN7 : (porth_bit register, ddrh_bit register, pinh_bit register) pin
-  | PIN8 : (porth_bit register, ddrh_bit register, pinh_bit register) pin
-  | PIN9 : (porth_bit register, ddrh_bit register, pinh_bit register) pin
-  | PIN10 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | PIN11 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | PIN12 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | PIN13 : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | PIN14 : (portj_bit register, ddrj_bit register, pinj_bit register) pin
-  | PIN15 : (portj_bit register, ddrj_bit register, pinj_bit register) pin
-  | PIN16 : (porth_bit register, ddrh_bit register, pinh_bit register) pin
-  | PIN17 : (porth_bit register, ddrh_bit register, pinh_bit register) pin
-  | PIN18 : (portd_bit register, ddrd_bit register, pind_bit register) pin
-  | PIN19 : (portd_bit register, ddrd_bit register, pind_bit register) pin
-  | PIN20 : (portd_bit register, ddrd_bit register, pind_bit register) pin
-  | PIN21 : (portd_bit register, ddrd_bit register, pind_bit register) pin
-  | PIN22 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN23 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN24 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN25 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN26 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN27 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN28 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN29 : (porta_bit register, ddra_bit register, pina_bit register) pin
-  | PIN30 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN31 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN32 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN33 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN34 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN35 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN36 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN37 : (portc_bit register, ddrc_bit register, pinc_bit register) pin
-  | PIN38 : (portd_bit register, ddrd_bit register, pind_bit register) pin
-  | PIN39 : (portg_bit register, ddrg_bit register, ping_bit register) pin
-  | PIN40 : (portg_bit register, ddrg_bit register, ping_bit register) pin
-  | PIN41 : (portg_bit register, ddrg_bit register, ping_bit register) pin
-  | PIN42 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | PIN43 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | PIN44 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | PIN45 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | PIN46 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | PIN47 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | PIN48 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | PIN49 : (portl_bit register, ddrl_bit register, pinl_bit register) pin
-  | MISO : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | SCK : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | MOSI : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | SS : (portb_bit register, ddrb_bit register, pinb_bit register) pin
-  | PINA0 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA1 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA2 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA3 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA4 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA5 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA6 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA7 : (portf_bit register, ddrf_bit register, pinf_bit register) pin
-  | PINA8 : (portk_bit register, ddrk_bit register, pink_bit register) pin
-  | PINA9 : (portk_bit register, ddrk_bit register, pink_bit register) pin
-  | PINA10 : (portk_bit register, ddrk_bit register, pink_bit register) pin
-  | PINA11 : (portk_bit register, ddrk_bit register, pink_bit register) pin
-  | PINA12 : (portk_bit register, ddrk_bit register, pink_bit register) pin
-  | PINA13 : (portk_bit register, ddrk_bit register, pink_bit register) pin
-  | PINA14 : (portk_bit register, ddrk_bit register, pink_bit register) pin
-  | PINA15 : (portk_bit register, ddrk_bit register, pink_bit register) pin
+type yes
+type no
+type 'a analog_pin = YES : yes analog_pin | NO : no analog_pin
+type ('a, 'b, 'c, 'd) pin =
+    PIN0 :
+      (porte_bit register, ddre_bit register, pine_bit register,
+       no analog_pin)
+      pin
+  | PIN1 :
+      (porte_bit register, ddre_bit register, pine_bit register,
+       no analog_pin)
+      pin
+  | PIN2 :
+      (porte_bit register, ddre_bit register, pine_bit register,
+       no analog_pin)
+      pin
+  | PIN3 :
+      (porte_bit register, ddre_bit register, pine_bit register,
+       no analog_pin)
+      pin
+  | PIN4 :
+      (portg_bit register, ddrg_bit register, ping_bit register,
+       no analog_pin)
+      pin
+  | PIN5 :
+      (porte_bit register, ddre_bit register, pine_bit register,
+       no analog_pin)
+      pin
+  | PIN6 :
+      (porth_bit register, ddrh_bit register, pinh_bit register,
+       no analog_pin)
+      pin
+  | PIN7 :
+      (porth_bit register, ddrh_bit register, pinh_bit register,
+       no analog_pin)
+      pin
+  | PIN8 :
+      (porth_bit register, ddrh_bit register, pinh_bit register,
+       no analog_pin)
+      pin
+  | PIN9 :
+      (porth_bit register, ddrh_bit register, pinh_bit register,
+       no analog_pin)
+      pin
+  | PIN10 :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | PIN11 :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | PIN12 :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | PIN13 :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | PIN14 :
+      (portj_bit register, ddrj_bit register, pinj_bit register,
+       no analog_pin)
+      pin
+  | PIN15 :
+      (portj_bit register, ddrj_bit register, pinj_bit register,
+       no analog_pin)
+      pin
+  | PIN16 :
+      (porth_bit register, ddrh_bit register, pinh_bit register,
+       no analog_pin)
+      pin
+  | PIN17 :
+      (porth_bit register, ddrh_bit register, pinh_bit register,
+       no analog_pin)
+      pin
+  | PIN18 :
+      (portd_bit register, ddrd_bit register, pind_bit register,
+       no analog_pin)
+      pin
+  | PIN19 :
+      (portd_bit register, ddrd_bit register, pind_bit register,
+       no analog_pin)
+      pin
+  | PIN20 :
+      (portd_bit register, ddrd_bit register, pind_bit register,
+       no analog_pin)
+      pin
+  | PIN21 :
+      (portd_bit register, ddrd_bit register, pind_bit register,
+       no analog_pin)
+      pin
+  | PIN22 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN23 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN24 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN25 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN26 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN27 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN28 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN29 :
+      (porta_bit register, ddra_bit register, pina_bit register,
+       no analog_pin)
+      pin
+  | PIN30 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN31 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN32 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN33 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN34 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN35 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN36 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN37 :
+      (portc_bit register, ddrc_bit register, pinc_bit register,
+       no analog_pin)
+      pin
+  | PIN38 :
+      (portd_bit register, ddrd_bit register, pind_bit register,
+       no analog_pin)
+      pin
+  | PIN39 :
+      (portg_bit register, ddrg_bit register, ping_bit register,
+       no analog_pin)
+      pin
+  | PIN40 :
+      (portg_bit register, ddrg_bit register, ping_bit register,
+       no analog_pin)
+      pin
+  | PIN41 :
+      (portg_bit register, ddrg_bit register, ping_bit register,
+       no analog_pin)
+      pin
+  | PIN42 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | PIN43 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | PIN44 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | PIN45 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | PIN46 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | PIN47 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | PIN48 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | PIN49 :
+      (portl_bit register, ddrl_bit register, pinl_bit register,
+       no analog_pin)
+      pin
+  | MISO :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | SCK :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | MOSI :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | SS :
+      (portb_bit register, ddrb_bit register, pinb_bit register,
+       no analog_pin)
+      pin
+  | PINA0 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA1 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA2 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA3 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA4 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA5 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA6 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA7 :
+      (portf_bit register, ddrf_bit register, pinf_bit register,
+       yes analog_pin)
+      pin
+  | PINA8 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
+  | PINA9 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
+  | PINA10 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
+  | PINA11 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
+  | PINA12 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
+  | PINA13 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
+  | PINA14 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
+  | PINA15 :
+      (portk_bit register, ddrk_bit register, pink_bit register,
+       yes analog_pin)
+      pin
 type mode = INPUT | OUTPUT | INPUT_PULLUP
 type level = LOW | HIGH
-val port_of_pin : ('a register, 'b register, 'c register) pin -> 'a register
-val ddr_of_pin : ('a register, 'b register, 'c register) pin -> 'b register
-val input_of_pin : ('a register, 'b register, 'c register) pin -> 'c register
-val port_bit_of_pin : ('a register, 'b register, 'c register) pin -> 'a
-val ddr_bit_of_pin : ('a register, 'b register, 'c register) pin -> 'b
-val input_bit_of_pin : ('a register, 'b register, 'c register) pin -> 'c
+val port_of_pin :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'a register
+val ddr_of_pin :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'b register
+val input_of_pin :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'c register
+val port_bit_of_pin :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'a
+val ddr_bit_of_pin :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'b
+val input_bit_of_pin :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'c
 external write_register : 'a register -> int -> unit
   = "caml_avr_write_register" [@@noalloc]
 external read_register : 'a register -> int = "caml_avr_read_register"
@@ -161,12 +380,18 @@ external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
   [@@noalloc]
 external delay : int -> unit = "caml_avr_delay" [@@noalloc]
 external millis : unit -> int = "caml_avr_millis" [@@noalloc]
-val pin_mode : ('a register, 'b register, 'c register) pin -> mode -> unit
+val pin_mode :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> mode -> unit
 val digital_write :
-  ('a register, 'b register, 'c register) pin -> level -> unit
-val digital_read : ('a register, 'b register, 'c register) pin -> level
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> level -> unit
+val digital_read :
+  ('a register, 'b register, 'c register, 'd analog_pin) pin -> level
 external adc_init : unit -> unit = "caml_avr_adc_init"
-external analog_read : int -> int = "caml_avr_analog_read"
+external avr_analog_read : int -> int = "caml_avr_analog_read"
+val channel_of_pin :
+  ('a register, 'b register, 'c register, yes analog_pin) pin -> int
+val analog_read :
+  ('a register, 'b register, 'c register, yes analog_pin) pin -> int
 module Serial :
   sig
     external init : unit -> unit = "caml_avr_serial_init" [@@noalloc]

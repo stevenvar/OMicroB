@@ -12,19 +12,19 @@ open Avr
 type ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
 
 (** Initialise a LCD in 4-bit mode : [create_4bitmode rs enable d0 d1 d2 d3] *)
-val create4bitmode : ('a register, 'b register, 'c register) pin ->
-  ('d register, 'e register, 'f register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
+val create4bitmode : ('a register, 'b register, 'c register, no analog_pin) pin ->
+  ('d register, 'e register, 'f register, no analog_pin) pin ->
+  ('g register, 'h register, 'i register, no analog_pin) pin -> ('g register, 'h register, 'i register, no analog_pin) pin ->
+  ('g register, 'h register, 'i register, no analog_pin) pin -> ('g register, 'h register, 'i register, no analog_pin) pin ->
   ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
 
 (** Initialise a LCD in 8-bit mode : [create_8bitmode rs enable d0 d1 d2 d3 d4 d5 d6 d7] *)
-val create8bitmode :  ('a register, 'b register, 'c register) pin ->
-  ('d register, 'e register, 'f register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
-  ('g register, 'h register, 'i register) pin -> ('g register, 'h register, 'i register) pin ->
+val create8bitmode :  ('a register, 'b register, 'c register, no analog_pin) pin ->
+  ('d register, 'e register, 'f register, no analog_pin) pin ->
+  ('g register, 'h register, 'i register, no analog_pin) pin -> ('g register, 'h register, 'i register, no analog_pin) pin ->
+  ('g register, 'h register, 'i register, no analog_pin) pin -> ('g register, 'h register, 'i register, no analog_pin) pin ->
+  ('g register, 'h register, 'i register, no analog_pin) pin -> ('g register, 'h register, 'i register, no analog_pin) pin ->
+  ('g register, 'h register, 'i register, no analog_pin) pin -> ('g register, 'h register, 'i register, no analog_pin) pin ->
   ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
 
 (** Start the LCD display with c columns and l lines : [lcdBegin lcd c l]. Was named [begin] in the C library, but is renamed because begin is a keyword in OCaml *)

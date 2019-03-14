@@ -14,6 +14,10 @@ flash: light.hex
 	sudo ./reset.py $(ATTY)
 	$(BIN)/omicrob -v -flash -sudo $<
 
+
+simul: light.elf
+	./$< '../../bin/omicrob_pin_simulator circuit.txt'
+
 clean:
 	@rm -f *.cmo *.cmi
 	@rm -rf *.elf.dSYM
