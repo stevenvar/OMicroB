@@ -1,5 +1,3 @@
-open Avr
-
 let _ =
   let s = PIN7 in
   let r = PIN8 in

@@ -5,18 +5,6 @@
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
 
-type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
-         | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
-         | PIN15 | PIN16 | PIN17 | PIN18 | PIN19 | PIN20 | PIN21
-         | PIN22 | PIN23 | PIN24 | PIN25 | PIN26 | PIN27 | PIN28
-         | PIN29 | PIN30 | PIN31 | PIN32 | PIN33 | PIN34 | PIN35
-         | PIN36 | PIN37 | PIN38 | PIN39 | PIN40 | PIN41 | PIN42
-         | PIN43 | PIN44 | PIN45 | PIN46 | PIN47 | PIN48 | PIN49
-         | MISO | SCK | MOSI | SS
-         | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5 | PINA6 | PINA7 | PINA8
-         | PINA9 | PINA10 | PINA11 | PINA12 | PINA13 | PINA14 | PINA15
-type _pin = pin
-
 type level = HIGH | LOW
 type _level = level
 
@@ -32,20 +20,6 @@ type register = PORTA | PORTB | PORTC | PORTD | PORTE | PORTF
               | PING | PINH | PINJ | PINK | PINL
               | SPCR | SPSR | SPDR
 
-module type AvrPins = sig
-  val port_of_pin: pin -> register
-  val ddr_of_pin: pin -> register
-  val input_of_pin: pin -> register
-  val bit_of_pin: pin -> bit
-  val pin_mode: pin -> mode -> unit
-  val digital_write: pin -> level -> unit
-  val digital_read: pin -> level
-  module MCUConnection: Circuits.MCUConnection
-    with type pin = pin
-    with type mode = mode
-    with type level = level
-end
-
 external write_register : register -> int -> unit = "caml_avr_write_register" [@@noalloc]
 external read_register : register -> int = "caml_avr_read_register" [@@noalloc]
 external set_bit : register -> bit -> unit = "caml_avr_set_bit" [@@noalloc]
@@ -54,9 +28,13 @@ external read_bit : register -> bit -> bool = "caml_avr_read_bit" [@@noalloc]
 external delay: int -> unit = "caml_avr_delay" [@@noalloc]
 external millis : unit -> int = "caml_avr_millis" [@@noalloc]
 
-exception PinNotPresentOnThisDevice of pin
+module ArduboyPins = struct
+  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7 | PIN8
+           | PIN9 | PIN10 | PIN11 | PIN12 | PIN13
+           | MISO | SCK | MOSI | SS
+           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5
+  type _pin = pin
 
-module ArduboyPins: AvrPins = struct
   let port_of_pin = function [@ocaml.warning"-4"]
                            | PIN0 -> PORTD
                            | PIN1 -> PORTD
@@ -82,7 +60,6 @@ module ArduboyPins: AvrPins = struct
                            | PINA3 -> PORTF
                            | PINA4 -> PORTF
                            | PINA5 -> PORTF
-                           | p -> raise (PinNotPresentOnThisDevice p)
 
   let ddr_of_pin = function [@ocaml.warning"-4"]
                           | PIN0 -> DDRD
@@ -109,7 +86,6 @@ module ArduboyPins: AvrPins = struct
                           | PINA3 -> DDRF
                           | PINA4 -> DDRF
                           | PINA5 -> DDRF
-                          | p -> raise (PinNotPresentOnThisDevice p)
 
   let input_of_pin = function [@ocaml.warning"-4"]
                             | PIN0 -> PIND
@@ -136,7 +112,6 @@ module ArduboyPins: AvrPins = struct
                             | PINA3 -> PINF
                             | PINA4 -> PINF
                             | PINA5 -> PINF
-                            | p -> raise (PinNotPresentOnThisDevice p)
 
   let bit_of_pin = function [@ocaml.warning"-4"]
                           | PIN0 -> B2
@@ -163,7 +138,6 @@ module ArduboyPins: AvrPins = struct
                           | PINA3 -> B4
                           | PINA4 -> B1
                           | PINA5 -> B0
-                          | p -> raise (PinNotPresentOnThisDevice p)
 
   let pin_mode p m =
     let port = port_of_pin p in
@@ -204,7 +178,19 @@ module ArduboyPins: AvrPins = struct
   end
 end
 
-module ArduinoMegaPins: AvrPins = struct
+module ArduinoMegaPins = struct
+  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
+           | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
+           | PIN15 | PIN16 | PIN17 | PIN18 | PIN19 | PIN20 | PIN21
+           | PIN22 | PIN23 | PIN24 | PIN25 | PIN26 | PIN27 | PIN28
+           | PIN29 | PIN30 | PIN31 | PIN32 | PIN33 | PIN34 | PIN35
+           | PIN36 | PIN37 | PIN38 | PIN39 | PIN40 | PIN41 | PIN42
+           | PIN43 | PIN44 | PIN45 | PIN46 | PIN47 | PIN48 | PIN49
+           | MISO | SCK | MOSI | SS
+           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5 | PINA6 | PINA7 | PINA8
+           | PINA9 | PINA10 | PINA11 | PINA12 | PINA13 | PINA14 | PINA15
+  type _pin = pin
+
   let port_of_pin = function
     | PIN0 -> PORTE
     | PIN1 -> PORTE
@@ -532,7 +518,13 @@ module ArduinoMegaPins: AvrPins = struct
   end
 end
 
-module ArduinoUnoPins: AvrPins = struct
+module ArduinoUnoPins = struct
+  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7 | PIN8
+           | PIN9 | PIN10 | PIN11 | PIN12 | PIN13
+           | MISO | SCK | MOSI | SS
+           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5
+  type _pin = pin
+
   let port_of_pin = function [@ocaml.warning"-4"]
                            | PIN0 -> PORTD
                            | PIN1 -> PORTD
@@ -558,7 +550,6 @@ module ArduinoUnoPins: AvrPins = struct
                            | PINA3 -> PORTC
                            | PINA4 -> PORTC
                            | PINA5 -> PORTC
-                           | p -> raise (PinNotPresentOnThisDevice p)
 
   let ddr_of_pin = function [@ocaml.warning"-4"]
                           | PIN0 -> DDRD
@@ -585,7 +576,6 @@ module ArduinoUnoPins: AvrPins = struct
                           | PINA3 -> DDRC
                           | PINA4 -> DDRC
                           | PINA5 -> DDRC
-                          | p -> raise (PinNotPresentOnThisDevice p)
 
   let input_of_pin = function [@ocaml.warning"-4"]
                             | PIN0 -> PIND
@@ -612,7 +602,6 @@ module ArduinoUnoPins: AvrPins = struct
                             | PINA3 -> PINC
                             | PINA4 -> PINC
                             | PINA5 -> PINC
-                            | p -> raise (PinNotPresentOnThisDevice p)
 
   let bit_of_pin = function [@ocaml.warning"-4"]
                           | PIN0 -> B0
@@ -639,7 +628,6 @@ module ArduinoUnoPins: AvrPins = struct
                           | PINA3 -> B3
                           | PINA4 -> B4
                           | PINA5 -> B5
-                          | p -> raise (PinNotPresentOnThisDevice p)
 
   let pin_mode p m =
     let port = port_of_pin p in
