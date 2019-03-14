@@ -13,9 +13,10 @@ module type MCUConnection = sig
   val low: level
   val input_mode: mode
   val output_mode: mode
+  val pin_mode: pin -> mode -> unit
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
-  val pin_mode: pin -> mode -> unit
+  val analog_read: pin -> int
   val delay: int -> unit
   val millis: unit -> int
 end
@@ -91,6 +92,27 @@ end
 
 module MakeClock(C: ClockConnection) = struct
   let is_on () = if (C.millis () mod C.period) < C.period/2 then true else false
+end
+
+(*******************************************************************************)
+
+module type AnalogInConnection = sig
+  type pin
+  type mode
+  val input_mode: mode
+  val pin_mode: pin -> mode -> unit
+  val analog_read: pin -> int
+  val connectedPin: pin
+end
+
+module type AnalogSensor = sig
+  val init: unit -> unit
+  val level: unit -> int
+end
+
+module MakeAnalogSensor(AC: AnalogInConnection) = struct
+  let init () = AC.pin_mode AC.connectedPin AC.input_mode
+  let level () = AC.analog_read AC.connectedPin
 end
 
 (*******************************************************************************)

@@ -15,9 +15,10 @@ module type MCUConnection = sig
   val low: level
   val input_mode: mode
   val output_mode: mode
+  val pin_mode: pin -> mode -> unit
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
-  val pin_mode: pin -> mode -> unit
+  val analog_read: pin -> int
   val delay: int -> unit
   val millis: unit -> int
 end
@@ -94,6 +95,27 @@ end
 
 (** Simple clock *)
 module MakeClock(C: ClockConnection): Sensor
+
+(*******************************************************************************)
+
+(** Connect an analog sensor to the MCU *)
+module type AnalogInConnection = sig
+  type pin
+  type mode
+  val input_mode: mode
+  val pin_mode: pin -> mode -> unit
+  val analog_read: pin -> int
+  val connectedPin: pin
+end
+
+(** Generic analog sensor *)
+module type AnalogSensor = sig
+  val init: unit -> unit
+  val level: unit -> int
+end
+
+(** Make an analog sensor *)
+module MakeAnalogSensor(AC: AnalogInConnection): AnalogSensor
 
 (*******************************************************************************)
 
