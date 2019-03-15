@@ -1,3 +1,14 @@
+(* let%component MyRGBLed = Circuits.MakeRGBLed(
+ *     redPin = PIN0;
+ *     greenPin = PIN1;
+ *     bluePin = PIN2) *) (* Pins for microbit*)
+
+let%component MyRGBLed = Circuits.MakeRGBLed(
+    redPin = PIN3;
+    greenPin = PIN5;
+    bluePin = PIN11;
+  ) (* Pins for arduino uno *)
+
 let rgb_of_hsv (h, s, v) =
   let c = v *. s in let m = v -. c in
   let x = c *. (1. -. abs_float ((mod_float (h/.60.) 2.) -. 1.)) in
@@ -11,11 +22,11 @@ let rgb_of_hsv (h, s, v) =
   (int_of_float ((r'+.m)*.255.), int_of_float ((g'+.m)*.255.), int_of_float ((b'+.m)*.255.))
 
 let _ =
-  let r = PIN0 and g = PIN1 and b = PIN2 in
+  MyRGBLed.init ();
   while(true) do
     for h = 0 to 360 do
       let (rv, gv, bv) = rgb_of_hsv ((float_of_int h), 1., 1.) in
-      analog_write r (rv*4); analog_write g (gv*4); analog_write b (bv*4);
+      MyRGBLed.set_color rv gv bv;
       delay 10
     done
   done

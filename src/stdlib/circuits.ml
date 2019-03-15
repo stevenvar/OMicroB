@@ -17,6 +17,7 @@ module type MCUConnection = sig
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
   val analog_read: pin -> int
+  val analog_write: pin -> int -> unit
   val delay: int -> unit
   val millis: unit -> int
 end
@@ -113,6 +114,36 @@ end
 module MakeAnalogSensor(AC: AnalogInConnection) = struct
   let init () = AC.pin_mode AC.connectedPin AC.input_mode
   let level () = AC.analog_read AC.connectedPin
+end
+
+(*******************************************************************************)
+
+module type RGBLedConnection = sig
+  type pin
+  type mode
+  val output_mode: mode
+  val pin_mode: pin -> mode -> unit
+  val analog_write: pin -> int -> unit
+  val redPin: pin
+  val greenPin: pin
+  val bluePin: pin
+end
+
+module type RGBLed = sig
+  val init: unit -> unit
+  val set_color: int -> int -> int -> unit
+end
+
+module MakeRGBLed(RLC: RGBLedConnection) = struct
+  let init () =
+    RLC.pin_mode RLC.redPin RLC.output_mode;
+    RLC.pin_mode RLC.greenPin RLC.output_mode;
+    RLC.pin_mode RLC.bluePin RLC.output_mode
+
+  let set_color r g b =
+    RLC.analog_write RLC.redPin (r*4);
+    RLC.analog_write RLC.greenPin (g*4);
+    RLC.analog_write RLC.bluePin (b*4)
 end
 
 (*******************************************************************************)
