@@ -51,6 +51,11 @@ value caml_avr_read_register(value reg) {
 
 /******************************************************************************/
 
+value caml_avr_analog_write(value pin, value val) {
+  avr_analog_write(Int_val(pin), Int_val(val));
+  return Val_unit;
+}
+
 value caml_avr_analog_read(value channel) {
   return Val_int(avr_analog_read(Int_val(channel)));
 }

@@ -43,6 +43,7 @@ module ArduboyPins: sig
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
   val analog_read: pin -> int
+  val analog_write: pin -> int -> unit
   module MCUConnection: Circuits.MCUConnection
     with type pin = pin
     with type mode = mode
@@ -69,6 +70,7 @@ module ArduinoMegaPins: sig
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
   val analog_read: pin -> int
+  val analog_write: pin -> int -> unit
   module MCUConnection: Circuits.MCUConnection
     with type pin = pin
     with type mode = mode
@@ -89,6 +91,7 @@ module ArduinoUnoPins: sig
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
   val analog_read: pin -> int
+  val analog_write: pin -> int -> unit
   module MCUConnection: Circuits.MCUConnection
     with type pin = pin
     with type mode = mode

@@ -172,6 +172,11 @@ module ArduboyPins = struct
     | true -> HIGH
     | false -> LOW
 
+  external avr_analog_write: pin -> int -> unit = "caml_avr_analog_write" [@@noalloc]
+  let analog_write p v =
+    if v < 0 || v >= 1024 then invalid_arg "analog_write";
+    if v = 0 then digital_write p LOW else avr_analog_write p (v/4)
+
   let analog_read p = avr_analog_read (channel_of_pin p)
 
   module MCUConnection = struct
@@ -534,6 +539,11 @@ module ArduinoMegaPins = struct
     | true -> HIGH
     | false -> LOW
 
+  external avr_analog_write: pin -> int -> unit = "caml_avr_analog_write" [@@noalloc]
+  let analog_write p v =
+    if v < 0 || v >= 1024 then invalid_arg "analog_write";
+    if v = 0 then digital_write p LOW else avr_analog_write p (v/4)
+
   let analog_read p = avr_analog_read (channel_of_pin p)
 
   module MCUConnection = struct
@@ -695,6 +705,11 @@ module ArduinoUnoPins = struct
     match read_bit input bit with
     | true -> HIGH
     | false -> LOW
+
+  external avr_analog_write: pin -> int -> unit = "caml_avr_analog_write" [@@noalloc]
+  let analog_write p v =
+    if v < 0 || v >= 1024 then invalid_arg "analog_write";
+    if v = 0 then digital_write p LOW else avr_analog_write p (v/4)
 
   let analog_read p = avr_analog_read (channel_of_pin p)
 

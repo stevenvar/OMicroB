@@ -546,6 +546,10 @@ void exec_instr(char *instr, int size){
 
 /******************************************************************************/
 
+void avr_analog_write(uint8_t pin, int val) {
+  printf("Writing value %d to pin %d", val, pin);
+}
+
 uint16_t avr_analog_read(uint8_t channel) {
   return 0;
 }
