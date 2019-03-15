@@ -28,11 +28,26 @@ value *sp;
 value trapSp;
 uint8_t extra_args;
 
-
 #if defined(__PC__) && DEBUG >= 2
     unsigned int cpt_instr = 0;
 #endif
 
+
+#ifdef __AVR__
+#include <avr/interrupt.h>
+uint8_t timer_interrupt = 0;
+int tot_overflow = 0;
+ISR (TIMER2_OVF_vect)    // Timer2 ISR
+{
+	timer_interrupt = 1;
+        tot_overflow++;
+ /* if(tot_overflow > 244){ */
+      /* avr_serial_write(tot_overflow); */
+      /* PORTB ^=0b10000000; */
+      /* tot_overflow=0; */
+    /* } */
+}
+#endif
 
 PROGMEM extern void * const ocaml_primitives[];
 
@@ -220,6 +235,23 @@ static inline void interp_init(void) {
   extra_args = 0;
   pc = 0;
 }
+
+/******************************************************************************/
+/* Interrupts */
+
+void handle_interrupts(){
+#ifdef __AVR__
+  if(timer_interrupt){
+    /* if(tot_overflow > 122){ */
+    /*   /\* avr_serial_write(tot_overflow); *\/ */
+    /*   PORTB ^=0b10000000; */
+    /*   tot_overflow=0; */
+    /* } */
+   timer_interrupt=0;
+  }
+#endif
+}
+
 
 /******************************************************************************/
 /* Interpretation */
@@ -1648,6 +1680,11 @@ static inline void interp(void) {
     case OCAML_CHECK_SIGNALS : {
       TRACE_INSTRUCTION("CHECK_SIGNALS");
       /* TODO */
+      #ifdef __AVR__
+      if(timer_interrupt){        
+        handle_interrupts();
+      }
+#endif
       break;
     }
 #endif
@@ -2458,9 +2495,9 @@ int main(int argc, const char **argv) {
 
 #ifdef __AVR__
 
-#include <avr/interrupt.h>
   unsigned long ctc_match_overflow;
 
+cli();
   ctc_match_overflow = ((F_CPU / 1000) / 8); //when timer1 is this value, 1ms has passed
 
   // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 8)
@@ -2472,9 +2509,24 @@ int main(int argc, const char **argv) {
 
   // Enable the compare match interrupt
 TIMSK1 |= (1 << OCIE1A);
-  sei();
 
 avr_serial_init();
+
+DDRB=0b11111111;
+
+//Setup Timer2 to fire every 1ms
+  TCCR2B = 0x00;        //Disbale Timer2 while we set it up
+  TCNT2  = 232;         //Reset Timer Count to 130 out of 255
+  TIFR2  = 0x00;        //Timer2 INT Flag Reg: Clear Timer Overflow Flag
+  TIMSK2 = 0x01;        //Timer2 INT Reg: Timer2 Overflow Interrupt Enable
+  TCCR2A = 0x00;        //Timer2 Control Reg A: Wave Gen Mode normal
+  /* TCCR2B = 0x05;        //Timer2 Control Reg B: Timer Prescaler set to 128 */
+  TCCR2B |= (1 << CS22) | (1 << CS21) | (0 << CS20);
+    // enable global interrupts
+    sei();
+  
+
+
 #endif
 
   interp_init();

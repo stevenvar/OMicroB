@@ -37,9 +37,9 @@ module Dip (M:MICRO ) = struct
   let vals = Array.make (M.pins_total) false
   let mem_vals = Array.make (M.pins_total) true
 
-  let pin_width = 15
-  let pin_height = 15
-  let pin_space = 7
+  let pin_width = 10
+  let pin_height = 10
+  let pin_space = 3
 
   let do_pin _p = ()
 
@@ -425,7 +425,7 @@ module DipMicro = Dip(Atmega2560)
 let _ =
   DipMicro.draw_micro ();
   while true do
-    try
+
       let line = read_line () in
       try
         match input_of_string line with
@@ -440,5 +440,5 @@ let _ =
         | ISync -> print_endline (string_of_output ODone)
         | IStop -> exit 0
       with DipMicro.Error -> Printf.eprintf "Invalid command: %s\n%!" line
-    with _ -> Printf.eprintf "Failure"; exit 0
+
   done

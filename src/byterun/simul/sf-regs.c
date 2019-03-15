@@ -11,7 +11,7 @@
 /******************************************************************************/
 
 #define NB_REG 255
-#define NB_PORT 5
+#define NB_PORT 11
 #define LOWER_PORT 0x0
 #define HIGHER_PORT (LOWER_PORT + NB_PORT - 1)
 #define LOWER_DDR (HIGHER_PORT + 1)
@@ -19,27 +19,49 @@
 #define LOWER_PIN (HIGHER_DDR + 1)
 #define HIGHER_PIN (LOWER_PIN + NB_PORT - 1)
 
-#define PORTB 0
-#define PORTC 1
-#define PORTD 2
-#define PORTE 3
-#define PORTF 4
 
-#define DDRB 5
-#define DDRC 6
-#define DDRD 7
-#define DDRE 8
-#define DDRF 9
+#define PORTA 0
+#define PORTB 1
+#define PORTC 2
+#define PORTD 3
+#define PORTE 4
+#define PORTF 5
+#define PORTG 6
+#define PORTH 7
+#define PORTI 8
+#define PORTJ 9
+#define PORTK 10
+#define PORTL 11
 
-#define PINB 10
-#define PINC 11
-#define PIND 12
-#define PINE 13
-#define PINF 14
+#define DDRA 12
+#define DDRB 13
+#define DDRC 14
+#define DDRD 15
+#define DDRE 16
+#define DDRF 17
+#define DDRG 18
+#define DDRH 19
+#define DDRI 20
+#define DDRJ 21
+#define DDRK 22
+#define DDRL 23
+
+#define PINA 24
+#define PINB 25
+#define PINC 26
+#define PIND 27
+#define PINE 28
+#define PINF 29
+#define PING 30
+#define PINH 31
+#define PINI 32
+#define PINJ 33
+#define PINK 34
+#define PINL 35
 
 
-#define SPSR 16
-#define SPDR 17
+#define SPSR 36
+#define SPDR 37
 
 static unsigned char *regs;
 static unsigned int *analogs;
@@ -80,7 +102,7 @@ void dump_regs(void){
   int i, j;
   P(sem_regs);
   for(i = LOWER_PORT ; i <= HIGHER_PORT ; i ++){
-    printf("%c: 0b", 'B' + i);
+    printf("%c: 0b", 'A' + i);
     for(j = 7 ; j >= 0 ; j --) printf("%d", (regs[i] & (1 << j)) != 0);
     printf("  = %3d  = 0x%02x\n", regs[i], regs[i]);
   }
@@ -130,7 +152,7 @@ static void may_sleep(){
 static void send_write(char cmnd, int port, unsigned char val){
   char buf[5];
   buf[0] = cmnd;
-  buf[1] = port + 'B';
+  buf[1] = port + 'A';
   buf[2] = hexchar_of_int((val >> 4) & 0x0F);
   buf[3] = hexchar_of_int(val & 0x0F);
   buf[4] = '\n';
@@ -166,7 +188,7 @@ static void send_write_ddr(int ddr, unsigned char val){
 
 static void send_set_analog(unsigned int chan, unsigned int val){
   char buf[6];
-  buf[0] = 'A';
+  buf[0] = 'Z';
   buf[1] = hexchar_of_int(chan);
   buf[2] = hexchar_of_int((val >> 8) & 0x0F);
   buf[3] = hexchar_of_int((val >> 4) & 0x0F);
@@ -199,7 +221,7 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
       int ddr = reg - LOWER_PORT + LOWER_DDR;
       uint8_t ddr_val = regs[ddr];
       if(ddr_val == 0x00){
-        char port_c = 'B' + reg - LOWER_PORT;
+        char port_c = 'A' + reg - LOWER_PORT;
         fprintf(stderr, "Warning: the avr writes PORT%c when DDR%c=0xFF\n",
                 port_c, port_c);
       }else{
@@ -216,7 +238,7 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
   }
   else if(reg == SPDR){
     regs[reg] = new_val;
-    send_write_port('G'-'B',new_val);
+    send_write_port('G'-'A',new_val);
   }
   else{
     regs[reg] = new_val;
@@ -275,7 +297,7 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
         int ddr = reg - LOWER_PORT + LOWER_DDR;
         uint8_t ddr_val = regs[ddr];
         if(!(ddr_val & mask)){
-          char port_c = 'B' + reg - LOWER_PORT;
+          char port_c = 'A' + reg - LOWER_PORT;
           fprintf(stderr,
                   "Warning: the avr clears PORT%c.R%c%d when DDR%c=0x%02X\n",
                   port_c, port_c, bit, port_c, ddr_val);
@@ -338,7 +360,7 @@ void avr_set_bit(uint8_t reg, uint8_t bit){
     }
   }
   else if (reg >= LOWER_PIN && reg <= HIGHER_PIN){
-    char port_c = 'B' + reg - LOWER_PIN;
+    char port_c = 'A' + reg - LOWER_PIN;
     fprintf(stderr, "Warning : PIN%c is only a read register, it shouldn't be written\n",
 		port_c);
   }
@@ -377,7 +399,7 @@ static void out_write_port(int port, unsigned char new_val){
     int ddr_val = regs[ddr];
     int old_val = regs[port];
     if((new_val & ~ddr_val) != 0xFF){
-      char port_c = 'B' + port - LOWER_PORT;
+      char port_c = 'A' + port - LOWER_PORT;
       fprintf(stderr,
               "Warning: an outside component writes PORT%c=0x%02X when TRIS%c=0x%02X\n",
               port_c, new_val, port_c, ddr_val);
@@ -400,7 +422,7 @@ static void out_clear_port_bit(int port, int bit){
     int old_val = regs[port];
     int new_val = old_val & ~mask;
     if(ddr_val & mask){
-      char port_c = 'B' + port - LOWER_PORT;
+      char port_c = 'A' + port - LOWER_PORT;
       fprintf(stderr,
         "Warning: an outside component clears PORT%c.R%c%d when TRIS%c=0x%02X\n",
               port_c, port_c, bit, port_c, ddr_val);
@@ -423,7 +445,7 @@ static void out_set_port_bit(int port, int bit){
     int old_val = regs[port];
     int new_val = old_val | mask;
     if(ddr_val & mask){
-      char port_c = 'B' + port - LOWER_PORT;
+      char port_c = 'A' + port - LOWER_PORT;
       fprintf(stderr,
         "Warning: an outside component sets PORT%c.R%c%d when DDR%c=0x%02X\n",
               port_c, port_c, bit, port_c, ddr_val);
@@ -467,7 +489,7 @@ void exec_instr(char *instr, int size){
     *sync_counter = *sync_counter - 1;
     if(*sync_counter == 0) V(sem_done);
     V(sem_sync);
-  }else if(size == 5 && instr[0] == 'A'){
+  }else if(size == 5 && instr[0] == 'Z'){
     int chan, h2, h1, h0, val;
     chan = int_of_hexchar(instr[1]);
     if(chan == -1 || chan > 14){
@@ -485,10 +507,10 @@ void exec_instr(char *instr, int size){
     out_set_analog(chan, val);
   }else{
     int port;
-    if(instr[1] >= 'B' && instr[1] <= ('B' + HIGHER_PORT - LOWER_PORT)){
-      port = instr[1] - 'B' + LOWER_PORT;
-    }else if(instr[1] >= 'b' && instr[1] <= ('b' + HIGHER_PORT - LOWER_PORT)){
-      port = instr[1] - 'b' + LOWER_PORT;
+    if(instr[1] >= 'A' && instr[1] <= ('A' + HIGHER_PORT - LOWER_PORT)){
+      port = instr[1] - 'A' + LOWER_PORT;
+    }else if(instr[1] >= 'a' && instr[1] <= ('a' + HIGHER_PORT - LOWER_PORT)){
+      port = instr[1] - 'a' + LOWER_PORT;
     }else{
       invalid_instr(instr);
       return;

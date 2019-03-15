@@ -355,7 +355,7 @@ let input_of_string s =
         match s.[0] with
         | 'W' -> assert (String.length s = 4); IWrite  (port_of_char s.[1], int_of_hex2 s.[2] s.[3])
         | 'T' -> assert (String.length s = 4); ITris   (port_of_char s.[1], int_of_hex2 s.[2] s.[3])
-        | 'A' -> assert (String.length s = 5); IWriteAnalog (an_of_char s.[1], int_of_hex3 s.[2] s.[3] s.[4])
+        | 'Z' -> assert (String.length s = 5); IWriteAnalog (an_of_char s.[1], int_of_hex3 s.[2] s.[3] s.[4])
         | 'C' -> assert (String.length s = 2); IConfigAnalog (int_of_hex1 s.[1])
         | _ -> error ()
       with _ -> error ()
