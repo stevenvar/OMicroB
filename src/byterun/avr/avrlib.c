@@ -180,7 +180,6 @@ void avr_analog_write(uint8_t pin, int val) {
   }
 #endif
 
-  // TODO faire la meme pour les autres...
 #if defined(TCCR0A) && defined(COM0B1)
   if(timer == TIMER0B) {
     OCR0B = val;
