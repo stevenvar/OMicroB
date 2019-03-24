@@ -1,1 +1,1 @@
-void delay(int);
+void stdlib_delay(int);

@@ -1,5 +1,5 @@
 (** Type of device *)
-type device_type = AVR
+type device_type = AVR | PIC32
 
 (** Config for a given avr device *)
 type config = {
@@ -42,16 +42,28 @@ let arduinoUnoConfig: config = {
   pins_module = "ArduinoUnoPins";
 }
 
+let fubarinoMiniConfig: config = {
+  typeD = PIC32;
+  mmcu = "PIC32MX250F128D";
+  avr = "";
+  baud = 115_200;
+  clock = 48_000_000;
+  device_def = "DEVICE_FUBARINO_MINI";
+  pins_module = "FubarinoMiniPins";
+}
+
 (** Choose se correct config according to name *)
 let get_config name = match name with
   | "arduboy" -> arduboyConfig
   | "arduino-mega" -> arduinoMegaConfig
   | "arduino-uno" -> arduinoUnoConfig
+  | "fubarino-mini" -> fubarinoMiniConfig
   | _ -> invalid_arg "choose_config"
 
 (** Get the names of all configs *)
 let all_config_names () = [
   "arduboy";
   "arduino-mega";
-  "arduino-uno"
+  "arduino-uno";
+  "fubarino-mini";
 ]

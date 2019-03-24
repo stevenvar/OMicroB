@@ -40,7 +40,9 @@
 
 #ifdef __AVR__
 #include "../avr/avrlib.c"
-#else
+#elif defined(__PIC32__)
+#include "../pic32/pic32lib.c"
+#elif defined(__PC__)
 #include "../simul/simul.c"
 #include "../simul/shared.c"
 #include "../simul/sf-regs.c"

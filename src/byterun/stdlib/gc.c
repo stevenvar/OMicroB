@@ -1,4 +1,4 @@
-#ifndef __AVR__
+#if defined(__OCAML__ ) || defined(__PC__)
 
 #include <caml/mlvalues.h>
 #include <caml/gc.h>

@@ -5,6 +5,8 @@
 
 #ifdef __AVR__
 #include <avr/pgmspace.h>
+#elif defined(__PIC32__)
+#include "../pic32/cores/avr/pgmspace.h"
 #else
 #define __PC__
 #define PROGMEM

@@ -1,4 +1,4 @@
-#ifndef __AVR__
+#ifdef __PC__
 #include <stdio.h>
 #endif
 
@@ -6,25 +6,25 @@
 #include "trace.h"
 
 void debug_trace_open(void) {
-#ifndef __AVR__
+#ifdef __PC__
   printf("TRACE: ");
 #endif
 }
 
 void debug_trace_char(char c) {
-#ifndef __AVR__
+#ifdef __PC__
   printf("%c", c);
 #endif
 }
 
 void debug_trace_close(void) {
-#ifndef __AVR__
+#ifdef __PC__
   printf("\n");
 #endif
 }
 
 void debug_trace_int(long i) {
-#ifndef __AVR__
+#ifdef __PC__
   printf("TRACE: %ld\n", i);
 #endif
 }
