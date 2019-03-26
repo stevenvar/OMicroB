@@ -79,9 +79,9 @@ module Dip (M:MICRO ) = struct
     let ((x,y),_) = p in
     let name = M.name_of_num i in
     if i < M.pins_total / 2 then
-      Graphics.moveto (x+pin_width + pin_space + 15) (y)
+      Graphics.moveto (x+pin_width + pin_space + 20) (y)
     else
-      Graphics.moveto (x-50) (y);
+      Graphics.moveto (x-(String.length name)*6-25) (y);
     Graphics.set_color Graphics.green;
     Graphics.draw_string (Printf.sprintf "%s " name );
     Graphics.set_color Graphics.black;
