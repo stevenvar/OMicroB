@@ -611,10 +611,8 @@ let () =
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
-    let cmd = cmd @ (match !default_config.typeD with
-        | AVR -> [ "-open"; "Avr";
-                   "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ]
-        | MICROBIT -> [ "-open"; "MicroBit"]) in
+    let cmd = cmd @ [ "-open"; "Avr";
+                      "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ] in
     run ~vars cmd;
 
     let cmd = [ Config.ocamlclean; output_path; "-o"; output_path ] in
@@ -789,157 +787,7 @@ let () =
     should_be_empty_options "-avrobjcopts" avrobjcopts;
   )
 
-(******************************************************************************)
-(* Compile a .c into a .arm_elf *)
-
-let available_arm_elf = ref input_arm_elf
-
-let microbitdir =
-  if local then Filename.concat Config.builddir "src/byterun/microbit"
-  else Filename.concat Config.includedir "microbit"
-
-let conc_microbit s = Filename.concat microbitdir s
-
-let rec interpose s l = match l with
-  | [] -> []
-  | t::q -> [s; t]@(interpose s q)
-
-let rec interleave l1 l2 = match (l1, l2) with
-  | [],[] -> []
-  | [],_ -> invalid_arg "interleave"
-  | _,[] -> invalid_arg "interleave"
-  | t1::q1, t2::q2 -> [t1; t2]@(interleave q1 q2)
-
-let () =
-  if !default_config.typeD = MICROBIT && available_c <> None &&
-     (flash || output_arm_elf <> None || output_hex <> None || output_combined_hex <> None || no_output_requested) then (
-    should_be_none_file input_arm_elf;
-    should_be_none_file input_hex;
-    should_be_none_file input_combined_hex;
-
-    let input_path = match available_c with
-      | None -> error "no input file to generate a .arm_elf"
-      | Some p -> p in
-
-    let o_output_path = get_first_defined [
-        output_arm_elf;
-        output_hex;
-        output_combined_hex;
-        Some input_path;
-      ] ".arm_o"
-
-    and output_path = get_first_defined [
-        output_arm_elf;
-        output_hex;
-        output_combined_hex;
-        Some input_path;
-      ] ".arm_elf" in
-
-    available_arm_elf := Some output_path;
-
-    let to_include = [
-      "mbed-classic/api"; "mbed-classic/hal"; "mbed-classic/cmsis";
-      "nrf51-sdk/source/ble/ble_radio_notification"; "nrf51-sdk/source/ble/ble_services/ble_dfu";
-      "nrf51-sdk/source/ble/common"; "nrf51-sdk/source/ble/device_manager";
-      "nrf51-sdk/source/ble/device_manager/config"; "nrf51-sdk/source/ble/peer_manager";
-      "nrf51-sdk/source/device"; "nrf51-sdk/source/drivers_nrf/ble_flash";
-      "nrf51-sdk/source/drivers_nrf/delay"; "nrf51-sdk/source/drivers_nrf/hal";
-      "nrf51-sdk/source/drivers_nrf/pstorage"; "nrf51-sdk/source/drivers_nrf/pstorage/config";
-      "nrf51-sdk/source/libraries/bootloader_dfu"; "nrf51-sdk/source/libraries/bootloader_dfu/hci_transport";
-      "nrf51-sdk/source/libraries/crc16"; "nrf51-sdk/source/libraries/experimental_section_vars";
-      "nrf51-sdk/source/libraries/fds"; "nrf51-sdk/source/libraries/fstorage";
-      "nrf51-sdk/source/libraries/hci"; "nrf51-sdk/source/libraries/scheduler";
-      "nrf51-sdk/source/libraries/timer"; "nrf51-sdk/source/libraries/util";
-      "nrf51-sdk/source/softdevice/common/softdevice_handler"; "nrf51-sdk/source/softdevice/s130/headers";
-      "ble"; "ble/ble"; "ble/ble/services";
-      "ble-nrf51822/source"; "ble-nrf51822/source/common";
-      "ble-nrf51822/source/btle"; "ble-nrf51822/source/btle/custom";
-      "microbit-dal/inc/core"; "microbit-dal/inc/types"; "microbit-dal/inc/drivers";
-      "microbit-dal/inc/bluetooth"; "microbit-dal/inc/platform";
-      "microbit/inc" ] in
-
-    let cmd = [ Config.arm_cxx ] @ default_arm_cxx_options in
-    let cmd = cmd @ [ "-D__MBED__"; "-DNDEBUG" ; "-DTOOLCHAIN_GCC"; "-DTOOLCHAIN_ARM_GCC"; "-DMBED_OPERATORS";
-                      "-DNRF51"; "-DTARGET_NORDIC"; "-DTARGET_M0"; "-DMCU_NORDIC_16K";
-                      "-DTARGET_NRF51_MICROBIT"; "-DTARGET_MCU_NORDIC_16K"; "-DTARGET_MCU_NRF51_16K_S110";
-                      "-DTARGET_NRF_LFCLK_RC"; "-D__CORTEX_M0"; "-DARM_MATH_CM0" ] in
-    let cmd = cmd @ (interpose "-I" (List.map conc_microbit to_include)) in
-    let cmd = cmd @ [ "-o"; o_output_path ] @ [ "-c"; input_path ] in
-    run cmd;
-
-    let to_link = [ "microbit"; "microbit-dal"; "ble-nrf51822"; "ble"; "nrf51-sdk"; "mbed-classic" ] in
-    let link_folders = List.map (fun s -> "-L"^(conc_microbit s)) to_link
-    and link_libs = List.map (fun s -> "-l"^s) to_link in
-
-    let cmd = [ Config.arm_cxx; "-o"; output_path; o_output_path ] @ default_arm_cxx_options in
-    let cmd = cmd @ [ "-D__MBED__" ] in
-    let cmd = cmd @ [ "-Wl,-wrap,main" ] in
-    let cmd = cmd @ [ "-T"; conc_microbit "mbed-classic/cmsis/NRF51822.ld" ] in
-    let cmd = cmd @ [ "-Wl,--start-group" ] in
-    let cmd = cmd @ (interleave link_folders link_libs) in
-    let cmd = cmd @ [ "-lnosys"; "-lstdc++"; "-lsupc++"; "-lm"; "-lc"; "-lgcc"; "-lstdc++"; "-lsupc++"; "-lm"; "-lc"; "-lgcc" ] in
-    let cmd = cmd @ [ "-Wl,--end-group"; "--specs=nano.specs" ] in
-    run cmd
-  )
-
-let available_arm_elf = !available_arm_elf
-
-(******************************************************************************)
-(* Compile a .arm.elf into a .hex targetting microbit TODO *)
-
-let () =
-  if !default_config.typeD = MICROBIT && available_arm_elf <> None &&
-     (flash || output_hex <> None || output_combined_hex <> None || no_output_requested) then (
-
-    should_be_none_file input_hex;
-    should_be_none_file input_combined_hex;
-
-    let input_path = match available_arm_elf with
-      | None -> error "no input file to generate a .hex"
-      | Some p -> p in
-
-    let output_path = get_first_defined [
-        output_hex;
-        output_combined_hex;
-        Some input_path;
-      ] ".hex" in
-
-    available_hex := Some output_path;
-
-    let cmd = [ Config.arm_objcopy; "-O"; "ihex"; input_path; output_path ] in
-    run cmd
-  )
-
 let available_hex = !available_hex
-
-(******************************************************************************)
-(* Combine microbit .hex with it's bootloader to make .combined_hex *)
-
-let available_combined_hex = ref input_combined_hex
-
-let () =
-  if !default_config.typeD = MICROBIT && available_hex <> None &&
-     (flash || output_combined_hex <> None || no_output_requested) then (
-
-    should_be_none_file input_combined_hex;
-
-    let input_path = match available_hex with
-      | None -> error "no input file to generate a .hex"
-      | Some p -> p in
-
-    let output_path = get_first_defined [
-        output_combined_hex;
-        Some input_path;
-      ] ".combined_hex" in
-
-    let cmd = [ "srec_cat"; Filename.concat microbitdir "BLE_BOOTLOADER_RESERVED.hex" ] in
-    let cmd = cmd @ [ "-intel"; Filename.concat microbitdir "mbed-classic/hal/Lib/s110_nrf51822_8_0_0/s110_nrf51822_8.0.0_softdevice.hex" ] in
-    let cmd = cmd @ [ "-intel"; input_path ] in
-    let cmd = cmd @ [ "-intel"; "-o"; output_path; "-intel"; "--line-length=44" ] in
-    run cmd
-  )
-
-let available_combined_hex = !available_combined_hex
 
 (******************************************************************************)
 (* Simul *)
@@ -963,61 +811,54 @@ let () =
 
 let () =
   if flash then (
-    if !default_config.typeD = AVR then (
-      let path =
-        match available_hex with
-        | None -> error "no input file to flash the micro-controller"
-        | Some path -> path in
+    let path =
+      match available_hex with
+      | None -> error "no input file to flash the micro-controller"
+      | Some path -> path in
 
-      let tty =
-        let rec find_in_options options =
-          match options with
-          | "-P" :: tty :: _ -> Some tty
-          | _ :: rest -> find_in_options rest
-          | [] -> None in
-        match find_in_options avrdudeopts with
-        | Some tty -> tty
-        | None ->
-          let dev_paths =
-            try Sys.readdir "/dev"
-            with _ -> Printf.eprintf "Error: fail to open /dev.\n%!"; exit 1 in
-          let available_ttys = ref [] in
-          Array.iter (fun dev_path ->
-              if is_substring dev_path ~sub:"tty.usbmodem"
-              || is_substring dev_path ~sub:"USB"
-              || is_substring dev_path ~sub:"ACM"
-              then (
-                available_ttys := Filename.concat "/dev" dev_path :: !available_ttys;
-              )
-            ) dev_paths;
-          match !available_ttys with
-          | [] ->
-            Printf.eprintf "Error: no available tty found to flash the micro-controller.\n";
-            Printf.eprintf "> Please connect the micro-controller if not already connected.\n";
-            Printf.eprintf "> Please reset the micro-controller if not ready to receive a new program.\n";
-            Printf.eprintf "> Otherwise, please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
-            exit 1;
-          | _ :: _ :: _ as lst ->
-            Printf.eprintf "Error: multiple available tty found to flash the micro-controller:\n";
-            List.iter (Printf.eprintf "  * %s\n") lst;
-            Printf.eprintf "> Please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
-            exit 1;
-          | [ tty ] -> tty in
+    let tty =
+      let rec find_in_options options =
+        match options with
+        | "-P" :: tty :: _ -> Some tty
+        | _ :: rest -> find_in_options rest
+        | [] -> None in
+      match find_in_options avrdudeopts with
+      | Some tty -> tty
+      | None ->
+        let dev_paths =
+          try Sys.readdir "/dev"
+          with _ -> Printf.eprintf "Error: fail to open /dev.\n%!"; exit 1 in
+        let available_ttys = ref [] in
+        Array.iter (fun dev_path ->
+            if is_substring dev_path ~sub:"tty.usbmodem"
+            || is_substring dev_path ~sub:"USB"
+            || is_substring dev_path ~sub:"ACM"
+            then (
+              available_ttys := Filename.concat "/dev" dev_path :: !available_ttys;
+            )
+          ) dev_paths;
+        match !available_ttys with
+        | [] ->
+          Printf.eprintf "Error: no available tty found to flash the micro-controller.\n";
+          Printf.eprintf "> Please connect the micro-controller if not already connected.\n";
+          Printf.eprintf "> Please reset the micro-controller if not ready to receive a new program.\n";
+          Printf.eprintf "> Otherwise, please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
+          exit 1;
+        | _ :: _ :: _ as lst ->
+          Printf.eprintf "Error: multiple available tty found to flash the micro-controller:\n";
+          List.iter (Printf.eprintf "  * %s\n") lst;
+          Printf.eprintf "> Please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
+          exit 1;
+        | [ tty ] -> tty in
 
-      let cmd = if sudo then [ "sudo" ] else [] in
-      let cmd = cmd @ [ Config.avrdude ] in
-      let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; !default_config.avr ] in
-      let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
-      let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; !default_config.mmcu ] in
-      let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int !default_config.baud ] in
-      let cmd = cmd @ avrdudeopts @ [ "-v"; "-D"; "-U"; "flash:w:" ^ path ^ ":i" ] in
-      run cmd
-    ) else if !default_config.typeD = MICROBIT then (
-      should_be_empty_options "-avrdudeopts" avrdudeopts;
-      Printf.printf
-        "To flash a microbit, please copy %s to your microbit device using your file manager\n"
-        (match input_arm_elf with | Some p -> p | None -> "the .arm_elf file")
-    )
+    let cmd = if sudo then [ "sudo" ] else [] in
+    let cmd = cmd @ [ Config.avrdude ] in
+    let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; !default_config.avr ] in
+    let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
+    let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; !default_config.mmcu ] in
+    let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int !default_config.baud ] in
+    let cmd = cmd @ avrdudeopts @ [ "-v"; "-D"; "-U"; "flash:w:" ^ path ^ ":i" ] in
+    run cmd
   ) else (
     should_be_empty_options "-avrdudeopts" avrdudeopts;
   )

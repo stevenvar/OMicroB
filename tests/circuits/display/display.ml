@@ -1,8 +1,5 @@
 (* Print some stuff on a screen *)
 
-(* Use the microbit internal screen *)
-(* module MyDisp = MicroBit.Screen *)
-
 (* Use an external, LiquidCrystal type screen *)
 let%component MyDisp = LiquidCrystal.MakeLCD(
     rsPin = PIN12;
