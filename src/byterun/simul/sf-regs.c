@@ -584,6 +584,14 @@ uint8_t pic32_digital_read(uint8_t _p) {
   return 0;
 }
 
+void pic32_analog_write(uint8_t p, uint8_t level) {
+  printf("Wrote %d to pin %d\n", level, p);
+}
+
+uint8_t pic32_analog_read(uint8_t _p) {
+  return 0;
+}
+
 void pic32_delay(int ms) {
   stdlib_delay(ms);
 }

@@ -13,7 +13,7 @@ __attribute__((section(".comment"))) void (*__use_force_isr_install)(void) = &__
 // y a pas tout
 uint8_t get_pin_addr(uint8_t pin) {
   if (pin == 0) return A0;
-  if (pin == 1) return 1; // nul, à changer
+  if (pin == 1) return PIN_LED1; // nul, à changer
   if (pin == 2) return A2;
   if (pin == 3) return A3;
   if (pin == 4) return A4;
@@ -45,6 +45,14 @@ void pic32_digital_write(uint8_t pin, uint8_t level) {
 
 uint8_t pic32_digital_read(uint8_t pin) {
   return digitalRead(get_pin_addr(pin));
+}
+
+void pic32_analog_write(uint8_t pin, uint8_t level) {
+  analogWrite(get_pin_addr(pin), level);
+}
+
+uint8_t pic32_analog_read(uint8_t pin) {
+  return analogRead(get_pin_addr(pin));
 }
 
 void pic32_delay(int ms) {

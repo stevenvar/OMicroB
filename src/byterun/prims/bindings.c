@@ -77,6 +77,15 @@ value caml_pic32_digital_read(value pin) {
   return Val_int(pic32_digital_read(Int_val(pin)));
 }
 
+value caml_pic32_analog_write(value pin, value level) {
+  pic32_analog_write(Int_val(pin), Int_val(level));
+  return Val_unit;
+}
+
+value caml_pic32_analog_read(value pin) {
+  return Val_int(pic32_analog_read(Int_val(pin)));
+}
+
 value caml_pic32_delay(value ms) {
   pic32_delay(Int_val(ms));
   return Val_unit;

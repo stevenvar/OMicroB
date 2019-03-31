@@ -1,7 +1,7 @@
-include ../../etc/Makefile.conf
+include ../../../etc/Makefile.conf
 
-SOURCES := led.ml
-TARGETS := led.byte led.c led.elf led.pic32_elf led.hex
+SOURCES := fade.ml
+TARGETS := fade.byte fade.c fade.elf fade.pic32_elf fade.hex
 
 all: $(TARGETS)
 
