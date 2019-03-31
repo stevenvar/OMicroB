@@ -5,19 +5,11 @@
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
 
-type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
-         | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
-         | PIN15 | PIN16 | PIN17 | PIN18 | PIN19 | PIN20 | PIN21
-         | PIN22 | PIN23 | PIN24 | PIN25 | PIN26 | PIN27 | PIN28
-         | PIN29 | PIN30 | PIN31 | PIN32 | PIN33 | PIN34 | PIN35
-         | PIN36 | PIN37 | PIN38 | PIN39 | PIN40 | PIN41 | PIN42
-         | PIN43 | PIN44 | PIN45 | PIN46 | PIN47 | PIN48 | PIN49
-         | MISO | SCK | MOSI | SS
-         | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5 | PINA6 | PINA7 | PINA8
-         | PINA9 | PINA10 | PINA11 | PINA12 | PINA13 | PINA14 | PINA15
-
 type level = HIGH | LOW
+type _level = level
+
 type mode = INPUT | OUTPUT | INPUT_PULLUP
+type _mode = mode
 
 type bit = B0 | B1 | B2 | B3 | B4 | B5 | B6 | B7
 type register = PORTA | PORTB | PORTC | PORTD | PORTE | PORTF
@@ -28,133 +20,134 @@ type register = PORTA | PORTB | PORTC | PORTD | PORTE | PORTF
               | PING | PINH | PINJ | PINK | PINL
               | SPCR | SPSR | SPDR
 
-module type AvrPins = sig
-  val port_of_pin: pin -> register
-  val ddr_of_pin: pin -> register
-  val input_of_pin: pin -> register
-  val bit_of_pin: pin -> bit
-  val pin_mode: pin -> mode -> unit
-  val digital_write: pin -> level -> unit
-  val digital_read: pin -> level
-end
-
 external write_register : register -> int -> unit = "caml_avr_write_register" [@@noalloc]
 external read_register : register -> int = "caml_avr_read_register" [@@noalloc]
 external set_bit : register -> bit -> unit = "caml_avr_set_bit" [@@noalloc]
 external clear_bit : register -> bit -> unit = "caml_avr_clear_bit" [@@noalloc]
 external read_bit : register -> bit -> bool = "caml_avr_read_bit" [@@noalloc]
+external avr_analog_read: int -> int = "caml_avr_analog_read" [@@noalloc]
 external delay: int -> unit = "caml_avr_delay" [@@noalloc]
+external millis : unit -> int = "caml_avr_millis" [@@noalloc]
 
-exception PinNotPresentOnThisDevice of pin
+module ArduboyPins = struct
+  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7 | PIN8
+           | PIN9 | PIN10 | PIN11 | PIN12 | PIN13
+           | MISO | SCK | MOSI | SS
+           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5
+  type _pin = pin
 
-module ArduboyPins: AvrPins = struct
-  let port_of_pin = function [@ocaml.warning"-4"]
-                           | PIN0 -> PORTD
-                           | PIN1 -> PORTD
-                           | PIN2 -> PORTD
-                           | PIN3 -> PORTD
-                           | PIN4 -> PORTD
-                           | PIN5 -> PORTC
-                           | PIN6 -> PORTD
-                           | PIN7 -> PORTE
-                           | PIN8 -> PORTB
-                           | PIN9 -> PORTB
-                           | PIN10 -> PORTB
-                           | PIN11 -> PORTB
-                           | PIN12 -> PORTD
-                           | PIN13 -> PORTC
-                           | MISO -> PORTB
-                           | SCK -> PORTB
-                           | MOSI -> PORTB
-                           | SS -> PORTB
-                           | PINA0 -> PORTF
-                           | PINA1 -> PORTF
-                           | PINA2 -> PORTF
-                           | PINA3 -> PORTF
-                           | PINA4 -> PORTF
-                           | PINA5 -> PORTF
-                           | p -> raise (PinNotPresentOnThisDevice p)
+  let port_of_pin = function
+    | PIN0 -> PORTD
+    | PIN1 -> PORTD
+    | PIN2 -> PORTD
+    | PIN3 -> PORTD
+    | PIN4 -> PORTD
+    | PIN5 -> PORTC
+    | PIN6 -> PORTD
+    | PIN7 -> PORTE
+    | PIN8 -> PORTB
+    | PIN9 -> PORTB
+    | PIN10 -> PORTB
+    | PIN11 -> PORTB
+    | PIN12 -> PORTD
+    | PIN13 -> PORTC
+    | MISO -> PORTB
+    | SCK -> PORTB
+    | MOSI -> PORTB
+    | SS -> PORTB
+    | PINA0 -> PORTF
+    | PINA1 -> PORTF
+    | PINA2 -> PORTF
+    | PINA3 -> PORTF
+    | PINA4 -> PORTF
+    | PINA5 -> PORTF
 
-  let ddr_of_pin = function [@ocaml.warning"-4"]
-                          | PIN0 -> DDRD
-                          | PIN1 -> DDRD
-                          | PIN2 -> DDRD
-                          | PIN3 -> DDRD
-                          | PIN4 -> DDRD
-                          | PIN5 -> DDRC
-                          | PIN6 -> DDRD
-                          | PIN7 -> DDRE
-                          | PIN8 -> DDRB
-                          | PIN9 -> DDRB
-                          | PIN10 -> DDRB
-                          | PIN11 -> DDRB
-                          | PIN12 -> DDRD
-                          | PIN13 -> DDRC
-                          | MISO -> DDRB
-                          | SCK -> DDRB
-                          | MOSI -> DDRB
-                          | SS -> DDRB
-                          | PINA0 -> DDRF
-                          | PINA1 -> DDRF
-                          | PINA2 -> DDRF
-                          | PINA3 -> DDRF
-                          | PINA4 -> DDRF
-                          | PINA5 -> DDRF
-                          | p -> raise (PinNotPresentOnThisDevice p)
+  let ddr_of_pin = function
+    | PIN0 -> DDRD
+    | PIN1 -> DDRD
+    | PIN2 -> DDRD
+    | PIN3 -> DDRD
+    | PIN4 -> DDRD
+    | PIN5 -> DDRC
+    | PIN6 -> DDRD
+    | PIN7 -> DDRE
+    | PIN8 -> DDRB
+    | PIN9 -> DDRB
+    | PIN10 -> DDRB
+    | PIN11 -> DDRB
+    | PIN12 -> DDRD
+    | PIN13 -> DDRC
+    | MISO -> DDRB
+    | SCK -> DDRB
+    | MOSI -> DDRB
+    | SS -> DDRB
+    | PINA0 -> DDRF
+    | PINA1 -> DDRF
+    | PINA2 -> DDRF
+    | PINA3 -> DDRF
+    | PINA4 -> DDRF
+    | PINA5 -> DDRF
 
-  let input_of_pin = function [@ocaml.warning"-4"]
-                            | PIN0 -> PIND
-                            | PIN1 -> PIND
-                            | PIN2 -> PIND
-                            | PIN3 -> PIND
-                            | PIN4 -> PIND
-                            | PIN5 -> PINC
-                            | PIN6 -> PIND
-                            | PIN7 -> PINE
-                            | PIN8 -> PINB
-                            | PIN9 -> PINB
-                            | PIN10 -> PINB
-                            | PIN11 -> PINB
-                            | PIN12 -> PIND
-                            | PIN13 -> PINC
-                            | MISO -> PINB
-                            | SCK -> PINB
-                            | MOSI -> PINB
-                            | SS -> PINB
-                            | PINA0 -> PINF
-                            | PINA1 -> PINF
-                            | PINA2 -> PINF
-                            | PINA3 -> PINF
-                            | PINA4 -> PINF
-                            | PINA5 -> PINF
-                            | p -> raise (PinNotPresentOnThisDevice p)
+  let input_of_pin = function
+    | PIN0 -> PIND
+    | PIN1 -> PIND
+    | PIN2 -> PIND
+    | PIN3 -> PIND
+    | PIN4 -> PIND
+    | PIN5 -> PINC
+    | PIN6 -> PIND
+    | PIN7 -> PINE
+    | PIN8 -> PINB
+    | PIN9 -> PINB
+    | PIN10 -> PINB
+    | PIN11 -> PINB
+    | PIN12 -> PIND
+    | PIN13 -> PINC
+    | MISO -> PINB
+    | SCK -> PINB
+    | MOSI -> PINB
+    | SS -> PINB
+    | PINA0 -> PINF
+    | PINA1 -> PINF
+    | PINA2 -> PINF
+    | PINA3 -> PINF
+    | PINA4 -> PINF
+    | PINA5 -> PINF
 
-  let bit_of_pin = function [@ocaml.warning"-4"]
-                          | PIN0 -> B2
-                          | PIN1 -> B3
-                          | PIN2 -> B1
-                          | PIN3 -> B0
-                          | PIN4 -> B4
-                          | PIN5 -> B6
-                          | PIN6 -> B7
-                          | PIN7 -> B6
-                          | PIN8 -> B4
-                          | PIN9 -> B5
-                          | PIN10 -> B6
-                          | PIN11 -> B7
-                          | PIN12 -> B6
-                          | PIN13 -> B7
-                          | MISO -> B3
-                          | SCK -> B1
-                          | MOSI -> B2
-                          | SS -> B0
-                          | PINA0 -> B7
-                          | PINA1 -> B6
-                          | PINA2 -> B5
-                          | PINA3 -> B4
-                          | PINA4 -> B1
-                          | PINA5 -> B0
-                          | p -> raise (PinNotPresentOnThisDevice p)
+  let bit_of_pin = function
+    | PIN0 -> B2
+    | PIN1 -> B3
+    | PIN2 -> B1
+    | PIN3 -> B0
+    | PIN4 -> B4
+    | PIN5 -> B6
+    | PIN6 -> B7
+    | PIN7 -> B6
+    | PIN8 -> B4
+    | PIN9 -> B5
+    | PIN10 -> B6
+    | PIN11 -> B7
+    | PIN12 -> B6
+    | PIN13 -> B7
+    | MISO -> B3
+    | SCK -> B1
+    | MOSI -> B2
+    | SS -> B0
+    | PINA0 -> B7
+    | PINA1 -> B6
+    | PINA2 -> B5
+    | PINA3 -> B4
+    | PINA4 -> B1
+    | PINA5 -> B0
+
+  let channel_of_pin = function [@ocaml.warning"-4"]
+    | PINA0 -> 0
+    | PINA1 -> 1
+    | PINA2 -> 2
+    | PINA3 -> 3
+    | PINA4 -> 4
+    | PINA5 -> 5
+    | _ -> failwith "This pin is not supported as analog"
 
   let pin_mode p m =
     let port = port_of_pin p in
@@ -178,9 +171,45 @@ module ArduboyPins: AvrPins = struct
     match read_bit input bit with
     | true -> HIGH
     | false -> LOW
+
+  external avr_analog_write: pin -> int -> unit = "caml_avr_analog_write" [@@noalloc]
+  let analog_write p v =
+    if v < 0 || v >= 1024 then invalid_arg "analog_write";
+    if v = 0 then digital_write p LOW else avr_analog_write p (v/4)
+
+  let analog_read p = avr_analog_read (channel_of_pin p)
+
+  module MCUConnection = struct
+    type pin = _pin
+    type mode = _mode
+    type level = _level
+    let high = HIGH
+    let low = LOW
+    let input_mode = OUTPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let analog_read = analog_read
+    let analog_write = analog_write
+    let pin_mode = pin_mode
+    let delay = delay
+    let millis = millis
+  end
 end
 
-module ArduinoMegaPins: AvrPins = struct
+module ArduinoMegaPins = struct
+  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
+           | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
+           | PIN15 | PIN16 | PIN17 | PIN18 | PIN19 | PIN20 | PIN21
+           | PIN22 | PIN23 | PIN24 | PIN25 | PIN26 | PIN27 | PIN28
+           | PIN29 | PIN30 | PIN31 | PIN32 | PIN33 | PIN34 | PIN35
+           | PIN36 | PIN37 | PIN38 | PIN39 | PIN40 | PIN41 | PIN42
+           | PIN43 | PIN44 | PIN45 | PIN46 | PIN47 | PIN48 | PIN49
+           | MISO | SCK | MOSI | SS
+           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5 | PINA6 | PINA7 | PINA8
+           | PINA9 | PINA10 | PINA11 | PINA12 | PINA13 | PINA14 | PINA15
+  type _pin = pin
+
   let port_of_pin = function
     | PIN0 -> PORTE
     | PIN1 -> PORTE
@@ -469,6 +498,25 @@ module ArduinoMegaPins: AvrPins = struct
     | PINA14 -> B6
     | PINA15 -> B7
 
+  let channel_of_pin = function [@ocaml.warning"-4"]
+    | PINA0 -> 0
+    | PINA1 -> 1
+    | PINA2 -> 2
+    | PINA3 -> 3
+    | PINA4 -> 4
+    | PINA5 -> 5
+    | PINA6 -> 6
+    | PINA7 -> 7
+    | PINA8 -> 8
+    | PINA9 -> 9
+    | PINA10 -> 10
+    | PINA11 -> 11
+    | PINA12 -> 12
+    | PINA13 -> 13
+    | PINA14 -> 14
+    | PINA15 -> 15
+    | _ -> failwith "This pin is not supported as analog"
+
   let pin_mode p m =
     let port = port_of_pin p in
     let ddr = ddr_of_pin p in
@@ -491,116 +539,151 @@ module ArduinoMegaPins: AvrPins = struct
     match read_bit input bit with
     | true -> HIGH
     | false -> LOW
+
+  external avr_analog_write: pin -> int -> unit = "caml_avr_analog_write" [@@noalloc]
+  let analog_write p v =
+    if v < 0 || v >= 1024 then invalid_arg "analog_write";
+    if v = 0 then digital_write p LOW else avr_analog_write p (v/4)
+
+  let analog_read p = avr_analog_read (channel_of_pin p)
+
+  module MCUConnection = struct
+    type pin = _pin
+    type mode = _mode
+    type level = _level
+    let high = HIGH
+    let low = LOW
+    let input_mode = OUTPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let analog_read = analog_read
+    let analog_write = analog_write
+    let pin_mode = pin_mode
+    let delay = delay
+    let millis = millis
+  end
 end
 
-module ArduinoUnoPins: AvrPins = struct
-  let port_of_pin = function [@ocaml.warning"-4"]
-                           | PIN0 -> PORTD
-                           | PIN1 -> PORTD
-                           | PIN2 -> PORTD
-                           | PIN3 -> PORTD
-                           | PIN4 -> PORTD
-                           | PIN5 -> PORTD
-                           | PIN6 -> PORTD
-                           | PIN7 -> PORTD
-                           | PIN8 -> PORTB
-                           | PIN9 -> PORTB
-                           | PIN10 -> PORTB
-                           | PIN11 -> PORTB
-                           | PIN12 -> PORTB
-                           | PIN13 -> PORTB
-                           | MISO -> PORTB
-                           | SCK -> PORTB
-                           | MOSI -> PORTB
-                           | SS -> PORTB
-                           | PINA0 -> PORTC
-                           | PINA1 -> PORTC
-                           | PINA2 -> PORTC
-                           | PINA3 -> PORTC
-                           | PINA4 -> PORTC
-                           | PINA5 -> PORTC
-                           | p -> raise (PinNotPresentOnThisDevice p)
+module ArduinoUnoPins = struct
+  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7 | PIN8
+           | PIN9 | PIN10 | PIN11 | PIN12 | PIN13
+           | MISO | SCK | MOSI | SS
+           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5
+  type _pin = pin
 
-  let ddr_of_pin = function [@ocaml.warning"-4"]
-                          | PIN0 -> DDRD
-                          | PIN1 -> DDRD
-                          | PIN2 -> DDRD
-                          | PIN3 -> DDRD
-                          | PIN4 -> DDRD
-                          | PIN5 -> DDRD
-                          | PIN6 -> DDRD
-                          | PIN7 -> DDRD
-                          | PIN8 -> DDRB
-                          | PIN9 -> DDRB
-                          | PIN10 -> DDRB
-                          | PIN11 -> DDRB
-                          | PIN12 -> DDRB
-                          | PIN13 -> DDRB
-                          | MISO -> DDRB
-                          | SCK -> DDRB
-                          | MOSI -> DDRB
-                          | SS -> DDRB
-                          | PINA0 -> DDRC
-                          | PINA1 -> DDRC
-                          | PINA2 -> DDRC
-                          | PINA3 -> DDRC
-                          | PINA4 -> DDRC
-                          | PINA5 -> DDRC
-                          | p -> raise (PinNotPresentOnThisDevice p)
+  let port_of_pin = function
+    | PIN0 -> PORTD
+    | PIN1 -> PORTD
+    | PIN2 -> PORTD
+    | PIN3 -> PORTD
+    | PIN4 -> PORTD
+    | PIN5 -> PORTD
+    | PIN6 -> PORTD
+    | PIN7 -> PORTD
+    | PIN8 -> PORTB
+    | PIN9 -> PORTB
+    | PIN10 -> PORTB
+    | PIN11 -> PORTB
+    | PIN12 -> PORTB
+    | PIN13 -> PORTB
+    | MISO -> PORTB
+    | SCK -> PORTB
+    | MOSI -> PORTB
+    | SS -> PORTB
+    | PINA0 -> PORTC
+    | PINA1 -> PORTC
+    | PINA2 -> PORTC
+    | PINA3 -> PORTC
+    | PINA4 -> PORTC
+    | PINA5 -> PORTC
 
-  let input_of_pin = function [@ocaml.warning"-4"]
-                            | PIN0 -> PIND
-                            | PIN1 -> PIND
-                            | PIN2 -> PIND
-                            | PIN3 -> PIND
-                            | PIN4 -> PIND
-                            | PIN5 -> PIND
-                            | PIN6 -> PIND
-                            | PIN7 -> PIND
-                            | PIN8 -> PINB
-                            | PIN9 -> PINB
-                            | PIN10 -> PINB
-                            | PIN11 -> PINB
-                            | PIN12 -> PINB
-                            | PIN13 -> PINB
-                            | MISO -> PINB
-                            | SCK -> PINB
-                            | MOSI -> PINB
-                            | SS -> PINB
-                            | PINA0 -> PINC
-                            | PINA1 -> PINC
-                            | PINA2 -> PINC
-                            | PINA3 -> PINC
-                            | PINA4 -> PINC
-                            | PINA5 -> PINC
-                            | p -> raise (PinNotPresentOnThisDevice p)
+  let ddr_of_pin = function
+    | PIN0 -> DDRD
+    | PIN1 -> DDRD
+    | PIN2 -> DDRD
+    | PIN3 -> DDRD
+    | PIN4 -> DDRD
+    | PIN5 -> DDRD
+    | PIN6 -> DDRD
+    | PIN7 -> DDRD
+    | PIN8 -> DDRB
+    | PIN9 -> DDRB
+    | PIN10 -> DDRB
+    | PIN11 -> DDRB
+    | PIN12 -> DDRB
+    | PIN13 -> DDRB
+    | MISO -> DDRB
+    | SCK -> DDRB
+    | MOSI -> DDRB
+    | SS -> DDRB
+    | PINA0 -> DDRC
+    | PINA1 -> DDRC
+    | PINA2 -> DDRC
+    | PINA3 -> DDRC
+    | PINA4 -> DDRC
+    | PINA5 -> DDRC
 
-  let bit_of_pin = function [@ocaml.warning"-4"]
-                          | PIN0 -> B0
-                          | PIN1 -> B1
-                          | PIN2 -> B2
-                          | PIN3 -> B3
-                          | PIN4 -> B4
-                          | PIN5 -> B5
-                          | PIN6 -> B6
-                          | PIN7 -> B7
-                          | PIN8 -> B0
-                          | PIN9 -> B1
-                          | PIN10 -> B2
-                          | PIN11 -> B3
-                          | PIN12 -> B4
-                          | PIN13 -> B5
-                          | MISO -> B4
-                          | SCK -> B5
-                          | MOSI -> B3
-                          | SS -> B0
-                          | PINA0 -> B0
-                          | PINA1 -> B1
-                          | PINA2 -> B2
-                          | PINA3 -> B3
-                          | PINA4 -> B4
-                          | PINA5 -> B5
-                          | p -> raise (PinNotPresentOnThisDevice p)
+  let input_of_pin = function
+    | PIN0 -> PIND
+    | PIN1 -> PIND
+    | PIN2 -> PIND
+    | PIN3 -> PIND
+    | PIN4 -> PIND
+    | PIN5 -> PIND
+    | PIN6 -> PIND
+    | PIN7 -> PIND
+    | PIN8 -> PINB
+    | PIN9 -> PINB
+    | PIN10 -> PINB
+    | PIN11 -> PINB
+    | PIN12 -> PINB
+    | PIN13 -> PINB
+    | MISO -> PINB
+    | SCK -> PINB
+    | MOSI -> PINB
+    | SS -> PINB
+    | PINA0 -> PINC
+    | PINA1 -> PINC
+    | PINA2 -> PINC
+    | PINA3 -> PINC
+    | PINA4 -> PINC
+    | PINA5 -> PINC
+
+  let bit_of_pin = function
+    | PIN0 -> B0
+    | PIN1 -> B1
+    | PIN2 -> B2
+    | PIN3 -> B3
+    | PIN4 -> B4
+    | PIN5 -> B5
+    | PIN6 -> B6
+    | PIN7 -> B7
+    | PIN8 -> B0
+    | PIN9 -> B1
+    | PIN10 -> B2
+    | PIN11 -> B3
+    | PIN12 -> B4
+    | PIN13 -> B5
+    | MISO -> B4
+    | SCK -> B5
+    | MOSI -> B3
+    | SS -> B0
+    | PINA0 -> B0
+    | PINA1 -> B1
+    | PINA2 -> B2
+    | PINA3 -> B3
+    | PINA4 -> B4
+    | PINA5 -> B5
+
+  let channel_of_pin = function [@ocaml.warning"-4"]
+    | PINA0 -> 0
+    | PINA1 -> 1
+    | PINA2 -> 2
+    | PINA3 -> 3
+    | PINA4 -> 4
+    | PINA5 -> 5
+    | _ -> failwith "This pin is not supported as analog"
 
   let pin_mode p m =
     let port = port_of_pin p in
@@ -624,4 +707,214 @@ module ArduinoUnoPins: AvrPins = struct
     match read_bit input bit with
     | true -> HIGH
     | false -> LOW
+
+  external avr_analog_write: pin -> int -> unit = "caml_avr_analog_write" [@@noalloc]
+  let analog_write p v =
+    if v < 0 || v >= 1024 then invalid_arg "analog_write";
+    if v = 0 then digital_write p LOW else avr_analog_write p (v/4)
+
+  let analog_read p = avr_analog_read (channel_of_pin p)
+
+  module MCUConnection = struct
+    type pin = _pin
+    type level = _level
+    type mode = _mode
+    let high = HIGH
+    let low = LOW
+    let input_mode = OUTPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let analog_read = analog_read
+    let analog_write = analog_write
+    let pin_mode = pin_mode
+    let delay = delay
+    let millis = millis
+  end
+end
+
+(** TODO *)
+module FubarinoMiniPins = struct
+  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
+           | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13
+           | MISO | SCK | MOSI | SS
+           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5
+  type _pin = pin
+
+  let port_of_pin = function
+    | PIN0 -> PORTD
+    | PIN1 -> PORTD
+    | PIN2 -> PORTD
+    | PIN3 -> PORTD
+    | PIN4 -> PORTD
+    | PIN5 -> PORTC
+    | PIN6 -> PORTD
+    | PIN7 -> PORTE
+    | PIN8 -> PORTB
+    | PIN9 -> PORTB
+    | PIN10 -> PORTB
+    | PIN11 -> PORTB
+    | PIN12 -> PORTD
+    | PIN13 -> PORTC
+    | MISO -> PORTB
+    | SCK -> PORTB
+    | MOSI -> PORTB
+    | SS -> PORTB
+    | PINA0 -> PORTF
+    | PINA1 -> PORTF
+    | PINA2 -> PORTF
+    | PINA3 -> PORTF
+    | PINA4 -> PORTF
+    | PINA5 -> PORTF
+
+  let ddr_of_pin = function
+    | PIN0 -> DDRD
+    | PIN1 -> DDRD
+    | PIN2 -> DDRD
+    | PIN3 -> DDRD
+    | PIN4 -> DDRD
+    | PIN5 -> DDRC
+    | PIN6 -> DDRD
+    | PIN7 -> DDRE
+    | PIN8 -> DDRB
+    | PIN9 -> DDRB
+    | PIN10 -> DDRB
+    | PIN11 -> DDRB
+    | PIN12 -> DDRD
+    | PIN13 -> DDRC
+    | MISO -> DDRB
+    | SCK -> DDRB
+    | MOSI -> DDRB
+    | SS -> DDRB
+    | PINA0 -> DDRF
+    | PINA1 -> DDRF
+    | PINA2 -> DDRF
+    | PINA3 -> DDRF
+    | PINA4 -> DDRF
+    | PINA5 -> DDRF
+
+  let input_of_pin = function
+    | PIN0 -> PIND
+    | PIN1 -> PIND
+    | PIN2 -> PIND
+    | PIN3 -> PIND
+    | PIN4 -> PIND
+    | PIN5 -> PINC
+    | PIN6 -> PIND
+    | PIN7 -> PINE
+    | PIN8 -> PINB
+    | PIN9 -> PINB
+    | PIN10 -> PINB
+    | PIN11 -> PINB
+    | PIN12 -> PIND
+    | PIN13 -> PINC
+    | MISO -> PINB
+    | SCK -> PINB
+    | MOSI -> PINB
+    | SS -> PINB
+    | PINA0 -> PINF
+    | PINA1 -> PINF
+    | PINA2 -> PINF
+    | PINA3 -> PINF
+    | PINA4 -> PINF
+    | PINA5 -> PINF
+
+  let bit_of_pin = function
+    | PIN0 -> B2
+    | PIN1 -> B3
+    | PIN2 -> B1
+    | PIN3 -> B0
+    | PIN4 -> B4
+    | PIN5 -> B6
+    | PIN6 -> B7
+    | PIN7 -> B6
+    | PIN8 -> B4
+    | PIN9 -> B5
+    | PIN10 -> B6
+    | PIN11 -> B7
+    | PIN12 -> B6
+    | PIN13 -> B7
+    | MISO -> B3
+    | SCK -> B1
+    | MOSI -> B2
+    | SS -> B0
+    | PINA0 -> B7
+    | PINA1 -> B6
+    | PINA2 -> B5
+    | PINA3 -> B4
+    | PINA4 -> B1
+    | PINA5 -> B0
+
+  let channel_of_pin = function [@ocaml.warning"-4"]
+    | PINA0 -> 0
+    | PINA1 -> 1
+    | PINA2 -> 2
+    | PINA3 -> 3
+    | PINA4 -> 4
+    | PINA5 -> 5
+    | _ -> failwith "This pin is not supported as analog"
+
+  let pin_mode p m =
+    let port = port_of_pin p in
+    let ddr = ddr_of_pin p in
+    let bit = bit_of_pin p in
+    match m with
+    | OUTPUT -> set_bit ddr bit
+    | INPUT -> clear_bit ddr bit; clear_bit port bit
+    | INPUT_PULLUP -> clear_bit ddr bit; set_bit port bit
+
+  let digital_write p b =
+    let port = port_of_pin p in
+    let bit = bit_of_pin p in
+    match b with
+    | HIGH -> set_bit port bit
+    | LOW -> clear_bit port bit
+
+  let digital_read p =
+    let input = input_of_pin p in
+    let bit = bit_of_pin p in
+    match read_bit input bit with
+    | true -> HIGH
+    | false -> LOW
+
+  external avr_analog_write: pin -> int -> unit = "caml_avr_analog_write" [@@noalloc]
+  let analog_write p v =
+    if v < 0 || v >= 1024 then invalid_arg "analog_write";
+    if v = 0 then digital_write p LOW else avr_analog_write p (v/4)
+
+  let analog_read p = avr_analog_read (channel_of_pin p)
+
+  module MCUConnection = struct
+    type pin = _pin
+    type mode = _mode
+    type level = _level
+    let high = HIGH
+    let low = LOW
+    let input_mode = OUTPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let analog_read = analog_read
+    let analog_write = analog_write
+    let pin_mode = pin_mode
+    let delay = delay
+    let millis = millis
+  end
+end
+
+module Serial = struct
+  external init: unit -> unit = "caml_avr_serial_init" [@@noalloc]
+
+  external write_char: char -> unit = "caml_avr_serial_write" [@@noalloc]
+  let write s = String.iter write_char s
+
+  external read_char: unit -> char = "caml_avr_serial_read" [@@noalloc]
+  let read () =
+    let s = ref ""
+    and c = ref (read_char ()) in
+    while((int_of_char !c) <> 0) do
+      s := (!s^(String.make 1 !c));
+      c := (read_char ())
+    done;
+    if(String.length !s > 0) then String.sub !s 0 ((String.length !s)-1) else !s
 end

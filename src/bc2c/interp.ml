@@ -522,6 +522,7 @@ let ccall arch ooid prim args =
       match prim with
       | "caml_avr_set_bit" | "caml_avr_clear_bit" | "caml_avr_read_bit" | "caml_avr_delay"
       | "caml_avr_write_register" | "caml_avr_read_register"
+      | "caml_avr_analog_write" | "caml_avr_analog_read"
       | "caml_avr_serial_init" | "caml_avr_serial_write" | "caml_avr_serial_read"
       | "caml_debug_trace" | "caml_debug_tracei"
       | "caml_random_init" | "caml_random_bits" | "caml_random_bool"

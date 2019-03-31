@@ -3,6 +3,29 @@
 
 /******************************************************************************/
 
+#define NOT_ON_TIMER 0
+#define TIMER0A 1
+#define TIMER0B 2
+#define TIMER1A 3
+#define TIMER1B 4
+#define TIMER1C 5
+#define TIMER2  6
+#define TIMER2A 7
+#define TIMER2B 8
+
+#define TIMER3A 9
+#define TIMER3B 10
+#define TIMER3C 11
+#define TIMER4A 12
+#define TIMER4B 13
+#define TIMER4C 14
+#define TIMER4D 15
+#define TIMER5A 16
+#define TIMER5B 17
+#define TIMER5C 18
+
+/******************************************************************************/
+
 #ifdef DEVICE_ARDUBOY
 volatile uint8_t *get_reg_addr(uint8_t reg) {
   if (reg ==  1) return &PORTB;
@@ -25,6 +48,12 @@ volatile uint8_t *get_reg_addr(uint8_t reg) {
   if (reg == 35) return &SPDR;
   return NULL;
 }
+
+volatile uint8_t get_timer_of_pin(uint8_t pin) {
+  // TODO
+  return NOT_ON_TIMER;
+}
+
 #endif
 
 #ifdef DEVICE_ARDUINO_MEGA
@@ -67,6 +96,25 @@ volatile uint8_t *get_reg_addr(uint8_t reg) {
   if (reg == 35) return &SPDR;
   return NULL;
 }
+
+volatile uint8_t get_timer_of_pin(uint8_t pin) {
+  if (pin == 2) return TIMER3B;
+  if (pin == 3) return TIMER3C;
+  if (pin == 4) return TIMER0B;
+  if (pin == 5) return TIMER3A;
+  if (pin == 6) return TIMER4A;
+  if (pin == 7) return TIMER4B;
+  if (pin == 8) return TIMER4C;
+  if (pin == 9) return TIMER2B;
+  if (pin == 10) return TIMER2A;
+  if (pin == 11) return TIMER1A;
+  if (pin == 12) return TIMER1B;
+  if (pin == 13) return TIMER0A;
+  if (pin == 44) return TIMER5C;
+  if (pin == 45) return TIMER5B;
+  if (pin == 46) return TIMER5A;
+  return NOT_ON_TIMER;
+}
 #endif
 
 #ifdef DEVICE_ARDUINO_UNO
@@ -85,6 +133,16 @@ volatile uint8_t *get_reg_addr(uint8_t reg) {
   if (reg == 35) return &SPDR;
   return NULL;
 }
+
+volatile uint8_t get_timer_of_pin(uint8_t pin) {
+  if (pin == 3) return TIMER2B;
+  if (pin == 5) return TIMER0B;
+  if (pin == 6) return TIMER0A;
+  if (pin == 9) return TIMER1A;
+  if (pin == 10) return TIMER1B;
+  if (pin == 11) return TIMER2A;
+  return NOT_ON_TIMER;
+}
 #endif
 
 /******************************************************************************/
@@ -99,6 +157,195 @@ void avr_clear_bit(uint8_t reg, uint8_t bit) {
 
 bool avr_read_bit(uint8_t reg, uint8_t bit) {
   return *(get_reg_addr(reg)) & ((uint8_t) 1 << bit);
+}
+
+/******************************************************************************/
+
+#ifndef sbi
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
+#endif
+
+#ifndef cbi
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#endif
+
+void avr_analog_write(uint8_t pin, int val) {
+  int timer = get_timer_of_pin(pin);
+#if defined(TCCR0A) && defined(COM0A1)
+  if(timer == TIMER0A) {
+    OCR0A = val;
+    sbi(TCCR0A, COM0A1);
+    TCCR0A |= (1 << WGM01) | (1 << WGM00);
+    TCCR0B |= (1 << CS01);
+  }
+#endif
+
+#if defined(TCCR0A) && defined(COM0B1)
+  if(timer == TIMER0B) {
+    OCR0B = val;
+    sbi(TCCR0A, COM0B1);
+    TCCR0A |= (1 << WGM01) | (1 << WGM00);
+    TCCR0B |= (1 << CS01);
+  }
+#endif
+
+#if defined(TCCR1A) && defined(COM1A1)
+  if(timer == TIMER1A) {
+    OCR1A = val;
+    sbi(TCCR1A, COM1A1);
+    TCCR1A |= (1 << WGM11) | (1 << WGM10);
+    TCCR1B |= (1 << CS11);
+  }
+#endif
+
+#if defined(TCCR1A) && defined(COM1B1)
+  if(timer == TIMER1B) {
+    OCR1B = val;
+    sbi(TCCR1A, COM1B1);
+    TCCR1A |= (1 << WGM11) | (1 << WGM10);
+    TCCR1B |= (1 << CS11);
+  }
+#endif
+
+#if defined(TCCR1A) && defined(COM1C1)
+  if(timer == TIMER1C) {
+    OCR1C = val;
+    sbi(TCCR1A, COM1C1);
+    TCCR1A |= (1 << WGM11) | (1 << WGM10);
+    TCCR1B |= (1 << CS11);
+  }
+#endif
+
+#if defined(TCCR2A) && defined(COM2A1)
+  if(timer == TIMER2A) {
+    OCR2A = val;
+    sbi(TCCR2A, COM2A1);
+    TCCR2A |= (1 << WGM21) | (1 << WGM20);
+    TCCR2B |= (1 << CS21);
+  }
+#endif
+
+#if defined(TCCR2A) && defined(COM2B1)
+  if(timer == TIMER2B) {
+    OCR2B = val;
+    sbi(TCCR2A, COM2B1);
+    TCCR2A |= (1 << WGM21) | (1 << WGM20);
+    TCCR2B |= (1 << CS21);
+  }
+#endif
+
+#if defined(TCCR3A) && defined(COM3A1)
+  if(timer == TIMER3A) {
+    OCR3A = val;
+    sbi(TCCR3A, COM3A1);
+    TCCR3A |= (1 << WGM31) | (1 << WGM30);
+    TCCR3B |= (1 << CS31);
+  }
+#endif
+
+#if defined(TCCR3A) && defined(COM3B1)
+  if(timer == TIMER3B) {
+    OCR3B = val;
+    sbi(TCCR3A, COM3B1);
+    TCCR3A |= (1 << WGM31) | (1 << WGM30);
+    TCCR3B |= (1 << CS31);
+  }
+#endif
+
+#if defined(TCCR3A) && defined(COM3C1)
+  if(timer == TIMER3C) {
+    OCR3C = val;
+    sbi(TCCR3A, COM3C1);
+    TCCR3A |= (1 << WGM31) | (1 << WGM30);
+    TCCR3B |= (1 << CS31);
+  }
+#endif
+
+#if defined(TCCR4A)
+  if(timer == TIMER4A) {
+    OCR4A = val;
+    sbi(TCCR4A, COM4A1);
+    TCCR4A |= (1 << WGM41) | (1 << WGM40);
+    TCCR4B |= (1 << CS41);
+  }
+#endif
+
+#if defined(TCCR4A) && defined(COM4B1)
+  if(timer == TIMER4B) {
+    OCR4B = val;
+    sbi(TCCR4A, COM4B1);
+    TCCR4A |= (1 << WGM41) | (1 << WGM40);
+    TCCR4B |= (1 << CS41);
+  }
+#endif
+
+#if defined(TCCR4A) && defined(COM4C1)
+  if(timer == TIMER4C) {
+    OCR4C = val;
+    sbi(TCCR4A, COM4C1);
+    TCCR4A |= (1 << WGM41) | (1 << WGM40);
+    TCCR4B |= (1 << CS41);
+  }
+#endif
+
+#if defined(TCCR4C) && defined(COM4D1)
+    if(timer == TIMER4D) {
+      OCR4D = val;
+      sbi(TCCR4C, COM4D1);
+      TCCR4A |= (1 << WGM41) | (1 << WGM40);
+      TCCR4B |= (1 << CS41);
+    }
+#endif
+
+#if defined(TCCR5A) && defined(COM5A1)
+    if(timer == TIMER5A) {
+      OCR5A = val;
+      sbi(TCCR5A, COM5A1);
+      TCCR5A |= (1 << WGM51) | (1 << WGM50);
+      TCCR4B |= (1 << CS51);
+    }
+#endif
+
+#if defined(TCCR5A) && defined(COM5B1)
+      if(timer == TIMER5B) {
+        OCR5B = val;
+        sbi(TCCR5B, COM5B1);
+        TCCR5A |= (1 << WGM51) | (1 << WGM50);
+        TCCR4B |= (1 << CS51);
+      }
+#endif
+
+#if defined(TCCR5A) && defined(COM5C1)
+        if(timer == TIMER5C) {
+          OCR5C = val;
+          sbi(TCCR5A, COM5C1);
+          TCCR5A |= (1 << WGM51) | (1 << WGM50);
+          TCCR4B |= (1 << CS51);
+        }
+#endif
+}
+
+int is_inited = 0;
+
+uint16_t avr_analog_read(uint8_t ch) {
+  // We init the channel
+  if(!is_inited) {
+    ADMUX = (1<<REFS0);
+    ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
+
+    is_inited = 1;
+  }
+
+  ch &= 0b00000111;  // AND operation with 7
+  ADMUX = (ADMUX & 0xF8)|ch; // clears the bottom 3 bits before ORing
+  // start single convertion
+  // write ’1′ to ADSC
+  ADCSRA |= (1<<ADSC);
+  // wait for conversion to complete
+  // ADSC becomes ’0′ again
+  // till then, run loop continuously
+  while(ADCSRA & (1<<ADSC));
+  return (ADC);
 }
 
 /******************************************************************************/
@@ -121,6 +368,7 @@ int avr_random(int max){
   return r;
 }
 
+/******************************************************************************/
 
 /* milli function from https://github.com/monoclecat/avr-millis-function */
 #include <util/atomic.h>
@@ -145,9 +393,6 @@ int avr_millis() {
 
 }
 
-
-
-
 /******************************************************************************/
 
 #if defined(DEVICE_ARDUINO_MEGA) || defined(DEVICE_ARDUINO_UNO)
@@ -169,17 +414,17 @@ void serial_init(void) {
 }
 
 int serial_write(char c, FILE *stream) {
-    if (c == '\n') {
-        serial_write('\r', stream);
-    }
-    loop_until_bit_is_set(UCSR0A, UDRE0);
-    UDR0 = c;
-    return 0;
+  if (c == '\n') {
+    serial_write('\r', stream);
+  }
+  loop_until_bit_is_set(UCSR0A, UDRE0);
+  UDR0 = c;
+  return 0;
 }
 
 int serial_read(FILE *stream) {
-    loop_until_bit_is_set(UCSR0A, RXC0);
-    return UDR0;
+  loop_until_bit_is_set(UCSR0A, RXC0);
+  return UDR0;
 }
 
 FILE serial_str;
