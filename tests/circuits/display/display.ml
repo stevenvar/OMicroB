@@ -10,11 +10,11 @@ let%component MyDisp = LiquidCrystal.MakeLCD(
     d7Pin = PIN2;
 )
 
-let smiley = [[LOW;HIGH;LOW;HIGH;LOW];
-              [LOW;HIGH;LOW;HIGH;LOW];
-              [LOW;LOW;LOW;LOW;LOW];
-              [HIGH;LOW;LOW;LOW;HIGH];
-              [LOW;HIGH;HIGH;HIGH;LOW]]
+let smiley = [[false;true;false;true;false];
+              [false;true;false;true;false];
+              [false;false;false;false;false];
+              [true;false;false;false;true];
+              [false;true;true;true;false]]
 
 let _ =
   MyDisp.init ();

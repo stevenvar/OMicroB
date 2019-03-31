@@ -55,7 +55,6 @@ module type LCDConnection = sig
 end
 
 module MakeLCD(L: LCDConnection) = struct
-  type level = L.level
 
   let cursorLine = ref 0
   let cursorColumn = ref 0
@@ -96,7 +95,7 @@ module MakeLCD(L: LCDConnection) = struct
     if (List.length l > 8) then invalid_arg "create_char: l";
     let vals = List.rev_map (fun l ->
         if (List.length l <> 5) then invalid_arg "create_char: l";
-        List.fold_left (fun a v -> (a lsl 1) + (if v = L.high then 1 else 0)) 0 l
+        List.fold_left (fun a v -> (a lsl 1) + (if v = true then 1 else 0)) 0 l
       ) (List.rev l) in
     command (lcd_setcgramaddr lor (loc lsl 3));
     List.iter (fun c -> write c) (vals@(List.init (8 - (List.length vals)) (fun _ -> 0)))

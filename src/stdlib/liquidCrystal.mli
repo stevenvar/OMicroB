@@ -21,4 +21,4 @@ module type LCDConnection = sig
 end
 
 (** Make a LiquidCrystal display from a LCDConnection *)
-module MakeLCD(L: LCDConnection): Circuits.Display with type level = L.level
+module MakeLCD(L: LCDConnection): Circuits.Display
