@@ -97,32 +97,3 @@ module ArduinoUnoPins: sig
     with type mode = mode
     with type level = level
 end
-
-(** TODO *)
-(** Pin layout of the Fubarino Mini *)
-module FubarinoMiniPins: sig
-  type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
-           | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13
-           | MISO | SCK | MOSI | SS
-           | PINA0 | PINA1 | PINA2 | PINA3 | PINA4 | PINA5
-  val port_of_pin: pin -> register
-  val ddr_of_pin: pin -> register
-  val input_of_pin: pin -> register
-  val bit_of_pin: pin -> bit
-  val pin_mode: pin -> mode -> unit
-  val digital_write: pin -> level -> unit
-  val digital_read: pin -> level
-  val analog_read: pin -> int
-  val analog_write: pin -> int -> unit
-  module MCUConnection: Circuits.MCUConnection
-    with type pin = pin
-    with type mode = mode
-    with type level = level
-end
-
-(** Serial communication *)
-module Serial: sig
-  val init: unit -> unit
-  val write: string -> unit
-  val read: unit -> string
-end

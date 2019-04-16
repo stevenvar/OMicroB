@@ -1,12 +1,10 @@
-open Pic32
-
 let _ =
-  init ();
+  _init ();
   schedule_task ();
-  pin_mode A1 OUTPUT;
+  pin_mode PIN1 OUTPUT;
   while true do
-    digital_write A1 HIGH;
+    digital_write PIN1 HIGH;
     delay 1000;
-    digital_write A1 LOW;
+    digital_write PIN1 LOW;
     delay 1000;
   done

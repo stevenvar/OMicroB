@@ -528,7 +528,7 @@ let ccall arch ooid prim args =
       | "caml_random_init" | "caml_random_bits" | "caml_random_bool"
       | "caml_pic32_pin_mode" | "caml_pic32_digital_write" | "caml_pic32_digital_read"
       | "caml_pic32_analog_write" | "caml_pic32_analog_read"
-      | "caml_pic32_serial_write_char" | "caml_pic32_serial_read_char"
+      | "caml_pic32_serial_init" | "caml_pic32_serial_write_char" | "caml_pic32_serial_read_char"
       | "caml_pic32_delay" | "caml_pic32_millis"
       | "caml_pic32_schedule_task" | "caml_pic32_init" -> ()
       | _ ->

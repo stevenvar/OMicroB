@@ -37,9 +37,16 @@ void pic32_schedule_task();
 void pic32_pin_mode(uint8_t p, uint8_t m);
 void pic32_digital_write(uint8_t p, uint8_t l);
 uint8_t pic32_digital_read(uint8_t p);
-void pic32_analog_write(uint8_t p, uint8_t l);
-uint8_t pic32_analog_read(uint8_t p);
+void pic32_analog_write(uint8_t p, int l);
+int pic32_analog_read(uint8_t p);
 void pic32_delay(int ms);
+int pic32_millis();
+
+/******************************************************************************/
+
+void pic32_serial_init();
+void pic32_serial_write_char(char c);
+char pic32_serial_read_char();
 
 /******************************************************************************/
 /******************************************************************************/

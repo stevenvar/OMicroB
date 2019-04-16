@@ -34,6 +34,10 @@ value caml_avr_delay(value ms) {
   return Val_unit;
 }
 
+value caml_pic32_millis() {
+  return Val_int(pic32_millis());
+}
+
 /******************************************************************************/
 
 value caml_avr_write_register(value reg, value val) {
@@ -89,6 +93,22 @@ value caml_pic32_analog_read(value pin) {
 value caml_pic32_delay(value ms) {
   pic32_delay(Int_val(ms));
   return Val_unit;
+}
+
+/******************************************************************************/
+
+value caml_pic32_serial_init() {
+  pic32_serial_init();
+  return Val_unit;
+}
+
+value caml_pic32_serial_write_char(value c) {
+  pic32_serial_write_char((char) Int_val(c));
+  return Val_unit;
+}
+
+value caml_pic32_serial_read_char() {
+  return Val_int(pic32_serial_read_char());
 }
 
 #endif
