@@ -22,19 +22,19 @@ uint8_t get_pin_addr(uint8_t pin) {
   // SS
   if (pin == 36) return SS;
   // Analog
-  if (pin = 37) return A0
-  if (pin = 38) return A1
-  if (pin = 39) return A2
-  if (pin = 40) return A3
-  if (pin = 41) return A4
-  if (pin = 42) return A5
-  if (pin = 43) return A6
-  if (pin = 44) return A7
-  if (pin = 45) return A8
-  if (pin = 46) return A9
-  if (pin = 47) return A10
-  if (pin = 48) return A11
-  if (pin = 49) return A12
+  if (pin = 37) return A0;
+  if (pin = 38) return A1;
+  if (pin = 39) return A2;
+  if (pin = 40) return A3;
+  if (pin = 41) return A4;
+  if (pin = 42) return A5;
+  if (pin = 43) return A6;
+  if (pin = 44) return A7;
+  if (pin = 45) return A8;
+  if (pin = 46) return A9;
+  if (pin = 47) return A10;
+  if (pin = 48) return A11;
+  if (pin = 49) return A12;
 }
 
 void pic32_init() {
