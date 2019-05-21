@@ -7,7 +7,7 @@ ATTY := /dev/tty.usbmodem*
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -trace 3 -gc MAC -arch 16 -no-flash-heap -stack-size 300 -heap-size 800
+	$(BIN)/omicrob -v $^ -gc MAC -arch 16 -no-flash-heap -stack-size 800 -heap-size 800
 	# $(BIN)/omicrob -v $^ -gc MAC -arch 32 -trace 3 -no-flash-heap -no-flash-globals -stack-size 300 -heap-size 300 -cxxopt -DDEBUG -avrcxxopt -DDEBUG
 	# $(BIN)/omicrob -v $^ -gc SC -arch 16 -no-flash-heap -no-flash-globals -stack-size 300 -heap-size 800
 

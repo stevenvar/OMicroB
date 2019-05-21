@@ -35,6 +35,8 @@ void debug_blink_pause(void);
 
 #if DEBUG >= 2 && defined(__PC__)
 #define TRACE_INSTRUCTION(instr_name) printf("[%3d]: " instr_name "\n", pc - 1); cpt_instr++; fflush(stdout)
+#elif DEBUG >=1 && defined(__PC__)
+#define TRACE_INSTRUCTION(instr_name) cpt_instr++;
 #else
 #define TRACE_INSTRUCTION(instr_name)
 #endif

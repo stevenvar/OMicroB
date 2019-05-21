@@ -13,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Pervasives = struct
+(* module Stdlib = struct end *)
 (* type 'a option = None | Some of 'a *)
 
 (* Exceptions *)
@@ -277,9 +277,9 @@ let rec ( @ ) l1 l2 =
 external trace : string -> unit = "caml_debug_trace"
 external tracei : int -> unit = "caml_debug_tracei"
 
-end
+(* end *)
 
-include Pervasives
+(* include Stdlib *)
 
 module ArrayLabels    = Stdlib__arrayLabels
 module Array          = Stdlib__array

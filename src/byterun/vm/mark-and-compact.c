@@ -176,9 +176,9 @@ static void wipe_dead_blocks() {
 static void reverse_pointer(value *p) {
   value v = *p;
   if (Is_block_in_dynamic_heap(v)) {         /* Is v point to heap?    */
-    printf("Reverse %p (value = 0x%08x ) ", v , Val_dynamic_block(p));
+    /* printf("Reverse %p (value = 0x%08x ) ", v , Val_dynamic_block(p)); */
     *p = Ram_hd_val(v) | Color_red;          /* Yes -> reverse pointer */
-    printf("with %p \n", Ram_hd_val(v) );
+    /* printf("with %p \n", Ram_hd_val(v) ); */
     Ram_hd_val(v) = Val_dynamic_block(p) | Color_black;
   }
 }

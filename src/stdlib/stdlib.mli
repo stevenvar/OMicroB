@@ -1,28 +1,12 @@
-(**************************************************************************)
-(*                                                                        *)
-(*                                 OCaml                                  *)
-(*                                                                        *)
-(*             Xavier Leroy, projet Cristal, INRIA Rocquencourt           *)
-(*                                                                        *)
-(*   Copyright 1996 Institut National de Recherche en Informatique et     *)
-(*     en Automatique.                                                    *)
-(*                                                                        *)
-(*   All rights reserved.  This file is distributed under the terms of    *)
-(*   the GNU Lesser General Public License version 2.1, with the          *)
-(*   special exception on linking described in the file LICENSE.          *)
-(*                                                                        *)
-(**************************************************************************)
 
-module Pervasives : sig
+(* module Stdlib : sig *)
 (** The initially opened module.
-
    This module provides the basic operations over the built-in types
    (numbers, booleans, byte sequences, strings, exceptions, references,
    lists, arrays, input-output channels, ...).
-
    This module is automatically opened at the beginning of each compilation.
    All components of this module can therefore be referred by their short
-   name, without prefixing them by [Pervasives].
+   name, without prefixing them by [Stdlib].
 *)
 
 
@@ -59,19 +43,19 @@ external ( = ) : 'a -> 'a -> bool = "%equal"
    Left-associative operator at precedence level 4/11. *)
 
 external ( <> ) : 'a -> 'a -> bool = "%notequal"
-(** Negation of {!Pervasives.( = )}.
+(** Negation of {!Stdlib.( = )}.
     Left-associative operator at precedence level 4/11. *)
 
 external ( < ) : 'a -> 'a -> bool = "%lessthan"
-(** See {!Pervasives.( >= )}.
+(** See {!Stdlib.( >= )}.
     Left-associative operator at precedence level 4/11. *)
 
 external ( > ) : 'a -> 'a -> bool = "%greaterthan"
-(** See {!Pervasives.( >= )}.
+(** See {!Stdlib.( >= )}.
     Left-associative operator at precedence level 4/11. *)
 
 external ( <= ) : 'a -> 'a -> bool = "%lessequal"
-(** See {!Pervasives.( >= )}.
+(** See {!Stdlib.( >= )}.
     Left-associative operator at precedence level 4/11. *)
 
 external ( >= ) : 'a -> 'a -> bool = "%greaterequal"
@@ -91,15 +75,13 @@ external compare : 'a -> 'a -> int = "%compare"
    if [x] is greater than [y].  The ordering implemented by [compare]
    is compatible with the comparison predicates [=], [<] and [>]
    defined above,  with one difference on the treatment of the float value
-   {!Pervasives.nan}.  Namely, the comparison predicates treat [nan]
+   {!Stdlib.nan}.  Namely, the comparison predicates treat [nan]
    as different from any other float value, including itself;
    while [compare] treats [nan] as equal to itself and less than any
    other float value.  This treatment of [nan] ensures that [compare]
    defines a total ordering relation.
-
    [compare] applied to functional values may raise [Invalid_argument].
    [compare] applied to cyclic structures may not terminate.
-
    The [compare] function can be used as the comparison function
    required by the {!Set.Make} and {!Map.Make} functors, as well as
    the {!List.sort} and {!Array.sort} functions. *)
@@ -126,7 +108,7 @@ external ( == ) : 'a -> 'a -> bool = "%eq"
    Left-associative operator at precedence level 4/11. *)
 
 external ( != ) : 'a -> 'a -> bool = "%noteq"
-(** Negation of {!Pervasives.( == )}.
+(** Negation of {!Stdlib.( == )}.
     Left-associative operator at precedence level 4/11. *)
 
 
@@ -143,7 +125,7 @@ external ( && ) : bool -> bool -> bool = "%sequand"
 
 external ( & ) : bool -> bool -> bool = "%sequand"
   [@@ocaml.deprecated "Use (&&) instead."]
-(** @deprecated {!Pervasives.( && )} should be used instead.
+(** @deprecated {!Stdlib.( && )} should be used instead.
     Right-associative operator at precedence level 3/11. *)
 
 external ( || ) : bool -> bool -> bool = "%sequor"
@@ -155,7 +137,7 @@ external ( || ) : bool -> bool -> bool = "%sequor"
 
 external ( or ) : bool -> bool -> bool = "%sequor"
   [@@ocaml.deprecated "Use (||) instead."]
-(** @deprecated {!Pervasives.( || )} should be used instead.
+(** @deprecated {!Stdlib.( || )} should be used instead.
     Right-associative operator at precedence level 2/11. *)
 
 (** {1 Debugging} *)
@@ -340,7 +322,6 @@ external ( asr ) : int -> int -> int = "%asrint"
 
 
 (** {1 Floating-point arithmetic}
-
    OCaml's floating-point numbers follow the
    IEEE 754 standard, using double precision (64 bits) numbers.
    Floating-point operations never raise an exception on overflow,
@@ -512,13 +493,13 @@ external modf : float -> float * float = "caml_modf_float"
     part of [f]. *)
 
 external float : int -> float = "%floatofint"
-(** Same as {!Pervasives.float_of_int}. *)
+(** Same as {!Stdlib.float_of_int}. *)
 
 external float_of_int : int -> float = "%floatofint"
 (** Convert an integer to floating-point. *)
 
 external truncate : float -> int = "%intoffloat"
-(** Same as {!Pervasives.int_of_float}. *)
+(** Same as {!Stdlib.int_of_float}. *)
 
 external int_of_float : float -> int = "%intoffloat"
 (** Truncate the given floating-point number to an integer.
@@ -556,7 +537,7 @@ type fpclass =
   | FP_infinite         (** Number is positive or negative infinity *)
   | FP_nan              (** Not a number: result of an undefined operation *)
 (** The five classes of floating-point numbers, as determined by
-   the {!Pervasives.classify_float} function. *)
+   the {!Stdlib.classify_float} function. *)
 
 external classify_float : (float [@unboxed]) -> fpclass =
   "caml_classify_float" "caml_classify_float_unboxed" [@@noalloc]
@@ -565,7 +546,6 @@ external classify_float : (float [@unboxed]) -> fpclass =
 
 
 (** {1 String operations}
-
    More string operations are provided in module {!String}.
 *)
 
@@ -575,7 +555,6 @@ val ( ^ ) : string -> string -> string
 
 
 (** {1 Character operations}
-
    More character operations are provided in module {!Char}.
 *)
 
@@ -623,16 +602,14 @@ val string_of_int : int -> string
 
 external int_of_string : string -> int = "caml_int_of_string"
 (** Convert the given string to an integer.
-   The string is read in decimal (by default, or if the string 
+   The string is read in decimal (by default, or if the string
    begins with [0u]), in hexadecimal (if it begins with [0x] or
    [0X]), in octal (if it begins with [0o] or [0O]), or in binary
    (if it begins with [0b] or [0B]).
-
    The [0u] prefix reads the input as an unsigned integer in the range
    [[0, 2*max_int+1]].  If the input exceeds {!max_int}
    it is converted to the signed integer
    [min_int + input - max_int - 1].
-
    The [_] (underscore) character can appear anywhere in the string
    and is ignored.
    Raise [Failure "int_of_string"] if the given string is not
@@ -680,7 +657,6 @@ external snd : 'a * 'b -> 'b = "%field1"
 
 
 (** {1 List operations}
-
    More list operations are provided in module {!List}.
 *)
 
@@ -722,13 +698,17 @@ type ('a,'b) result = Ok of 'a | Error of 'b
 
 external trace : string -> unit = "caml_debug_trace"
 (** Trace execution with a string message *)
-  
+
 external tracei : int -> unit = "caml_debug_tracei"
 (** Trace execution with a integer message *)
 
-end
+(* end *)
 
-include module type of struct include Pervasives end
+(* module Stdlib : sig *)
+(* end *)
+
+(* include module type of struct include Stdlib end *)
+
 
 module ArrayLabels    = Stdlib__arrayLabels
 module Array          = Stdlib__array
