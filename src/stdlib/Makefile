@@ -6,11 +6,9 @@ BASES :=                                                         \
   complex gc int32 int64 obj hashtbl set moreLabels queue sort   \
   stack stdLabels avr liquidCrystal
 
-SPECIALS := stdlib camlinternalOO std_exit
+MODULES := stdlib $(BASES) camlinternalOO std_exit
 
-MODULES := $(SPECIALS) $(BASES)
-
-STDLIB_MODULES := $(SPECIALS) $(foreach m,$(BASES),stdlib__$(m))
+STDLIB_MODULES := stdlib $(foreach m,$(BASES),stdlib__$(m)) camlinternalOO std_exit
 
 MLS  := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
