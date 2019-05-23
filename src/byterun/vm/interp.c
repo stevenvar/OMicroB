@@ -2487,6 +2487,7 @@ avr_serial_init();
 
 #if defined(__PC__) && DEBUG >= 1
   printf("# of instructions = %d\n", cpt_instr);
+  printf("# of gc = %d\n", gc_count);
 #endif
 
 

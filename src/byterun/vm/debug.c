@@ -160,7 +160,7 @@ void print_value(value v) {
   if (OCAML_VIRTUAL_ARCH != 16 && Maybe_code_pointer(v)) {
     printf("@%" PRIflag "d (code pointer)", Codeptr_val(v));
   } else if (Is_int(v)) {
-    printf("(int = %" PRIflag "d / float = %" PRIflag "f)", Int_val(v), Float_val(v));
+    printf("(int = %" PRIflag "d / float = %" PRIflag "f)", Int_val(v), (double)Float_val(v));
   } else if (Is_block_in_dynamic_heap(v)) {
     printf("@%p (block in dynamic heap)", Ram_block_val(v));
   } else if (Is_block_in_static_heap(v)) {
@@ -170,7 +170,7 @@ void print_value(value v) {
   } else if (v == 0) {
     printf("NULL");
   } else if (Float_val(v) >= -1e6 && Float_val(v) <= 1e6) {
-    printf("(maybe %f)", Float_val(v));
+    printf("(maybe %f)", (double)Float_val(v));
   } else {
     printf("(?)");
   }
