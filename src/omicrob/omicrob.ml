@@ -9,7 +9,7 @@ let default_gc         = "MAC"
 let default_arch       = 32
 
 let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
-let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
+let default_cxx_options = [ "-Wall"; "-O2" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 
 let default_mmcu  = Avr_config.default_mmcu
@@ -677,6 +677,7 @@ let () =
     let cmd = [ Config.cxx ] @ default_cxx_options @ cxxopts in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
+    let cmd = cmd @ [ "-lm" ] in
     run cmd
   )
 

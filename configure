@@ -88,7 +88,7 @@ check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam i
 
 ################################################################################
 
-GXX="$(which g++)"
+GXX="$(which gcc)"
 AVR_GXX="$(which avr-g++)"
 AVR_OBJCOPY="$(which avr-objcopy)"
 AVRDUDE="$(which avrdude)"
