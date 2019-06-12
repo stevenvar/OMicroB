@@ -77,8 +77,8 @@ type 'a register =
   | SPDR : spsr_bit register
 
 type yes
-type no 
-type 'a analog_pin = 
+type no
+type 'a analog_pin =
   | YES : yes analog_pin
   | NO : no analog_pin
 
@@ -646,7 +646,7 @@ external avr_analog_read : int -> int = "caml_avr_analog_read"
 let channel_of_pin : type a b c. (a register , b register, c register, yes analog_pin) pin -> int = function
   | PINA0 -> 0
   | PINA1 -> 1
-  | PINA2 -> 2 
+  | PINA2 -> 2
   | PINA3 -> 3
   | PINA4 -> 4
   | PINA5 -> 5
@@ -661,15 +661,9 @@ let channel_of_pin : type a b c. (a register , b register, c register, yes analo
   | PINA14 -> 14
   | PINA15 -> 15
 
-let analog_read p = 
-  let channel = channel_of_pin p in 
+let analog_read p =
+  let channel = channel_of_pin p in
   avr_analog_read channel
-
-  (* ADMUX = (ADMUX & OxF8) | ch; *)
-  (* ADCSRA |= (1<< ADSC); *)
-  (* while (ADCSRA land (1 lsl ADSC)); *)
-    (* ADC *)
-
 
 
 module Serial = struct
