@@ -157,3 +157,11 @@ value caml_string_of_float(value v) {
   snprintf(buf, sizeof(buf), "%.3lg", (double) Float_val(v));
   return copy_bytes(buf);
 }
+
+value caml_string_of_bytes(value v){
+  return v;
+}
+
+value caml_bytes_of_string(value v){
+  return v;
+}
