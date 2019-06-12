@@ -83,6 +83,8 @@ type ana = {
 
 type lcd = Types.display;;
 
+type lcd16x2 = Types.display16x2;;
+
 type t =
   | Led  of led
   | Ledb of ledb
@@ -90,6 +92,7 @@ type t =
   | Swi  of swi
   | Seg7 of seg7
   | Lcd  of lcd
+  | Lcd16x2  of lcd16x2
   | Ana  of ana
 ;;
 
@@ -212,6 +215,10 @@ let register component = match component with
     (* Display.display_border lcd; *)
     sync_display ();
     Proto.register lcd;
+ | Lcd16x2 _lcd ->
+    (* Display.display_border lcd; *)
+    sync_display ();
+    (* Proto.register lcd; *)
   | Ana ana ->
     let normalize ana p = min (ana.ana_length - ana.ana_width) (max 0 p) in
     let float_of_ofs ofs = float_of_int (normalize ana ofs) /. float_of_int (ana.ana_length - ana.ana_width) in

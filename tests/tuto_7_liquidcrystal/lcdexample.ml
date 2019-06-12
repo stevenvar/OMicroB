@@ -2,7 +2,7 @@ open Avr
 open LiquidCrystal
 
 let () =
-  let lcd = create4bitmode PIN12 PIN11 PIN5 PIN4 PIN3 PIN2 in
+  let lcd = create4bitmode PIN12 PIN11 PIN9 PIN8 PIN7 PIN6 in
 
   (* The function int_of_string is not available in OMicroB, so we'll convert binary to decimal ourselves ! *)
   let smiley =[| (* 00000 *) 0;

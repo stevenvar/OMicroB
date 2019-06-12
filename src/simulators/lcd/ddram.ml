@@ -28,7 +28,7 @@ let write, set_line, set_column_low, set_column_high =
     i := (!i land 0xFF8F) lor ((n land 0x07) lsl 4) in
   write, set_line, set_column_low, set_column_high
 
-let to_matrix display =
+let to_matrix (display:display) =
   let ddram = display.ddram in
   let matrix = display.matrix in
   for i = 0 to size - 1 do

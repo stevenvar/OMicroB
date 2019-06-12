@@ -71,13 +71,18 @@ let port_of_char c =
 let index_of_port port =
   match port with
   | PORTA -> 0
-  | PORTB -> 1 | PORTC -> 2 | PORTD -> 3 | PORTE -> 4 | PORTF -> 5 | SPDR -> 6
-  | PORTG -> 6
-  | PORTH -> 7
-  | PORTI -> 8
-  | PORTJ -> 9
-  | PORTK -> 10
-  | PORTL -> 11
+  | PORTB -> 1 
+  | PORTC -> 2 
+  | PORTD -> 3 
+  | PORTE -> 4 
+  | PORTF -> 5 
+  | SPDR -> 6
+  | PORTG -> 7
+  | PORTH -> 8
+  | PORTI -> 9
+  | PORTJ -> 10
+  | PORTK -> 11
+  | PORTL -> 12
 ;;
 
 let port_of_index ind =
@@ -446,8 +451,8 @@ let remove_handler handler =
 
 (***)
 
-let ports = Array.make 7 0;; (* we count SPDR as a port *)
-let triss = Array.make 5 0xFF;;
+let ports = Array.make 13 0;; (* we count SPDR as a port *)
+let triss = Array.make 13 0xFF;;
 let analogs = Array.make 13 0;;
 let analog_cnt = ref 0;;
 
@@ -605,7 +610,8 @@ let (start, join) =
 
 (***)
 
-let write_port port value = send (OWrite (port, value mod 256));;
+let write_port port value = 
+  send (OWrite (port, value mod 256));;
 
 let set_pin pin = send (OSet pin);;
 
@@ -620,15 +626,19 @@ let read_port port = ports.(index_of_port port);;
 let read_tris port = triss.(index_of_port port);;
 
 let test_pin pin =
-  let value = ports.(index_of_port (port_of_pin pin)) in
-  let mask = 1 lsl (index_of_pin pin) in
-  (value land mask) <> 0
+  try
+    let value = ports.(index_of_port (port_of_pin pin)) in
+    let mask = 1 lsl (index_of_pin pin) in
+    (value land mask) <> 0
+  with _ -> invalid_arg "test_pin"
 ;;
 
 let state_pin pin =
-  let value = triss.(index_of_port (port_of_pin pin)) in
-  let mask = 1 lsl (index_of_pin pin) in
-  (value land mask) <> 0
+  try
+    let value = triss.(index_of_port (port_of_pin pin)) in
+    let mask = 1 lsl (index_of_pin pin) in
+    (value land mask) <> 0
+  with _ -> invalid_arg "state_pin"
 ;;
 
 let analog_input_count () =
