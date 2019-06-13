@@ -160,6 +160,8 @@ external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit"
   [@@noalloc]
 external delay : int -> unit = "caml_avr_delay" [@@noalloc]
 external millis : unit -> int = "caml_avr_millis" [@@noalloc]
+val bool_of_level : level -> bool
+val level_of_bool : bool -> level
 val pin_mode :
   ('a register, 'b register, 'c register, 'd analog_pin) pin -> mode -> unit
 val digital_write :

@@ -231,6 +231,11 @@ external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit" [@@noalloc
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit" [@@noalloc]
 external delay : int -> unit = "caml_avr_delay" [@@noalloc]
 
+
+let bool_of_level = function LOW -> false | HIGH -> true
+let level_of_bool = function false -> LOW | true -> HIGH
+
+
 let pin_mode p m =
   let port = port_of_pin p in
   let bit = port_bit_of_pin p in
