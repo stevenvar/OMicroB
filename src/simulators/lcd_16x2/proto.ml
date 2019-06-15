@@ -129,7 +129,7 @@ let read_busy_flag_and_address bus_low bus_port display =
 ;;
 
 let write_data_to_ram data display =
-  print (sprintf "write_data_to_ram(%C)" (char_of_int data));
+  print (sprintf "write_data_to_ram(%C = %d)" (char_of_int data) data);
   match display.selected_ram with
     | DDRam ->
       Ddram.write (char_of_int data) display;
@@ -149,10 +149,11 @@ let read_data_from_ram bus_low bus_port display=
 ;;
 
 let exec_8bit rs rw bus display =
-  let bus_port = Simul.PORTC in 
+  (* let bus_port = Simul.PORTB in *)
   let bus_bit bit = ((1 lsl bit) land bus) <> 0 in
   match (rs, rw) with
-    | (false, false) ->
+  | (false, _) ->
+
       if bus = 0 then ()
       else if bus = 1 then clear display
       else if bus = 2 || bus = 3 then home display
@@ -170,34 +171,38 @@ let exec_8bit rs rw bus display =
         set_cgram_address (bus land 0b111111) display
       else
         set_ddram_address (bus land 0b1111111) display
-    | (false, true) -> read_busy_flag_and_address bus bus_port display
+    (* | (false, true) -> read_busy_flag_and_address bus bus_port display *)
     | (true, false) -> write_data_to_ram bus display
-    | (true, true) -> read_data_from_ram bus bus_port display
+    | _ -> ()
+    (* | (true, true) -> read_data_from_ram bus bus_port display *)
 ;;
 
 let exec_4bit =
   let mem_bus = ref (-1) in
-  let old_rw = ref false in
+  (* let old_rw = ref false in *)
   fun rs rw bus display ->
-    if !old_rw <> rw then ( old_rw := rw ; mem_bus := -1 );
-    if rw then (
-      if !mem_bus = -1 then (
-        mem_bus := 0;
-        exec_8bit rs rw ((bus land 0x0F) lor 0xF0) display;
-      ) else (
-        mem_bus := -1;
-        exec_8bit rs rw (bus land 0x0F) display;
-      )
-    ) else (
+    (* if !old_rw <> rw then ( old_rw := rw ; mem_bus := -1 );
+     * if rw then (
+     *   if !mem_bus = -1 then (
+     *     mem_bus := 0;
+     *     exec_8bit rs rw ((bus land 0x0F) lor 0xF0) display;
+     *   ) else (
+     *     mem_bus := -1;
+     *     exec_8bit rs rw (bus land 0x0F) display;
+     *   )
+     * ) else ( *)
       let old_bus = !mem_bus in
       if old_bus = -1 then mem_bus := bus
       else (
         mem_bus := -1;
-        exec_8bit rs rw ((old_bus land 0xF0) lor (bus lsr 4))
+        let new_bus = ((old_bus lsl 4) lor (bus )) in
+        exec_8bit rs rw new_bus
            display;
       )
-    )
+    (* ) *)
 ;;
+
+exception Lol
 
 let register display =
   let handler () =
@@ -207,14 +212,16 @@ let register display =
     let d5_val = Simul.test_pin display.d5 in
     let d6_val = Simul.test_pin display.d6 in
     let d7_val = Simul.test_pin display.d7 in
-    let d4_val = if d4_val then 0b1 else 0b0 in
-    let d5_val = if d5_val then 0b10 else 0b0 in
-    let d6_val = if d6_val then 0b100 else 0b0 in
+    let d4_val = if d4_val then 0b0001 else 0b0 in
+    let d5_val = if d5_val then 0b0010 else 0b0 in
+    let d6_val = if d6_val then 0b0100 else 0b0 in
     let d7_val = if d7_val then 0b1000 else 0b0 in
     let bus = d4_val lor d5_val lor d6_val lor d7_val in
-    match display.bus_mode with
-      | Eight -> exec_8bit rs_val rw_val bus display;
-      | Four -> exec_4bit rs_val rw_val bus display;
+    (* match display.bus_mode with *)
+    (* | Eight -> exec_8bit rs_val rw_val bus display; *)
+    (* | Four -> *)
+       exec_4bit rs_val rw_val bus display;
   in
+
   Simul.add_handler (Simul.Set_pin_handler (display.e, handler));
 ;;

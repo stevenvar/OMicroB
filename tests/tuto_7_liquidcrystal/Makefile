@@ -6,7 +6,7 @@ TARGETS := lcdexample.byte lcdexample.c lcdexample.elf lcdexample.avr lcdexample
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -no-shortcut-initialization -heap-size 256
+	$(BIN)/omicrob -v $^ -no-flash-globals -no-flash-heap -no-shortcut-initialization -heap-size 256
 
 flash: lcdexample.hex
 	$(BIN)/omicrob -flash -sudo $<

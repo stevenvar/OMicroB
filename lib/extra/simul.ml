@@ -7,7 +7,6 @@ let int_of_hex1 c =
   | 'a' .. 'f' -> int_of_char c - int_of_char 'a' + 10
   | 'A' .. 'F' -> int_of_char c - int_of_char 'A' + 10
   | _ -> invalid_arg "Simul.int_of_hex1"
-
 let int_of_hex2 c1 c0 =
   (int_of_hex1 c1 lsl 4) lor int_of_hex1 c0
 ;;
@@ -71,11 +70,11 @@ let port_of_char c =
 let index_of_port port =
   match port with
   | PORTA -> 0
-  | PORTB -> 1 
-  | PORTC -> 2 
-  | PORTD -> 3 
-  | PORTE -> 4 
-  | PORTF -> 5 
+  | PORTB -> 1
+  | PORTC -> 2
+  | PORTD -> 3
+  | PORTE -> 4
+  | PORTF -> 5
   | SPDR -> 6
   | PORTG -> 7
   | PORTH -> 8
@@ -276,13 +275,13 @@ let pin_of_number s =
   | "PIN3" -> RD0
   | "PIN4" -> RD4
   | "PIN5" -> RC6
-  | "PIN6" -> RD7
-  | "PIN7" -> RE6
-  | "PIN8" -> RB4
-  | "PIN9" -> RB5
-  | "PIN10" -> RB6
-  | "PIN11" -> RB7
-  | "PIN12" -> RD6
+  | "PIN6" -> RH3
+  | "PIN7" -> RH4
+  | "PIN8" -> RH5
+  | "PIN9" -> RH6
+  | "PIN10" -> RB4
+  | "PIN11" -> RB5
+  | "PIN12" -> RB6
   | "PIN13" -> RC7
   | "PINA0" -> RF7
   | "PINA1" -> RF6
@@ -447,6 +446,7 @@ let remove_handler handler =
   Mutex.lock handlers_mutex;
   handlers := List.filter ((!=) handler) !handlers;
   Mutex.unlock handlers_mutex;
+
 ;;
 
 (***)
@@ -466,7 +466,9 @@ let scall2 f arg1 arg2 =
 
 let exec input =
   match input with
-    | IWrite (port, new_value) ->
+  | IWrite (port, new_value) ->
+     (* let s = Printf.sprintf "port %s = %d" (string_of_port port) new_value in *)
+     (* if true then failwith s; *)
       assert (new_value >= 0 && new_value <= 255);
       let index = index_of_port port in
       let old_value = ports.(index) in
@@ -610,7 +612,7 @@ let (start, join) =
 
 (***)
 
-let write_port port value = 
+let write_port port value =
   send (OWrite (port, value mod 256));;
 
 let set_pin pin = send (OSet pin);;

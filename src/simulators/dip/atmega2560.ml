@@ -17,10 +17,11 @@ let num_of_pin pin =
   | (PORTE,5) -> 6
   | (PORTE,6) -> 7
   | (PORTE,7) -> 8
-  | (PORTH,0) -> 12
-  | (PORTH,1) -> 13
-  | (PORTH,2) -> 14
-  | (PORTH,3) -> 15
+  | (PORTH,0) -> 11
+  | (PORTH,1) -> 12
+  | (PORTH,2) -> 13
+  | (PORTH,3) -> 14
+  | (PORTH,4) -> 15
   | (PORTH,5) -> 16
   | (PORTH,6) -> 17
   | (PORTB,0) -> 18
@@ -110,6 +111,7 @@ let name_of_num num =
   | 10 -> "GND"
   | 11 -> "PIN17/RX2"
   | 12 -> "PIN16/TX2"
+
 
   | 14 -> "PIN6/PWM"
   | 15 -> "PIN7/PWM"
@@ -205,10 +207,11 @@ let pin_of_num num =
   | 6 -> (PORTE,5)
   | 7 -> (PORTE,6)
   | 8 -> (PORTE,7)
-  | 12 -> (PORTH,0)
-  | 13 -> (PORTH,1)
-  | 14 -> (PORTH,2)
-  | 15 -> (PORTH,3)
+  | 11 -> (PORTH,0)
+  | 12 -> (PORTH,1)
+  | 13 -> (PORTH,2)
+  | 14 -> (PORTH,3)
+  | 15 -> (PORTH,4)
   | 16 -> (PORTH,5)
   | 17 -> (PORTH,6)
   | 18 -> (PORTB,0)

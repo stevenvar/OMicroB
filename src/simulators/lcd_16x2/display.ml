@@ -24,7 +24,7 @@ let create_display x y e rs rw d4 d5 d6 d7 column_nb line_nb =
   end;
   {
     x = x; y = y;
-    e = e; rs = rs; rw = rw; 
+    e = e; rs = rs; rw = rw;
     d4 = d4;
     d5 = d5;
     d6 = d6;
