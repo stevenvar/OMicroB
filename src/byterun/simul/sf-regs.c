@@ -187,6 +187,7 @@ static void send_write_ddr(int ddr, unsigned char val){
 /* } */
 
 static void send_set_analog(unsigned int chan, unsigned int val){
+  fprintf(stderr,"SET ANALOG %d to %d",chan,val);
   char buf[6];
   buf[0] = 'Z';
   buf[1] = hexchar_of_int(chan);
@@ -464,6 +465,7 @@ static void out_set_analog(unsigned int chan, unsigned int val){
   {
     if(val != analogs[chan]){
       analogs[chan] = val;
+      fprintf(stderr,"I put %d in analog %d", val, chan);
       send_set_analog(chan, val);
     }
   }
@@ -564,10 +566,10 @@ void avr_adc_init(){
 
 uint16_t avr_analog_read(uint8_t ch){
   /* printf("analog read (%d)\n", ch); */
-  out_set_analog(ch,0b11111111);
-  usleep(50000);
-  out_set_analog(ch,0);
-  return 0;
+  /* out_set_analog(ch,0b11111111); */
+  /* usleep(50000); */
+  /* out_set_analog(ch,analogs[ch]); */
+  return analogs[ch];
 }
 
 void avr_serial_init(){

@@ -270,9 +270,9 @@ let pin_of_port_index port index =
 let pin_of_number s =
   match s with
   | "PIN0" -> RD2
-  | "PIN1" -> RD3
-  | "PIN2" -> RD1
-  | "PIN3" -> RD0
+  | "PIN1" -> RE1
+  | "PIN2" -> RE4
+  | "PIN3" -> RE5
   | "PIN4" -> RD4
   | "PIN5" -> RC6
   | "PIN6" -> RH3
@@ -282,14 +282,18 @@ let pin_of_number s =
   | "PIN10" -> RB4
   | "PIN11" -> RB5
   | "PIN12" -> RB6
-  | "PIN13" -> RC7
-  | "PINA0" -> RF7
-  | "PINA1" -> RF6
-  | "PINA2" -> RF5
-  | "PINA3" -> RF4
-  | "PINA4" -> RF1
-  | "PINA5" -> RF0
-  | _ -> raise (Invalid_argument ("PIN"^s));;
+  | "PIN13" -> RB7
+  | "PIN18" -> RD3
+  | "PIN19" -> RD2
+  | "PIN20" -> RD1
+  | "PIN21" -> RD0
+  | "PINA0" -> RF0
+  | "PINA1" -> RF1
+  | "PINA2" -> RF2
+  | "PINA3" -> RF3
+  | "PINA4" -> RF4
+  | "PINA5" -> RF5
+  | _ -> raise (Invalid_argument ("Wrong pin "^s));;
 
 let pin_of_string s =
   let error () = invalid_arg ("Simul.pin_of_string : "^s) in
@@ -384,7 +388,7 @@ let string_of_output output =
     | OWriteAnalog (an, value) ->
       if value < 0 || value > 0x3FF
       then failwith (Printf.sprintf "value %d of OWriteAnalog is out of range [ 0x0; 0x3FF ]" value);
-      Printf.sprintf "A%c%03X" (char_of_an an) value
+      Printf.sprintf "Z%c%03X" (char_of_an an) value
     | ODone -> "DONE"
     | OStop -> "STOP"
 ;;
