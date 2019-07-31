@@ -60,6 +60,7 @@ check_command "ocamlbuild"
 check_command "ocamldep"
 check_command "ocamldoc"
 check_command "ocamlclean"
+check_command "ocamlfind"
 check_command "mkdir"
 check_command "rmdir"
 check_command "chmod"
@@ -87,6 +88,7 @@ OCAMLDOC="$(which ocamldoc.opt 2> /dev/null || which ocamldoc)"
 OCAMLBUILD="$(which ocamlbuild)"
 OCAMLCLEAN="$(which ocamlclean)"
 OCAMLWHERE="$(ocamlc -where)"
+OCAMLFIND="$(which ocamlfind)"
 VERSION="$(cat VERSION)"
 ROOT="$(pwd)"
 
@@ -150,6 +152,7 @@ OCAMLOPT    := $OCAMLOPT -w A-58-e -warn-error A -safe-string -strict-formats -s
 OCAMLDOC    := $OCAMLDOC
 OCAMLBUILD  := $OCAMLBUILD -cflags -w,A-58-e,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -lflags -w,A-58-e,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -no-links -classic-display -build-dir .build
 OCAMLWHERE  := $OCAMLWHERE
+OCAMLFIND   := $OCAMLFIND
 SRC         := $ROOT/src
 BIN         := $ROOT/bin
 LIB         := $ROOT/lib

@@ -11,6 +11,7 @@ all: config
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
+	$(call compile, src/gui)
 	$(call compile, targets/avr)
 
 config:
@@ -31,6 +32,7 @@ install: all
 	cp bin/bc2c "$(BINDIR)/bc2c"
 	cp bin/h15ppx "$(BINDIR)/h15ppx"
 	cp bin/omicrob "$(BINDIR)/omicrob"
+	cp bin/omicrobide "$(BINDIR)/omicrobide"
 	cp bin/*_simulator "$(LIBEXECDIR)/"
 	cp doc/bc2c.1 "$(MAN1DIR)/bc2c.1"
 	cp doc/omicrob.1 "$(MAN1DIR)/omicrob.1"
@@ -53,6 +55,7 @@ uninstall:
 	-rm -f "$(BINDIR)/bc2c"
 	-rm -f "$(BINDIR)/h15ppx"
 	-rm -f "$(BINDIR)/omicrob"
+	-rm -f "$(BINDIR)/omicrobide"
 	-rm -f "$(MAN1DIR)/omicrob.1"
 	-rm -f "$(MAN1DIR)/bc2c.1"
 	-rm -f "$(LIBDIR)/stdlib.cma"
@@ -104,6 +107,7 @@ clean:
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
+	$(call clean, src/gui)
 	$(call clean, targets/avr)
 
 .PHONY: all config install uninstall tests clean

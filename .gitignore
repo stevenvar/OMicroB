@@ -10,6 +10,7 @@
 **/*.avr
 **/*.hex
 **/*.elf.dSYM
+**/*.merlin
 **/*~
 .build/
 config.ml
