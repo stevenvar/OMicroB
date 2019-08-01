@@ -5,16 +5,26 @@ let locale = GtkMain.Main.init ()
 
 let currentFileName : string option ref = ref None
 
-let editor = GText.view ~editable:true ~wrap_mode:`WORD_CHAR ()
+let window = GWindow.window ~width:640 ~title:"OMicroBIDE" ()
+let vbox = GPack.vbox ~packing:window#add ()
+let menubar = GMenu.menu_bar ~packing:vbox#pack ()
+
+(* Editor *)
+let editor = new Editor.editor ~packing:vbox#add ()
+
+(* Terminal *)
+let term = new Term.term ~packing:vbox#add ()
 
 let write_file filename buff =
   let oc = open_out filename in
   output_string oc buff;
   close_out oc
 
+(** Save the sketch *)
 let save filename =
-  write_file filename (editor#buffer#get_text ())
+  write_file filename (editor#get_text ())
 
+(** Choose the file to save as *)
 let save_as () =
   let saverDialog = GWindow.file_chooser_dialog ~action:`SAVE
       ~title:"Save as" ~deletable:true () in
@@ -40,6 +50,7 @@ let read_file filename =
   with End_of_file -> close_in ic);
   String.concat "\n" (List.rev !lines)
 
+(** Open the sketch *)
 let open_file () =
   let openerDialog = GWindow.file_chooser_dialog ~action:`OPEN
       ~title:"Open" ~deletable:true () in
@@ -48,38 +59,96 @@ let open_file () =
       | [] -> ()
       | hd::_ -> (
           currentFileName := Some hd;
-          editor#buffer#set_text (read_file hd);
+          editor#set_text (read_file hd);
           openerDialog#destroy ()
         )));
   openerDialog#show ()
 
+(** Run a command and print its output in the terminal *)
+let run_for_output cmd =
+  Thread.create (fun () ->
+      term#print_msg ("> "^cmd);
+      let ic, oc, ec = Unix.open_process_full cmd (Unix.environment ()) in
+      let buf = Buffer.create 16 in
+      (* Error *)
+      (try
+         while true do
+           Buffer.add_channel buf ec 1
+         done
+       with End_of_file -> ());
+      let _ = Unix.close_process_full (ic, oc, ec) in
+      term#print_msg (Buffer.contents buf)) ()
+
+(** Compilation command *)
+let compilation_command ?(flash=false) filename =
+  Printf.sprintf "omicrob -v %s %s"
+    (if(flash) then "-flash" else "")
+    filename
+
+(** Try to compile the sketch *)
+let compile () =
+  match !currentFileName with
+  | None -> term#print_error "Save first !"
+  | Some s -> (
+      save s;
+      term#clear ();
+      term#print_msg "Compiling...";
+      ignore (run_for_output (compilation_command s))
+    )
+
+(** Try to compile and simulate the sketch *)
+let simulate () =
+  compile ();
+  match !currentFileName with
+  | None -> term#print_error "Save first !"
+  | Some s -> (
+      save s;
+      term#clear ();
+      ignore (Thread.create(fun () ->
+          term#print_msg "Compiling...";
+          Thread.join (run_for_output (compilation_command s));
+          term#print_msg "Simulating...";
+          Thread.join (run_for_output (Printf.sprintf "%s.elf" (Filename.remove_extension s)))) ())
+    )
+
+(** Try to compile and upload the sketch *)
+let upload () =
+  match !currentFileName with
+  | None -> term#print_error "Save first !"
+  | Some s -> (
+      save s;
+      term#clear ();
+      term#print_msg "Compiling and Uploading...";
+      ignore (run_for_output (compilation_command ~flash:true s))
+    )
+
 let main () =
-  let window = GWindow.window ~width:640 ~title:"OMicroBIDE" () in
   ignore (window#connect#destroy ~callback:Main.quit);
-  let vbox = GPack.vbox ~packing:window#add () in
 
   (* Menu bar *)
-  let menubar = GMenu.menu_bar ~packing:vbox#pack () in
   let factory = new GMenu.factory menubar in
   let accel_group = factory#accel_group in
-  window#add_accel_group accel_group;
   let file_menu = factory#add_submenu "File" in
+  let edit_menu = factory#add_submenu "Edit" in
+  let sketch_menu = factory#add_submenu "Sketch" in
 
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
-  ignore (factory#add_item "Open" ~callback: open_file);
-  ignore (factory#add_item "Save" ~key:_S ~callback: (fun () ->
+  ignore (factory#add_item "Open" ~key:_o ~callback: open_file);
+  ignore (factory#add_item "Save" ~key:0x53 ~callback: (fun () ->
       match !currentFileName with
       | Some s -> save s
       | None -> save_as ()));
   ignore (factory#add_item "Save as" ~callback: save_as);
-  ignore (factory#add_item "Quit" ~key:_Q ~callback: Main.quit);
+  ignore (factory#add_item "Quit" ~key:_q ~callback: Main.quit);
 
-  (* Editor *)
-  let scrolledEditor = GBin.scrolled_window ~height:600 ~packing:vbox#pack
-      ~hpolicy:`NEVER ~vpolicy:`AUTOMATIC () in
-  scrolledEditor#add (editor :> GObj.widget);
+  (* Sketch menu *)
+  let factory = new GMenu.factory sketch_menu ~accel_group in
+  ignore (factory#add_item "Check/Compile" ~key:_r ~callback:compile);
+  ignore (factory#add_item "Simulate" ~callback:simulate);
+  ignore (factory#add_item "Upload" ~key:_u ~callback:upload);
 
+  window#add_accel_group accel_group;
   window#show ();
   Main.main ()
 

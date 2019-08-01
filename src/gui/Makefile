@@ -1,13 +1,13 @@
 include ../../etc/Makefile.conf
 
-MLS := omicrobide.ml
+MLS := editor.ml term.ml omicrobide.ml
 
 TARGETS := $(BIN)/omicrobide
 
 omicrobide: $(TARGETS)
 
 $(BIN)/omicrobide: $(MLS)
-	$(OCAMLFIND) ocamlc -g -package lablgtk2 -linkpkg $^ -o $@
+	$(OCAMLFIND) ocamlc -thread -g -package lablgtk3 -linkpkg $^ -o $@
 
 clean:
 	@rm -f *.cmo *.cmi *.cmx $(TARGETS)
