@@ -156,11 +156,11 @@ void print_flash_global_data(void) {
 
 
 void print_value(value v) {
-  printf("0x%08" PRIflag "x / ", v);
+  printf("0x%08" PRIflag "lx / ", v);
   if (OCAML_VIRTUAL_ARCH != 16 && Maybe_code_pointer(v)) {
-    printf("@%" PRIflag "d (code pointer)", Codeptr_val(v));
+    printf("@%" PRIflag "ld (code pointer)", Codeptr_val(v));
   } else if (Is_int(v)) {
-    printf("(int = %" PRIflag "d / float = %" PRIflag "f)", Int_val(v), (double)Float_val(v));
+    printf("(int = %" PRIflag "ld / float = %" PRIflag "f)", Int_val(v), (double)Float_val(v));
   } else if (Is_block_in_dynamic_heap(v)) {
     printf("@%p (block in dynamic heap)", Ram_block_val(v));
   } else if (Is_block_in_static_heap(v)) {
