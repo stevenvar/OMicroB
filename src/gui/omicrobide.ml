@@ -98,7 +98,6 @@ let compile () =
 
 (** Try to compile and simulate the sketch *)
 let simulate () =
-  compile ();
   match !currentFileName with
   | None -> term#print_error "Save first !"
   | Some s -> (
@@ -141,6 +140,11 @@ let main () =
       | None -> save_as ()));
   ignore (factory#add_item "Save as" ~callback: save_as);
   ignore (factory#add_item "Quit" ~key:_q ~callback: Main.quit);
+
+  (* Edit menu *)
+  let factory = new GMenu.factory edit_menu ~accel_group in
+  (* ignore (factory#add_item "Undo" ~key:_z ~callback: editor#undo);
+   * ignore (factory#add_item "Redo" ~key:_y ~callback: editor#redo); *)
 
   (* Sketch menu *)
   let factory = new GMenu.factory sketch_menu ~accel_group in

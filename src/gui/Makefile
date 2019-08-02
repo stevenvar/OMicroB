@@ -7,7 +7,9 @@ TARGETS := $(BIN)/omicrobide
 omicrobide: $(TARGETS)
 
 $(BIN)/omicrobide: $(MLS)
-	$(OCAMLFIND) ocamlc -thread -g -package lablgtk3 -linkpkg $^ -o $@
+	$(OCAMLFIND) ocamlc -thread -g -package lablgtk3 \
+	lablgtksourceview3.cma \
+	-linkpkg $^ -o $@
 
 clean:
 	@rm -f *.cmo *.cmi *.cmx $(TARGETS)
