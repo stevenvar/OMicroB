@@ -14,6 +14,8 @@ class editor ?packing ?show () = object (self)
   method set_text (s:string) = view#buffer#set_text s
   method get_text () = view#buffer#get_text ()
 
-  method undo () = (* ignore (view#connect#undo (fun _ -> ())) *) ()
-  method redo () = (* ignore (view#connect#redo (fun _ -> ())) *) ()
+  method undo () =
+    if(view#source_buffer#can_undo) then view#source_buffer#undo ()
+  method redo () =
+    if(view#source_buffer#can_redo) then view#source_buffer#redo ()
 end

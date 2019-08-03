@@ -1,6 +1,16 @@
 open GMain
 open GdkKeysyms
 
+let local = ref false
+
+let () =
+  let build_omicrobide = Filename.concat (Filename.concat Config.builddir "bin") "omicrobide" in
+  try
+    let build_stats = Unix.stat build_omicrobide in
+    let my_stats = Unix.stat Sys.argv.(0) in
+    if build_stats.Unix.st_ino = my_stats.Unix.st_ino then local := true;
+  with _ -> ()
+
 let locale = GtkMain.Main.init ()
 
 let currentFileName : string option ref = ref None
@@ -81,7 +91,10 @@ let run_for_output cmd =
 
 (** Compilation command *)
 let compilation_command ?(flash=false) filename =
-  Printf.sprintf "omicrob -v %s %s"
+  let omicrob =
+    if !local then Filename.concat (Filename.concat Config.builddir "bin") "omicrob"
+    else Filename.concat Config.bindir "omicrob" in
+  Printf.sprintf "%s -v %s %s" omicrob
     (if(flash) then "-flash" else "")
     filename
 
@@ -143,8 +156,8 @@ let main () =
 
   (* Edit menu *)
   let factory = new GMenu.factory edit_menu ~accel_group in
-  (* ignore (factory#add_item "Undo" ~key:_z ~callback: editor#undo);
-   * ignore (factory#add_item "Redo" ~key:_y ~callback: editor#redo); *)
+  ignore (factory#add_item "Undo" ~key:_z ~callback: editor#undo);
+  ignore (factory#add_item "Redo" ~key:_y ~callback: editor#redo);
 
   (* Sketch menu *)
   let factory = new GMenu.factory sketch_menu ~accel_group in
@@ -156,4 +169,5 @@ let main () =
   window#show ();
   Main.main ()
 
-let () = main ()
+let () =
+  main ()
