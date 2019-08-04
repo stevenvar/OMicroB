@@ -1,8 +1,8 @@
 open GMain
 open GdkKeysyms
 
+(* OMicroB location *)
 let local = ref false
-
 let () =
   let build_omicrobide = Filename.concat (Filename.concat Config.builddir "bin") "omicrobide" in
   try
@@ -10,6 +10,9 @@ let () =
     let my_stats = Unix.stat Sys.argv.(0) in
     if build_stats.Unix.st_ino = my_stats.Unix.st_ino then local := true;
   with _ -> ()
+let omicrob =
+  if !local then Filename.concat (Filename.concat Config.builddir "bin") "omicrob"
+  else Filename.concat Config.bindir "omicrob"
 
 let locale = GtkMain.Main.init ()
 
@@ -77,61 +80,83 @@ let open_file () =
 (** Run a command and print its output in the terminal *)
 let run_for_output cmd =
   Thread.create (fun () ->
-      term#print_msg ("> "^cmd);
-      let ic, oc, ec = Unix.open_process_full cmd (Unix.environment ()) in
-      let buf = Buffer.create 16 in
-      (* Error *)
-      (try
-         while true do
-           Buffer.add_channel buf ec 1
-         done
+      term#print_external ("> "^cmd);
+      let ic, oc = Unix.open_process cmd in
+      (try while true do term#print_external (input_line ic) done
        with End_of_file -> ());
-      let _ = Unix.close_process_full (ic, oc, ec) in
-      term#print_msg (Buffer.contents buf)) ()
+      ignore (Unix.close_process (ic, oc))) ()
 
-(** Compilation command *)
-let compilation_command ?(flash=false) filename =
-  let omicrob =
-    if !local then Filename.concat (Filename.concat Config.builddir "bin") "omicrob"
-    else Filename.concat Config.bindir "omicrob" in
-  Printf.sprintf "%s -v %s %s" omicrob
-    (if(flash) then "-flash" else "")
+let unixEnv = Unix.environment ()
+
+(** Run a command and print its output followed by its errors in the terminal *)
+let run_for_output_and_errors cmd =
+  Thread.create (fun () ->
+      term#print_external ("> "^cmd);
+      let ic, oc, ec = Unix.open_process_full cmd unixEnv in
+      (try while true do term#print_external (input_line ic) done
+       with End_of_file -> ());
+      (try while true do term#print_external_error (input_line ec) done
+       with End_of_file -> ());
+      ignore (Unix.close_process_full (ic, oc, ec))) ()
+
+(** Compilation command 1 : .ml -> .byte *)
+let compilation_command_1 filename =
+  Printf.sprintf "%s -v %s -o %s" omicrob
     filename
+    ((Filename.remove_extension filename)^".byte")
+
+(** Compilation command 2 : .byte -> end *)
+let compilation_command_2 filename =
+  Printf.sprintf "%s -v %s" omicrob
+    ((Filename.remove_extension filename)^".byte")
+
+let upload_command filename =
+  Printf.sprintf "%s -v %s -flash" omicrob
+    ((Filename.remove_extension filename)^".hex")
+
+(** Run both compilation commands in sequence *)
+let run_compilation filename =
+  Thread.create (fun () ->
+      Thread.join (run_for_output_and_errors (compilation_command_1 filename));
+      Thread.join (run_for_output (compilation_command_2 filename))) ()
 
 (** Try to compile the sketch *)
 let compile () =
   match !currentFileName with
-  | None -> term#print_error "Save first !"
+  | None -> term#print_error "Save your sketch first !"
   | Some s -> (
       save s;
       term#clear ();
       term#print_msg "Compiling...";
-      ignore (run_for_output (compilation_command s))
+      ignore (run_compilation s)
     )
 
 (** Try to compile and simulate the sketch *)
 let simulate () =
   match !currentFileName with
-  | None -> term#print_error "Save first !"
+  | None -> term#print_error "Save your sketch first !"
   | Some s -> (
       save s;
       term#clear ();
       ignore (Thread.create(fun () ->
           term#print_msg "Compiling...";
-          Thread.join (run_for_output (compilation_command s));
+          Thread.join (run_compilation s);
           term#print_msg "Simulating...";
-          Thread.join (run_for_output (Printf.sprintf "%s.elf" (Filename.remove_extension s)))) ())
+          Thread.join (run_for_output_and_errors (Printf.sprintf "%s.elf" (Filename.remove_extension s)))) ())
     )
 
 (** Try to compile and upload the sketch *)
 let upload () =
   match !currentFileName with
-  | None -> term#print_error "Save first !"
+  | None -> term#print_error "Save your sketch first !"
   | Some s -> (
       save s;
       term#clear ();
-      term#print_msg "Compiling and Uploading...";
-      ignore (run_for_output (compilation_command ~flash:true s))
+      ignore (Thread.create(fun () ->
+          term#print_msg "Compiling...";
+          Thread.join (run_compilation s);
+          term#print_msg "Uploading...";
+          Thread.join (run_for_output_and_errors (upload_command s))) ())
     )
 
 let main () =

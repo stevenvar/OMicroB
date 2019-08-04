@@ -215,10 +215,10 @@ void init_simulator(void){
       wait(NULL);
       if (nb_proc > 0) {
         usleep(100000);
-        fprintf(stderr, "Program terminated, press enter to exit...\n");
+        fprintf(stdout, "Program terminated, press enter to exit...\n");
         fgetc(stdin);
       } else {
-        fprintf(stderr, "Program terminated.\n");
+        fprintf(stdout, "Program terminated.\n");
       }
       destroy();
       exit(0);
