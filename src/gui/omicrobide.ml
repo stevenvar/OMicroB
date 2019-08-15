@@ -14,6 +14,10 @@ let omicrob =
   if !local then Filename.concat (Filename.concat Config.builddir "bin") "omicrob"
   else Filename.concat Config.bindir "omicrob"
 
+(* Parameters *)
+let stack_size = ref 200
+let heap_size = ref 200
+
 let locale = GtkMain.Main.init ()
 
 let currentFileName : string option ref = ref None
@@ -107,8 +111,9 @@ let compilation_command_1 filename =
 
 (** Compilation command 2 : .byte -> end *)
 let compilation_command_2 filename =
-  Printf.sprintf "%s -v %s" omicrob
+  Printf.sprintf "%s -v %s -stack-size %d -heap-size %d" omicrob
     ((Filename.remove_extension filename)^".byte")
+    !stack_size !heap_size
 
 let upload_command filename =
   Printf.sprintf "%s -v %s -flash" omicrob
@@ -156,8 +161,50 @@ let upload () =
           term#print_msg "Compiling...";
           Thread.join (run_compilation s);
           term#print_msg "Uploading...";
-          Thread.join (run_for_output_and_errors (upload_command s))) ())
-    )
+          Thread.join (run_for_output_and_errors (upload_command s))) ()))
+
+(** Show "Select stack size" dialog *)
+let stack_size_dialog menu =
+  let dialog = GWindow.dialog ~title:"Set stack size" ~width:250 () in
+  let scale = GRange.scale `HORIZONTAL ~packing:dialog#vbox#add
+      ~digits:0
+      ~adjustment: (GData.adjustment ~lower:20.0 ~upper:400.0 ~step_incr:1.0 ()) () in
+  scale#adjustment#set_value (float_of_int !stack_size);
+  ignore (dialog#add_button_stock `SAVE `DELETE_EVENT);
+  ignore (dialog#connect#response
+            (fun _ -> stack_size := int_of_float scale#adjustment#value;
+              let menuLabel = GMisc.label_cast (List.hd menu#children) in
+              menuLabel#set_text (Printf.sprintf "Stack size: %d" !stack_size);
+              dialog#destroy ()));
+  dialog#show ()
+
+(** Show "Select heap size" dialog *)
+let heap_size_dialog menu =
+  let dialog = GWindow.dialog ~title:"Set heap size" ~width:250 () in
+  let scale = GRange.scale `HORIZONTAL ~packing:dialog#vbox#add
+      ~digits:0
+      ~adjustment: (GData.adjustment ~lower:20.0 ~upper:400.0 ~step_incr:1.0 ()) () in
+  scale#adjustment#set_value (float_of_int !heap_size);
+  ignore (dialog#add_button_stock `SAVE `DELETE_EVENT);
+  ignore (dialog#connect#response
+            (fun _ -> heap_size := int_of_float scale#adjustment#value;
+              let menuLabel = GMisc.label_cast (List.hd menu#children) in
+              menuLabel#set_text (Printf.sprintf "Heap size: %d" !heap_size);
+              dialog#destroy ()));
+  dialog#show ()
+
+
+(** Show "About" dialog *)
+let about_dialog () =
+  let aboutDialog = GWindow.about_dialog ~name:"OMicroB"
+      ~authors:["Steven Varoumas";"Benoit Vaugon";"Emmanuel Chailloux";"Basile Pesin"]
+      ~license:"CeCILL"
+      ~website:"https://github.com/stevenvar/OMicroB"
+      ~website_label:"https://github.com/stevenvar/OMicroB" () in
+  ignore (aboutDialog#connect#response (fun _ ->
+      aboutDialog#destroy ()
+    ));
+  aboutDialog#show ()
 
 let main () =
   ignore (window#connect#destroy ~callback:Main.quit);
@@ -168,11 +215,13 @@ let main () =
   let file_menu = factory#add_submenu "File" in
   let edit_menu = factory#add_submenu "Edit" in
   let sketch_menu = factory#add_submenu "Sketch" in
+  let tools_menu = factory#add_submenu "Tools" in
+  let help_menu = factory#add_submenu "Help" in
 
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
   ignore (factory#add_item "Open" ~key:_o ~callback: open_file);
-  ignore (factory#add_item "Save" ~key:0x53 ~callback: (fun () ->
+  ignore (factory#add_item "Save" ~key:_s ~callback: (fun () ->
       match !currentFileName with
       | Some s -> save s
       | None -> save_as ()));
@@ -189,6 +238,33 @@ let main () =
   ignore (factory#add_item "Check/Compile" ~key:_r ~callback:compile);
   ignore (factory#add_item "Simulate" ~callback:simulate);
   ignore (factory#add_item "Upload" ~key:_u ~callback:upload);
+
+  (* Tools menu *)
+  let factory = new GMenu.factory tools_menu ~accel_group in
+  let device_menu = factory#add_submenu "Device type" in
+  ignore (factory#add_separator ());
+  let stack_size_menu = factory#add_item
+      (Printf.sprintf "Stack size: %d" !stack_size) in
+  ignore(stack_size_menu#connect#activate
+           ~callback:(fun () -> stack_size_dialog stack_size_menu));
+  let heap_size_menu = factory#add_item
+      (Printf.sprintf "Heap size: %d" !heap_size) in
+  ignore(heap_size_menu#connect#activate
+           ~callback:(fun () -> heap_size_dialog heap_size_menu));
+
+  (* Device menu *)
+  let factory = new GMenu.factory device_menu ~accel_group in
+  let device_group = (factory#add_radio_item "Arduboy" ~active:true
+                       ~callback:(fun _ -> () (* TODO *))
+                    )#group in
+  ignore (factory#add_radio_item "Arduino Uno" ~group:device_group
+         ~callback:(fun _ -> () (* TODO *)));
+  ignore (factory#add_radio_item "Arduino Mega 2560" ~group:device_group
+            ~callback:(fun _ -> () (* TODO *)));
+
+  (* Help menu *)
+  let factory = new GMenu.factory help_menu ~accel_group in
+  ignore (factory#add_item "About" ~callback:about_dialog);
 
   window#add_accel_group accel_group;
   window#show ();
