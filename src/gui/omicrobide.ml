@@ -15,6 +15,8 @@ let omicrob =
   else Filename.concat Config.bindir "omicrob"
 
 (* Parameters *)
+type device = Arduboy | ArduinoUno | ArduinoMega
+let device = ref Arduboy
 let stack_size = ref 200
 let heap_size = ref 200
 
@@ -46,7 +48,7 @@ let save_as () =
   let saverDialog = GWindow.file_chooser_dialog ~action:`SAVE
       ~title:"Save as" ~deletable:true () in
   saverDialog#add_select_button_stock `SAVE `DELETE_EVENT;
-  ignore (saverDialog#connect#response (fun _ ->
+  ignore (saverDialog#connect#response ~callback:(fun _ ->
       match saverDialog#get_filenames with
       | [] -> ()
       | hd::_ -> (
@@ -71,7 +73,7 @@ let read_file filename =
 let open_file () =
   let openerDialog = GWindow.file_chooser_dialog ~action:`OPEN
       ~title:"Open" ~deletable:true () in
-  ignore (openerDialog#connect#file_activated (fun () ->
+  ignore (openerDialog#connect#file_activated ~callback:(fun () ->
       match openerDialog#get_filenames with
       | [] -> ()
       | hd::_ -> (
@@ -115,15 +117,15 @@ let compilation_command_2 filename =
     ((Filename.remove_extension filename)^".byte")
     !stack_size !heap_size
 
-let upload_command filename =
-  Printf.sprintf "%s -v %s -flash" omicrob
-    ((Filename.remove_extension filename)^".hex")
-
 (** Run both compilation commands in sequence *)
-let run_compilation filename =
+let compilation_command filename =
   Thread.create (fun () ->
       Thread.join (run_for_output_and_errors (compilation_command_1 filename));
       Thread.join (run_for_output (compilation_command_2 filename))) ()
+
+let upload_command filename =
+  Printf.sprintf "%s -v %s -flash" omicrob
+    ((Filename.remove_extension filename)^".hex")
 
 (** Try to compile the sketch *)
 let compile () =
@@ -133,7 +135,7 @@ let compile () =
       save s;
       term#clear ();
       term#print_msg "Compiling...";
-      ignore (run_compilation s)
+      ignore (compilation_command s)
     )
 
 (** Try to compile and simulate the sketch *)
@@ -145,7 +147,7 @@ let simulate () =
       term#clear ();
       ignore (Thread.create(fun () ->
           term#print_msg "Compiling...";
-          Thread.join (run_compilation s);
+          Thread.join (compilation_command s);
           term#print_msg "Simulating...";
           Thread.join (run_for_output_and_errors (Printf.sprintf "%s.elf" (Filename.remove_extension s)))) ())
     )
@@ -159,7 +161,7 @@ let upload () =
       term#clear ();
       ignore (Thread.create(fun () ->
           term#print_msg "Compiling...";
-          Thread.join (run_compilation s);
+          Thread.join (compilation_command s);
           term#print_msg "Uploading...";
           Thread.join (run_for_output_and_errors (upload_command s))) ()))
 
@@ -171,11 +173,11 @@ let stack_size_dialog menu =
       ~adjustment: (GData.adjustment ~lower:20.0 ~upper:400.0 ~step_incr:1.0 ()) () in
   scale#adjustment#set_value (float_of_int !stack_size);
   ignore (dialog#add_button_stock `SAVE `DELETE_EVENT);
-  ignore (dialog#connect#response
-            (fun _ -> stack_size := int_of_float scale#adjustment#value;
-              let menuLabel = GMisc.label_cast (List.hd menu#children) in
-              menuLabel#set_text (Printf.sprintf "Stack size: %d" !stack_size);
-              dialog#destroy ()));
+  ignore (dialog#connect#response ~callback:(fun _ ->
+      stack_size := int_of_float scale#adjustment#value;
+      let menuLabel = GMisc.label_cast (List.hd menu#children) in
+      menuLabel#set_text (Printf.sprintf "Stack size: %d" !stack_size);
+      dialog#destroy ()));
   dialog#show ()
 
 (** Show "Select heap size" dialog *)
@@ -186,13 +188,12 @@ let heap_size_dialog menu =
       ~adjustment: (GData.adjustment ~lower:20.0 ~upper:400.0 ~step_incr:1.0 ()) () in
   scale#adjustment#set_value (float_of_int !heap_size);
   ignore (dialog#add_button_stock `SAVE `DELETE_EVENT);
-  ignore (dialog#connect#response
-            (fun _ -> heap_size := int_of_float scale#adjustment#value;
-              let menuLabel = GMisc.label_cast (List.hd menu#children) in
-              menuLabel#set_text (Printf.sprintf "Heap size: %d" !heap_size);
-              dialog#destroy ()));
+  ignore (dialog#connect#response ~callback:(fun _ ->
+      heap_size := int_of_float scale#adjustment#value;
+      let menuLabel = GMisc.label_cast (List.hd menu#children) in
+      menuLabel#set_text (Printf.sprintf "Heap size: %d" !heap_size);
+      dialog#destroy ()));
   dialog#show ()
-
 
 (** Show "About" dialog *)
 let about_dialog () =
@@ -201,7 +202,7 @@ let about_dialog () =
       ~license:"CeCILL"
       ~website:"https://github.com/stevenvar/OMicroB"
       ~website_label:"https://github.com/stevenvar/OMicroB" () in
-  ignore (aboutDialog#connect#response (fun _ ->
+  ignore (aboutDialog#connect#response ~callback:(fun _ ->
       aboutDialog#destroy ()
     ));
   aboutDialog#show ()
@@ -255,12 +256,12 @@ let main () =
   (* Device menu *)
   let factory = new GMenu.factory device_menu ~accel_group in
   let device_group = (factory#add_radio_item "Arduboy" ~active:true
-                       ~callback:(fun _ -> () (* TODO *))
-                    )#group in
+                        ~callback:(fun b -> if b then device := Arduboy)
+                     )#group in
   ignore (factory#add_radio_item "Arduino Uno" ~group:device_group
-         ~callback:(fun _ -> () (* TODO *)));
+         ~callback:(fun b -> if b then device := ArduinoUno));
   ignore (factory#add_radio_item "Arduino Mega 2560" ~group:device_group
-            ~callback:(fun _ -> () (* TODO *)));
+            ~callback:(fun b -> if b then device := ArduinoMega));
 
   (* Help menu *)
   let factory = new GMenu.factory help_menu ~accel_group in
