@@ -2,9 +2,6 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef __PC__
-#include <stdlib.h>
-#endif
 
 #include "debug.h"
 #include "values.h"
@@ -27,15 +24,6 @@ code_t pc;
 value *sp;
 value trapSp;
 uint8_t extra_args;
-
-#if defined(__PC__) && DEBUG >= 1
-    unsigned int cpt_instr = 0;
-#endif
-
-
-#ifdef __AVR__
-#include <avr/interrupt.h>
-#endif
 
 PROGMEM extern void * const ocaml_primitives[];
 
@@ -83,12 +71,7 @@ static inline value read_flash_global_data_2B(uint16_t glob_ind) {
 }
 
 static inline char read_byte(void) {
-  char c;
-#ifdef __AVR__
-  c = pgm_read_byte_near(ocaml_bytecode + pc);
-#else
-  c = ocaml_bytecode[pc];
-#endif
+  char c = do_read_byte(ocaml_bytecode, pc);
   pc ++;
   return c;
 }
@@ -187,11 +170,7 @@ static inline void pop_n(int n) {
 static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, uint16_t size) {
   uint16_t ind = 0;
   for (ind = 0; ind < size; ind ++) {
-#ifdef __AVR__
-    uint8_t byte = pgm_read_byte_near(&((uint8_t *) flash_ptr)[ind]);
-#else
-    uint8_t byte = ((uint8_t *) flash_ptr)[ind];
-#endif
+    uint8_t byte = do_read_byte_from_flash(flash_ptr, ind);
     ((uint8_t *) ram_ptr)[ind] = byte;
   }
 }
@@ -252,23 +231,6 @@ static inline void interp(void) {
       printf("pc = %d\n", pc);
       printf("extra_args = %d\n", extra_args);
     }
-#endif
-
-
-
-#ifdef __AVR__
-#if DEBUG >=3
-    /* char str[20]; */
-    /* itoa( pc, str, 10); */
-    /* avr_serial_write('['); */
-    /* for(int i = 0; i < 20; i++){ */
-      /* if(str[i]=='\0') break; */
-      /* avr_serial_write(str[i]); */
-    /* } */
-    /* avr_serial_write(']'); */
-    /* avr_serial_write('\n'); */
-    /* printf("[%d]",pc); */
-#endif
 #endif
 
     assert(pc >= 0 && pc < OCAML_BYTECODE_BSIZE);
@@ -2448,10 +2410,6 @@ static inline void interp(void) {
 
 /******************************************************************************/
 /* Main function */
-
-#ifdef __PC__
-extern const char **global_argv; // used by simulator
-#endif
 
 int main(int argc, const char **argv) {
 #ifdef __PC__

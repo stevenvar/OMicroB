@@ -3,27 +3,6 @@
 
 /******************************************************************************/
 
-#ifdef __PC__
-
-#include <assert.h>
-
-#else
-
-#if DEBUG > 0
-#define assert(x) do { if (!(x)) debug_blink_error();  } while(0);
-#else
-#define assert(x)
-#endif
-
-void debug_blink_error(void);
-void debug_blink_uncatched_exception(void);
-void debug_blink_message(int n);
-void debug_blink_pause(void);
-
-#endif
-
-/******************************************************************************/
-
 /*
   DEBUG levels:
     == 0: no debug, only traces from the OCaml program
