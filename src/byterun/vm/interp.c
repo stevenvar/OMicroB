@@ -188,7 +188,7 @@ static inline void interp(void) {
 
   while (1) {
 
-#if defined(__PC__) && DEBUG >= 4 // DUMP STACK AND HEAP
+#if DEBUG >= 4 // DUMP STACK AND HEAP
     {
       printf("=========\n");
       /* print_global(); */
@@ -1537,40 +1537,8 @@ static inline void interp(void) {
       ocaml_raise:
       TRACE_INSTRUCTION("RAISE");
       if (trapSp == Val_int(-1)) {
-#if defined (__PC__)
-        value str;
-        int i;
-        char c;
-        if (Is_block(acc) && Tag_val(acc) == Object_tag && Wosize_val(acc) > 0 && Is_block(Field(acc, 0)) && Tag_val(Field(acc, 0)) == String_tag) {
-          str = Field(acc, 0);
-        } else {
-          str = Field(Field(acc, 0), 0);
-        }
-        printf("Error: uncaught exception: ");
-        i = 0;
-        c = String_field(str, 0);
-        while (c != '\0') {
-          printf("%c", c);
-          i ++;
-          c = String_field(str, i);
-        }
-        if (Is_block(acc) && Tag_val(acc) == 0 && Wosize_val(acc) > 1 && Is_block(Field(acc, 1)) && Tag_val(Field(acc, 1)) == String_tag) {
-          printf(" \"");
-          str = Field(acc, 1);
-          i = 0;
-          c = String_field(str, 0);
-          while (c != '\0') {
-            printf("%c", c);
-            i ++;
-            c = String_field(str, i);
-          }
-          printf("\"");
-        }
-        printf("\n");
+        uncaught_exception(acc);
         return;
-#else
-        debug_blink_error();
-#endif
       } else {
         sp = ocaml_stack + Int_val(trapSp);
         pc = Codeptr_val(pop());
@@ -2367,7 +2335,7 @@ static inline void interp(void) {
 
     default:
 
-#if defined(__PC__) && DEBUG >= 2
+#if DEBUG >= 2
       printf("UNKNOWN INSTRUCTION %d", opcode);
 #endif
       assert(0);
@@ -2381,11 +2349,7 @@ static inline void interp(void) {
 /* Main function */
 
 int main(int argc, const char **argv) {
-#ifdef __PC__
-  global_argv = argv;
-#endif
-
-  device_init();
+  device_init(argv);
 
   interp_init();
   gc_init();

@@ -28,4 +28,3 @@
 #include "../prims/bindings.c"
 #include "../stdlib/random.c"
 #include "../stdlib/trace.c"
-#include "../stdlib/delay.h"

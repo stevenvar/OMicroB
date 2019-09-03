@@ -5,7 +5,7 @@
 /************************ General operations **********************************/
 /******************************************************************************/
 
-void device_init() {
+void device_init(const char **argv) {
   unsigned long ctc_match_overflow;
 
   cli();
@@ -84,6 +84,10 @@ void debug_blink_pause(void) {
 #else
 #define assert(x)
 #endif
+
+void uncaught_exception(value acc) {
+  debug_blink_error();
+}
 
 /******************************************************************************/
 

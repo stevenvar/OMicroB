@@ -7,7 +7,9 @@
 
 extern const char **global_argv; // used by simulator
 
-void device_init() {}
+void device_init(const char **argv) {
+  global_argv = argv;
+}
 
 #if DEBUG >= 1
 unsigned int cpt_instr = 0;
@@ -21,6 +23,40 @@ void device_finish() {
 
 /******************************************************************************/
 /********************************** Debug *************************************/
+/******************************************************************************/
+
+void uncaught_exception(value acc) {
+  value str;
+  int i;
+  char c;
+  if (Is_block(acc) && Tag_val(acc) == Object_tag && Wosize_val(acc) > 0 && Is_block(Field(acc, 0)) && Tag_val(Field(acc, 0)) == String_tag) {
+    str = Field(acc, 0);
+  } else {
+    str = Field(Field(acc, 0), 0);
+  }
+  printf("Error: uncaught exception: ");
+  i = 0;
+  c = String_field(str, 0);
+  while (c != '\0') {
+    printf("%c", c);
+    i ++;
+    c = String_field(str, i);
+  }
+  if (Is_block(acc) && Tag_val(acc) == 0 && Wosize_val(acc) > 1 && Is_block(Field(acc, 1)) && Tag_val(Field(acc, 1)) == String_tag) {
+    printf(" \"");
+    str = Field(acc, 1);
+    i = 0;
+    c = String_field(str, 0);
+    while (c != '\0') {
+      printf("%c", c);
+      i ++;
+      c = String_field(str, i);
+    }
+    printf("\"");
+  }
+  printf("\n");
+}
+
 /******************************************************************************/
 
 #if DEBUG >= 2

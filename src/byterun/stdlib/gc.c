@@ -1,4 +1,3 @@
-#ifndef __AVR__
 
 #include <caml/mlvalues.h>
 #include <caml/gc.h>
@@ -28,5 +27,3 @@ value caml_gc_used_stack_size(value unit) {
 value caml_gc_available_stack_size(value unit) {
   return Val_int(0);
 }
-
-#endif

@@ -5,7 +5,6 @@
 #ifndef __ARCH_SPECIFIC__
 #define __ARCH_SPECIFIC__
 
-#define __PC__
 #define PROGMEM
 
 /******************************************************************************/

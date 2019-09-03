@@ -313,10 +313,6 @@ void gc(void) {
   print_dynamic_heap();
 #endif
 
-
-#if DEBUG >= 1 // TRACE GC RUNS
-  printf("#################### MARK & COMPACT ####################\n");
-#endif
 #if DEBUG >= 3 // DUMP STACK AND HEAP
   printf("&acc = %p\n", &acc);
   printf("&env = %p\n", &env);

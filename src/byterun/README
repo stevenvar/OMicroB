@@ -23,8 +23,8 @@ simul/:
 
 vm/:
  * Implementation of the OCaml Virtual Machine for micro-controllers.
- * To be compiled for micro-controller with the __AVR__ constant defined.
- * To be compiled for simulation/debugging purpose without the __AVR__ constant defined.
+ * To be compiled for micro-controller, with option `-I byterun/avr`
+ * To be compiled for simulation/debugging with option `-I byterun/simul`
 
 
 ########################################################################################################################
