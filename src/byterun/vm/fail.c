@@ -1,8 +1,3 @@
-#ifdef __AVR__
-#include <avr/io.h>
-#include <util/delay.h>
-#endif
-
 #include <setjmp.h>
 #include <string.h>
 

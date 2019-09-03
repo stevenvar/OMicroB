@@ -336,6 +336,10 @@ let libdir =
   if local then Filename.concat Config.builddir "lib"
   else Config.libdir
 
+let includedir =
+  if local then Filename.concat Config.builddir "src/byterun"
+  else Config.includedir
+
 let libexecdir =
   if local then Filename.concat Config.builddir "bin"
   else Config.libexecdir
@@ -676,6 +680,7 @@ let () =
 
     let cmd = [ Config.cxx ] @ default_cxx_options @ cxxopts in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir "simul" ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   )
@@ -712,6 +717,7 @@ let () =
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ default_mmcu ] in
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int default_clock ] in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir "/avr" ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   ) else (

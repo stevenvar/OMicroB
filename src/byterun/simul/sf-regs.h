@@ -17,8 +17,7 @@ void avr_write_register(uint8_t reg, uint8_t val);
 uint8_t avr_read_register(uint8_t reg);
 int avr_random(int max);
 int avr_millis();
-
-
+void avr_delay(int ms);
 
 void avr_adc_init();
 uint16_t avr_analog_read(uint8_t ch);

@@ -3,27 +3,6 @@
 
 /******************************************************************************/
 
-#ifdef __PC__
-
-#include <assert.h>
-
-#else
-
-#if DEBUG > 0
-#define assert(x) do { if (!(x)) debug_blink_error();  } while(0);
-#else
-#define assert(x)
-#endif
-
-void debug_blink_error(void);
-void debug_blink_uncatched_exception(void);
-void debug_blink_message(int n);
-void debug_blink_pause(void);
-
-#endif
-
-/******************************************************************************/
-
 /*
   DEBUG levels:
     == 0: no debug, only traces from the OCaml program
@@ -32,14 +11,6 @@ void debug_blink_pause(void);
     >= 3: dump stack and heap at each GC
     >= 4: dump stack and heap at each VM instruction
 */
-
-#if DEBUG >= 2 && defined(__PC__)
-#define TRACE_INSTRUCTION(instr_name) printf("[%3d]: " instr_name "\n", pc - 1); cpt_instr++; fflush(stdout)
-#elif DEBUG >=1 && defined(__PC__)
-#define TRACE_INSTRUCTION(instr_name) cpt_instr++;
-#else
-#define TRACE_INSTRUCTION(instr_name)
-#endif
 
 /******************************************************************************/
 
