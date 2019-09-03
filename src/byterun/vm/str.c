@@ -143,11 +143,7 @@ value caml_string_of_int(value v) {
 #elif OCAML_VIRTUAL_ARCH == 32
   snprintf(buf, sizeof(buf), "%" PRId32, Int_val(v));
 #elif OCAML_VIRTUAL_ARCH == 64
-#ifdef __AVR__
-  snprintf(buf, sizeof(buf), "%lld", Int_val(v));
-#else
-  snprintf(buf, sizeof(buf), "%ld", Int_val(v));
-#endif
+  format_long(buf, sizeof(buf), v);
 #endif
   return copy_bytes(buf);
 }

@@ -100,6 +100,7 @@ typedef uint32_t code_t;
 
 #define Val_int(x) ((value) (((uint16_t) (int16_t) (x) << 1) | 1))
 #define Int_val(x) ((int16_t) ((value) (x) >> 1))
+#define Int64_val(v) (Is_int(v) ? (int64_t) Int_val(v) : ((int64_t) (uint16_t) Field(v, 1)) | ((int64_t) (uint16_t) Field(v, 2) << 16) | ((int64_t) (uint16_t) Field(v, 3) << 32) | ((int64_t) Field(v, 4) << 48))
 
 #define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)

@@ -183,3 +183,18 @@ static inline value do_read_flash_data_2B(const value flash_global_data[], uint8
   return (v2 << 32) | v1;
 #endif
 }
+
+/******************************************************************************/
+/********************************* Format *************************************/
+/******************************************************************************/
+
+void format_int64(char *buf, int bufsize, value v) {
+  snprintf(buf, bufsize, "%lld", Int64_val(v));
+}
+
+#if OCAML_VIRTUAL_ARCH == 64
+void format_long(char *buf, int bufsize, value v) {
+  snprintf(buf, bufsize, "%ld", Int_val(v));
+}
+#endif
+

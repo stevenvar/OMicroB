@@ -121,3 +121,17 @@ static inline value do_read_flash_data_1B(const value flash_global_data[], uint8
 static inline value do_read_flash_data_2B(const value flash_global_data[], uint8_t glob_ind) {
   return flash_global_data[glob_ind];
 }
+
+/******************************************************************************/
+/********************************* Format *************************************/
+/******************************************************************************/
+
+void format_int64(char *buf, int bufsize, value v) {
+  snprintf(buf, bufsize, "%ld", Int64_val(v));
+}
+
+#if OCAML_VIRTUAL_ARCH == 64
+void format_long(char *buf, int bufsize, value v) {
+  snprintf(buf, bufsize, "%lld", Int_val(v));
+}
+#endif
