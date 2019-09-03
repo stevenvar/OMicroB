@@ -1,4 +1,5 @@
 #include <sys/time.h>
+#include <unistd.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -320,11 +321,14 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
   may_sleep();
 }
 
-/* TODO : move these  */
-
 int avr_millis(){
   printf("millis()\n");
   return 0;
+}
+
+void avr_delay(int ms) {
+  printf("delay(%d)\n", ms);
+  usleep((useconds_t) ms * 1000);
 }
 
 int avr_random(int max){

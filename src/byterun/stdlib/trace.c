@@ -1,7 +1,3 @@
-#ifndef __AVR__
-#include <stdio.h>
-#endif
-
 #include <stdint.h>
 #include "trace.h"
 

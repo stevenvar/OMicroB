@@ -1,7 +1,3 @@
-#ifdef __PC__
-#include <stdio.h>
-#endif
-
 #include <string.h>
 #include "values.h"
 #include "fail.h"

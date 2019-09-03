@@ -31,43 +31,15 @@ PROGMEM extern void * const ocaml_primitives[];
 /* Read tools for program memory */
 
 static inline void *get_primitive(uint8_t prim_ind) {
-#ifdef __AVR__
-  return (void *) pgm_read_word_near(ocaml_primitives + prim_ind);
-#else
-  return ocaml_primitives[prim_ind];
-#endif
+  return do_get_primitive(ocaml_primitives, prim_ind);
 }
 
 static inline value read_flash_global_data_1B(uint8_t glob_ind) {
-#ifdef __AVR__
-#if OCAML_VIRTUAL_ARCH == 16
-  return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 32
-  return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 64
-  value v1 = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-  value v2 = pgm_read_dword_near((char *) (ocaml_flash_global_data + glob_ind) + 4);
-  return (v2 << 32) | v1;
-#endif
-#else
-  return ocaml_flash_global_data[glob_ind];
-#endif
+  return do_read_flash_data_1B(ocaml_flash_global_data, glob_ind);
 }
 
 static inline value read_flash_global_data_2B(uint16_t glob_ind) {
-#ifdef __AVR__
-#if OCAML_VIRTUAL_ARCH == 16
-  return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 32
-  return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 64
-  value v1 = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-  value v2 = pgm_read_dword_near((char *) (ocaml_flash_global_data + glob_ind) + 4);
-  return (v2 << 32) | v1;
-#endif
-#else
-  return ocaml_flash_global_data[glob_ind];
-#endif
+  return do_read_flash_data_2B(ocaml_flash_global_data, glob_ind);
 }
 
 static inline char read_byte(void) {
@@ -2389,9 +2361,6 @@ static inline void interp(void) {
 #ifdef OCAML_STOP
     case OCAML_STOP : {
       TRACE_INSTRUCTION("STOP");
-      #ifndef __PC__
-      while(1){ /* This is needed to easily soft reset the AVR  */}
-      #endif
       return;
     }
 #endif
@@ -2416,42 +2385,13 @@ int main(int argc, const char **argv) {
   global_argv = argv;
 #endif
 
-#ifdef __AVR__
-
-  unsigned long ctc_match_overflow;
-
-cli();
-  ctc_match_overflow = ((F_CPU / 1000) / 8); //when timer1 is this value, 1ms has passed
-
-  // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 8)
-  TCCR1B |= (1 << WGM12) | (1 << CS11);
-
-  // high byte first, then low byte
-  OCR1AH = (ctc_match_overflow >> 8);
-  OCR1AL = ctc_match_overflow;
-
-  // Enable the compare match interrupt
-TIMSK1 |= (1 << OCIE1A);
-
-avr_serial_init();
-
-
-#endif
+  device_init();
 
   interp_init();
   gc_init();
   interp();
 
-
-#if defined(__PC__) && DEBUG >= 1
-  printf("# of instructions = %d\n", cpt_instr);
-  printf("# of gc = %d\n", gc_count);
-#endif
-
-
-#ifdef __AVR__
-  while(1) _delay_ms(10);
-#endif
+  device_finish();
 
   return 0;
 }

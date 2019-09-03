@@ -1,9 +1,5 @@
 /* PC specific includes and functions */
-
-#include <stdio.h>
-#include <unistd.h>
-#include <inttypes.h>
-#include <assert.h>
+#include "arch-specific.h"
 
 #include "simul.c"
 #include "shared.c"
@@ -11,18 +7,29 @@
 
 extern const char **global_argv; // used by simulator
 
+void device_init() {}
+
 #if DEBUG >= 1
 unsigned int cpt_instr = 0;
 #endif
 
-void delay(int count) {
-  printf("delay(%d)\n", count);
-  usleep((useconds_t) count * 1000);
+void device_finish() {
+#if DEBUG >= 1
+  printf("# of instructions = %d\n", cpt_instr);
+#endif
 }
 
 /******************************************************************************/
 /********************************** Debug *************************************/
 /******************************************************************************/
+
+#if DEBUG >= 2
+#define TRACE_INSTRUCTION(instr_name) printf("[%3d]: " instr_name "\n", pc - 1); cpt_instr++; fflush(stdout)
+#elif DEBUG >=1
+#define TRACE_INSTRUCTION(instr_name) cpt_instr++;
+#else
+#define TRACE_INSTRUCTION(instr_name)
+#endif
 
 void print_value(value v) {
   printf("0x%08" PRIflag "x / ", v);
@@ -101,4 +108,16 @@ static inline char do_read_byte(const opcode_t *ocaml_bytecode, int pc) {
 
 static inline uint8_t do_read_byte_from_flash(const void *flash_ptr, int ind) {
   return ((uint8_t *) flash_ptr)[ind];
+}
+
+static inline void *do_get_primitive(void *const primitives[], uint8_t prim_ind) {
+  return primitives[prim_ind];
+}
+
+static inline value do_read_flash_data_1B(const value flash_global_data[], uint8_t glob_ind) {
+  return flash_global_data[glob_ind];
+}
+
+static inline value do_read_flash_data_2B(const value flash_global_data[], uint8_t glob_ind) {
+  return flash_global_data[glob_ind];
 }
