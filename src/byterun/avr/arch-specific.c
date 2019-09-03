@@ -137,8 +137,6 @@ void print_static_heap(void) {
   print_table("STATIC HEAP", ocaml_ram_heap, OCAML_STATIC_HEAP_WOSIZE);
 }
 
-/* void print_dynamic_heap(void) {} */
-/* void print_static_heap(void) {} */
 void print_flash_heap(void) {}
 void print_ram_global_data(void) {}
 void print_flash_global_data(void) {}
