@@ -50,13 +50,13 @@ function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
 
-function select_avr () {
-    check_directory "avrs/$1"
+function select_target () {
+    check_directory "targets/$1"
     rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
-    cp -f "avrs/$1/avr.mli" "src/stdlib/avr.mli"
-    cp -f "avrs/$1/avr.ml" "src/stdlib/avr.ml"
-    cp -f "avrs/$1/avr_config.ml" "src/omicrob/avr_config.ml"
-    cp -f "avrs/$1/avrlib.c" "src/byterun/avr/avrlib.c"
+    cp -f "targets/$1/avr.mli" "src/stdlib/avr.mli"
+    cp -f "targets/$1/avr.ml" "src/stdlib/avr.ml"
+    cp -f "targets/$1/avr_config.ml" "src/omicrob/avr_config.ml"
+    cp -f "targets/$1/avrlib.c" "src/byterun/avr/avrlib.c"
 }
 
 ################################################################################
@@ -197,7 +197,7 @@ let version     = \"$VERSION\"
 ################################################################################
 
 # select_avr "arduboy"
-select_avr "arduino_mega_2560"
+select_target "avrs/arduino_mega_2560"
 
 ################################################################################
 
