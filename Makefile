@@ -39,6 +39,7 @@ install: all
 	cp lib/*.mli "$(LIBDIR)/"
 	cp lib/*.cmo "$(LIBDIR)/"
 	cp lib/*.cmi "$(LIBDIR)/"
+	cp lib/lcd_cgrom.txt "$(LIBDIR)/"
 	cp -a lib/extra "$(LIBDIR)/extra"
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
@@ -58,6 +59,7 @@ uninstall:
 	-rm -f "$(LIBDIR)/"*.mli
 	-rm -f "$(LIBDIR)/"*.cmi
 	-rm -f "$(LIBDIR)/"*.cmo
+	-rm -f "$(LIBDIR)/lcd_cgrom.txt"
 	-rm -rf "$(LIBDIR)/extra"
 	-rm -f "$(LIBEXECDIR)/"*_simulator
 	-rm -f "$(INCLUDEDIR)/vm/"*
