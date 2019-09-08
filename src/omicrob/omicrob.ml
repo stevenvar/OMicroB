@@ -14,9 +14,9 @@ let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequenc
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 
-let default_config = ref Device_config.arduboyConfig
+let device_config = ref Device_config.defConfig
 let set_config name =
-  try default_config := Device_config.get_config name
+  try device_config := Device_config.get_config name
   with _ ->
     Printf.printf "Error: device %s is not recognized\n" name;
     exit 1
@@ -592,9 +592,10 @@ let () =
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
-    let cmd = cmd @ match !default_config.typeD with
+    let cmd = cmd @ match !device_config.typeD with
       | AVR -> [ "-open"; Printf.sprintf "Avr";
-                 "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ]
+                 "-open"; Printf.sprintf "Avr.%s" !device_config.pins_module ]
+      | NONE -> []
     in
     run ~vars cmd;
 
@@ -710,7 +711,7 @@ let available_elf = !available_elf
 let available_avr = ref input_avr
 
 let () =
-  if !default_config.typeD = AVR && (available_c <> None && (flash || output_avr <> None || no_output_requested)) then (
+  if !device_config.typeD = AVR && (available_c <> None && (flash || output_avr <> None || no_output_requested)) then (
     should_be_none_file input_avr;
     should_be_none_file input_elf;
     should_be_none_file input_hex;
@@ -731,11 +732,11 @@ let () =
     available_avr := Some output_path;
 
     let cmd = [ Config.avr_cxx ] @ default_avr_cxx_options @ avrcxxopts in
-    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ !default_config.mmcu ] in
-    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int !default_config.clock ] in
+    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ !device_config.mmcu ] in
+    let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int !device_config.clock ] in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "avr" ] in
-    let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "avr" !default_config.folder) ] in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "avr" !device_config.folder) ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   ) else (
@@ -750,7 +751,7 @@ let available_avr = !available_avr
 let available_hex = ref input_hex
 
 let () =
-  if !default_config.typeD = AVR && (available_avr <> None && (flash || output_hex <> None || no_output_requested)) then (
+  if !device_config.typeD = AVR && (available_avr <> None && (flash || output_hex <> None || no_output_requested)) then (
     should_be_none_file input_hex;
 
     let input_path =
@@ -846,12 +847,12 @@ let () =
 
     let cmd = if sudo then [ "sudo" ] else [] in
     let cmd = cmd @ [ Config.avrdude ] in
-    let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; !default_config.avr ] in
+    let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; !device_config.avr ] in
     let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
-    let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; !default_config.mmcu ] in
+    let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; !device_config.mmcu ] in
     let _reset_cmd = cmd in
     let _reset_cmd = _reset_cmd @ [ "-b" ; "1200" ] in
-    let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int !default_config.baud ] in
+    let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int !device_config.baud ] in
     let cmd = cmd @ avrdudeopts @ [ "-v"; "-D"; "-U"; "flash:w:" ^ path ^ ":i" ] in
     (* run reset_cmd; *)
     run cmd

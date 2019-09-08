@@ -162,7 +162,8 @@ endef
 define clean
         @\$(MAKE) --no-print-directory -C \$1 clean > /dev/null
 endef
-" > etc/Makefile.conf
+
+TARGET_MODULES := " > etc/Makefile.conf
 
 ################################################################################
 
@@ -185,7 +186,7 @@ let version     = \"$VERSION\"
 ################################################################################
 
 # Refresh targets files
-rm -f "src/omicrob/device_config.ml"
+cp "targets/device_config.ml" "src/omicrob/device_config.ml"
 rm -rf "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/byterun/avr/"
 
 function target_avr () {
@@ -194,9 +195,12 @@ function target_avr () {
     check_command "avrdude"
     check_directory "targets/avrs"
 
+    cat "targets/avrs/device_config.ml" >> "src/omicrob/device_config.ml"
+
     cp -f "targets/avrs/avr.mli" "src/stdlib/avr.mli"
     cp -f "targets/avrs/avr.ml" "src/stdlib/avr.ml"
-    cp -f "targets/avrs/device_config.ml" "src/omicrob/device_config.ml"
+    echo -n "avr liquidCrystal" >> etc/Makefile.conf
+
     mkdir -p "src/byterun/avr"
     cp -f "targets/avrs/arch-specific.c" "src/byterun/avr/"
     cp -f "targets/avrs/arch-specific.h" "src/byterun/avr/"
@@ -206,6 +210,9 @@ function target_avr () {
         cp -f "targets/avrs/$f/avrlib.c" "src/byterun/avr/$f/"
     done
 }
+
+################################################################################
+## Choose your targets
 
 target_avr
 
