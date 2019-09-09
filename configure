@@ -162,8 +162,7 @@ endef
 define clean
         @\$(MAKE) --no-print-directory -C \$1 clean > /dev/null
 endef
-
-TARGET_MODULES := " > etc/Makefile.conf
+" > etc/Makefile.conf
 
 ################################################################################
 
@@ -197,9 +196,9 @@ function target_avr () {
 
     cat "targets/avrs/device_config.ml" >> "src/omicrob/device_config.ml"
 
-    cp -f "targets/avrs/avr.mli" "src/stdlib/avr.mli"
-    cp -f "targets/avrs/avr.ml" "src/stdlib/avr.ml"
-    echo -n "avr liquidCrystal" >> etc/Makefile.conf
+    # cp -f "targets/avrs/avr.mli" "src/stdlib/avr.mli"
+    # cp -f "targets/avrs/avr.ml" "src/stdlib/avr.ml"
+    # echo -n "avr liquidCrystal" >> etc/Makefile.conf
 
     mkdir -p "src/byterun/avr"
     cp -f "targets/avrs/arch-specific.c" "src/byterun/avr/"

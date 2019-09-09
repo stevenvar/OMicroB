@@ -712,7 +712,6 @@ external tracei : int -> unit = "caml_debug_tracei"
 
 module ArrayLabels    = Stdlib__arrayLabels
 module Array          = Stdlib__array
-module Avr            = Stdlib__avr
 module Buffer         = Stdlib__buffer
 module BytesLabels    = Stdlib__bytesLabels
 module Bytes          = Stdlib__bytes
@@ -723,7 +722,6 @@ module Gc             = Stdlib__gc
 module Hashtbl        = Stdlib__hashtbl
 module Int32          = Stdlib__int32
 module Int64          = Stdlib__int64
-module LiquidCrystal  = Stdlib__liquidCrystal
 module ListLabels     = Stdlib__listLabels
 module List           = Stdlib__list
 module Map            = Stdlib__map
