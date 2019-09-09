@@ -594,8 +594,14 @@ let () =
     let cmd = cmd @ match !device_config.typeD with
       | AVR -> [ "-I"; Filename.concat libdir "archs/avrs" ;
                  Filename.concat libdir "archs/avrs/avr.cma";
+                 "-I"; Filename.concat libdir
+                   (Filename.concat "archs/avrs" !device_config.folder);
+                 Filename.concat libdir
+                   (Filename.concat "archs/avrs"
+                      (Filename.concat !device_config.folder
+                         ((String.uncapitalize_ascii !device_config.pins_module)^".cmo")));
                  "-open"; Printf.sprintf "Avr";
-                 "-open"; Printf.sprintf "Avr.%s" !device_config.pins_module ]
+                 "-open"; Printf.sprintf "%s" !device_config.pins_module ]
       | NONE -> []
     in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
@@ -659,8 +665,6 @@ let () =
     let cmd = if no_flash_globals then cmd @ [ "-no-flash-globals" ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun path -> [ "-i"; path ]) input_cs) in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
-    run cmd;
-
     run cmd
 
   ) else (

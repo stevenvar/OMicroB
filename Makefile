@@ -104,5 +104,6 @@ clean:
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
+	$(call clean, targets/avrs)
 
 .PHONY: all config install uninstall tests clean
