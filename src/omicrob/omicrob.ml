@@ -592,12 +592,12 @@ let () =
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ match !device_config.typeD with
-      | AVR -> [ "-I"; Filename.concat libdir "archs/avrs" ;
-                 Filename.concat libdir "archs/avrs/avr.cma";
+      | AVR -> [ "-I"; Filename.concat libdir "targets/avr" ;
+                 Filename.concat libdir "targets/avr/avr.cma";
                  "-I"; Filename.concat libdir
-                   (Filename.concat "archs/avrs" !device_config.folder);
+                   (Filename.concat "targets/avr" !device_config.folder);
                  Filename.concat libdir
-                   (Filename.concat "archs/avrs"
+                   (Filename.concat "targets/avr"
                       (Filename.concat !device_config.folder
                          ((String.uncapitalize_ascii !device_config.pins_module)^".cmo")));
                  "-open"; Printf.sprintf "Avr";

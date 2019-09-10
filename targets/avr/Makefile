@@ -1,10 +1,10 @@
 include ../../etc/Makefile.conf
 
-LIBAVRS := $(LIB)/archs/avrs
+LIBAVR := $(LIB)/targets/avr
 
 FOLDERS := arduino_uno arduino_mega_2560 arduboy
 
-LIB_FOLDERS := $(foreach f,$(FOLDERS),$(LIBAVRS)/$(f))
+LIB_FOLDERS := $(foreach f,$(FOLDERS),$(LIBAVR)/$(f))
 
 MODULES := avr liquidCrystal
 SUBMODULES := arduino_uno/arduinoUnoPins \
@@ -21,20 +21,20 @@ SMLIS := $(SUBMODULES:=.mli)
 SCMOS := $(SUBMODULES:=.cmo)
 SCMIS := $(SUBMODULES:=.cmi)
 
-LIB_MLS  := $(foreach ml,$(MLS),$(LIBAVRS)/$(ml)) \
-						$(foreach ml,$(SMLS),$(LIBAVRS)/$(ml))
-LIB_MLIS := $(foreach mli,$(MLIS),$(LIBAVRS)/$(mli)) \
-						$(foreach ml,$(SMLIS),$(LIBAVRS)/$(ml))
-LIB_CMIS := $(foreach cmi,$(CMIS),$(LIBAVRS)/$(cmi)) \
-						$(foreach cmi,$(SCMIS),$(LIBAVRS)/$(cmi))
-LIB_CMOS := $(foreach cmo,$(CMOS),$(LIBAVRS)/$(cmo)) \
-						$(foreach cmo,$(SCMOS),$(LIBAVRS)/$(cmo))
+LIB_MLS  := $(foreach ml,$(MLS),$(LIBAVR)/$(ml)) \
+						$(foreach ml,$(SMLS),$(LIBAVR)/$(ml))
+LIB_MLIS := $(foreach mli,$(MLIS),$(LIBAVR)/$(mli)) \
+						$(foreach ml,$(SMLIS),$(LIBAVR)/$(ml))
+LIB_CMIS := $(foreach cmi,$(CMIS),$(LIBAVR)/$(cmi)) \
+						$(foreach cmi,$(SCMIS),$(LIBAVR)/$(cmi))
+LIB_CMOS := $(foreach cmo,$(CMOS),$(LIBAVR)/$(cmo)) \
+						$(foreach cmo,$(SCMOS),$(LIBAVR)/$(cmo))
 
-TARGETS := $(LIB_FOLDERS) $(LIB_MLS) $(LIB_MLIS) $(LIB_CMIS) $(LIB_CMOS) $(LIBAVRS)/avr.cma
+TARGETS := $(LIB_FOLDERS) $(LIB_MLS) $(LIB_MLIS) $(LIB_CMIS) $(LIB_CMOS) $(LIBAVR)/avr.cma
 
 avrs: $(TARGETS)
 
-$(LIBAVRS)/avr.cma: avr.cmo liquidCrystal.cmo
+$(LIBAVR)/avr.cma: avr.cmo liquidCrystal.cmo
 	$(OCAMLC) -a $^ -o $@
 
 avr.cmi: avr.mli
@@ -58,16 +58,16 @@ $(SCMOS): %.cmo: %.ml
 $(LIB_FOLDERS):
 	mkdir -p $@
 
-$(LIBAVRS)/%.ml: %.ml
+$(LIBAVR)/%.ml: %.ml
 	cp $< $@
 
-$(LIBAVRS)/%.mli: %.mli
+$(LIBAVR)/%.mli: %.mli
 	cp $< $@
 
-$(LIBAVRS)/%.cmi: %.cmi
+$(LIBAVR)/%.cmi: %.cmi
 	cp $< $@
 
-$(LIBAVRS)/%.cmo: %.cmo
+$(LIBAVR)/%.cmo: %.cmo
 	cp $< $@
 
 clean:
