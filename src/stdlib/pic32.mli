@@ -16,6 +16,8 @@ type level = LOW | HIGH
 external pin_mode: pin -> mode -> unit = "caml_pic32_pin_mode" [@@noalloc]
 external digital_write: pin -> level -> unit = "caml_pic32_digital_write" [@@noalloc]
 external digital_read: pin -> level = "caml_pic32_digital_read" [@@noalloc]
+external lchip_digital_write_lled: level -> unit = "caml_lchip_digital_write_lled" [@@noalloc]
+external lchip_digital_write_rled: level -> unit = "caml_lchip_digital_write_rled" [@@noalloc]
 val analog_write: pin -> int -> unit
 val analog_read: pin -> int
 

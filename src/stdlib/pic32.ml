@@ -18,6 +18,8 @@ external pin_mode: pin -> mode -> unit = "caml_pic32_pin_mode" [@@noalloc]
 external digital_write: pin -> level -> unit = "caml_pic32_digital_write" [@@noalloc]
 external digital_read: pin -> level = "caml_pic32_digital_read" [@@noalloc]
 external unsafe_analog_write: pin -> int -> unit = "caml_pic32_analog_write" [@@noalloc]
+external lchip_digital_write_lled: level -> unit = "caml_lchip_digital_write_lled" [@@noalloc]
+external lchip_digital_write_rled: level -> unit = "caml_lchip_digital_write_rled" [@@noalloc]
 
 let analog_write p l =
   if (l < 0 || l >= 1024) then invalid_arg "analog_write: value should be between 0 and 1023";

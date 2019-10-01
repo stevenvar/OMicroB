@@ -81,6 +81,18 @@ value caml_pic32_digital_read(value pin) {
   return Val_int(pic32_digital_read(Int_val(pin)));
 }
 
+// For lchip only
+value caml_lchip_digital_write_lled(value level) {
+  lchip_digital_write_lled(Int_val(level));
+  return Val_unit;
+}
+
+// For lchip only
+value caml_lchip_digital_write_rled(value level) {
+  lchip_digital_write_rled(Int_val(level));
+  return Val_unit;
+}
+
 value caml_pic32_analog_write(value pin, value level) {
   pic32_analog_write(Int_val(pin), Int_val(level));
   return Val_unit;

@@ -2,8 +2,8 @@
 #define OPT_SYSTEM_INTERNAL
 #endif
 
-#include "cores/System_Defs.h"
-#include "cores/Arduino.h"
+#include <xc.h>
+#include <p32xxxx.h>
 
 extern "C" {
 extern void __use_isr_install(void);
@@ -38,51 +38,49 @@ uint8_t get_pin_addr(uint8_t pin) {
 }
 
 void pic32_init() {
-  init();
+  
 }
 
 void pic32_schedule_task() {
-  _scheduleTask();
+  
 }
 
 void pic32_pin_mode(uint8_t pin, uint8_t mode) {
-  pinMode(get_pin_addr(pin), mode);
+  
 }
 
 void pic32_digital_write(uint8_t pin, uint8_t level) {
-  digitalWrite(get_pin_addr(pin), level);
+  
 }
 
 uint8_t pic32_digital_read(uint8_t pin) {
-  return digitalRead(get_pin_addr(pin));
-}
+  return 0;
+  }
 
 void pic32_analog_write(uint8_t pin, int level) {
-  analogWrite(get_pin_addr(pin), level);
+  
 }
 
 int pic32_analog_read(uint8_t pin) {
-  return analogRead(get_pin_addr(pin));
-}
+    return 0;
+    }
 
 void pic32_delay(int ms) {
-  delay(ms);
+  
 }
 
 int pic32_millis() {
-  return millis();
+ return 0; 
 }
 
 void pic32_serial_init() {
-  Serial.begin(9600);
+  
 }
 
 void pic32_serial_write_char(char c) {
-  Serial.write(c);
+ 
 }
 
 char pic32_serial_read_char() {
-  int incoming = Serial.read();
-  if (incoming == -1) return 0;
-  else return (char)incoming;
+  return ""
 }
