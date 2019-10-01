@@ -52,12 +52,23 @@ let fubarinoMiniConfig: config = {
   pins_module = "FubarinoMiniPins";
 }
 
+let lchipConfig: config = {
+  typeD = PIC32;
+  mmcu  = "PIC32MX795F512L";
+  avr   = "";
+  baud  = 115_200;
+  clock = 48_000_000;
+  device_def = "DEVICE_LCHIP";
+  pins_module = "LchipPins";
+}
+
 (** Choose se correct config according to name *)
 let get_config name = match name with
   | "arduboy" -> arduboyConfig
   | "arduino-mega" -> arduinoMegaConfig
   | "arduino-uno" -> arduinoUnoConfig
   | "fubarino-mini" -> fubarinoMiniConfig
+  | "lchip" -> lchipConfig
   | _ -> invalid_arg "choose_config"
 
 (** Get the names of all configs *)
@@ -66,4 +77,5 @@ let all_config_names () = [
   "arduino-mega";
   "arduino-uno";
   "fubarino-mini";
+  "lchip";
 ]
