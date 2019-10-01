@@ -76,7 +76,8 @@ int pic32_analog_read(uint8_t pin) {
     }
 
 void pic32_delay(int ms) {
-  
+  int i;
+  for (i = 0; i <= 14000000; i++);
 }
 
 int pic32_millis() {
