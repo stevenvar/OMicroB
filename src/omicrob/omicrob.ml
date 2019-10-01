@@ -14,7 +14,7 @@ let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequenc
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 (* let default_pic32_cxx_options = [ "-w"; "-Os"; "-mdebugger"; "-mno-peripheral-libs"; "-nostartfiles" ] *)
-let default_pic32_cxx_options = [ "-w" ]
+let default_xc32_cxx_options = [ "-w" ]
 (* let default_pic32_board_options = [ "-c"; "-g"; "-O2"; "-w"; "-std=gnu++11"; "-DARDUINO_ARCH_PIC32"; "-mno-smart-io"; "-ffunction-sections"; "-fdata-sections"; "-mdebugger"; "-Wcast-align"; "-fno-short-double"; "-ftoplevel-reorder"; "-fno-exceptions" ] *)
 let default_arm_cxx_options = [ "-g"; "-fno-exceptions"; "-fno-unwind-tables"; "-Wall"; "-Wno-array-bounds"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections"; "-mcpu=cortex-m0"; "-mthumb" ]
 
@@ -845,10 +845,10 @@ let () =
     let cmd = cmd @ [ "-o"; (conc_pic32 "Board_Data.o"); (conc_pic32 "Board_Data.c") ] in
     run cmd; *)
 
-    let cmd = [ Config.pic32_cxx  ] @ default_pic32_cxx_options in
+    let cmd = [ Config.xc32_cxx  ] @ default_xc32_cxx_options in
     let cmd = cmd @ [ "-mprocessor=32MX795F512L" ] in
     let cmd = cmd @ [ "-o"; output_path ] in
-    let cmd = cmd @ [ "-T"; (conc_pic32 "ld/32MX795F512-lchip.ld") ] in
+    let cmd = cmd @ [ "-T"; (conc_pic32 "ld/32MX795F512L-lchip.ld") ] in
     run cmd
   )
 
@@ -876,7 +876,7 @@ let () =
 
     available_pic32_hex := Some output_path;
 
-    let cmd = [ Config.pic32_bin2hex  ] in
+    let cmd = [ Config.xc32_bin2hex  ] in
     let cmd = cmd @ [ "-a"; input_path ] in
     run cmd
   )
