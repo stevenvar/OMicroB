@@ -28,6 +28,8 @@ void avr_serial_write(char c);
 void pic32_schedule_task();
 void pic32_pin_mode(uint8_t p, uint8_t m);
 void pic32_digital_write(uint8_t p, uint8_t l);
+void lchip_digital_write_lled(uint8_t l);
+void lchip_digital_write_rled(uint8_t l);
 uint8_t pic32_digital_read(uint8_t p);
 void pic32_analog_write(uint8_t p, int l);
 int pic32_analog_read(uint8_t p);
