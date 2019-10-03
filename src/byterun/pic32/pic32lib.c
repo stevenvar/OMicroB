@@ -55,12 +55,12 @@ void pic32_digital_write(uint8_t pin, uint8_t level) {
 
 void lchip_digital_write_lled(uint8_t level) {
   TRISDbits.TRISD5 = 0;
-  PORTDbits.RD5 = level;
+  LATDbits.LATD5 = level;
 }
 
 void lchip_digital_write_rled(uint8_t level) {
   TRISDbits.TRISD3 = 0;
-  PORTDbits.RD3 = level;
+  LATDbits.LATD3 = level;
 }
 
 uint8_t pic32_digital_read(uint8_t pin) {

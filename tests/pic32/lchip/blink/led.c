@@ -5,8 +5,8 @@
 #define OCAML_STACK_INITIAL_WOSIZE         0
 #define OCAML_RAM_GLOBDATA_NUMBER          0
 #define OCAML_FLASH_GLOBDATA_NUMBER        0
-#define OCAML_BYTECODE_BSIZE              13
-#define OCAML_PRIMITIVE_NUMBER             2
+#define OCAML_BYTECODE_BSIZE              29
+#define OCAML_PRIMITIVE_NUMBER             3
 #define OCAML_VIRTUAL_ARCH                32
 #define OCAML_STARTING_OOID                1
 #define OCAML_NO_FLASH_HEAP                0
@@ -20,8 +20,10 @@
 #define OCAML_BRANCHIF_1B                 1
 #define OCAML_CHECK_SIGNALS               2
 #define OCAML_C_CALL1                     3
-#define OCAML_CONST1                      4
-#define OCAML_STOP                        5
+#define OCAML_CONST0                      4
+#define OCAML_CONST1                      5
+#define OCAML_CONSTINT_2B                 6
+#define OCAML_STOP                        7
 
 value ocaml_stack[OCAML_STACK_WOSIZE];
 value ocaml_ram_heap[OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE];
@@ -98,9 +100,17 @@ PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
   /*  4 */  OCAML_C_CALL1, 0,
   /*  6 */  OCAML_CONST1,
   /*  7 */  OCAML_C_CALL1, 1,
-  /*  9 */  OCAML_CONST1,
-  /* 10 */  OCAML_BRANCHIF_1B, (opcode_t) -8,
-  /* 12 */  OCAML_STOP
+  /*  9 */  OCAML_CONSTINT_2B, 3, 232,
+  /* 12 */  OCAML_C_CALL1, 2,
+  /* 14 */  OCAML_CONST0,
+  /* 15 */  OCAML_C_CALL1, 0,
+  /* 17 */  OCAML_CONST0,
+  /* 18 */  OCAML_C_CALL1, 1,
+  /* 20 */  OCAML_CONSTINT_2B, 3, 232,
+  /* 23 */  OCAML_C_CALL1, 2,
+  /* 25 */  OCAML_CONST1,
+  /* 26 */  OCAML_BRANCHIF_1B, (opcode_t) -24,
+  /* 28 */  OCAML_STOP
 };
 
 #include </home/adilla/Documents/VmMic/Tools/OMicroBPIC32/src/byterun/vm/runtime.c>
@@ -108,4 +118,5 @@ PROGMEM opcode_t const ocaml_bytecode[OCAML_BYTECODE_BSIZE] = {
 PROGMEM void * const ocaml_primitives[OCAML_PRIMITIVE_NUMBER] = {
   /*  0 */  (void *) &caml_lchip_digital_write_rled,
   /*  1 */  (void *) &caml_lchip_digital_write_lled,
+  /*  2 */  (void *) &caml_pic32_delay,
 };
