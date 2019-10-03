@@ -100,7 +100,7 @@ external millis : unit -> int = "caml_pic32_millis" [@@noalloc]
 
 
 
-module FubarinoMiniPins: struct
+module FubarinoMiniPins = struct
   type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
            | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
            | PIN15 | PIN16 | PIN17 | PIN18 | PIN19 | PIN20 | PIN21
@@ -180,7 +180,6 @@ module FubarinoMiniPins: struct
     | PIN32 -> LATB
 
 
-  
   let tris_of_pin = function
     | PIN0 -> TRISB
     | PIN1 -> TRISA
@@ -216,13 +215,177 @@ module FubarinoMiniPins: struct
     | PIN31 -> TRISB
     | PIN32 -> TRISB
 
+  let bit_of_pin = function
+    | PIN0 -> B13
+    | PIN1 -> B10
+    | PIN2 -> B7
+    | PIN3 -> B14
+    | PIN4 -> B15
+    | PIN5 -> B0
+    | PIN6 -> B1
+    | PIN7 -> B0
+    | PIN8 -> B1
+    | PIN9 -> B2
+    | PIN10 -> B3
+    | PIN11 -> B0
+    | PIN12 -> B1
+    | PIN13 -> B2
+    | PIN14 -> B2
+    | PIN15 -> B3
+    | PIN16 -> B8
+    | PIN17 -> B4
+    | PIN18 -> B4
+    | PIN19 -> B9
+    | PIN20 -> B3
+    | PIN21 -> B4
+    | PIN22 -> B5
+    | PIN23 -> B5
+    | PIN24 -> B7
+    | PIN25 -> B8
+    | PIN26 -> B9
+    | PIN27 -> B6
+    | PIN28 -> B7
+    | PIN29 -> B8
+    | PIN30 -> B9
+    | PIN31 -> B10
+    | PIN32 -> B11
 
-  val bit_of_pin: pin -> bit
-  val pin_mode: pin -> mode -> unit
-  val digital_write: pin -> level -> unit
-  val digital_read: pin -> level
-  module MCUConnection: Circuits.MCUConnection
-    with type pin = pin
-    with type mode = mode
-    with type level = level
+  let pin_mode p m =
+    let tris = tris_of_pin p in 
+    let bit = bit_of_pin p in
+    match m with
+      | OUTPUT -> clear_bit tris bit
+      | INPUT -> set_bit tris bit
+
+  let digital_write p l = 
+    let lat = lat_of_pin p in 
+    let bit = bit_of_pin p in
+    match l with
+      | HIGH -> set_bit lat bit
+      | LOW -> clear_bit lat bit
+
+  let digital_read p =
+    let port = port_of_pin p in 
+    let bit = bit_of_pin p in 
+    match read_bit port bit with
+    | true -> HIGH
+    | false -> LOW
+
+  module MCUConnection = struct
+    type pin = _pin
+    type mode = _mode 
+    type level = _level
+    let high = HIGH
+    let low = LOW
+    let input_mode = INPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let delay = delay
+    let millis = millis
+  end
+end
+
+
+
+module LchipPins = struct
+    type pin = PIN1 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7 | PIN8 | PIN9 | PIN10 | PIN11
+           | PIN12 | PIN14 | PIN17 | PIN18 | PIN19 | PIN20 | PIN21 | PIN22 | PIN23 
+           | PIN24 | PIN25 | PIN26 | PIN27 | PIN28 | PIN29 | PIN32 | PIN33 | PIN34
+           | PIN35 | PIN38 | PIN39 | PIN40 | PIN41 | PIN42 | PIN43 | PIN44 | PIN47
+           | PIN48 | PIN49 | PIN50 | PIN51 | PIN52 | PIN53 | PIN56 | PIN57 | PIN58
+           | PIN59 | PIN60 | PIN61 | PIN63 | PIN64 | PIN66 | PIN67 | PIN68 | PIN69
+           | PIN70 | PIN71 | PIN72 | PIN73 | PIN74 | PIN76 | PIN77 | PIN78 | PIN79
+           | PIN80 | PIN81 | PIN82 | PIN83 | PIN84 | PIN87 | PIN88 | PIN89 | PIN90
+           | PIN91 | PIN92 | PIN93 | PIN94 | PIN95 | PIN96 | PIN97 | PIN98 | PIN99
+           | PIN100
+
+    type _pin = pin
+
+    let port_of_pin = function
+      | PIN1 -> PORTG
+      | PIN3 -> PORTE
+      | PIN4 -> PORTE
+      | PIN5 -> PORTE
+      | PIN6 -> PORTC
+      | PIN7 -> PORTC
+      | PIN8 -> PORTC
+      | PIN9 -> PORTC
+      | PIN10 -> PORTC
+      | PIN11 -> PORTC
+      | PIN12 -> PORTC
+      | PIN14 -> PORTC
+      | PIN17 -> PORTA
+      | PIN18 -> PORTE
+      | PIN19 -> PORTE
+      | PIN20 -> PORTB
+      | PIN21 -> PORTB
+      | PIN22 -> PORTB
+      | PIN23 -> PORTB
+      | PIN24 -> PORTB
+      | PIN25 -> PORTB
+      | PIN26 -> PORTB
+      | PIN27 -> PORTB
+      | PIN28 -> PORTA
+      | PIN29 -> PORTA
+      | PIN32 -> PORTB
+      | PIN33 -> PORTB
+      | PIN34 -> PORTB
+      | PIN35 -> PORTB
+      | PIN38 -> PORTA
+      | PIN39 -> PORTF
+      | PIN40 -> PORTF
+      | PIN41 -> PORTB
+      | PIN42 -> PORTB
+      | PIN43 -> PORTB
+      | PIN44 -> PORTB
+      | PIN47 -> PORTD
+      | PIN48 -> PORTD
+      | PIN49 -> PORTF
+      | PIN50 -> PORTF
+      | PIN51 -> PORTF
+      | PIN52 -> PORTF
+      | PIN53 -> PORTF
+      | PIN56 -> PORTG
+      | PIN57 -> PORTG
+      | PIN58 -> PORTA
+      | PIN59 -> PORTA
+      | PIN60 -> PORTA
+      | PIN61 -> PORTA
+      | PIN63 -> PORTC
+      | PIN64 -> PORTC
+      | PIN66 -> PORTA
+      | PIN67 -> PORTA
+      | PIN68 -> PORTD
+      | PIN69 -> PORTD
+      | PIN70 -> PORTD
+      | PIN71 -> PORTD
+      | PIN72 -> PORTD
+      | PIN73 -> PORTC
+      | PIN74 -> PORTC
+      | PIN76 -> PORTD
+      | PIN77 -> PORTD
+      | PIN78 -> PORTD
+      | PIN79 -> PORTD
+      | PIN80 -> PORTD
+      | PIN81 -> PORTD
+      | PIN82 -> PORTD
+      | PIN83 -> PORTD
+      | PIN84 -> PORTD
+      | PIN87 -> PORTF
+      | PIN88 -> PORTF
+      | PIN89 -> PORTG
+      | PIN90 -> PORTC
+      | PIN91 -> PORTA
+      | PIN92 -> PORTA
+      | PIN93 -> PORTE
+      | PIN94 -> PORTE
+      | PIN95 -> PORTG
+      | PIN96 -> PORTG
+      | PIN97 -> PORTG
+      | PIN98 -> PORTE
+      | PIN99 -> PORTE
+      | PIN100 -> PORTE
+
+
 end
