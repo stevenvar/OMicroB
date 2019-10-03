@@ -614,7 +614,7 @@ module LchipPins = struct
       | PIN68 -> B8
       | PIN69 -> B9
       | PIN70 -> B10
-      | PIN71 -> B????
+      | PIN71 -> B11
       | PIN72 -> B0
       | PIN73 -> B13
       | PIN74 -> B14
@@ -641,4 +641,39 @@ module LchipPins = struct
       | PIN98 -> B2
       | PIN99 -> B3
       | PIN100 -> B4
+
+let pin_mode p m =
+    let tris = tris_of_pin p in 
+    let bit = bit_of_pin p in
+    match m with
+      | OUTPUT -> clear_bit tris bit
+      | INPUT -> set_bit tris bit
+
+  let digital_write p l = 
+    let lat = lat_of_pin p in 
+    let bit = bit_of_pin p in
+    match l with
+      | HIGH -> set_bit lat bit
+      | LOW -> clear_bit lat bit
+
+  let digital_read p =
+    let port = port_of_pin p in 
+    let bit = bit_of_pin p in 
+    match read_bit port bit with
+    | true -> HIGH
+    | false -> LOW
+
+  module MCUConnection = struct
+    type pin = _pin
+    type mode = _mode 
+    type level = _level
+    let high = HIGH
+    let low = LOW
+    let input_mode = INPUT
+    let output_mode = OUTPUT
+    let digital_read = digital_read
+    let digital_write = digital_write
+    let delay = delay
+    let millis = millis
+  end
 end
