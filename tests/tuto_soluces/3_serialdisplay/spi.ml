@@ -3,20 +3,20 @@ open Avr
 (* Initialise SPI connection *)
 let begin_spi ~ss ~sck ~mosi =
   pin_mode ss OUTPUT;
-  set_bit SPCR B4;
-  set_bit SPCR B6;
-  set_bit SPCR B7;
-  clear_bit SPCR B7;
+  set_bit SPCR MSTR;
+  set_bit SPCR SPE;
+  set_bit SPCR SPIE;
+  clear_bit SPCR SPIE;
   pin_mode sck OUTPUT;
   pin_mode mosi OUTPUT
 
 (* Close SPI connection *)
 let end_spi () =
-  clear_bit SPCR B6
+  clear_bit SPCR SPE
 
 (* Emit data through the SPI connection *)
 let transfer data =
   write_register SPDR data;
-  while (read_bit SPSR B7) = false do
+  while (read_bit SPSR SPIF) = false do
     ()
   done

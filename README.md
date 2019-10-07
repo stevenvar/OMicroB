@@ -2,20 +2,21 @@
 
 OMicroB is an OCaml virtual machine dedicated at running OCaml programs on devices with very limited resources such as AVR Atmega32u4 microcontrollers (2.5 ko of RAM).
 
-This tools, steming from the works of OCaPIC (https://github.com/bvaugon/ocapic) is seen as a generic virtual machine approach, which can be ported on various architectures.
+This tools, steming from the works of OCaPIC (https://github.com/bvaugon/ocapic) consists of a generic virtual machine, which can be ported on various architectures.
 
 OMicroB performs multiple static analysis passes in order to reduce the generated final executable.
 
 ## Published version
 
-An article describing our generic virtual machine approach has been published on ERTS 2018 :
+An article describing our generic virtual machine approach has been published in ERTS 2018 :
 
 [A Generic Virtual Machine Approach for Programming Microcontrollers: the OMicroB Project (S. Varoumas, B. Vaugon, E. Chailloux)](http://hal.upmc.fr/hal-01705825/document)
 
 
 ## Requirements
 
-- OPAM + OCaml (>= 4.03)
+- OPAM2 + OCaml (>= 4.07)
+  (OCaml versions prior to 4.07 are not supported at the moment because of changes in the bytecode instructions and in the structure of the standard library of the language since v. 4.07)
 - obytelib (on OPAM)
 - ocamlclean (on OPAM)
 - ocamlbuild (on OPAM)

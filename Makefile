@@ -4,8 +4,8 @@ all: config
 	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
 	$(call compile, src/h15ppx)
-	$(call compile, src/circuitppx)
 	$(call compile, src/simulators/lcd)
+	$(call compile, src/simulators/lcd_16x2)
 	$(call compile, src/simulators/dip)
 	$(call compile, src/simulators/circuit)
 	$(call compile, src/byterun)
@@ -29,7 +29,6 @@ install: all
 	mkdir -p "$(MAN3DIR)"
 	cp bin/bc2c "$(BINDIR)/bc2c"
 	cp bin/h15ppx "$(BINDIR)/h15ppx"
-	cp bin/circuitppx "$(BINDIR)/circuitppx"
 	cp bin/omicrob "$(BINDIR)/omicrob"
 	cp bin/*_simulator "$(LIBEXECDIR)/"
 	cp doc/bc2c.1 "$(MAN1DIR)/bc2c.1"
@@ -40,6 +39,7 @@ install: all
 	cp lib/*.mli "$(LIBDIR)/"
 	cp lib/*.cmo "$(LIBDIR)/"
 	cp lib/*.cmi "$(LIBDIR)/"
+	cp lib/lcd_cgrom.txt "$(LIBDIR)/"
 	cp -a lib/extra "$(LIBDIR)/extra"
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
@@ -59,6 +59,7 @@ uninstall:
 	-rm -f "$(LIBDIR)/"*.mli
 	-rm -f "$(LIBDIR)/"*.cmi
 	-rm -f "$(LIBDIR)/"*.cmo
+	-rm -f "$(LIBDIR)/lcd_cgrom.txt"
 	-rm -rf "$(LIBDIR)/extra"
 	-rm -f "$(LIBEXECDIR)/"*_simulator
 	-rm -f "$(INCLUDEDIR)/vm/"*
@@ -95,6 +96,7 @@ clean:
 	$(call clean, src/h15ppx)
 	$(call clean, src/byterun)
 	$(call clean, src/simulators/dip)
+	$(call clean, src/simulators/lcd_16x2)
 	$(call clean, src/simulators/lcd)
 	$(call clean, src/simulators/circuit)
 	$(call clean, src/omicrob)

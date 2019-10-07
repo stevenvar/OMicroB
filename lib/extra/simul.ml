@@ -7,7 +7,6 @@ let int_of_hex1 c =
   | 'a' .. 'f' -> int_of_char c - int_of_char 'a' + 10
   | 'A' .. 'F' -> int_of_char c - int_of_char 'A' + 10
   | _ -> invalid_arg "Simul.int_of_hex1"
-
 let int_of_hex2 c1 c0 =
   (int_of_hex1 c1 lsl 4) lor int_of_hex1 c0
 ;;
@@ -18,17 +17,25 @@ let int_of_hex3 c2 c1 c0 =
 
 (***)
 
-type port = PORTB | PORTC | PORTD | PORTE | PORTF | SPDR
+type port = PORTA | PORTB | PORTC | PORTD | PORTE | PORTF | SPDR | PORTG | PORTH | PORTI | PORTJ | PORTK | PORTL
 
 let string_of_port port =
   match port with
-    | PORTB -> "PORTB" | PORTC -> "PORTC"
-    | PORTD -> "PORTD" | PORTE -> "PORTE" | PORTF -> "PORTF"
-    | SPDR -> "SPDR"
+  | PORTA -> "PORTA"
+  | PORTB -> "PORTB" | PORTC -> "PORTC"
+  | PORTD -> "PORTD" | PORTE -> "PORTE" | PORTF -> "PORTF"
+  | PORTG -> "PORTG"
+  | PORTH -> "PORTH"
+  | PORTI -> "PORTI"
+  | PORTJ -> "PORTJ"
+  | PORTK -> "PORTK"
+  | PORTL -> "PORTL"
+  | SPDR -> "SPDR"
 ;;
 
 let port_of_string s =
   match String.uppercase_ascii s with
+  | "PORTA" -> PORTA
   | "PORTB" -> PORTB | "PORTC" -> PORTC
   | "PORTD" -> PORTD | "PORTE" -> PORTE | "PORTF" -> PORTF
   | "SPDR" -> SPDR
@@ -37,7 +44,14 @@ let port_of_string s =
 
 let char_of_port port =
   match port with
-    | PORTB -> 'B' | PORTC -> 'C' | PORTD -> 'D' | PORTE -> 'E' | PORTF -> 'F' | SPDR -> 'G'
+  | PORTA -> 'A'
+  | PORTB -> 'B' | PORTC -> 'C' | PORTD -> 'D' | PORTE -> 'E' | PORTF -> 'F' | SPDR -> 'G'
+  | PORTG -> 'G'
+  | PORTH -> 'H'
+  | PORTI -> 'I'
+  | PORTJ -> 'J'
+  | PORTK -> 'K'
+  | PORTL -> 'L'
 ;;
 
 let port_of_char c =
@@ -45,12 +59,29 @@ let port_of_char c =
     | 'B' | 'b' -> PORTB | 'C' | 'c' -> PORTC
     | 'D' | 'd' -> PORTD | 'E' | 'e' -> PORTE | 'F' | 'f' -> PORTF
     | 'G' | 'g' -> SPDR
+    | 'H' | 'h' -> PORTH
+    | 'I' | 'i' -> PORTI
+    | 'J' | 'j' -> PORTJ
+    | 'K' | 'k' -> PORTK
+    | 'L' | 'l' -> PORTL
     | _ -> invalid_arg "Simul.port_of_char"
 ;;
 
 let index_of_port port =
   match port with
-    |  PORTB -> 1 | PORTC -> 2 | PORTD -> 3 | PORTE -> 4 | PORTF -> 5 | SPDR -> 6
+  | PORTA -> 0
+  | PORTB -> 1
+  | PORTC -> 2
+  | PORTD -> 3
+  | PORTE -> 4
+  | PORTF -> 5
+  | SPDR -> 6
+  | PORTG -> 7
+  | PORTH -> 8
+  | PORTI -> 9
+  | PORTJ -> 10
+  | PORTK -> 11
+  | PORTL -> 12
 ;;
 
 let port_of_index ind =
@@ -62,16 +93,26 @@ let port_of_index ind =
 (***)
 
 type pin =
+  | RA0 | RA1 | RA2 | RA3 | RA4 | RA5 | RA6 | RA7
   | RB0 | RB1 | RB2 | RB3 | RB4 | RB5 | RB6 | RB7
   | RC0 | RC1 | RC2 | RC3 | RC4 | RC5 | RC6 | RC7
   | RD0 | RD1 | RD2 | RD3 | RD4 | RD5 | RD6 | RD7
   | RE0 | RE1 | RE2 | RE3 | RE4 | RE5 | RE6 | RE7
   | RF0 | RF1 | RF2 | RF3 | RF4 | RF5 | RF6 | RF7
   | SPDR0 | SPDR1 | SPDR2 | SPDR3 | SPDR4 | SPDR5 | SPDR6 | SPDR7
+  | RG0 | RG1 | RG2 | RG3 | RG4 | RG5 | RG6 | RG7
+  | RH0 | RH1 | RH2 | RH3 | RH4 | RH5 | RH6 | RH7
+  | RI0 | RI1 | RI2 | RI3 | RI4 | RI5 | RI6 | RI7
+  | RJ0 | RJ1 | RJ2 | RJ3 | RJ4 | RJ5 | RJ6 | RJ7
+  | RK0 | RK1 | RK2 | RK3 | RK4 | RK5 | RK6 | RK7
+  | RL0 | RL1 | RL2 | RL3 | RL4 | RL5 | RL6 | RL7
+
 ;;
 
 let string_of_pin pin =
   match pin with
+    | RA0 -> "RA0" | RA1 -> "RA1" | RA2 -> "RA2" | RA3 -> "RA3"
+    | RA4 -> "RA4" | RA5 -> "RA5" | RA6 -> "RA6" | RA7 -> "RA7"
     | RB0 -> "RB0" | RB1 -> "RB1" | RB2 -> "RB2" | RB3 -> "RB3"
     | RB4 -> "RB4" | RB5 -> "RB5" | RB6 -> "RB6" | RB7 -> "RB7"
     | RC0 -> "RC0" | RC1 -> "RC1" | RC2 -> "RC2" | RC3 -> "RC3"
@@ -82,6 +123,32 @@ let string_of_pin pin =
     | RE4 -> "RE4" | RE5 -> "RE5" | RE6 -> "RE6" | RE7 -> "RE7"
     | RF0 -> "RF0" | RF1 -> "RF1" | RF2 -> "RF2" | RF3 -> "RF3"
     | RF4 -> "RF4" | RF5 -> "RF5" | RF6 -> "RF6" | RF7 -> "RF7"
+
+    | RG0 -> "RG0" | RG1 -> "RG1" | RG2 -> "RG2" | RG3 -> "RG3"
+    | RG4 -> "RG4" | RG5 -> "RG5" | RG6 -> "RG6" | RG7 -> "RG7"
+
+
+    | RH0 -> "RH0" | RH1 -> "RH1" | RH2 -> "RH2" | RH3 -> "RH3"
+    | RH4 -> "RH4" | RH5 -> "RH5" | RH6 -> "RH6" | RH7 -> "RH7"
+
+
+    | RI0 -> "RI0" | RI1 -> "RI1" | RI2 -> "RI2" | RI3 -> "RI3"
+    | RI4 -> "RI4" | RI5 -> "RI5" | RI6 -> "RI6" | RI7 -> "RI7"
+
+
+    | RJ0 -> "RJ0" | RJ1 -> "RJ1" | RJ2 -> "RJ2" | RJ3 -> "RJ3"
+    | RJ4 -> "RJ4" | RJ5 -> "RJ5" | RJ6 -> "RJ6" | RJ7 -> "RF7"
+
+
+    | RK0 -> "RK0" | RK1 -> "RK1" | RK2 -> "RK2" | RK3 -> "RK3"
+    | RK4 -> "RK4" | RK5 -> "RK5" | RK6 -> "RK6" | RK7 -> "RK7"
+
+
+    | RL0 -> "RL0" | RL1 -> "RL1" | RL2 -> "RL2" | RL3 -> "RL3"
+    | RL4 -> "RL4" | RL5 -> "RL5" | RL6 -> "RL6" | RL7 -> "RL7"
+
+
+
     | SPDR0 -> "SPDR0"
     | SPDR1 -> "SPDR1"
     | SPDR2 -> "SPDR2"
@@ -94,31 +161,43 @@ let string_of_pin pin =
 
 let port_of_pin pin =
   match pin with
-    | RB0 | RB1 | RB2 | RB3 | RB4 | RB5 | RB6 | RB7 -> PORTB
-    | RC0 | RC1 | RC2 | RC3 | RC4 | RC5 | RC6 | RC7 -> PORTC
-    | RD0 | RD1 | RD2 | RD3 | RD4 | RD5 | RD6 | RD7 -> PORTD
-    | RE0 | RE1 | RE2 | RE3 | RE4 | RE5 | RE6 | RE7 -> PORTE
-    | RF0 | RF1 | RF2 | RF3 | RF4 | RF5 | RF6 | RF7 -> PORTF
-    | SPDR0 | SPDR1 | SPDR2 | SPDR3 | SPDR4 | SPDR5 | SPDR6 | SPDR7 -> SPDR
+  | RA0 | RA1 | RA2 | RA3 | RA4 | RA5 | RA6 | RA7 -> PORTA
+  | RB0 | RB1 | RB2 | RB3 | RB4 | RB5 | RB6 | RB7 -> PORTB
+  | RC0 | RC1 | RC2 | RC3 | RC4 | RC5 | RC6 | RC7 -> PORTC
+  | RD0 | RD1 | RD2 | RD3 | RD4 | RD5 | RD6 | RD7 -> PORTD
+  | RE0 | RE1 | RE2 | RE3 | RE4 | RE5 | RE6 | RE7 -> PORTE
+  | RF0 | RF1 | RF2 | RF3 | RF4 | RF5 | RF6 | RF7 -> PORTF
+  | RG0 | RG1 | RG2 | RG3 | RG4 | RG5 | RG6 | RG7 -> PORTG
+  | RH0 | RH1 | RH2 | RH3 | RH4 | RH5 | RH6 | RH7 -> PORTH
+  | RI0 | RI1 | RI2 | RI3 | RI4 | RI5 | RI6 | RI7 -> PORTI
+  | RJ0 | RJ1 | RJ2 | RJ3 | RJ4 | RJ5 | RJ6 | RJ7 -> PORTJ
+  | RK0 | RK1 | RK2 | RK3 | RK4 | RK5 | RK6 | RK7 -> PORTK
+  | RL0 | RL1 | RL2 | RL3 | RL4 | RL5 | RL6 | RL7 -> PORTL
+  | SPDR0 | SPDR1 | SPDR2 | SPDR3 | SPDR4 | SPDR5 | SPDR6 | SPDR7 -> SPDR
 
 ;;
 
 let index_of_pin pin =
   match pin with
-     RB0 | RC0 | RD0 | RE0 | RF0 | SPDR0 -> 0
-    | RB1 | RC1 | RD1 | RE1 | RF1 | SPDR1 -> 1
-    | RB2 | RC2 | RD2 | RE2 | RF2 | SPDR2 -> 2
-    | RB3 | RC3 | RD3 | RE3 | RF3 | SPDR3 -> 3
-    | RB4 | RC4 | RD4 | RE4 | RF4 | SPDR4 -> 4
-    | RB5 | RC5 | RD5 | RE5 | RF5 | SPDR5 -> 5
-    | RB6 | RC6 | RD6 | RE6 | RF6 | SPDR6 -> 6
-    | RB7 | RC7 | RD7 | RE7 | RF7 | SPDR7 -> 7
+  | RA0 | RB0 | RC0 | RD0 | RE0 | RF0 | SPDR0 | RG0 | RH0 | RI0 | RJ0 | RK0 | RL0 -> 0
+  | RA1 | RB1 | RC1 | RD1 | RE1 | RF1 | SPDR1 | RG1 | RH1 | RI1 | RJ1 | RK1 | RL1 -> 1
+  | RA2 | RB2 | RC2 | RD2 | RE2 | RF2 | SPDR2 | RG2 | RH2 | RI2 | RJ2 | RK2 | RL2 -> 2
+  | RA3 | RB3 | RC3 | RD3 | RE3 | RF3 | SPDR3 | RG3 | RH3 | RI3 | RJ3 | RK3 | RL3 -> 3
+  | RA4 | RB4 | RC4 | RD4 | RE4 | RF4 | SPDR4 | RG4 | RH4 | RI4 | RJ4 | RK4 | RL4 -> 4
+  | RA5 | RB5 | RC5 | RD5 | RE5 | RF5 | SPDR5 | RG5 | RH5 | RI5 | RJ5 | RK5 | RL5 -> 5
+  | RA6 | RB6 | RC6 | RD6 | RE6 | RF6 | SPDR6 | RG6 | RH6 | RI6 | RJ6 | RK6 | RL6 -> 6
+  | RA7 | RB7 | RC7 | RD7 | RE7 | RF7 | SPDR7 | RG7 | RH7 | RI7 | RJ7 | RK7 | RL7 -> 7
 
-;;
+
 
 let pin_of_port_index port index =
   let error () = invalid_arg "Simul.pin_of_port_index" in
   match port with
+    | PORTA ->
+      begin match index with
+        | 0 -> RA0 | 1 -> RA1 | 2 -> RA2 | 3 -> RA3 | 4 -> RA4 | 5 -> RA5
+        | 6 -> RA6 | 7 -> RA7 | _ -> error ()
+      end
     | PORTB ->
       begin match index with
         | 0 -> RB0 | 1 -> RB1 | 2 -> RB2 | 3 -> RB3 | 4 -> RB4 | 5 -> RB5
@@ -144,6 +223,36 @@ let pin_of_port_index port index =
         | 0 -> RF0 | 1 -> RF1 | 2 -> RF2 | 3 -> RF3 | 4 -> RF4 | 5 -> RF5
         | 6 -> RF6 | 7 -> RF7 | _ -> error ()
       end
+        | PORTG ->
+      begin match index with
+        | 0 -> RG0 | 1 -> RG1 | 2 -> RG2 | 3 -> RG3 | 4 -> RG4 | 5 -> RG5
+        | 6 -> RG6 | 7 -> RG7 | _ -> error ()
+      end
+        | PORTH ->
+      begin match index with
+        | 0 -> RH0 | 1 -> RH1 | 2 -> RH2 | 3 -> RH3 | 4 -> RH4 | 5 -> RH5
+        | 6 -> RH6 | 7 -> RH7 | _ -> error ()
+      end
+        | PORTI ->
+      begin match index with
+        | 0 -> RI0 | 1 -> RI1 | 2 -> RI2 | 3 -> RI3 | 4 -> RI4 | 5 -> RI5
+        | 6 -> RI6 | 7 -> RI7 | _ -> error ()
+      end
+        | PORTJ ->
+      begin match index with
+        | 0 -> RJ0 | 1 -> RJ1 | 2 -> RJ2 | 3 -> RJ3 | 4 -> RJ4 | 5 -> RJ5
+        | 6 -> RJ6 | 7 -> RJ7 | _ -> error ()
+      end
+        | PORTK ->
+      begin match index with
+        | 0 -> RK0 | 1 -> RK1 | 2 -> RK2 | 3 -> RK3 | 4 -> RK4 | 5 -> RK5
+        | 6 -> RK6 | 7 -> RK7 | _ -> error ()
+      end
+        | PORTL ->
+      begin match index with
+        | 0 -> RL0 | 1 -> RL1 | 2 -> RL2 | 3 -> RL3 | 4 -> RL4 | 5 -> RL5
+        | 6 -> RL6 | 7 -> RL7 | _ -> error ()
+      end
     | SPDR ->
       begin match index with
         | 0 -> SPDR0
@@ -161,26 +270,30 @@ let pin_of_port_index port index =
 let pin_of_number s =
   match s with
   | "PIN0" -> RD2
-  | "PIN1" -> RD3
-  | "PIN2" -> RD1
-  | "PIN3" -> RD0
+  | "PIN1" -> RE1
+  | "PIN2" -> RE4
+  | "PIN3" -> RE5
   | "PIN4" -> RD4
   | "PIN5" -> RC6
-  | "PIN6" -> RD7
-  | "PIN7" -> RE6
-  | "PIN8" -> RB4
-  | "PIN9" -> RB5
-  | "PIN10" -> RB6
-  | "PIN11" -> RB7
-  | "PIN12" -> RD6
-  | "PIN13" -> RC7
-  | "PINA0" -> RF7
-  | "PINA1" -> RF6
-  | "PINA2" -> RF5
-  | "PINA3" -> RF4
-  | "PINA4" -> RF1
-  | "PINA5" -> RF0
-  | _ -> raise (Invalid_argument ("PIN"^s));;
+  | "PIN6" -> RH3
+  | "PIN7" -> RH4
+  | "PIN8" -> RH5
+  | "PIN9" -> RH6
+  | "PIN10" -> RB4
+  | "PIN11" -> RB5
+  | "PIN12" -> RB6
+  | "PIN13" -> RB7
+  | "PIN18" -> RD3
+  | "PIN19" -> RD2
+  | "PIN20" -> RD1
+  | "PIN21" -> RD0
+  | "PINA0" -> RF0
+  | "PINA1" -> RF1
+  | "PINA2" -> RF2
+  | "PINA3" -> RF3
+  | "PINA4" -> RF4
+  | "PINA5" -> RF5
+  | _ -> raise (Invalid_argument ("Wrong pin "^s));;
 
 let pin_of_string s =
   let error () = invalid_arg ("Simul.pin_of_string : "^s) in
@@ -250,7 +363,7 @@ let input_of_string s =
         match s.[0] with
         | 'W' -> assert (String.length s = 4); IWrite  (port_of_char s.[1], int_of_hex2 s.[2] s.[3])
         | 'T' -> assert (String.length s = 4); ITris   (port_of_char s.[1], int_of_hex2 s.[2] s.[3])
-        | 'A' -> assert (String.length s = 5); IWriteAnalog (an_of_char s.[1], int_of_hex3 s.[2] s.[3] s.[4])
+        | 'Z' -> assert (String.length s = 5); IWriteAnalog (an_of_char s.[1], int_of_hex3 s.[2] s.[3] s.[4])
         | 'C' -> assert (String.length s = 2); IConfigAnalog (int_of_hex1 s.[1])
         | _ -> error ()
       with _ -> error ()
@@ -275,7 +388,7 @@ let string_of_output output =
     | OWriteAnalog (an, value) ->
       if value < 0 || value > 0x3FF
       then failwith (Printf.sprintf "value %d of OWriteAnalog is out of range [ 0x0; 0x3FF ]" value);
-      Printf.sprintf "A%c%03X" (char_of_an an) value
+      Printf.sprintf "Z%c%03X" (char_of_an an) value
     | ODone -> "DONE"
     | OStop -> "STOP"
 ;;
@@ -337,12 +450,13 @@ let remove_handler handler =
   Mutex.lock handlers_mutex;
   handlers := List.filter ((!=) handler) !handlers;
   Mutex.unlock handlers_mutex;
+
 ;;
 
 (***)
 
-let ports = Array.make 7 0;; (* we count SPDR as a port *)
-let triss = Array.make 5 0xFF;;
+let ports = Array.make 13 0;; (* we count SPDR as a port *)
+let triss = Array.make 13 0xFF;;
 let analogs = Array.make 13 0;;
 let analog_cnt = ref 0;;
 
@@ -356,7 +470,9 @@ let scall2 f arg1 arg2 =
 
 let exec input =
   match input with
-    | IWrite (port, new_value) ->
+  | IWrite (port, new_value) ->
+     (* let s = Printf.sprintf "port %s = %d" (string_of_port port) new_value in *)
+     (* if true then failwith s; *)
       assert (new_value >= 0 && new_value <= 255);
       let index = index_of_port port in
       let old_value = ports.(index) in
@@ -500,7 +616,8 @@ let (start, join) =
 
 (***)
 
-let write_port port value = send (OWrite (port, value mod 256));;
+let write_port port value =
+  send (OWrite (port, value mod 256));;
 
 let set_pin pin = send (OSet pin);;
 
@@ -515,15 +632,19 @@ let read_port port = ports.(index_of_port port);;
 let read_tris port = triss.(index_of_port port);;
 
 let test_pin pin =
-  let value = ports.(index_of_port (port_of_pin pin)) in
-  let mask = 1 lsl (index_of_pin pin) in
-  (value land mask) <> 0
+  try
+    let value = ports.(index_of_port (port_of_pin pin)) in
+    let mask = 1 lsl (index_of_pin pin) in
+    (value land mask) <> 0
+  with _ -> invalid_arg "test_pin"
 ;;
 
 let state_pin pin =
-  let value = triss.(index_of_port (port_of_pin pin)) in
-  let mask = 1 lsl (index_of_pin pin) in
-  (value land mask) <> 0
+  try
+    let value = triss.(index_of_port (port_of_pin pin)) in
+    let mask = 1 lsl (index_of_pin pin) in
+    (value land mask) <> 0
+  with _ -> invalid_arg "state_pin"
 ;;
 
 let analog_input_count () =

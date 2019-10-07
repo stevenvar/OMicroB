@@ -1,4 +1,5 @@
 #include <sys/time.h>
+#include <unistd.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -19,6 +20,7 @@
 #define LOWER_PIN (HIGHER_DDR + 1)
 #define HIGHER_PIN (LOWER_PIN + NB_PORT - 1)
 
+
 #define PORTA 0
 #define PORTB 1
 #define PORTC 2
@@ -27,36 +29,40 @@
 #define PORTF 5
 #define PORTG 6
 #define PORTH 7
-#define PORTJ 8
-#define PORTK 9
-#define PORTL 10
+#define PORTI 8
+#define PORTJ 9
+#define PORTK 10
+#define PORTL 11
 
-#define DDRA 11
-#define DDRB 12
-#define DDRC 13
-#define DDRD 14
-#define DDRE 15
-#define DDRF 16
-#define DDRG 17
-#define DDRH 18
-#define DDRJ 19
-#define DDRK 20
-#define DDRL 21
+#define DDRA 12
+#define DDRB 13
+#define DDRC 14
+#define DDRD 15
+#define DDRE 16
+#define DDRF 17
+#define DDRG 18
+#define DDRH 19
+#define DDRI 20
+#define DDRJ 21
+#define DDRK 22
+#define DDRL 23
 
-#define PINA 22
-#define PINB 23
-#define PINC 24
-#define PIND 25
-#define PINE 26
-#define PINF 27
-#define PING 28
-#define PINH 29
-#define PINK 30
-#define PINL 31
+#define PINA 24
+#define PINB 25
+#define PINC 26
+#define PIND 27
+#define PINE 28
+#define PINF 29
+#define PING 30
+#define PINH 31
+#define PINI 32
+#define PINJ 33
+#define PINK 34
+#define PINL 35
 
 
-#define SPSR 34
-#define SPDR 35
+#define SPSR 36
+#define SPDR 37
 
 static unsigned char *regs;
 static unsigned int *analogs;
@@ -76,7 +82,7 @@ static int is_slow;
 void init_regs(int n, int slow){
   int i;
   regs = (unsigned char *) alloc_shm(NB_REG * sizeof(unsigned char));
-  /* analogs = (unsigned int *) alloc_shm(16 * sizeof(unsigned int)); */
+  analogs = (unsigned int *) alloc_shm(16 * sizeof(unsigned int));
   sync_counter = (int *) alloc_shm(sizeof(int));
   *sync_counter = 0;
   is_slow = slow;
@@ -97,7 +103,7 @@ void dump_regs(void){
   int i, j;
   P(sem_regs);
   for(i = LOWER_PORT ; i <= HIGHER_PORT ; i ++){
-    printf("%c: 0b", 'B' + i);
+    printf("%c: 0b", 'A' + i);
     for(j = 7 ; j >= 0 ; j --) printf("%d", (regs[i] & (1 << j)) != 0);
     printf("  = %3d  = 0x%02x\n", regs[i], regs[i]);
   }
@@ -182,8 +188,9 @@ static void send_write_ddr(int ddr, unsigned char val){
 /* } */
 
 static void send_set_analog(unsigned int chan, unsigned int val){
+  fprintf(stderr,"SET ANALOG %d to %d",chan,val);
   char buf[6];
-  buf[0] = 'A';
+  buf[0] = 'Z';
   buf[1] = hexchar_of_int(chan);
   buf[2] = hexchar_of_int((val >> 8) & 0x0F);
   buf[3] = hexchar_of_int((val >> 4) & 0x0F);
@@ -314,11 +321,14 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
   may_sleep();
 }
 
-/* TODO : move these  */
-
 int avr_millis(){
   printf("millis()\n");
   return 0;
+}
+
+void avr_delay(int ms) {
+  printf("delay(%d)\n", ms);
+  usleep((useconds_t) ms * 1000);
 }
 
 int avr_random(int max){
@@ -459,6 +469,7 @@ static void out_set_analog(unsigned int chan, unsigned int val){
   {
     if(val != analogs[chan]){
       analogs[chan] = val;
+      fprintf(stderr,"I put %d in analog %d", val, chan);
       send_set_analog(chan, val);
     }
   }
@@ -484,7 +495,7 @@ void exec_instr(char *instr, int size){
     *sync_counter = *sync_counter - 1;
     if(*sync_counter == 0) V(sem_done);
     V(sem_sync);
-  }else if(size == 5 && instr[0] == 'A'){
+  }else if(size == 5 && instr[0] == 'Z'){
     int chan, h2, h1, h0, val;
     chan = int_of_hexchar(instr[1]);
     if(chan == -1 || chan > 14){
@@ -545,94 +556,45 @@ void exec_instr(char *instr, int size){
 }
 
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-void avr_analog_write(uint8_t pin, int val) {
-  printf("Writing value %d to pin %d", val, pin);
+
+void avr_adc_init(){
+  printf("adc init\n");
+  init_simulator();
+
 }
 
-uint16_t avr_analog_read(uint8_t channel) {
-  return 0;
-}
+#include <unistd.h>
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
+uint16_t avr_analog_read(uint8_t ch){
+  /* printf("analog read (%d)\n", ch); */
+  /* out_set_analog(ch,0b11111111); */
+  /* usleep(50000); */
+  /* out_set_analog(ch,analogs[ch]); */
+  return analogs[ch];
+}
 
 void avr_serial_init(){
+  init_simulator();
   printf("serial init\n");
+  avr_set_bit(DDRD,3);
 }
+
+
 
 char avr_serial_read(){
   printf("serial read\n");
+  avr_set_bit(PORTD,2);
+  usleep(10000);
+  avr_clear_bit(PORTD,2);
   return '0';
 }
 
 void avr_serial_write(char c){
   printf("serial write(%c)\n",c);
+  avr_set_bit(PORTD,3);
+  usleep(10000);
+  avr_clear_bit(PORTD,3);
 }
-
-void pic32_init() {
-  // TODO ?
-}
-
-void pic32_schedule_task() {
-  // TODO ?
-}
-
-void pic32_pin_mode(uint8_t p, uint8_t mode) {
-  if(mode == 0) printf("Set pin %d to INPUT mode\n", p);
-  else if(mode == 1) printf("Set pin %d to OUTPUT mode\n", p);
-  else printf("Set pin %d to INPUT_PULLUP mode\n", p);
-}
-
-void pic32_digital_write(uint8_t p, uint8_t level) {
-  if(level == 0) printf("Wrote LOW to pin %d\n", p);
-  else printf("Wrote HIGH to pin %d\n", p);
-}
-
-void lchip_digital_write_lled(uint8_t level) {
-  if(level == 0) printf("Wrote LOW to Lchip left led");
-  else printf("Wrote HIGH to Lchip left led");
-}
-
-void lchip_digital_write_rled(uint8_t level) {
-  if(level == 0) printf("Wrote LOW to Lchip right led");
-  else printf("Wrote HIGH to Lchip right led");
-}
-
-uint8_t pic32_digital_read(uint8_t _p) {
-  return 0;
-}
-
-void pic32_analog_write(uint8_t p, int level) {
-  printf("Wrote %d to pin %d\n", level, p);
-}
-
-int pic32_analog_read(uint8_t _p) {
-  return 0;
-}
-
-void pic32_delay(int ms) {
-  stdlib_delay(ms);
-}
-
-int pic32_millis() {
-  printf("millis()\n");
-  return 0;
-}
-
-/******************************************************************************/
-
-void pic32_serial_init() {}
-
-void pic32_serial_write_char(char c) {
-  printf("%c", c);
-}
-
-char pic32_serial_read_char() {
-  return 0;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/

@@ -7,7 +7,6 @@ HEADERS := $(wildcard */*.h)
 OBJECTS :=              \
   .build/bindings.o     \
   .build/random.o       \
-  .build/delay.o        \
   .build/trace.o        \
   .build/gc.o           \
   .build/format.o       \

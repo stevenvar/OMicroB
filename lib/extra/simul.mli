@@ -1,7 +1,20 @@
 val int_of_hex1 : char -> int
 val int_of_hex2 : char -> char -> int
 val int_of_hex3 : char -> char -> char -> int
-type port = PORTB | PORTC | PORTD | PORTE | PORTF | SPDR
+type port =
+    PORTA
+  | PORTB
+  | PORTC
+  | PORTD
+  | PORTE
+  | PORTF
+  | SPDR
+  | PORTG
+  | PORTH
+  | PORTI
+  | PORTJ
+  | PORTK
+  | PORTL
 val string_of_port : port -> string
 val port_of_string : string -> port
 val char_of_port : port -> char
@@ -9,7 +22,15 @@ val port_of_char : char -> port
 val index_of_port : port -> int
 val port_of_index : int -> port
 type pin =
-    RB0
+    RA0
+  | RA1
+  | RA2
+  | RA3
+  | RA4
+  | RA5
+  | RA6
+  | RA7
+  | RB0
   | RB1
   | RB2
   | RB3
@@ -57,6 +78,54 @@ type pin =
   | SPDR5
   | SPDR6
   | SPDR7
+  | RG0
+  | RG1
+  | RG2
+  | RG3
+  | RG4
+  | RG5
+  | RG6
+  | RG7
+  | RH0
+  | RH1
+  | RH2
+  | RH3
+  | RH4
+  | RH5
+  | RH6
+  | RH7
+  | RI0
+  | RI1
+  | RI2
+  | RI3
+  | RI4
+  | RI5
+  | RI6
+  | RI7
+  | RJ0
+  | RJ1
+  | RJ2
+  | RJ3
+  | RJ4
+  | RJ5
+  | RJ6
+  | RJ7
+  | RK0
+  | RK1
+  | RK2
+  | RK3
+  | RK4
+  | RK5
+  | RK6
+  | RK7
+  | RL0
+  | RL1
+  | RL2
+  | RL3
+  | RL4
+  | RL5
+  | RL6
+  | RL7
 val string_of_pin : pin -> string
 val port_of_pin : pin -> port
 val index_of_pin : pin -> int

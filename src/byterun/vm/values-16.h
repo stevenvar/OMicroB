@@ -100,6 +100,7 @@ typedef uint32_t code_t;
 
 #define Val_int(x) ((value) (((uint16_t) (int16_t) (x) << 1) | 1))
 #define Int_val(x) ((int16_t) ((value) (x) >> 1))
+#define Int64_val(v) (Is_int(v) ? (int64_t) Int_val(v) : ((int64_t) (uint16_t) Field(v, 1)) | ((int64_t) (uint16_t) Field(v, 2) << 16) | ((int64_t) (uint16_t) Field(v, 3) << 32) | ((int64_t) Field(v, 4) << 48))
 
 #define Val_bool(x) ((uint8_t) (x) != 0 ? 0x3 : 0x1)
 #define Bool_val(x) (((uint8_t) (x) & 2) != 0)
@@ -133,14 +134,6 @@ extern float float_of_value(value v);
 
 #define Ram_field(val, i) (Ram_block_val(val)[i])
 #define Ram_string_field(val, i) (((uint8_t *) Ram_block_val(val))[i])
-
-#ifdef __AVR__
-#define Flash_field(val, i) (pgm_read_dword_near(Flash_block_val(val) + i))
-#define Flash_string_field(val, i) ((uint8_t) pgm_read_byte_near((uint8_t *) Flash_block_val(val) + i))
-#else
-#define Flash_field(val, i) (Flash_block_val(val)[i])
-#define Flash_string_field(val, i) (((uint8_t *) Flash_block_val(val))[i])
-#endif
 
 #define Field(val, i) (Is_in_ram(val) ? Ram_field(val, i) : Flash_field(val, i))
 #define String_field(val, i) (Is_in_ram(val) ? Ram_string_field(val, i) : Flash_string_field(val, i))

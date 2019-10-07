@@ -6,8 +6,11 @@
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
 
+open Avr
+
+(* Commands *)
 let lcd_cleardisplay = 0x01
-(* and lcd_returnhome = 0x02 *)
+and lcd_returnhome = 0x02
 and lcd_entrymodeset = 0x04
 and lcd_displaycontrol = 0x08
 and lcd_cursorshift = 0x10
@@ -18,146 +21,213 @@ and lcd_setddramaddr = 0x80
 (* Flags for display on / off control *)
 let lcd_displayon = 0x04
 (* and lcd_displayoff = 0x00 *)
-(* and lcd_cursoron = 0x02 *)
+and lcd_cursoron = 0x02
 and lcd_cursoroff = 0x00
-(* and lcd_blinkon = 0x01 *)
+and lcd_blinkon = 0x01
 and lcd_blinkoff = 0x00
 
 (* Flags for entry mode *)
-let lcd_entryleft = 0x02
-(* and lcd_entryright = 0x00 *)
-(* and lcd_entryshiftincrement = 0x01 *)
+let (* lcd_entryright = 0x00
+ * and *) lcd_entryleft = 0x02
+and lcd_entryshiftincrement = 0x01
 and lcd_entryshiftdecrement = 0x00
 
 (* Flags for display/cursor move *)
-(* let lcd_displaymove = 0x08 *)
+let lcd_displaymove = 0x08
 (* and lcd_cursormove = 0x00 *)
-let lcd_moveright = 0x04
+and lcd_moveright = 0x04
 and lcd_moveleft = 0x00
 
 (* Flags for function set *)
-let lcd_4bitmode = 0x00
-and lcd_2line = 0x08
-(* and lcd_1line = 0x00 *)
-(* and lcd_5x10dots = 0x04 *)
-and lcd_5x8dots = 0x00;
+let lcd_8bitmode = 0x10 and lcd_4bitmode = 0x00
+and lcd_2line = 0x08 and lcd_1line = 0x00
+(* and lcd_5x10dots = 0x04 *) and lcd_5x8dots = 0x00;
 
-module type LCDConnection = sig
-  type pin
-  type level
-  include Circuits.MCUConnection with type pin := pin with type level := level
-  val rsPin: pin
-  val enablePin: pin
-  val d4Pin: pin
-  val d5Pin: pin
-  val d6Pin: pin
-  val d7Pin: pin
-end
+type ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd = {
+  is4bitmode : bool;
+  rsPin : ('a register, 'b register, 'c register, no analog_pin) pin;
+  enablePin : ('d register, 'e register, 'f register, no analog_pin) pin;
+  dpins : ('g register, 'h register, 'i register, no analog_pin) pin array;
+  mutable displayFunction : int;
+  mutable displayMode : int;
+  mutable displayControl : int;
+  mutable numLines : int;
+  mutable rowOffsets : int array;
+}
 
-module MakeLCD(L: LCDConnection) = struct
+(********************** Low level data pushing commands ************************)
 
-  let cursorLine = ref 0
-  let cursorColumn = ref 0
+let pulseEnable lcd =
+  digital_write lcd.enablePin LOW;
+  delay 1;
+  digital_write lcd.enablePin HIGH;
+  delay 1;
+  digital_write lcd.enablePin LOW;
+  delay 1
 
-  (********************** Low level data pushing commands ************************)
+let write4bits lcd value =
+  for i = 0 to 3 do
+    digital_write lcd.dpins.(i) (if ((value lsr i) land 0x01)> 0 then HIGH else LOW)
+  done;
 
-  let pulseEnable () =
-    L.digital_write L.enablePin L.low;
-    L.delay 1;
-    L.digital_write L.enablePin L.high;
-    L.delay 1;
-    L.digital_write L.enablePin L.low;
-    L.delay 1
+  pulseEnable lcd
 
-  let write4bits value =
-    L.digital_write L.d4Pin (if ((value lsr 0) land 0x01)> 0 then L.high else L.low);
-    L.digital_write L.d5Pin (if ((value lsr 1) land 0x01)> 0 then L.high else L.low);
-    L.digital_write L.d6Pin (if ((value lsr 2) land 0x01)> 0 then L.high else L.low);
-    L.digital_write L.d7Pin (if ((value lsr 3) land 0x01)> 0 then L.high else L.low);
-    pulseEnable ()
+let write8bits lcd value =
+  for i = 0 to 7 do
+    digital_write lcd.dpins.(i) (if ((value lsr i) land 0x01) > 0 then HIGH else LOW)
+  done;
 
-  let send value mode =
-    L.digital_write L.rsPin mode;
+  pulseEnable lcd
 
-    write4bits (value lsr 4);
-    write4bits value
+let send lcd value mode =
+  digital_write lcd.rsPin mode;
 
-  (**************** Mid level commands, for sending data / cmds ******************)
+  if not lcd.is4bitmode then write8bits lcd value
+  else begin
+    write4bits lcd (value lsr 4);
+    write4bits lcd value
+  end
 
-  let command value = send value L.low
+(**************** Mid level commands, for sending data / cmds ******************)
 
-  let write value = send value L.high
+let command lcd value = send lcd value LOW
 
-  (**************************** Char creation and display ************************)
+let write lcd value = send lcd value HIGH
 
-  let create_char loc l =
-    if (loc > 7) then invalid_arg "create_char: i";
-    if (List.length l > 8) then invalid_arg "create_char: l";
-    let vals = List.rev_map (fun l ->
-        if (List.length l <> 5) then invalid_arg "create_char: l";
-        List.fold_left (fun a v -> (a lsl 1) + (if v = true then 1 else 0)) 0 l
-      ) (List.rev l) in
-    command (lcd_setcgramaddr lor (loc lsl 3));
-    List.iter (fun c -> write c) (vals@(List.init (8 - (List.length vals)) (fun _ -> 0)))
+(************************** High level user commands ***************************)
 
-  let print_char loc = write loc; cursorColumn := !cursorColumn + 1
+let clear lcd = command lcd lcd_cleardisplay; delay 2
 
-  (*********************** High level, user exposed commands *********************)
+let noDisplay lcd =
+  lcd.displayControl <- lcd.displayControl land (lnot lcd_displayon);
+  command lcd (lcd_displaycontrol lor lcd.displayControl)
 
-  let clear_screen () = command lcd_cleardisplay; L.delay 2
+let display lcd =
+  lcd.displayControl <- lcd.displayControl lor lcd_displayon;
+  command lcd (lcd_displaycontrol lor lcd.displayControl)
 
-  let init () =
-    (* Set output mode for the pins *)
-    L.pin_mode L.rsPin L.output_mode;
-    L.pin_mode L.enablePin L.output_mode;
-    L.pin_mode L.d4Pin L.output_mode;
-    L.pin_mode L.d5Pin L.output_mode;
-    L.pin_mode L.d6Pin L.output_mode;
-    L.pin_mode L.d7Pin L.output_mode;
+let noCursor lcd =
+  lcd.displayControl <- lcd.displayControl land (lnot lcd_cursoron);
+  command lcd (lcd_displaycontrol lor lcd.displayControl)
 
-    L.delay 50;
+let cursor lcd =
+  lcd.displayControl <- lcd.displayControl lor lcd_cursoron;
+  command lcd (lcd_displaycontrol lor lcd.displayControl)
 
-    L.digital_write L.rsPin L.low;
-    L.digital_write L.enablePin L.low;
+let noBlink lcd =
+  lcd.displayControl <- lcd.displayControl land (lnot lcd_blinkon);
+  command lcd (lcd_displaycontrol lor lcd.displayControl)
 
-    write4bits 0x03;
-    L.delay 5;
-    write4bits 0x03;
-    L.delay 5;
-    write4bits 0x03;
-    L.delay 1;
-    write4bits 0x02;
+let blink lcd =
+  lcd.displayControl <- lcd.displayControl lor lcd_blinkon;
+  command lcd (lcd_displaycontrol lor lcd.displayControl)
 
-    command (lcd_functionset lor lcd_4bitmode lor lcd_2line lor lcd_5x8dots);
+let leftToRight lcd =
+  lcd.displayMode <- lcd.displayMode lor lcd_entryleft;
+  command lcd (lcd_entrymodeset lor lcd.displayMode)
 
-    (* Turn the display on *)
-    command (lcd_displaycontrol lor lcd_displayon lor lcd_cursoroff lor lcd_blinkoff);
+let rightToLeft lcd =
+  lcd.displayMode <- lcd.displayMode land (lnot lcd_entryleft);
+  command lcd (lcd_entrymodeset lor lcd.displayMode)
 
-    (* Clear the display *)
-    clear_screen ();
+let autoscroll lcd =
+  lcd.displayMode <- lcd.displayMode lor lcd_entryshiftincrement;
+  command lcd (lcd_entrymodeset lor lcd.displayMode)
 
-    (* Set entry mode *)
-    command (lcd_entrymodeset lor lcd_entryleft lor lcd_entryshiftdecrement)
+let noAutoscroll lcd =
+  lcd.displayMode <- lcd.displayMode land (lnot lcd_entryshiftincrement);
+  command lcd (lcd_entrymodeset lor lcd.displayMode)
 
-  let print_string s = String.iter (fun c -> write (int_of_char c)) s;
-    cursorColumn := !cursorColumn + (String.length s)
+let setRowOffsets lcd r0 r1 r2 r3 = lcd.rowOffsets <- [|r0;r1;r2;r3|]
 
-  let print_int i = print_string (string_of_int i)
+let lcdBegin lcd c l =
+  if l > 1 then lcd.displayFunction <- lcd.displayFunction lor lcd_2line;
+  lcd.numLines <- l;
 
-  let print_newline () =
-    if !cursorLine > 0 then clear_screen ();
-    cursorLine := (!cursorLine + 1) mod 2;
-    command (lcd_setddramaddr lor if (!cursorLine = 0) then 0x00 else 0x40);
-    cursorColumn := 0
+  setRowOffsets lcd 0x00 0x40 (0x00 + c) (0x40 + c);
 
-  let print_image img =
-    create_char 0 img;
-    (* The commands below are necessary for some reason *)
-    command (lcd_cursorshift lor lcd_moveleft); command (lcd_cursorshift lor lcd_moveright);
-    for _ = !cursorColumn to 7 do command (lcd_cursorshift lor lcd_moveleft) done;
-    tracei !cursorColumn;
-    for _ = 8 to !cursorColumn-1 do command (lcd_cursorshift lor lcd_moveright) done;
-    print_char 0
+  (* Set output mode for the pins *)
+  pin_mode lcd.rsPin OUTPUT;
+  pin_mode lcd.enablePin OUTPUT;
+  Array.iter (fun p -> pin_mode p OUTPUT) lcd.dpins;
 
-  let set_pixel _ _ _ = ()
-end
+  delay 50;
+
+  digital_write lcd.rsPin LOW;
+  digital_write lcd.enablePin LOW;
+
+  if (lcd.displayFunction land lcd_8bitmode) = 0 then begin
+    write4bits lcd 0x03;
+    delay 5;
+    write4bits lcd 0x03;
+    delay 5;
+    write4bits lcd 0x03;
+    delay 1;
+    write4bits lcd 0x02;
+  end
+  else begin
+    command lcd (lcd_functionset lor lcd.displayFunction);
+    delay 5;
+    command lcd (lcd_functionset lor lcd.displayFunction);
+    delay 1;
+    command lcd (lcd_functionset lor lcd.displayFunction);
+  end;
+
+  command lcd (lcd_functionset lor lcd.displayFunction);
+
+  (* Turn the display on *)
+  lcd.displayControl <- lcd_displayon lor lcd_cursoroff lor lcd_blinkoff;
+  display lcd;
+
+  (* Clear the display *)
+  clear lcd;
+
+  (* Set entry mode *)
+  lcd.displayMode <- lcd_entryleft lor lcd_entryshiftdecrement;
+  command lcd (lcd_entrymodeset lor lcd.displayMode)
+
+let create4bitmode rs enable d0 d1 d2 d3 = let lcd = {
+    is4bitmode = true;
+    rsPin = rs;
+    enablePin = enable;
+    dpins = [|d0;d1;d2;d3|];
+    displayFunction = lcd_4bitmode lor lcd_1line lor lcd_5x8dots;
+    displayMode = 0;
+    displayControl = 0;
+    numLines = 0;
+    rowOffsets = [||];
+  } in lcdBegin lcd 16 1; lcd
+
+let create8bitmode rs enable d0 d1 d2 d3 d4 d5 d6 d7 =
+  let lcd = {
+    is4bitmode = false;
+    rsPin = rs;
+    enablePin = enable;
+    dpins = [|d0;d1;d2;d3;d4;d5;d6;d7|];
+    displayFunction =lcd_8bitmode lor lcd_1line lor lcd_5x8dots;
+    displayMode = 0;
+    displayControl = 0;
+    numLines = 0;
+    rowOffsets = [||];
+  } in lcdBegin lcd 16 1; lcd
+
+let print lcd s =
+  String.iter (fun c -> write lcd (int_of_char c)) s
+
+let scrollDisplayLeft lcd =
+  command lcd (lcd_cursorshift lor lcd_displaymove lor lcd_moveleft)
+
+let scrollDisplayRight lcd =
+  command lcd (lcd_cursorshift lor lcd_displaymove lor lcd_moveright)
+
+let setCursor lcd c r =
+  command lcd (lcd_setddramaddr lor (c + lcd.rowOffsets.(r)))
+
+let home lcd =
+  command lcd lcd_returnhome;
+  delay 2
+
+let createChar lcd loc data =
+  let location = loc land 0x7 in
+  command lcd (lcd_setcgramaddr lor (location lsl 3));
+  Array.iter (fun c -> write lcd c) data;
