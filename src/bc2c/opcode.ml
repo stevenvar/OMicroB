@@ -95,8 +95,8 @@ type t =
 | VECTLENGTH
 | GETVECTITEM
 | SETVECTITEM
-| GETBYTESCHAR
-| SETBYTESCHAR
+| GETSTRINGCHAR
+| SETSTRINGCHAR
 | BRANCH_1B
 | BRANCH_2B
 | BRANCH_4B
@@ -292,8 +292,8 @@ let to_string opcode =
   | VECTLENGTH                 -> "VECTLENGTH"
   | GETVECTITEM                -> "GETVECTITEM"
   | SETVECTITEM                -> "SETVECTITEM"
-  | GETBYTESCHAR               -> "GETBYTESCHAR"
-  | SETBYTESCHAR               -> "SETBYTESCHAR"
+  | GETSTRINGCHAR              -> "GETSTRINGCHAR"
+  | SETSTRINGCHAR              -> "SETSTRINGCHAR"
   | BRANCH_1B                  -> "BRANCH_1B"
   | BRANCH_2B                  -> "BRANCH_2B"
   | BRANCH_4B                  -> "BRANCH_4B"
@@ -488,8 +488,8 @@ let all = [
   VECTLENGTH;
   GETVECTITEM;
   SETVECTITEM;
-  GETBYTESCHAR;
-  SETBYTESCHAR;
+  GETSTRINGCHAR;
+  SETSTRINGCHAR;
   BRANCH_1B;
   BRANCH_2B;
   BRANCH_4B;
