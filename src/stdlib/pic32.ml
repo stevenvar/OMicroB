@@ -1,4 +1,4 @@
-type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
+(* type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7
          | PIN8 | PIN9 | PIN10 | PIN11 | PIN12 | PIN13 | PIN14
          | PIN15 | PIN16 | PIN17 | PIN18 | PIN19 | PIN20 | PIN21
          | PIN22 | PIN23 | PIN24 | PIN25 | PIN26 | PIN27 | PIN28
@@ -68,4 +68,4 @@ module MCUConnection = struct
   let pin_mode = pin_mode
   let delay = delay
   let millis = millis
-end
+end *)

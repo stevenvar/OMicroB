@@ -18,8 +18,8 @@ module type MCUConnection = sig
   val pin_mode: pin -> mode -> unit
   val digital_write: pin -> level -> unit
   val digital_read: pin -> level
-  val analog_read: pin -> int
-  val analog_write: pin -> int -> unit
+  (* val analog_read: pin -> int
+  val analog_write: pin -> int -> unit *)
   val delay: int -> unit
   val millis: unit -> int
 end
