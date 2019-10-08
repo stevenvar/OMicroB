@@ -525,6 +525,8 @@ let ccall arch ooid prim args =
       | "caml_avr_serial_init" | "caml_avr_serial_write" | "caml_avr_serial_read"
       | "caml_debug_trace" | "caml_debug_tracei"
       | "caml_random_init" | "caml_random_bits" | "caml_random_bool"
+      | "caml_pic32_set_bit" | "caml_pic32_clear_bit" | "caml_pic32_read_bit" 
+      | "caml_pic32_delay" | "caml_pic32_write_register" | "caml_pic32_read_register"
       | _ ->
         let print_arg arg =
           let buf = Buffer.create 16 in
