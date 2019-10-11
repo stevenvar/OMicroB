@@ -32,8 +32,25 @@ uint8_t *get_reg_addr(uint8_t reg) {
 
 /*****************************************************************************/
 
+void pic32_set_bit(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
+}
 
+void pic32_clear_bit(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr(reg)) &= ~((uint8_t) 1 << bit);
+}
 
+bool pic32_read_bit(uint8_t reg, uint8_t bit) {
+  return *(get_reg_addr(reg)) & ((uint8_t) 1 << bit);
+}
+
+void pic32_write_register(uint8_t reg, uint8_t val) {
+  *(get_reg_addr(reg)) = val;
+}
+
+uint8_t pic32_read_register(uint8_t reg) {
+  return *(get_reg_addr(reg));
+}
 
 void pic32_delay(int ms) {
   int i;
