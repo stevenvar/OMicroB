@@ -13,6 +13,10 @@ let default_arch       = 32
 let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
+let default_arm_cxx_options = [ "-mcpu=cortex-m0"; "-mthumb";
+                                "-fno-exceptions"; "-fno-unwind-tables";
+                                "-fdata-sections"; "-ffunction-sections";
+                                "-O"; "-g"; "-Wall" ]
 
 let device_config = ref Device_config.defConfig
 let set_config name =
@@ -246,6 +250,7 @@ let input_byte   = ref None
 let input_avr    = ref None
 let input_elf    = ref None
 let input_hex    = ref None
+let input_arm_elf = ref None
 
 let input_prgms  = ref []
 
@@ -254,6 +259,7 @@ let output_c     = ref None
 let output_elf   = ref None
 let output_avr   = ref None
 let output_hex   = ref None
+let output_arm_elf = ref None
 
 (***)
 
@@ -276,6 +282,7 @@ let push_input_file path =
   | ".avr"         -> set_file "input" ".avr"  input_avr  path
   | ".elf"         -> set_file "input" ".elf"  input_elf  path
   | ".hex"         -> set_file "input" ".hex"  input_hex  path
+  | ".arm_elf"     -> set_file "input" ".arm_elf" input_arm_elf path
   | _              -> error "don't know what to do with input file %S" path
 
 let push_output_file path =
@@ -285,6 +292,7 @@ let push_output_file path =
   | ".elf"  -> set_file "output" ".elf"  output_elf  path
   | ".avr"  -> set_file "output" ".avr"  output_avr  path
   | ".hex"  -> set_file "output" ".hex"  output_hex  path
+  | ".arm_elf" -> set_file "output" ".arm_elf" output_arm_elf path
   | _       -> error "don't know what to do to generate output file %S" path
 
 (******************************************************************************)
@@ -334,6 +342,7 @@ let input_byte       = !input_byte
 let input_avr        = !input_avr
 let input_elf        = !input_elf
 let input_hex        = !input_hex
+let input_arm_elf    = !input_arm_elf
 
 let input_prgms      = List.rev !input_prgms
 
@@ -342,6 +351,7 @@ let output_c         = !output_c
 let output_elf       = !output_elf
 let output_avr       = !output_avr
 let output_hex       = !output_hex
+let output_arm_elf   = !output_arm_elf
 
 let libdir =
   if local then Filename.concat Config.builddir "lib"
@@ -706,6 +716,7 @@ let () =
     available_elf := Some output_path;
 
     let cmd = [ Config.cxx ] @ default_cxx_options @ cxxopts in
+    let cmd = cmd @ [ "-D__PC__" ] in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "simul" ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
@@ -741,6 +752,7 @@ let () =
     available_avr := Some output_path;
 
     let cmd = [ Config.avr_cxx ] @ default_avr_cxx_options @ avrcxxopts in
+    let cmd = cmd @ [ "-D__AVR__" ] in
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-mmcu=") avrcxxopts then cmd else cmd @ [ "-mmcu=" ^ !device_config.mmcu ] in
     let cmd = if List.exists (fun avrcxxopt -> starts_with avrcxxopt ~sub:"-DF_CPU=") avrcxxopts then cmd else cmd @ [ "-DF_CPU=" ^ string_of_int !device_config.clock ] in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
@@ -785,10 +797,83 @@ let () =
   )
 
 (******************************************************************************)
-(* Compile a .c into a .arm.elf TODO *)
+(* Compile a .c into a .arm_elf *)
+
+let available_arm_elf = ref input_arm_elf
+
+let microbitdir =
+  if local then Filename.concat Config.builddir "src/byterun/microbit"
+  else Filename.concat Config.includedir "microbit"
+
+let conc_microbit s = Filename.concat microbitdir s
+
+let () =
+  if !device_config.typeD = MICROBIT && available_c <> None &&
+     (flash || output_arm_elf <> None || output_hex <> None || no_output_requested) then (
+    should_be_none_file input_arm_elf;
+    should_be_none_file input_hex;
+
+    let input_path = match available_c with
+      | None -> error "no input file to generate a .arm_elf"
+      | Some p -> p in
+
+    let o_output_path = get_first_defined [
+        output_arm_elf;
+        output_hex;
+        Some input_path;
+      ] ".arm_o"
+
+    and output_path = get_first_defined [
+        output_arm_elf;
+        output_hex;
+        Some input_path;
+      ] ".arm_elf" in
+
+    available_arm_elf := Some output_path;
+
+    let cmd = [ Config.arm_cxx ] @ default_arm_cxx_options in
+    let cmd = cmd @ [ "-D__MICROBIT__" ] in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir "microbit" ] in
+    let cmd = cmd @ [ "-o"; o_output_path ] @ [ "-c"; input_path ] in
+    run cmd;
+
+    let cmd = [ Config.arm_cxx ] @ default_arm_cxx_options in
+    let cmd = cmd @ [ "--specs=nosys.specs" ] in
+    let cmd = cmd @ [ "-D__MICROBIT__" ] in
+    let cmd = cmd @ [ "-T"; conc_microbit "NRF51822.ld" ] in
+    let cmd = cmd @ [ conc_microbit "startup.o";
+                      o_output_path;
+                      conc_microbit "microbitlib.o" ] in
+    let cmd = cmd @ [ "-lnosys"; "-lstdc++"; "-lsupc++"; "-lm"; "-lc"; "-lgcc"; "-lstdc++"; "-lsupc++"; "-lm"; "-lc"; "-lgcc" ] in
+    let cmd = cmd @ [ "-o" ; output_path ] in
+    run cmd
+  )
+
+let available_arm_elf = !available_arm_elf
 
 (******************************************************************************)
-(* Compile a .arm.elf into a .hex targetting microbit TODO *)
+(* Compile a .arm.elf into a .hex targetting microbit *)
+
+let () =
+  if !device_config.typeD = MICROBIT && available_arm_elf <> None &&
+     (flash || output_hex <> None || no_output_requested) then (
+
+    should_be_none_file input_hex;
+
+    let input_path = match available_arm_elf with
+      | None -> error "no input file to generate a .hex"
+      | Some p -> p in
+
+    let output_path = get_first_defined [
+        output_hex;
+        Some input_path;
+      ] ".hex" in
+
+    available_hex := Some output_path;
+
+    let cmd = [ Config.arm_objcopy; "-O"; "ihex"; input_path; output_path ] in
+    run cmd
+  )
 
 let available_hex = !available_hex
 
@@ -814,57 +899,67 @@ let () =
 
 let () =
   if flash then (
-    let path =
-      match available_hex with
-      | None -> error "no input file to flash the micro-controller"
-      | Some path -> path in
+    match !device_config.typeD with
+    | AVR -> (
+        let path =
+          match available_hex with
+          | None -> error "no input file to flash the micro-controller"
+          | Some path -> path in
 
-    let tty =
-      let rec find_in_options options =
-        match options with
-        | "-P" :: tty :: _ -> Some tty
-        | _ :: rest -> find_in_options rest
-        | [] -> None in
-      match find_in_options avrdudeopts with
-      | Some tty -> tty
-      | None ->
-        let dev_paths =
-          try Sys.readdir "/dev"
-          with _ -> Printf.eprintf "Error: fail to open /dev.\n%!"; exit 1 in
-        let available_ttys = ref [] in
-        Array.iter (fun dev_path ->
-          if is_substring dev_path ~sub:"tty.usbmodem"
-          || is_substring dev_path ~sub:"USB"
-          || is_substring dev_path ~sub:"ACM"
-          then (
-            available_ttys := Filename.concat "/dev" dev_path :: !available_ttys;
-          )
-        ) dev_paths;
-        match !available_ttys with
-        | [] ->
-           Printf.eprintf "Error: no available tty found to flash the micro-controller.\n";
-          Printf.eprintf "> Please connect the micro-controller if not already connected.\n";
-          Printf.eprintf "> Please reset the micro-controller if not ready to receive a new program.\n";
-          Printf.eprintf "> Otherwise, please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
-          exit 1;
-        | _ :: _ :: _ as lst ->
-           Printf.eprintf "Error: multiple available tty found to flash the micro-controller:\n";
-          List.iter (Printf.eprintf "  * %s\n") lst;
-          Printf.eprintf "> Please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
-          exit 1;
-        | [ tty ] -> tty in
+        let tty =
+          let rec find_in_options options =
+            match options with
+            | "-P" :: tty :: _ -> Some tty
+            | _ :: rest -> find_in_options rest
+            | [] -> None in
+          match find_in_options avrdudeopts with
+          | Some tty -> tty
+          | None ->
+            let dev_paths =
+              try Sys.readdir "/dev"
+              with _ -> Printf.eprintf "Error: fail to open /dev.\n%!"; exit 1 in
+            let available_ttys = ref [] in
+            Array.iter (fun dev_path ->
+                if is_substring dev_path ~sub:"tty.usbmodem"
+                || is_substring dev_path ~sub:"USB"
+                || is_substring dev_path ~sub:"ACM"
+                then (
+                  available_ttys := Filename.concat "/dev" dev_path :: !available_ttys;
+                )
+              ) dev_paths;
+            match !available_ttys with
+            | [] ->
+              Printf.eprintf "Error: no available tty found to flash the micro-controller.\n";
+              Printf.eprintf "> Please connect the micro-controller if not already connected.\n";
+              Printf.eprintf "> Please reset the micro-controller if not ready to receive a new program.\n";
+              Printf.eprintf "> Otherwise, please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
+              exit 1;
+            | _ :: _ :: _ as lst ->
+              Printf.eprintf "Error: multiple available tty found to flash the micro-controller:\n";
+              List.iter (Printf.eprintf "  * %s\n") lst;
+              Printf.eprintf "> Please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
+              exit 1;
+            | [ tty ] -> tty in
 
-    let cmd = if sudo then [ "sudo" ] else [] in
-    let cmd = cmd @ [ Config.avrdude ] in
-    let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; !device_config.avr ] in
-    let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
-    let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; !device_config.mmcu ] in
-    let _reset_cmd = cmd in
-    let _reset_cmd = _reset_cmd @ [ "-b" ; "1200" ] in
-    let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int !device_config.baud ] in
-    let cmd = cmd @ avrdudeopts @ [ "-v"; "-D"; "-U"; "flash:w:" ^ path ^ ":i" ] in
-    (* run reset_cmd; *)
-    run cmd
+        let cmd = if sudo then [ "sudo" ] else [] in
+        let cmd = cmd @ [ Config.avrdude ] in
+        let cmd = if List.mem "-c" avrdudeopts then cmd else cmd @ [ "-c"; !device_config.avr ] in
+        let cmd = if List.mem "-P" avrdudeopts then cmd else cmd @ [ "-P"; tty ] in
+        let cmd = if List.mem "-p" avrdudeopts then cmd else cmd @ [ "-p"; !device_config.mmcu ] in
+        let _reset_cmd = cmd in
+        let _reset_cmd = _reset_cmd @ [ "-b" ; "1200" ] in
+        let cmd = if List.mem "-b" avrdudeopts then cmd else cmd @ [ "-b"; string_of_int !device_config.baud ] in
+        let cmd = cmd @ avrdudeopts @ [ "-v"; "-D"; "-U"; "flash:w:" ^ path ^ ":i" ] in
+        (* run reset_cmd; *)
+        run cmd)
+    | MICROBIT -> (
+        should_be_empty_options "-avrdudeopts" avrdudeopts;
+        Printf.printf
+          "To flash a microbit, please copy %s to your microbit device using your file manager\n"
+          (match input_arm_elf with | Some p -> p | None -> "the .arm_elf file")
+      )
+    | NONE ->
+      Printf.printf "This config does not allow for flashing"
   ) else (
     should_be_empty_options "-avrdudeopts" avrdudeopts;
   )
