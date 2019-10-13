@@ -80,6 +80,7 @@ GXX="$(which g++)"
 AVR_GXX="$(which avr-g++ 2> /dev/null)"
 AVR_OBJCOPY="$(which avr-objcopy 2> /dev/null)"
 AVRDUDE="$(which avrdude 2> /dev/null)"
+ARM_GXX="$(which arm-none-eabi-g++ 2> /dev/null)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -162,7 +163,8 @@ endef
 define clean
         @\$(MAKE) --no-print-directory -C \$1 clean > /dev/null
 endef
-" > etc/Makefile.conf
+
+ARCHS := " > etc/Makefile.conf
 
 ################################################################################
 
@@ -179,6 +181,7 @@ let cxx         = \"$GXX\"
 let avr_cxx     = \"$AVR_GXX\"
 let avr_objcopy = \"$AVR_OBJCOPY\"
 let avrdude     = \"$AVRDUDE\"
+let arm_cxx     = \"$ARM_GXX\"
 let version     = \"$VERSION\"
 " > etc/config.ml
 
@@ -186,7 +189,8 @@ let version     = \"$VERSION\"
 
 # Refresh targets files
 cp "targets/device_config.ml" "src/omicrob/device_config.ml"
-rm -rf "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/byterun/avr/"
+rm -rf "src/byterun/avr/"
+rm -rf "src/byterun/microbit"
 
 function target_avr () {
     check_command "avr-g++"
@@ -204,12 +208,25 @@ function target_avr () {
         mkdir -p "src/byterun/avr/$f/"
         cp -f "targets/avr/$f/avrlib.c" "src/byterun/avr/$f/"
     done
+
+    echo "avr\\" >> "etc/Makefile.conf"
+}
+
+function target_microbit () {
+    check_command "arm-none-eabi-g++"
+
+    cat "targets/microbit/device_config.ml" >> "src/omicrob/device_config.ml"
+
+    cp -rf "targets/microbit/byterun" "src/byterun/microbit"
+
+    echo "microbit\\" >> "etc/Makefile.conf"
 }
 
 ################################################################################
 ## Choose your targets
 
 target_avr
+target_microbit
 
 ################################################################################
 

@@ -1,5 +1,5 @@
 (** Available devices *)
-type device_type = NONE | AVR
+type device_type = NONE | AVR | MICROBIT
 
 (** Config for a given device *)
 type config = {

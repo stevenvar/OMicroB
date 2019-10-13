@@ -600,8 +600,11 @@ let () =
                    (Filename.concat "targets/avr"
                       (Filename.concat !device_config.folder
                          ((String.uncapitalize_ascii !device_config.pins_module)^".cmo")));
-                 "-open"; Printf.sprintf "Avr";
+                 "-open"; "Avr";
                  "-open"; Printf.sprintf "%s" !device_config.pins_module ]
+      | MICROBIT -> [ "-I"; Filename.concat libdir "targets/microbit";
+                      Filename.concat libdir "targets/microbit/microbit.cma";
+                      "-open"; "Microbit" ]
       | NONE -> []
     in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in

@@ -524,7 +524,21 @@ let ccall arch ooid prim args =
       | "caml_avr_write_register" | "caml_avr_read_register"
       | "caml_avr_serial_init" | "caml_avr_serial_write" | "caml_avr_serial_read"
       | "caml_debug_trace" | "caml_debug_tracei"
-      | "caml_random_init" | "caml_random_bits" | "caml_random_bool" -> ()
+      | "caml_random_init" | "caml_random_bits" | "caml_random_bool"
+      | "caml_microbit_print_string" | "caml_microbit_print_int"
+      | "caml_microbit_write_pixel" | "caml_microbit_print_image" | "caml_microbit_clear_screen"
+      | "caml_microbit_button_is_pressed"
+      | "caml_microbit_pin_mode"
+      | "caml_microbit_digital_write" | "caml_microbit_digital_read"
+      | "caml_microbit_analog_write" | "caml_microbit_analog_read"
+      | "caml_microbit_serial_send_char" | "caml_microbit_serial_read_char"
+      | "caml_microbit_spi_init_master" | "caml_microbit_spi_transmit"
+      | "caml_microbit_delay" | "caml_microbit_millis"
+      | "caml_microbit_accelerometer_x" | "caml_microbit_accelerometer_y" | "caml_microbit_accelerometer_z"
+      | "caml_microbit_accelerometer_pitch" | "caml_microbit_accelerometer_roll"
+      | "caml_microbit_compass_calibrate" | "caml_microbit_compass_heading"
+      | "caml_microbit_radio_init" | "caml_microbit_radio_send" | "caml_microbit_radio_recv"
+      | "caml_microbit_i2c_init" | "caml_microbit_i2c_write" | "caml_microbit_i2c_read" -> ()
       | _ ->
         let print_arg arg =
           let buf = Buffer.create 16 in

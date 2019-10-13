@@ -12,6 +12,7 @@ all: config
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
 	$(call compile, targets/avr)
+	$(call compile, targets/microbit)
 
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
@@ -105,5 +106,6 @@ clean:
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
 	$(call clean, targets/avr)
+	$(call clean, targets/microbit)
 
 .PHONY: all config install uninstall tests clean
