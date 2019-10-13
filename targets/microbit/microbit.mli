@@ -12,9 +12,9 @@ type pin = PIN0 | PIN1 | PIN2 | PIN8 | PIN12 | PIN16
 type mode = INPUT | OUTPUT
 type _mode = mode
 
-module ButtonA: Circuits.Button
-
-module ButtonB: Circuits.Button
+(* module ButtonA: Circuits.Button
+ * 
+ * module ButtonB: Circuits.Button *)
 
 val pin_mode: pin -> mode -> unit
 
@@ -30,7 +30,7 @@ external delay: int -> unit = "caml_microbit_delay" [@@noalloc]
 
 external millis: unit -> int = "caml_microbit_millis" [@@noalloc]
 
-module Screen: Circuits.Display
+(* module Screen: Circuits.Display *)
 
 module Serial: sig
   val init: unit -> unit
@@ -70,10 +70,10 @@ module Radio: sig
   val recv: unit -> string
 end
 
-module MCUConnection: Circuits.MCUConnection with type pin = pin with type level = level
-
-(** I2C communication for the micro:bit *)
-module I2C(A: sig val address: int end): Circuits.I2C
-
-(** SPI communication for the micro:bit *)
-module MakeSPIMaster(SC: sig val slavePin: pin end): Circuits.SPI
+(* module MCUConnection: Circuits.MCUConnection with type pin = pin with type level = level
+ * 
+ * (\** I2C communication for the micro:bit *\)
+ * module I2C(A: sig val address: int end): Circuits.I2C
+ * 
+ * (\** SPI communication for the micro:bit *\)
+ * module MakeSPIMaster(SC: sig val slavePin: pin end): Circuits.SPI *)

@@ -1,4 +1,4 @@
-open Avr
+(** No need to open something specific ! *)
 
 let _ =
   let r = PIN8 in
