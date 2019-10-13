@@ -14,7 +14,7 @@ OBJECTS :=              \
   .build/shared.o       \
   .build/simul.o
 
-byterun: $(TARGETS)
+byterun: $(TARGETS) $(ARCHS)
 
 $(LIB)/libcamlrun.a: $(OBJECTS)
 	@rm -f $@
@@ -38,4 +38,7 @@ $(LIB)/libcamlrun.a: $(OBJECTS)
 clean:
 	@rm -Rf .build/ $(TARGETS)
 
-.PHONY: byterun clean
+microbit: microbit/microbitlib.c microbit/startup.c
+	$(MAKE) -C microbit
+
+.PHONY: byterun clean $(ARCHS)

@@ -1,16 +1,16 @@
 #include "arch-specific.h"
-#include "avrlib.c"
+#include "microbitlib.h"
 
 /******************************************************************************/
 /************************ General operations **********************************/
 /******************************************************************************/
 
 void device_init(const char **argv) {
-  return;
+  microbit_init();
 }
 
 void device_finish() {
-  while(1) _delay_ms(10);
+  delay(10);
 }
 
 /******************************************************************************/
@@ -18,24 +18,31 @@ void device_finish() {
 /******************************************************************************/
 
 void debug_blink_error(void) {
-  /* TODO */
-  return;
+  while(1) {
+    char s[] = "E";
+    microbit_print_string(s);
+    delay(300);
+  }
 }
 
 void debug_blink_uncatched_exception(void) {
-  /* TODO */
-  return;
-  
+  while(1) {
+    char s[] = "U";
+    microbit_print_string(s);
+    delay(300);
+  }
 }
 
 void debug_blink_message(int n) {
-  /* TODO */
-  return;
+  char buf[50];
+  sprintf(buf, "%d", n);
+  microbit_print_string(buf);
 }
 
 void debug_blink_pause(void) {
-  /* TODO */
-  return;
+  char s[] = "P";
+  microbit_print_string(s);
+  delay(1000);
 }
 
 #if DEBUG > 0
@@ -114,7 +121,7 @@ static inline char do_read_byte(const opcode_t *ocaml_bytecode, int pc) {
 }
 
 static inline uint8_t do_read_byte_from_flash(const void *flash_ptr, int ind) {
-  return flash_ptr[ind];
+  return ((uint8_t *)flash_ptr)[ind];
 }
 
 static inline void *do_get_primitive(void *const primitives[], uint8_t prim_ind) {

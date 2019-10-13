@@ -1,6 +1,6 @@
 include etc/Makefile.conf
 
-all: internals $(TARGETS)
+all: internals $(ARCHS)
 
 internals: config
 	$(call compile, lib/extra)
@@ -16,6 +16,9 @@ internals: config
 
 avr: internals
 	$(call compile, targets/avr)
+
+microbit: internals
+	$(call compile, targets/microbit)
 
 pic32: internals
 	$(call compile, targets/pic32)
@@ -53,8 +56,9 @@ install: all
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
-	cp -a src/byterun/avr "$(INCLUDEDIR)" 2> /dev/null
-	cp -a src/byterun/pic32 "$(INCLUDEDIR)/" 2> /dev/null
+	cp -a src/byterun/avr "$(INCLUDEDIR)" 2> /dev/null || :
+	cp -a src/byterun/pic32 "$(INCLUDEDIR)/" 2> /dev/null || :
+	cp -a src/byterun/microbit "$(INCLUDEDIR)/" 2> /dev/null || :
 	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:
@@ -114,5 +118,6 @@ clean:
 	$(call clean, lib/extra)
 	$(call clean, targets/avr)
 	$(call clean, targets/pic32)
+	$(call clean, targets/microbit)
 
 .PHONY: all config install uninstall tests clean

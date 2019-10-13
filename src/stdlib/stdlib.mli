@@ -737,3 +737,4 @@ module StringLabels   = Stdlib__stringlabels
 module String         = Stdlib__string
 module Sys            = Stdlib__sys
 module Uchar          = Stdlib__uchar
+module Circuits       = Stdlib__circuits
