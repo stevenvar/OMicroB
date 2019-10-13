@@ -9,8 +9,57 @@
 #include "../stdlib/trace.h"
 
 /******************************************************************************/
+
+value caml_random_init(value n) {
+  random_init(Int_val(n));
+  return Val_unit;
+}
+
+value caml_random_bits(value bound) {
+  return Val_int(random_bits((uint32_t) Int_val(bound)));
+}
+
+value caml_random_bool(value unit) {
+  return Val_bool(random_bool());
+}
+
+/******************************************************************************/
+
+value caml_unsafe_string_of_bytes(value b) {
+  return b;
+}
+
+value caml_unsafe_bytes_of_string(value s) {
+  return s;
+}
+
+/******************************************************************************/
+
+#ifdef __OCAML__
+#define String_field(val, i) String_val(val)[i]
+#endif
+
+value caml_debug_trace(value msg) {
+  mlsize_t sz = string_length(msg);
+  mlsize_t i;
+  debug_trace_open();
+  for (i = 0; i < sz; i ++) {
+    debug_trace_char(String_field(msg, i));
+  }
+  debug_trace_close();
+  return Val_unit;
+}
+
+value caml_debug_tracei(value n) {
+  debug_trace_int(Int_val(n));
+  return Val_unit;
+}
+
 /******************************************************************************/
 /******************************************************************************/
+/******************************************************************************/
+
+#if defined(__AVR__) || defined(__OCAML__) || defined(__PC__)
 
 value caml_avr_set_bit(value reg, value bit) {
   avr_set_bit(Int_val(reg), Int_val(bit));
@@ -76,57 +125,13 @@ value caml_avr_serial_read(value unit){
   return Val_int(avr_serial_read());
 }
 
-
-/******************************************************************************/
-
-value caml_random_init(value n) {
-  random_init(Int_val(n));
-  return Val_unit;
-}
-
-value caml_random_bits(value bound) {
-  return Val_int(random_bits((uint32_t) Int_val(bound)));
-}
-
-value caml_random_bool(value unit) {
-  return Val_bool(random_bool());
-}
-
-/******************************************************************************/
-
-value caml_unsafe_string_of_bytes(value b) {
-  return b;
-}
-
-value caml_unsafe_bytes_of_string(value s) {
-  return s;
-}
-
-/******************************************************************************/
-
-#ifdef __OCAML__
-#define String_field(val, i) String_val(val)[i]
 #endif
 
-value caml_debug_trace(value msg) {
-  mlsize_t sz = string_length(msg);
-  mlsize_t i;
-  debug_trace_open();
-  for (i = 0; i < sz; i ++) {
-    debug_trace_char(String_field(msg, i));
-  }
-  debug_trace_close();
-  return Val_unit;
-}
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
 
-value caml_debug_tracei(value n) {
-  debug_trace_int(Int_val(n));
-  return Val_unit;
-}
-
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
+#if defined(__MICROBIT__) || defined(__OCAML__) || defined(__PC__)
 
 value caml_microbit_print_string(value s) {
   #ifdef __OCAML__
@@ -317,6 +322,8 @@ value caml_microbit_spi_init_master() {
 value caml_microbit_spi_transmit(value c) {
   return Val_int(microbit_spi_transmit(Int_val(c)));
 }
+
+#endif
 
 /******************************************************************************/
 /******************************************************************************/

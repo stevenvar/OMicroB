@@ -81,6 +81,7 @@ AVR_GXX="$(which avr-g++ 2> /dev/null)"
 AVR_OBJCOPY="$(which avr-objcopy 2> /dev/null)"
 AVRDUDE="$(which avrdude 2> /dev/null)"
 ARM_GXX="$(which arm-none-eabi-g++ 2> /dev/null)"
+ARM_OBJCOPY="$(which arm-none-eabi-objcopy 2> /dev/null)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -146,6 +147,8 @@ GXX         := $GXX
 AVR_GXX     := $AVR_GXX
 AVR_OBJCOPY := $AVR_OBJCOPY
 AVRDUDE     := $AVRDUDE
+ARM_GXX     := $ARM_GXX
+ARM_OBJCOPY := $ARM_OBJCOPY
 OCAMLC      := $OCAMLC -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLOPT    := $OCAMLOPT -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLDOC    := $OCAMLDOC
@@ -182,6 +185,7 @@ let avr_cxx     = \"$AVR_GXX\"
 let avr_objcopy = \"$AVR_OBJCOPY\"
 let avrdude     = \"$AVRDUDE\"
 let arm_cxx     = \"$ARM_GXX\"
+let arm_objcopy = \"$ARM_OBJCOPY\"
 let version     = \"$VERSION\"
 " > etc/config.ml
 
