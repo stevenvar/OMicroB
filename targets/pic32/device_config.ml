@@ -13,7 +13,7 @@ let lchipConfig: config = {
   mmcu = "PIC32MX795F512L";
   avr = "";
   baud = 115_200;
-  clock = 0;
+  clock = 48_000_000;
   folder = "lchip";
   pins_module = "LchipPins";
 }
