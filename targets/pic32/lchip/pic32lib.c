@@ -3,6 +3,9 @@
 #include <plib.h>
 
 
+#define SYS_FREQ(80000000L)
+#define COUNTS_PER_MICRO_SEC ((SYS_FREQ/2L/1000000L))
+
 /*****************************************************************************/
 
 uint8_t *get_reg_addr(uint8_t reg) {
@@ -53,9 +56,8 @@ uint8_t pic32_read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
-/* Implementation found on 
-   https://forum.digilentinc.com/topic/246-chipkit-max32-delay-functions/
-*/
+
+
 void pic32_delay(int ms) {
   // int i;
   // for (i = 0; i <= 14000000; i++);

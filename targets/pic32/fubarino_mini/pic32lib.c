@@ -41,8 +41,18 @@ uint8_t pic32_read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
+
 void pic32_delay(int ms) {
-  int i;
-  for (i = 0; i <= 14000000; i++);
+  // int i;
+  // for (i = 0; i <= 14000000; i++);
+
+  int begin = ReadCoreTimer();
+  int end;
+  if (end >= begin) {
+    while (ReadCoreTimer() < end);
+  } else {
+    while (ReadCoreTimer() > begin);
+    while (ReadCoreTimer() < end);
+  }
 }
 
