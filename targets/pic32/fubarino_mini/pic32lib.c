@@ -1,6 +1,10 @@
 #include <xc.h>
 #include <p32xxxx.h>
+#include <plib.h>
 
+
+#define SYS_FREQ(80000000L)
+#define COUNTS_PER_MICRO_SEC ((SYS_FREQ/2L/1000000L))
 
 /*****************************************************************************/
 
