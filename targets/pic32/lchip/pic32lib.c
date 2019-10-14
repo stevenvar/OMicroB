@@ -1,5 +1,6 @@
 #include <xc.h>
 #include <p32xxxx.h>
+#include <plib.h>
 
 
 /*****************************************************************************/
@@ -52,8 +53,20 @@ uint8_t pic32_read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
+/* Implementation found on 
+   https://forum.digilentinc.com/topic/246-chipkit-max32-delay-functions/
+*/
 void pic32_delay(int ms) {
-  int i;
-  for (i = 0; i <= 14000000; i++);
+  // int i;
+  // for (i = 0; i <= 14000000; i++);
+
+  int begin = ReadCoreTimer();
+  int end;
+  if (end >= begin) {
+    while (ReadCoreTimer() < end);
+  } else {
+    while (ReadCoreTimer() > begin);
+    while (ReadCoreTimer() < end);
+  }
 }
 
