@@ -433,10 +433,12 @@ let export_code_from_codemap code codemap =
       export_opcode Opcode.GETVECTITEM;
     | STD SETVECTITEM ->
       export_opcode Opcode.SETVECTITEM;
+    | STD GETBYTESCHAR ->
+      export_opcode Opcode.GETBYTESCHAR;
+    | STD SETBYTESCHAR ->
+      export_opcode Opcode.SETBYTESCHAR;
     | STD GETSTRINGCHAR ->
-      export_opcode Opcode.GETSTRINGCHAR;
-    | STD SETSTRINGCHAR ->
-      export_opcode Opcode.SETSTRINGCHAR;
+      export_opcode Opcode.GETBYTESCHAR;
     | STD (BRANCH ptr) ->
       let ofs = ofs_of_ptr ptr in
       let kind = kind_of_int ofs in

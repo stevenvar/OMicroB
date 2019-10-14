@@ -33,14 +33,5 @@ void avr_delay(int ms);
 int avr_millis();
 
 /******************************************************************************/
-
-void pic32_set_bit(uint8_t reg, uint8_t bit);
-void pic32_clear_bit(uint8_t reg, uint8_t bit);
-bool pic32_read_bit(uint8_t reg, uint8_t bit);
-
-void pic32_write_register(uint8_t reg, uint8_t val);
-uint8_t pic32_read_register(uint8_t reg);
-void pic32_delay(int ms);
-
 /******************************************************************************/
 /******************************************************************************/

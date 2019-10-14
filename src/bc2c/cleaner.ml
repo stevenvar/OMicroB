@@ -16,7 +16,7 @@ let nexts code pc =
   | MAKEBLOCK _ | MAKEBLOCK1 _ | MAKEBLOCK2 _ | MAKEBLOCK3 _ | MAKEFLOATBLOCK _
   | GETFIELD0 | GETFIELD1 | GETFIELD2 | GETFIELD3 | GETFIELD _ | GETFLOATFIELD _
   | SETFIELD0 | SETFIELD1 | SETFIELD2 | SETFIELD3 | SETFIELD _ | SETFLOATFIELD _
-  | VECTLENGTH | GETVECTITEM | SETVECTITEM | GETSTRINGCHAR | SETSTRINGCHAR
+  | VECTLENGTH | GETVECTITEM | SETVECTITEM | GETBYTESCHAR | SETBYTESCHAR | GETSTRINGCHAR
   | GETGLOBAL _ | PUSHGETGLOBAL _ | GETGLOBALFIELD (_, _) | PUSHGETGLOBALFIELD (_, _)
   | SETGLOBAL _ | BOOLNOT | POPTRAP | CHECK_SIGNALS
   | C_CALL1 _ | C_CALL2 _ | C_CALL3 _ | C_CALL4 _ | C_CALL5 _ | C_CALLN _
@@ -121,7 +121,7 @@ let remap_instr code_mapper globals_mapper instr =
   | MAKEBLOCK _ | MAKEBLOCK1 _ | MAKEBLOCK2 _ | MAKEBLOCK3 _ | MAKEFLOATBLOCK _
   | GETFIELD0 | GETFIELD1 | GETFIELD2 | GETFIELD3 | GETFIELD _ | GETFLOATFIELD _
   | SETFIELD0 | SETFIELD1 | SETFIELD2 | SETFIELD3 | SETFIELD _ | SETFLOATFIELD _
-  | VECTLENGTH | GETVECTITEM | SETVECTITEM | GETSTRINGCHAR | SETSTRINGCHAR
+  | VECTLENGTH | GETVECTITEM | SETVECTITEM | GETBYTESCHAR | SETBYTESCHAR | GETSTRINGCHAR
   | BOOLNOT | POPTRAP | CHECK_SIGNALS
   | C_CALL1 _ | C_CALL2 _ | C_CALL3 _ | C_CALL4 _ | C_CALL5 _ | C_CALLN _
   | CONST0 | CONST1 | CONST2 | CONST3 | CONSTINT _
@@ -231,10 +231,101 @@ let clean_primitives old_prims old_code =
       | _ -> instr
     ) old_code in
   (new_prims, new_code)
-    
+
+let clean_stack code pc stack =
+  let stack_max_usage = ref (-1) in
+  let usages = Array.map (fun _ -> None) code in
+  let rec interp pc stack_ofs =
+    match usages.(pc) with
+    | Some old_stack_ofs ->
+      assert (stack_ofs = old_stack_ofs)
+    | None ->
+      usages.(pc) <- Some stack_ofs;
+      let use_stack ind = stack_max_usage := max !stack_max_usage (ind - stack_ofs) in
+      match code.(pc) with
+      | ACC0  -> use_stack 0; interp (pc + 1) stack_ofs
+      | ACC1  -> use_stack 1; interp (pc + 1) stack_ofs
+      | ACC2  -> use_stack 2; interp (pc + 1) stack_ofs
+      | ACC3  -> use_stack 3; interp (pc + 1) stack_ofs
+      | ACC4  -> use_stack 4; interp (pc + 1) stack_ofs
+      | ACC5  -> use_stack 5; interp (pc + 1) stack_ofs
+      | ACC6  -> use_stack 6; interp (pc + 1) stack_ofs
+      | ACC7  -> use_stack 7; interp (pc + 1) stack_ofs
+      | ACC n -> use_stack n; interp (pc + 1) stack_ofs
+      | PUSHACC1  -> use_stack 0; interp (pc + 1) (stack_ofs + 1)
+      | PUSHACC2  -> use_stack 1; interp (pc + 1) (stack_ofs + 1)
+      | PUSHACC3  -> use_stack 2; interp (pc + 1) (stack_ofs + 1)
+      | PUSHACC4  -> use_stack 3; interp (pc + 1) (stack_ofs + 1)
+      | PUSHACC5  -> use_stack 4; interp (pc + 1) (stack_ofs + 1)
+      | PUSHACC6  -> use_stack 5; interp (pc + 1) (stack_ofs + 1)
+      | PUSHACC7  -> use_stack 6; interp (pc + 1) (stack_ofs + 1)
+      | PUSHACC n -> use_stack (n - 1); interp (pc + 1) (stack_ofs + 1)
+      | ASSIGN _ | ENVACC1 | ENVACC2 | ENVACC3 | ENVACC4 | ENVACC _
+      | OFFSETCLOSUREM2 | OFFSETCLOSURE0 | OFFSETCLOSURE2 | OFFSETCLOSURE _
+      | GETGLOBAL _ | GETGLOBALFIELD _ | SETGLOBAL _ | ATOM0 | ATOM _
+      | MAKEBLOCK1 _
+      | GETFIELD0 | GETFIELD1 | GETFIELD2 | GETFIELD3 | GETFIELD _ | GETFLOATFIELD _
+      | VECTLENGTH | BOOLNOT | CHECK_SIGNALS | C_CALL1 _
+      | CONST0 | CONST1 | CONST2 | CONST3 | CONSTINT _
+      | NEGINT | OFFSETINT _ | OFFSETREF _ | ISINT
+        -> interp (pc + 1) stack_ofs
+      | PUSH | PUSHACC0 | PUSHENVACC1 | PUSHENVACC2 | PUSHENVACC3 | PUSHENVACC4 | PUSHENVACC _
+      | PUSHOFFSETCLOSUREM2 | PUSHOFFSETCLOSURE0 | PUSHOFFSETCLOSURE2 | PUSHOFFSETCLOSURE _
+      | PUSHGETGLOBAL _ | PUSHGETGLOBALFIELD _ | PUSHATOM0 | PUSHATOM _
+      | PUSHCONST0 | PUSHCONST1 | PUSHCONST2 | PUSHCONST3 | PUSHCONSTINT _
+      | GETPUBMET _
+        -> interp (pc + 1) (stack_ofs + 1)
+      | PUSH_RETADDR ptr ->
+        interp (pc + 1) (stack_ofs + 3);
+        interp ptr stack_ofs;
+      | APPLY1 -> use_stack 0; interp (pc + 1) (stack_ofs - 1)
+      | APPLY2 -> use_stack 1; interp (pc + 1) (stack_ofs - 2)
+      | APPLY3 -> use_stack 2; interp (pc + 1) (stack_ofs - 3)
+      | CLOSURE (n, _) -> use_stack (n - 2); interp (pc + 1) (stack_ofs - max 0 (n - 1))
+      | CLOSUREREC (_f, v, _o, t) -> use_stack (v - 2); interp (pc + 1) (stack_ofs - max 0 (v - 1) + 1 + Array.length t)
+      | MAKEBLOCK (_, sz) -> use_stack (sz - 2); interp (pc + 1) (stack_ofs - max 0 (sz - 1))
+      | MAKEBLOCK2 _ -> use_stack 0; interp (pc + 1) (stack_ofs - 1)
+      | MAKEBLOCK3 _ -> use_stack 1; interp (pc + 1) (stack_ofs - 2)
+      | MAKEFLOATBLOCK sz -> use_stack (sz - 2); interp (pc + 1) (stack_ofs - max 0 (sz - 1))
+      | SETFIELD0 | SETFIELD1 | SETFIELD2 | SETFIELD3 | SETFIELD _ | SETFLOATFIELD _
+      | GETVECTITEM | GETBYTESCHAR | GETSTRINGCHAR
+      | ADDINT | SUBINT | MULINT | DIVINT | MODINT | ANDINT | ORINT | XORINT | LSLINT | LSRINT | ASRINT
+      | EQ | NEQ | LTINT | LEINT | GTINT | GEINT
+      | ULTINT | UGEINT
+        -> use_stack 0; interp (pc + 1) (stack_ofs - 1)
+      | SETVECTITEM | SETBYTESCHAR
+        -> use_stack 1; interp (pc + 1) (stack_ofs - 2)
+      | GETMETHOD | GETDYNMET -> use_stack 0; interp (pc + 1) stack_ofs
+      | POP n -> interp (pc + 1) (stack_ofs - n)
+      | C_CALL2 _ -> use_stack 0; interp (pc + 1) (stack_ofs - 1)
+      | C_CALL3 _ -> use_stack 1; interp (pc + 1) (stack_ofs - 2)
+      | C_CALL4 _ -> use_stack 2; interp (pc + 1) (stack_ofs - 3)
+      | C_CALL5 _ -> use_stack 3; interp (pc + 1) (stack_ofs - 4)
+      | C_CALLN (n, _) -> use_stack (n - 2); interp (pc + 1) (stack_ofs - (n - 1))
+      | PUSHTRAP ptr -> interp (pc + 1) (stack_ofs + 4); interp ptr stack_ofs
+      | POPTRAP -> use_stack 1; interp (pc + 1) (stack_ofs - 4)
+      | BRANCH ptr -> interp ptr stack_ofs
+      | BRANCHIF ptr | BRANCHIFNOT ptr
+      | BEQ (_, ptr) | BNEQ (_, ptr) | BLTINT (_, ptr) | BLEINT (_, ptr) | BGTINT (_, ptr) | BGEINT (_, ptr)
+      | BULTINT (_, ptr) | BUGEINT (_, ptr)
+        -> interp (pc + 1) stack_ofs; interp ptr stack_ofs
+      | SWITCH (_, ptrs) -> Array.iter (fun ptr -> interp ptr stack_ofs) ptrs
+      | APPTERM _ | APPTERM1 _ | APPTERM2 _ | APPTERM3 _ | RESTART | GRAB _ | RETURN _ -> assert false
+      | APPLY _ | RAISE | RERAISE | RAISE_NOTRACE | STOP | EVENT | BREAK -> () in
+  interp pc 0;
+  let racc = ref [] and acc = ref stack in
+  for _i = 0 to !stack_max_usage do
+    match !acc with
+    | hd :: tl -> racc := hd :: !racc; acc := tl
+    | _ -> assert false
+  done;
+  List.rev !racc
+      
 let clean arch prims globals code =
   let pc, ooid, accu, stack, globals = Interp.run arch prims globals code in
 
+  let stack = clean_stack code pc stack in
+  
   let living_code = Array.map (fun _ -> false) code in
   let read_globals = Array.map (fun _ -> false) globals in
   let written_globals = Array.map (fun _ -> false) globals in
@@ -266,5 +357,5 @@ let clean arch prims globals code =
   let accu = remap_value code_mapper qhtbl accu in
 
   let prims, code = clean_primitives prims code in
-  
+
   ooid, accu, stack, globals, prims, code

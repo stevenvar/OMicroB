@@ -524,9 +524,7 @@ let ccall arch ooid prim args =
       | "caml_avr_write_register" | "caml_avr_read_register"
       | "caml_avr_serial_init" | "caml_avr_serial_write" | "caml_avr_serial_read"
       | "caml_debug_trace" | "caml_debug_tracei"
-      | "caml_random_init" | "caml_random_bits" | "caml_random_bool"
-      | "caml_pic32_set_bit" | "caml_pic32_clear_bit" | "caml_pic32_read_bit" 
-      | "caml_pic32_delay" | "caml_pic32_write_register" | "caml_pic32_read_register"
+      | "caml_random_init" | "caml_random_bits" | "caml_random_bool" -> ()
       | _ ->
         let print_arg arg =
           let buf = Buffer.create 16 in
@@ -948,10 +946,10 @@ let exec arch prims globals code cycle_limit =
         accu := unit;
         incr pc;
 
-      | GETSTRINGCHAR ->
+      | GETBYTESCHAR | GETSTRINGCHAR ->
         accu := Int (int_of_char (Bytes.get (bytes_of_value !accu) (int_of_value (pop stack))));
         incr pc;
-      | SETSTRINGCHAR ->
+      | SETBYTESCHAR ->
         let i = pop stack in
         let c = pop stack in
         Bytes.set (bytes_of_value !accu) (int_of_value i) (char_of_value c);

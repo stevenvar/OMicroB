@@ -1,5 +1,13 @@
-open Avr
-open LiquidCrystal
+type 'a _register = 'a register
+type ('a, 'b, 'c, 'd)_pin = ('a, 'b, 'c, 'd) pin
+
+module LCD = LiquidCrystal.MakeLCD(struct
+    type 'a register = 'a _register
+    type ('a, 'b, 'c, 'd) pin = ('a, 'b, 'c, 'd) _pin
+    let pin_mode = pin_mode
+    let digital_write = digital_write
+  end)
+open LCD
 
 let () =
   delay 1000;

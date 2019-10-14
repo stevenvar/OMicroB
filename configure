@@ -50,24 +50,9 @@ function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
 
-function select_target () {
-    check_directory "targets/$1"
-    rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
-    cp -f "targets/$1/avr.mli" "src/stdlib/avr.mli"
-    cp -f "targets/$1/avr.ml" "src/stdlib/avr.ml"
-    cp -f "targets/$1/avr_config.ml" "src/omicrob/avr_config.ml"
-    cp -f "targets/$1/avrlib.c" "src/byterun/avr/avrlib.c"
-}
-
 ################################################################################
 
 check_command "gcc"
-check_command "avr-g++"
-check_command "avr-objcopy"
-check_command "avrdude"
-check_command "xc32-g++"
-check_command "xc32-bin2hex"
-check_command "pic32prog"
 check_command "ocaml"
 check_command "ocamlc"
 check_command "ocamlopt"
@@ -92,12 +77,9 @@ check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam i
 ################################################################################
 
 GXX="$(which g++)"
-AVR_GXX="$(which avr-g++)"
-AVR_OBJCOPY="$(which avr-objcopy)"
-AVRDUDE="$(which avrdude)"
-XC32_GXX="$(which xc32-g++)"
-XC32_BIN2HEX="$(which xc32-bin2hex)"
-PIC32PROG="$(which pic32prog)"
+AVR_GXX="$(which avr-g++ 2> /dev/null)"
+AVR_OBJCOPY="$(which avr-objcopy 2> /dev/null)"
+AVRDUDE="$(which avrdude 2> /dev/null)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -163,9 +145,6 @@ GXX         := $GXX
 AVR_GXX     := $AVR_GXX
 AVR_OBJCOPY := $AVR_OBJCOPY
 AVRDUDE     := $AVRDUDE
-XC32_GXX    := $XC32_GXX
-XC32_BIN2HEX := $XC32_BIN2HEX
-PIC32PROG   := $PIC32PROG
 OCAMLC      := $OCAMLC -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLOPT    := $OCAMLOPT -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLDOC    := $OCAMLDOC
@@ -200,16 +179,37 @@ let cxx         = \"$GXX\"
 let avr_cxx     = \"$AVR_GXX\"
 let avr_objcopy = \"$AVR_OBJCOPY\"
 let avrdude     = \"$AVRDUDE\"
-let xc32_cxx    = \"$XC32_GXX\"
-let xc32_bin2hex = \"$XC32_BIN2HEX\"
-let pic32prog   = \"$PIC32PROG\"
 let version     = \"$VERSION\"
 " > etc/config.ml
 
 ################################################################################
 
-# select_avr "arduboy"
-select_target "avrs/arduino_mega_2560"
+# Refresh targets files
+cp "targets/device_config.ml" "src/omicrob/device_config.ml"
+rm -rf "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/byterun/avr/"
+
+function target_avr () {
+    check_command "avr-g++"
+    check_command "avr-objcopy"
+    check_command "avrdude"
+    check_directory "targets/avr"
+
+    cat "targets/avr/device_config.ml" >> "src/omicrob/device_config.ml"
+
+    mkdir -p "src/byterun/avr"
+    cp -f "targets/avr/arch-specific.c" "src/byterun/avr/"
+    cp -f "targets/avr/arch-specific.h" "src/byterun/avr/"
+    for f in "arduboy" "arduino_uno" "arduino_mega_2560"
+    do
+        mkdir -p "src/byterun/avr/$f/"
+        cp -f "targets/avr/$f/avrlib.c" "src/byterun/avr/$f/"
+    done
+}
+
+################################################################################
+## Choose your targets
+
+target_avr
 
 ################################################################################
 
