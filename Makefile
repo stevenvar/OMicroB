@@ -11,6 +11,7 @@ all: config
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
+	$(call compile, targets/avr)
 
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
@@ -41,6 +42,7 @@ install: all
 	cp lib/*.cmi "$(LIBDIR)/"
 	cp lib/lcd_cgrom.txt "$(LIBDIR)/"
 	cp -a lib/extra "$(LIBDIR)/extra"
+	cp -a lib/targets "$(LIBDIR)/targets"
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
@@ -102,5 +104,6 @@ clean:
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
+	$(call clean, targets/avr)
 
 .PHONY: all config install uninstall tests clean

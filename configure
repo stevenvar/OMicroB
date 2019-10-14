@@ -50,21 +50,9 @@ function remove_trailing_slash () {
     echo "$1" | sed 'sX^\(.*[^/]\)/*$X\1X'
 }
 
-function select_target () {
-    check_directory "targets/$1"
-    rm -f "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/omicrob/avr_config.ml" "src/byterun/avr/avrlib.c"
-    cp -f "targets/$1/avr.mli" "src/stdlib/avr.mli"
-    cp -f "targets/$1/avr.ml" "src/stdlib/avr.ml"
-    cp -f "targets/$1/avr_config.ml" "src/omicrob/avr_config.ml"
-    cp -f "targets/$1/avrlib.c" "src/byterun/avr/avrlib.c"
-}
-
 ################################################################################
 
 check_command "gcc"
-check_command "avr-g++"
-check_command "avr-objcopy"
-check_command "avrdude"
 check_command "ocaml"
 check_command "ocamlc"
 check_command "ocamlopt"
@@ -89,9 +77,9 @@ check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam i
 ################################################################################
 
 GXX="$(which g++)"
-AVR_GXX="$(which avr-g++)"
-AVR_OBJCOPY="$(which avr-objcopy)"
-AVRDUDE="$(which avrdude)"
+AVR_GXX="$(which avr-g++ 2> /dev/null)"
+AVR_OBJCOPY="$(which avr-objcopy 2> /dev/null)"
+AVRDUDE="$(which avrdude 2> /dev/null)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -196,8 +184,32 @@ let version     = \"$VERSION\"
 
 ################################################################################
 
-# select_avr "arduboy"
-select_target "avrs/arduino_mega_2560"
+# Refresh targets files
+cp "targets/device_config.ml" "src/omicrob/device_config.ml"
+rm -rf "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/byterun/avr/"
+
+function target_avr () {
+    check_command "avr-g++"
+    check_command "avr-objcopy"
+    check_command "avrdude"
+    check_directory "targets/avr"
+
+    cat "targets/avr/device_config.ml" >> "src/omicrob/device_config.ml"
+
+    mkdir -p "src/byterun/avr"
+    cp -f "targets/avr/arch-specific.c" "src/byterun/avr/"
+    cp -f "targets/avr/arch-specific.h" "src/byterun/avr/"
+    for f in "arduboy" "arduino_uno" "arduino_mega_2560"
+    do
+        mkdir -p "src/byterun/avr/$f/"
+        cp -f "targets/avr/$f/avrlib.c" "src/byterun/avr/$f/"
+    done
+}
+
+################################################################################
+## Choose your targets
+
+target_avr
 
 ################################################################################
 
