@@ -23,7 +23,9 @@ function usage () {
  -mandir <dir>       Directory where the manual pages will be installed
                      (default: /usr/local/man)
  -prefix <dir>       Set bindir, libdir, libexecdir includedir and mandir to <dir>/bin, <dir>/lib/omicrob,
-                     <dir>/libexec/omicrob, <dir>/include/omicrob and <dir>/man respectively"
+                     <dir>/libexec/omicrob, <dir>/include/omicrob and <dir>/man respectively
+ -target <opt>       Select for which target OMicroB will be installed
+                     (e.g. -target PIC32|AVR)"
 }
 
 function check_command () {
@@ -80,6 +82,9 @@ GXX="$(which g++)"
 AVR_GXX="$(which avr-g++ 2> /dev/null)"
 AVR_OBJCOPY="$(which avr-objcopy 2> /dev/null)"
 AVRDUDE="$(which avrdude 2> /dev/null)"
+XC32_GXX="$(which xc32-g++)"
+XC32_BIN2HEX="$(which xc32-bin2hex)"
+PIC32PROG="$(which pic32prog)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -97,6 +102,7 @@ LIBDIR=/usr/local/lib/omicrob
 LIBEXECDIR=/usr/local/libexec/omicrob
 INCLUDEDIR=/usr/local/include/omicrob
 MANDIR=/usr/local/man
+TARGET=""
 
 while [ $# -ne 0 ]; do
     case "$1" in
@@ -123,6 +129,8 @@ while [ $# -ne 0 ]; do
             LIBEXECDIR="$PREFIX/libexec/omicrob"
             INCLUDEDIR="$PREFIX/include/omicrob"
             MANDIR="$PREFIX/man" ;;
+        -target)
+            TARGET="$2";;
         *)
         usage "Don't know what to do with \"$1\""
     esac
@@ -145,6 +153,9 @@ GXX         := $GXX
 AVR_GXX     := $AVR_GXX
 AVR_OBJCOPY := $AVR_OBJCOPY
 AVRDUDE     := $AVRDUDE
+XC32_GXX    := $XC32_GXX
+XC32_BIN2HEX:= $XC32_BIN2HEX
+PIC32PROG   := $PIC32PROG
 OCAMLC      := $OCAMLC -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLOPT    := $OCAMLOPT -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLDOC    := $OCAMLDOC
@@ -179,6 +190,9 @@ let cxx         = \"$GXX\"
 let avr_cxx     = \"$AVR_GXX\"
 let avr_objcopy = \"$AVR_OBJCOPY\"
 let avrdude     = \"$AVRDUDE\"
+let xc32_cxx    = \"$XC32_GXX\"
+let xc32_bin2hex= \"$XC32_BIN2HEX\"
+let pic32prog   = \"$PIC32PROG\"
 let version     = \"$VERSION\"
 " > etc/config.ml
 
@@ -186,7 +200,9 @@ let version     = \"$VERSION\"
 
 # Refresh targets files
 cp "targets/device_config.ml" "src/omicrob/device_config.ml"
+
 rm -rf "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/byterun/avr/"
+rm -rf "src/stdlib/pic32.mli" "src/stdlib/pic32.ml" "src/byterun/pic32/"
 
 function target_avr () {
     check_command "avr-g++"
@@ -206,10 +222,36 @@ function target_avr () {
     done
 }
 
+function target_pic32 () {
+    check_command "xc32-g++"
+    check_command "xc32-bin2hex"
+    check_command "pic32prog"
+    check_directory "targets/pic32"
+
+    cat "targets/pic32/device_config.ml" >> "src/omicrob/device_config.ml"
+
+    mkdir -p "src/byterun/pic32"
+    cp -f "targets/pic32/arch-specific.c" "src/byterun/pic32/"
+    cp -f "targets/pic32/arch-specific.h" "src/byterun/pic32/"
+    for f in "fubarino_mini" "lchip"
+    do  
+        mkdir -p "src/byterun/pic32/$f"
+        cp -f "targets/pic32/$f/pic32lib.c" "src/byterun/pic32/$f/"
+    done
+}
+
 ################################################################################
 ## Choose your targets
 
-target_avr
+if [[ $TARGET = "AVR" ]]
+then 
+    target_avr
+elif [[ $TARGET = "PIC32" ]]
+then
+    target_pic32
+else
+    error "Error: No target has been selected. Please specify target (AVR or PIC32) using -target."
+fi
 
 ################################################################################
 
