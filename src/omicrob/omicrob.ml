@@ -622,7 +622,7 @@ let () =
                    Filename.concat libdir
                     (Filename.concat "targets/pic32"
                       (Filename.concat !device_config.folder
-                        ((String.uncapitalizer_ascii !device_config.pins_module)^".cmo")));
+                        ((String.uncapitalize_ascii !device_config.pins_module)^".cmo")));
                   "-open"; Printf.sprintf "Pic32";
                   "-open"; Printf.sprintf "%s" !device_config.pins_module ]
       | NONE -> []
@@ -829,7 +829,7 @@ let () =
     let cmd = [ Config.xc32_cxx  ] @ default_xc32_cxx_options in
     let cmd = cmd @ [ "-mprocessor=32MX795F512L" ] in
     let cmd = cmd @ [ "-o"; output_path ] in
-    let cmd = cmd @ [ "-T"; (conc_pic32 "ld/32MX795F512L-lchip.ld") ] in
+    (* let cmd = cmd @ [ "-T"; (conc_pic32 "ld/32MX795F512L-lchip.ld") ] in *)
     run cmd
   )
 
@@ -893,6 +893,42 @@ let () =
 
 (******************************************************************************)
 (* Flash *)
+
+
+let tty () =
+  let rec find_in_options options =
+    match options with
+    | "-P" :: tty :: _ -> Some tty
+    | _ :: rest -> find_in_options rest
+    | [] -> None in
+  match find_in_options avrdudeopts with
+  | Some tty -> tty
+  | None ->
+    let dev_paths =
+      try Sys.readdir "/dev"
+      with _ -> Printf.eprintf "Error: fail to open /dev.\n%!"; exit 1 in
+    let available_ttys = ref [] in
+    Array.iter (fun dev_path ->
+        if is_substring dev_path ~sub:"tty.usbmodem"
+        || is_substring dev_path ~sub:"USB"
+        || is_substring dev_path ~sub:"ACM"
+        then (
+          available_ttys := Filename.concat "/dev" dev_path :: !available_ttys;
+        )
+      ) dev_paths;
+    match !available_ttys with
+    | [] ->
+      Printf.eprintf "Error: no available tty found to flash the micro-controller.\n";
+      Printf.eprintf "> Please connect the micro-controller if not already connected.\n";
+      Printf.eprintf "> Please reset the micro-controller if not ready to receive a new program.\n";
+      Printf.eprintf "> Otherwise, please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
+      exit 1;
+    | _ :: _ :: _ as lst ->
+      Printf.eprintf "Error: multiple available tty found to flash the micro-controller:\n";
+      List.iter (Printf.eprintf "  * %s\n") lst;
+      Printf.eprintf "> Please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
+      exit 1;
+    | [ tty ] -> tty
 
 let () =
   if flash then (

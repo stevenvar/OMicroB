@@ -108,8 +108,8 @@ value caml_pic32_write_register(value reg, value val) {
   return Val_unit;
 }
 
-value caml_avr_read_register(value reg) {
-  return Val_int(avr_read_register(Int_val(reg)));
+value caml_pic32_read_register(value reg) {
+  return Val_int(pic32_read_register(Int_val(reg)));
 }
 
 

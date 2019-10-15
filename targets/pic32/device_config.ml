@@ -4,7 +4,7 @@ let fubarinoMiniConfig: config = {
   avr = "";
   baud = 115_200;
   clock = 48_000_000;
-  folder = "fubarino_mini"
+  folder = "fubarino_mini";
   pins_module = "FubarinoMiniPins";
 }
 
@@ -24,7 +24,7 @@ let defConfig = fubarinoMiniConfig
 let get_config name = match name with
   | "fubarino-mini" -> fubarinoMiniConfig
   | "lchip" -> lchipConfig
-  | -> get_config name
+  | _ -> get_config name
 
 let all_config_names () = [
   "fubarino-mini";
