@@ -13,6 +13,14 @@ type yes
 type no
 type 'a analog_pin = YES : yes analog_pin | NO : no analog_pin
 
+(* Control registers on PIC32:
+
+   Each I/O port is associated to a:
+   - TRIS register (controlling the data direction flow)
+   - PORT register (to allow read accesses of I/O pin)
+   - LAT register (for holding written data to port I/O pin)
+*)
+
 module type Pic32Pins = sig
   type ('a, 'b, 'c, 'd) pin
   type 'a register
