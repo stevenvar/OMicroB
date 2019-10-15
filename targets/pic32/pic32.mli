@@ -5,7 +5,7 @@
 (*******************************************************************************)
 
 type level = HIGH | LOW
-type mode = INTPUT | OUTPUT
+type mode = INPUT | OUTPUT
 
 type yes
 type no
