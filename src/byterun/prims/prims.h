@@ -2,8 +2,8 @@
 /*   -> prims/std-bindings.c | prims/omc-bindings.c */
 /*   -> simul/sf-regs.c | avr/avrlib.c              */
 
-#include <stdbool.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 
 

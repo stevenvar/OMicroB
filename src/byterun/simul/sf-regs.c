@@ -335,6 +335,37 @@ int avr_random(int max){
   return 0;
 }
 
+
+
+/***************************************************/
+
+void pic32_set_bit(uint8_t reg, uint8_t bit) {
+ 
+}
+
+void pic32_clear_bit(uint8_t reg, uint8_t bit) {
+ 
+}
+
+bool pic32_read_bit(uint8_t reg, uint8_t bit) {
+  return true;
+}
+
+void pic32_write_register(uint8_t reg, uint8_t val) {
+}
+
+uint8_t pic32_read_register(uint8_t reg) {
+  return 0;
+}
+
+
+void pic32_delay(int ms) {
+
+}
+
+
+/***************************************************/
+
 void avr_set_bit(uint8_t reg, uint8_t bit){
   /* printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit); */
   init_simulator();

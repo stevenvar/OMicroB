@@ -1,6 +1,6 @@
 let fubarinoMiniConfig: config = {
   typeD = PIC32;
-  mmcu = "PIC32MX250F128D";
+  mmcu = "32MX250F128D";
   avr = "";
   baud = 115_200;
   clock = 48_000_000;
@@ -10,7 +10,7 @@ let fubarinoMiniConfig: config = {
 
 let lchipConfig: config = {
   typeD = PIC32;
-  mmcu = "PIC32MX795F512L";
+  mmcu = "32MX795F512L";
   avr = "";
   baud = 115_200;
   clock = 48_000_000;

@@ -11,7 +11,7 @@ all: config
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
-	$(call compile, targets/avr)
+	#$(call compile, targets/avr)
 	$(call compile, targets/pic32)
 
 config:
@@ -42,13 +42,14 @@ install: all
 	cp lib/*.cmo "$(LIBDIR)/"
 	cp lib/*.cmi "$(LIBDIR)/"
 	cp lib/lcd_cgrom.txt "$(LIBDIR)/"
-	cp -a lib/extra "$(LIBDIR)/extra"
-	cp -a lib/targets "$(LIBDIR)/targets"
+	cp -a lib/extra "$(LIBDIR)/"
+	cp -a lib/targets "$(LIBDIR)/"
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
-	if [ -d src/byterun/pic32 ]; then cp -a src/byterun/pic32 "$(INCLUDEDIR)/"; fi
-	if [ -d src/byterun/avr ]; then cp -a src/byterun/avr "$(INCLUDEDIR)/"; fi
+	cp -a src/byterun/pic32 "$(INCLUDEDIR)/"
+	# if [ -d src/byterun/pic32 ]; then cp -a src/byterun/pic32 "$(INCLUDEDIR)/"; fi
+	# if [ -d src/byterun/avr ]; then cp -a src/byterun/avr "$(INCLUDEDIR)/"; fi
 	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:
@@ -84,7 +85,7 @@ uninstall:
 	@if [ -d "$(INCLUDEDIR)/prims" ]; then rmdir "$(INCLUDEDIR)/prims"; fi
 	@if [ -d "$(INCLUDEDIR)/simul" ]; then rmdir "$(INCLUDEDIR)/simul"; fi
 	@if [ -d "$(INCLUDEDIR)/avr" ]; then rmdir "$(INCLUDEDIR)/avr"; fi
-	@if [ -d "$(INCLUDEDIR)/pic32" ]; then rmdir "$(INCLUDEDIR)/pic32"; fi
+	#@if [ -d "$(INCLUDEDIR)/pic32" ]; then rmdir "$(INCLUDEDIR)/pic32"; fi
 	@if [ -d "$(INCLUDEDIR)/stdlib" ]; then rmdir "$(INCLUDEDIR)/stdlib"; fi
 	@if [ -d "$(INCLUDEDIR)" ]; then rmdir "$(INCLUDEDIR)"; fi
 
@@ -108,7 +109,7 @@ clean:
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
-	$(call clean, targets/avr)
+	#$(call clean, targets/avr)
 	$(call clean, targets/pic32)
 
 .PHONY: all config install uninstall tests clean

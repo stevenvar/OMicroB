@@ -7,7 +7,7 @@ ATTY := /dev/tty.usbmodem1411
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -device arduino-uno -mlopt -verbose -stack-size 200 -heap-size 200
+	$(BIN)/omicrob -v $^ -device arduino-uno -mlopt -verbose -stack-size 200 -heap-size 200 -cxxopts -save-temps
 
 flash: test.hex
 	$(BIN)/omicrob -device arduino-uno -flash -sudo $<

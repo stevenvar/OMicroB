@@ -13,7 +13,7 @@ let default_arch       = 32
 let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
-let default_xc32_cxx_options = [ "-w" ]
+let default_xc32_cxx_options = [ "-std=c++11" ]
 
 let device_config = ref Device_config.defConfig
 let set_config name =
@@ -702,7 +702,7 @@ let available_c = !available_c
 (******************************************************************************)
 (* Compile a .c into a .elf *)
 
-let available_elf = ref input_elf
+(* let available_elf = ref input_elf
 
 let () =
   if available_c <> None && (simul || output_elf <> None || no_output_requested) then (
@@ -732,7 +732,7 @@ let () =
     run cmd
   )
 
-let available_elf = !available_elf
+let available_elf = !available_elf *)
 
 (******************************************************************************)
 (* Compile a .c into a .avr *)
@@ -827,15 +827,17 @@ let () =
     available_pic32_elf := Some output_path;
 
     let cmd = [ Config.xc32_cxx  ] @ default_xc32_cxx_options in
-    let cmd = cmd @ [ "-mprocessor=32MX795F512L" ] in
-    let cmd = cmd @ [ "-o"; output_path ] in
-    (* let cmd = cmd @ [ "-T"; (conc_pic32 "ld/32MX795F512L-lchip.ld") ] in *)
+    let cmd = cmd @ [ "-mprocessor=" ^ !device_config.mmcu ] in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir "pic32" ] in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "pic32" !device_config.folder) ] in
+    let cmd = cmd @ [ input_path; "-o"; output_path ] in
+    (* let cmd = cmd @ [ "-T"; "chipKIT-application-COMMON.ld"; "-T"; "chipKIT-application-32MX250F128.ld" ] in *)
     run cmd
   )
 
 let available_pic32_elf = !available_pic32_elf
     
-
+(* 
 (******************************************************************************)
 (* Compile a .pic32_elf into a .hex targetting pic32 *)
 
@@ -846,7 +848,7 @@ let () =
     should_be_none_file input_pic32_hex;
 
     let input_path =
-      match available_c with
+      match available_pic32_elf with
       | None -> error "no input file to generate a .hex"
       | Some path -> path in
 
@@ -859,11 +861,11 @@ let () =
     available_pic32_hex := Some output_path;
 
     let cmd = [ Config.xc32_bin2hex  ] in
-    let cmd = cmd @ [ "-a"; input_path ] in
+    let cmd = cmd @ [ "-a"; output_path ] in
     run cmd
   ) 
 
-let available_pic32_hex = !available_pic32_hex
+let available_pic32_hex = !available_pic32_hex *)
 
 
 (******************************************************************************)
@@ -872,7 +874,7 @@ let available_pic32_hex = !available_pic32_hex
 (******************************************************************************)
 (* Compile a .arm.elf into a .hex targetting microbit TODO *)
 
-let available_hex = !available_hex
+(* let available_hex = !available_hex
 
 (******************************************************************************)
 (* Simul *)
@@ -999,4 +1001,4 @@ let () =
 
 (******************************************************************************)
 (******************************************************************************)
-(******************************************************************************)
+**************************************************************************** *)

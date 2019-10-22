@@ -1,4 +1,4 @@
-open Pic32
+open Avr
 
 let _ =
   let r = PIN8 in
