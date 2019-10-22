@@ -215,6 +215,7 @@ function target_avr () {
     mkdir -p "src/byterun/avr"
     cp -f "targets/avr/arch-specific.c" "src/byterun/avr/"
     cp -f "targets/avr/arch-specific.h" "src/byterun/avr/"
+    cp -fr "targets/avr/prims" "src/byterun/"
     for f in "arduboy" "arduino_uno" "arduino_mega_2560"
     do
         mkdir -p "src/byterun/avr/$f/"
@@ -233,6 +234,7 @@ function target_pic32 () {
     mkdir -p "src/byterun/pic32"
     cp -f "targets/pic32/arch-specific.c" "src/byterun/pic32/"
     cp -f "targets/pic32/arch-specific.h" "src/byterun/pic32/"
+    cp -fr "targets/pic32/prims" "src/byterun/"
     for f in "fubarino_mini" "lchip"
     do  
         mkdir -p "src/byterun/pic32/$f/"

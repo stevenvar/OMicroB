@@ -10,41 +10,73 @@
 
 
 
-value caml_pic32_set_bit(value reg, value bit) {
-  pic32_set_bit(Int_val(reg), Int_val(bit));
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+value caml_avr_set_bit(value reg, value bit) {
+  avr_set_bit(Int_val(reg), Int_val(bit));
   return Val_unit;
 }
 
-value caml_pic32_clear_bit(value reg, value bit) {
-  pic32_clear_bit(Int_val(reg), Int_val(bit));
+value caml_avr_clear_bit(value reg, value bit) {
+  avr_clear_bit(Int_val(reg), Int_val(bit));
   return Val_unit;
 }
 
-value caml_pic32_read_bit(value reg, value bit) {
-  return Val_bool(pic32_read_bit(Int_val(reg), Int_val(bit)));
+value caml_avr_read_bit(value reg, value bit) {
+  return Val_bool(avr_read_bit(Int_val(reg), Int_val(bit)));
 }
 
-value caml_pic32_delay(value ms) {
-  pic32_delay(Int_val(ms));
+value caml_avr_delay(value ms) {
+  avr_delay(Int_val(ms));
   return Val_unit;
+}
+
+value caml_avr_millis(value unit) {
+  return Val_int(avr_millis());
+}
+
+/******************************************************************************/
+
+value caml_avr_write_register(value reg, value val) {
+  avr_write_register(Int_val(reg), Int_val(val));
+  return Val_unit;
+}
+
+value caml_avr_read_register(value reg) {
+  return Val_int(avr_read_register(Int_val(reg)));
+}
+
+/******************************************************************************/
+
+value caml_avr_adc_init(value unit){
+  avr_adc_init();
+  return Val_unit;
+}
+
+value caml_avr_analog_read(value channel){
+  return Val_int(avr_analog_read(Int_val(channel)));
 }
 
 
 /******************************************************************************/
 
-value caml_pic32_write_register(value reg, value val) {
-  pic32_write_register(Int_val(reg), Int_val(val));
+
+value caml_avr_serial_init(value unit){
+  avr_serial_init();
   return Val_unit;
 }
 
-value caml_pic32_read_register(value reg) {
-  return Val_int(pic32_read_register(Int_val(reg)));
+value caml_avr_serial_write(value val){
+  avr_serial_write(Int_val(val));
+  return Val_unit;
 }
 
 
-/******************************************************************************/
-/******************************************************************************/
-/******************************************************************************/
+value caml_avr_serial_read(value unit){
+  return Val_int(avr_serial_read());
+}
 
 
 value caml_random_init(value n) {
