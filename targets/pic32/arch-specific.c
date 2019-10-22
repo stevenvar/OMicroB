@@ -1,5 +1,6 @@
 #include "arch-specific.h"
 #include "pic32lib.c"
+#include <inttypes.h>
 
 /******************************************************************************/
 /************************ General operations **********************************/
@@ -114,7 +115,7 @@ static inline char do_read_byte(const opcode_t *ocaml_bytecode, int pc) {
 }
 
 static inline uint8_t do_read_byte_from_flash(const void *flash_ptr, int ind) {
-  return flash_ptr[ind];
+  return ((uint8_t *) flash_ptr)[ind];
 }
 
 static inline void *do_get_primitive(void *const primitives[], uint8_t prim_ind) {
