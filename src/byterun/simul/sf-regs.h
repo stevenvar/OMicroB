@@ -27,7 +27,6 @@ char avr_serial_read();
 void avr_serial_write(char c);
 
 void microbit_print_string(char *str);
-void microbit_print_int(int i);
 void microbit_write_pixel(int x, int y, int l);
 void microbit_print_image(char *str);
 void microbit_clear_screen();

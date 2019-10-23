@@ -607,10 +607,6 @@ void microbit_print_string(char *str) {
   printf("%s\n", str);
 }
 
-void microbit_print_int(int i) {
-  printf("%d\n", i);
-}
-
 void microbit_write_pixel(int x, int y, int l) {
   if(l == 0) printf("Turning off pixel %d %d\n", x, y);
   else printf("Turning on pixel %d %d at level %d\n", x, y, l);

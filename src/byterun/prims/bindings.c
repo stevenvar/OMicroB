@@ -146,11 +146,6 @@ value caml_microbit_print_string(value s) {
   return Val_unit;
 }
 
-value caml_microbit_print_int(value i) {
-  microbit_print_int(Int_val(i));
-  return Val_unit;
-}
-
 value caml_microbit_write_pixel(value x, value y, value l) {
   microbit_write_pixel(Int_val(x), Int_val(y), Int_val(l)*255);
   return Val_unit;

@@ -38,7 +38,7 @@ $(LIB)/libcamlrun.a: $(OBJECTS)
 clean:
 	@rm -Rf .build/ $(TARGETS)
 
-microbit:
+microbit: microbit/microbitlib.c microbit/startup.c
 	$(MAKE) -C microbit
 
 .PHONY: byterun clean $(ARCHS)

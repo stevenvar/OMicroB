@@ -61,7 +61,8 @@ external millis : unit -> int = "caml_microbit_millis" [@@noalloc]
 module Screen = struct
   let init () = ()
   external print_string: string -> unit = "caml_microbit_print_string" [@@noalloc]
-  external print_int: int -> unit = "caml_microbit_print_int" [@@noalloc]
+  let print_int i =
+    print_string (string_of_int i)
   external clear_screen: unit -> unit = "caml_microbit_clear_screen" [@@noalloc]
   external unsafe_print_image: bytes -> unit = "caml_microbit_print_image" [@@noalloc]
   external unsafe_set_pixel: int -> int -> bool -> unit = "caml_microbit_write_pixel" [@@noalloc]
