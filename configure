@@ -165,6 +165,7 @@ SRC         := $ROOT/src
 BIN         := $ROOT/bin
 LIB         := $ROOT/lib
 ETC         := $ROOT/etc
+TARGET      := $TARGET
 
 define compile
         @\$(MAKE) --no-print-directory -q -C \$1 && \$(MAKE) --no-print-directory -C \$1 || \$(MAKE) -C \$1
@@ -235,6 +236,7 @@ function target_pic32 () {
     cp -f "targets/pic32/arch-specific.c" "src/byterun/pic32/"
     cp -f "targets/pic32/arch-specific.h" "src/byterun/pic32/"
     cp -fr "targets/pic32/prims" "src/byterun/"
+    cp -fr "targets/pic32/ld" "src/byterun/pic32/"
     for f in "fubarino_mini" "lchip"
     do  
         mkdir -p "src/byterun/pic32/$f/"
@@ -245,14 +247,14 @@ function target_pic32 () {
 ################################################################################
 ## Choose your targets
 
-if [[ $TARGET = "AVR" ]]
+if [[ $TARGET = "avr" ]]
 then 
     target_avr
-elif [[ $TARGET = "PIC32" ]]
+elif [[ $TARGET = "pic32" ]]
 then
     target_pic32
 else
-    error "Error: No target has been selected. Please specify target (AVR or PIC32) using -target."
+    error "Error: No target has been selected. Please specify target (avr or pic32) using -target."
 fi
 
 ################################################################################

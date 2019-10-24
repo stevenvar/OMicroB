@@ -11,8 +11,7 @@ all: config
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
-	#$(call compile, targets/avr)
-	$(call compile, targets/pic32)
+	$(call compile, targets/$(TARGET))
 
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
@@ -47,9 +46,7 @@ install: all
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
-	cp -a src/byterun/pic32 "$(INCLUDEDIR)/"
-	# if [ -d src/byterun/pic32 ]; then cp -a src/byterun/pic32 "$(INCLUDEDIR)/"; fi
-	# if [ -d src/byterun/avr ]; then cp -a src/byterun/avr "$(INCLUDEDIR)/"; fi
+	cp -a src/byterun/$(TARGET) "$(INCLUDEDIR)/"
 	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:
@@ -70,8 +67,7 @@ uninstall:
 	-rm -f "$(INCLUDEDIR)/vm/"*
 	-rm -f "$(INCLUDEDIR)/prims/"*
 	-rm -f "$(INCLUDEDIR)/simul/"*
-	-rm -rf "$(INCLUDEDIR)/avr/"*
-	-rm -rf "$(INCLUDEDIR)/pic32/"*
+	-rm -rf "$(INCLUDEDIR)/$(TARGET)/"*
 	-rm -f "$(INCLUDEDIR)/stdlib/"*
 	@for mod in $(MAN_3P_BASES); do \
 	  rm -f "$(MAN3DIR)/"$$mod.3p;	\
@@ -84,8 +80,7 @@ uninstall:
 	@if [ -d "$(INCLUDEDIR)/vm" ]; then rmdir "$(INCLUDEDIR)/vm"; fi
 	@if [ -d "$(INCLUDEDIR)/prims" ]; then rmdir "$(INCLUDEDIR)/prims"; fi
 	@if [ -d "$(INCLUDEDIR)/simul" ]; then rmdir "$(INCLUDEDIR)/simul"; fi
-	@if [ -d "$(INCLUDEDIR)/avr" ]; then rmdir "$(INCLUDEDIR)/avr"; fi
-	#@if [ -d "$(INCLUDEDIR)/pic32" ]; then rmdir "$(INCLUDEDIR)/pic32"; fi
+	@if [ -d "$(INCLUDEDIR)/$(TARGET)" ]; then rmdir "$(INCLUDEDIR)/$(TARGET)"; fi
 	@if [ -d "$(INCLUDEDIR)/stdlib" ]; then rmdir "$(INCLUDEDIR)/stdlib"; fi
 	@if [ -d "$(INCLUDEDIR)" ]; then rmdir "$(INCLUDEDIR)"; fi
 
@@ -109,7 +104,6 @@ clean:
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
-	#$(call clean, targets/avr)
-	$(call clean, targets/pic32)
+	$(call clean, targets/$(TARGET))
 
 .PHONY: all config install uninstall tests clean
