@@ -7,6 +7,7 @@ let arduinoMegaConfig: config = {
   clock = 16_000_000;
   folder = "arduino_mega_2560";
   pins_module = "ArduinoMegaPins";
+  linker_script = "";
 }
 
 let arduboyConfig: config = {
@@ -17,6 +18,7 @@ let arduboyConfig: config = {
   clock = 16_000_000;
   folder = "arduboy";
   pins_module = "ArduboyPins";
+  linker_script = "";
 }
 
 let arduinoUnoConfig: config = {
@@ -27,6 +29,7 @@ let arduinoUnoConfig: config = {
   clock = 16_000_000;
   folder = "arduino_uno";
   pins_module = "ArduinoUnoPins";
+  linker_script = "";
 }
 
 [@@@warning "-32"]

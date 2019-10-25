@@ -688,11 +688,11 @@ let port_bit_of_pin : type a b c d. (a register, b register, c register, d analo
     | PIN100 -> PE4
 
 
-external write_register : 'a register -> int -> unit = "caml_pic32_write_register" [@@noalloc]
-external read_register : 'a register -> int = "caml_pic32_read_register" [@@noalloc]
-external set_bit : 'a register -> 'a -> unit = "caml_pic32_set_bit" [@@noalloc]
-external clear_bit : 'a register -> 'a -> unit = "caml_pic32_clear_bit" [@@noalloc]
-external read_bit : 'a register -> 'a -> bool = "caml_pic32_read_bit" [@@noalloc]
+external write_register : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
+external read_register : 'a register -> int = "caml_read_register" [@@noalloc]
+external set_bit : 'a register -> 'a -> unit = "caml_set_bit" [@@noalloc]
+external clear_bit : 'a register -> 'a -> unit = "caml_clear_bit" [@@noalloc]
+external read_bit : 'a register -> 'a -> bool = "caml_read_bit" [@@noalloc]
 
 let pin_mode p m =
   let tris = tris_of_pin p in 

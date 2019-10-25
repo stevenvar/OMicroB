@@ -14,67 +14,53 @@
 /******************************************************************************/
 /******************************************************************************/
 
-value caml_avr_set_bit(value reg, value bit) {
+value caml_set_bit(value reg, value bit) {
   avr_set_bit(Int_val(reg), Int_val(bit));
   return Val_unit;
 }
 
-value caml_avr_clear_bit(value reg, value bit) {
+value caml_clear_bit(value reg, value bit) {
   avr_clear_bit(Int_val(reg), Int_val(bit));
   return Val_unit;
 }
 
-value caml_avr_read_bit(value reg, value bit) {
+value caml_read_bit(value reg, value bit) {
   return Val_bool(avr_read_bit(Int_val(reg), Int_val(bit)));
 }
 
-value caml_avr_delay(value ms) {
+value caml_delay(value ms) {
   avr_delay(Int_val(ms));
   return Val_unit;
 }
 
-value caml_avr_millis(value unit) {
+value caml_millis(value unit) {
   return Val_int(avr_millis());
 }
 
 /******************************************************************************/
 
-value caml_avr_write_register(value reg, value val) {
+value caml_write_register(value reg, value val) {
   avr_write_register(Int_val(reg), Int_val(val));
   return Val_unit;
 }
 
-value caml_avr_read_register(value reg) {
+value caml_read_register(value reg) {
   return Val_int(avr_read_register(Int_val(reg)));
 }
 
-/******************************************************************************/
 
-value caml_avr_adc_init(value unit){
-  avr_adc_init();
-  return Val_unit;
-}
-
-value caml_avr_analog_read(value channel){
-  return Val_int(avr_analog_read(Int_val(channel)));
-}
-
-
-/******************************************************************************/
-
-
-value caml_avr_serial_init(value unit){
+value caml_serial_init(value unit){
   avr_serial_init();
   return Val_unit;
 }
 
-value caml_avr_serial_write(value val){
+value caml_serial_write(value val){
   avr_serial_write(Int_val(val));
   return Val_unit;
 }
 
 
-value caml_avr_serial_read(value unit){
+value caml_serial_read(value unit){
   return Val_int(avr_serial_read());
 }
 
@@ -92,7 +78,26 @@ value caml_random_bool(value unit) {
   return Val_bool(random_bool());
 }
 
+
 /******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+/* Specific functions to AVR */
+
+value caml_avr_adc_init(value unit){
+  avr_adc_init();
+  return Val_unit;
+}
+
+value caml_avr_analog_read(value channel){
+  return Val_int(avr_analog_read(Int_val(channel)));
+}
+
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
+
 
 value caml_unsafe_string_of_bytes(value b) {
   return b;

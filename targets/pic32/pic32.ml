@@ -49,5 +49,5 @@ module type Pic32Pins = sig
   val read_bit : 'a register -> 'a -> bool
 end
 
-external delay : int -> unit = "caml_pic32_delay" [@@noalloc]
+external delay : int -> unit = "caml_delay" [@@noalloc]
 

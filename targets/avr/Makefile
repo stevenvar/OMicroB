@@ -34,7 +34,7 @@ TARGETS := $(LIB_FOLDERS) $(LIB_MLS) $(LIB_MLIS) $(LIB_CMIS) $(LIB_CMOS) $(LIBAV
 
 avrs: $(TARGETS)
 
-$(LIBAVR)/avr.cma: avr.cmo liquidCrystal.cmo
+$(LIBAVR)/avr.cma: avr.cmo #liquidCrystal.cmo
 	$(OCAMLC) -a $^ -o $@
 
 avr.cmi: avr.mli
@@ -43,11 +43,11 @@ avr.cmi: avr.mli
 avr.cmo: avr.ml avr.cmi
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
 
-liquidCrystal.cmi: liquidCrystal.mli
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
+# liquidCrystal.cmi: liquidCrystal.mli
+# 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
 
-liquidCrystal.cmo: liquidCrystal.ml liquidCrystal.cmi
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
+# liquidCrystal.cmo: liquidCrystal.ml liquidCrystal.cmi
+# 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
 
 $(SCMIS): %.cmi: %.mli
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $^ -o $@

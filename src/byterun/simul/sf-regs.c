@@ -287,7 +287,7 @@ bool avr_read_bit(uint8_t reg, uint8_t bit){
 }
 
 void avr_clear_bit(uint8_t reg, uint8_t bit){
-  /* printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit); */
+  printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit); 
   init_simulator();
   P(sem_regs);
   {
@@ -340,11 +340,11 @@ int avr_random(int max){
 /***************************************************/
 
 void pic32_set_bit(uint8_t reg, uint8_t bit) {
- 
+  printf("pic32_set_bit(%d, %d)\n", (int) reg, (int)bit);
 }
 
 void pic32_clear_bit(uint8_t reg, uint8_t bit) {
- 
+   printf("pic32_clear_bit(%d, %d)\n", (int) reg, (int)bit);
 }
 
 bool pic32_read_bit(uint8_t reg, uint8_t bit) {
@@ -360,14 +360,14 @@ uint8_t pic32_read_register(uint8_t reg) {
 
 
 void pic32_delay(int ms) {
-
+    printf("random delay\n");
 }
 
 
 /***************************************************/
 
 void avr_set_bit(uint8_t reg, uint8_t bit){
-  /* printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit); */
+  printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit); 
   init_simulator();
   P(sem_regs);
   uint8_t old_val = regs[reg];

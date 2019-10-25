@@ -1,11 +1,15 @@
-open Avr
+open Pic32
 
 let _ =
-  let r = PIN8 in
+  let r = PIN78 in
+  let p = PIN82 in
   pin_mode r OUTPUT;
-  while true do
+  pin_mode p OUTPUT;
+   while true do
     digital_write r HIGH;
-    delay 500;
+    digital_write p HIGH;
+    delay 2500;
     digital_write r LOW;
-    delay 500
-  done
+    digital_write p LOW;
+    delay 2500
+  done  

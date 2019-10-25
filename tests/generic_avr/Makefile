@@ -7,10 +7,10 @@ ATTY := /dev/tty.usbmodem1411
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -device arduino-uno -mlopt -verbose -stack-size 200 -heap-size 200 -cxxopts -save-temps
+	$(BIN)/omicrob -v $^ -device lchip -mlopt -verbose -stack-size 200 -heap-size 200
 
 flash: test.hex
-	$(BIN)/omicrob -device arduino-uno -flash -sudo $<
+	$(BIN)/omicrob -device lchip -flash -sudo $<
 
 simul: test.elf
 	./$< '../../bin/omicrob_pin_simulator' '../../bin/omicrob_circuit_simulator circuit.txt'

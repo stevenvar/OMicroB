@@ -53,13 +53,6 @@ type latg_bit = LG0 | LG1 | LG2 | LG3 | LG4 | LG5 | LG6 | LG7 |
                 LG8 | LG9 | LG10 | LG11 | LG12 | LG13 | LG14 | LG15
 
 type 'a register =
-  | TRISA : trisa_bit register
-  | TRISB : trisb_bit register
-  | TRISC : trisc_bit register
-  | TRISD : trisd_bit register
-  | TRISE : trise_bit register
-  | TRISF : trisf_bit register
-  | TRISG : trisg_bit register
   | LATA : lata_bit register 
   | LATB : latb_bit register
   | LATC : latc_bit register
@@ -67,6 +60,13 @@ type 'a register =
   | LATE : late_bit register
   | LATF : latf_bit register
   | LATG : latg_bit register
+  | TRISA : trisa_bit register
+  | TRISB : trisb_bit register
+  | TRISC : trisc_bit register
+  | TRISD : trisd_bit register
+  | TRISE : trise_bit register
+  | TRISF : trisf_bit register
+  | TRISG : trisg_bit register
   | PORTA : porta_bit register
   | PORTB : portb_bit register
   | PORTC : portc_bit register
@@ -76,6 +76,7 @@ type 'a register =
   | PORTG : portg_bit register
 
 
+
 (* 32MX795F512L has 83 I/O pins available. 
    The following pin naming convention stricly follows that which is specified in the official datasheet
    (http://ww1.microchip.com/downloads/en/devicedoc/61156g.pdf) on page 17. Therefore, certain pin numbers
@@ -83,42 +84,42 @@ type 'a register =
 *)
 
 type ('a,'b,'c,'d) pin =
-  | PIN0 : (latg_bit register, trisg_bit register, portg_bit register, yes analog_pin) pin
+  | PIN1 : (latg_bit register, trisg_bit register, portg_bit register, no analog_pin) pin
   | PIN3 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
   | PIN4 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
-  | PIN5 : (late_bit register, trise_bit register, porte_bit register, yes analog_pin) pin
-  | PIN6 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN7 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN8 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN9 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN10 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN11 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN12 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN14 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN17 : (lata_bit register, trisa_bit register, porta_bit register, yes analog_pin) pin
-  | PIN18 : (late_bit register, trise_bit register, porte_bit register, yes analog_pin) pin
+  | PIN5 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
+  | PIN6 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN7 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN8 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN9 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN10 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN11 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN12 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN14 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN17 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN18 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
   | PIN19 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
-  | PIN20 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN21 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN22 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN23 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN24 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN25 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN26 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN27 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN20 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN21 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN22 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN23 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN24 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN25 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN26 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN27 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
   | PIN28 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
   | PIN29 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN32 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN33 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN34 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN35 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN32 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN33 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN34 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN35 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
   | PIN38 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
   | PIN39 : (latf_bit register, trisf_bit register, portf_bit register, no analog_pin) pin
   | PIN40 : (latf_bit register, trisf_bit register, portf_bit register, no analog_pin) pin
-  | PIN41 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN42 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN43 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN44 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN41 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN42 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN43 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN44 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
   | PIN47 : (latd_bit register, trisd_bit register, portd_bit register, no analog_pin) pin
   | PIN48 : (latd_bit register, trisd_bit register, portd_bit register, no analog_pin) pin
   | PIN49 : (latf_bit register, trisf_bit register, portf_bit register, no analog_pin) pin
