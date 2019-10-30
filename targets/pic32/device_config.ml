@@ -6,7 +6,7 @@ let fubarinoMiniConfig: config = {
   clock = 48_000_000;
   folder = "fubarino_mini";
   pins_module = "FubarinoMiniPins";
-  linker_script = ""
+  linker_scripts = ["chipKIT-application-32MX250F128.ld"; "chipKIT-application-COMMON.ld"]
 }
 
 let lchipConfig: config = {
@@ -17,7 +17,7 @@ let lchipConfig: config = {
   clock = 48_000_000;
   folder = "lchip";
   pins_module = "LchipPins";
-  linker_script = "32MX795F512L-lchip.ld"
+  linker_scripts = ["32MX795F512L-lchip.ld"]
 }
 
 [@@@warning "-32"]

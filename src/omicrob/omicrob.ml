@@ -826,12 +826,18 @@ let () =
 
     available_pic32_elf := Some output_path;
 
+
+    let append_linker_script (ls) = [ "-T"; Filename.concat includedir (Filename.concat "pic32/ld" ls) ] in
+    let rec collect_linker_scripts script_list = 
+      match script_list with
+      | [] -> []
+      | head::body -> append_linker_script (head) @ collect_linker_scripts body in
     let cmd = [ Config.xc32_cxx  ] @ default_xc32_cxx_options in
     let cmd = cmd @ [ "-mprocessor=" ^ !device_config.mmcu ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "pic32" ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "pic32" !device_config.folder) ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
-    let cmd = cmd @ [ "-T"; Filename.concat includedir (Filename.concat "pic32/ld" !device_config.linker_script) ] in
+    let cmd = cmd @ collect_linker_scripts !device_config.linker_scripts in 
     run cmd
   )
 
@@ -861,7 +867,7 @@ let () =
     available_pic32_hex := Some output_path;
 
     let cmd = [ Config.xc32_bin2hex  ] in
-    let cmd = cmd @ [ "-a"; output_path ] in
+    let cmd = cmd @ [ "-a"; input_path ] in
     run cmd
   ) 
 
@@ -949,7 +955,7 @@ let () =
       run cmd
 
     ) else if !device_config.typeD = PIC32 then (
-      (* should_be_empty_options "-avrdudeopts" avrdudeopts; *)
+      should_be_empty_options "-avrdudeopts" avrdudeopts;
       let path =
         match available_pic32_hex with
         | None -> error "no input file to flash the micro-controller"

@@ -10,7 +10,7 @@ type config = {
   clock: int;
   folder: string;
   pins_module: string;
-  linker_script: string;
+  linker_scripts: string list;
 }
 
 [@@@warning "-32"]
@@ -22,7 +22,7 @@ let defConfig = {
   clock = 0;
   folder = "";
   pins_module = "";
-  linker_script = "";
+  linker_scripts = [];
 }
 
 let get_config _ = invalid_arg "choose_config"
