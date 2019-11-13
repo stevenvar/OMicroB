@@ -7,7 +7,7 @@
 // #define COUNTS_PER_MICRO_SEC ((SYS_FREQ/2L/1000000L))
 
 /*****************************************************************************/
-volatile uint32_t *get_reg_addr(uint8_t reg) {
+volatile unsigned int *get_reg_addr(uint8_t reg) {
   if (reg == 0) return &LATA;
   if (reg == 1) return &LATB;
   if (reg == 2) return &LATC;
@@ -43,6 +43,7 @@ void pic32_write_register(uint8_t reg, uint8_t val) {
 uint8_t pic32_read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
+
 
 
 void pic32_delay(int ms) {

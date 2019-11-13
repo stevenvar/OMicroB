@@ -29,7 +29,7 @@ type latc_bit = LC0 | LC1 | LC2 | LC3 | LC4 | LC5 | LC6 | LC7 |
                 LC8 | LC9 | LC10 | LC11 | LC12 | LC13 | LC14 | LC15
 
 type 'a register =
-    LATA : lata_bit register 
+  | LATA : lata_bit register 
   | LATB : latb_bit register
   | LATC : latc_bit register
   | TRISA : trisa_bit register
@@ -311,6 +311,8 @@ external read_register : 'a register -> int = "caml_read_register" [@@noalloc]
 external set_bit : 'a register -> 'a -> unit = "caml_set_bit" [@@noalloc]
 external clear_bit : 'a register -> 'a -> unit = "caml_clear_bit" [@@noalloc]
 external read_bit : 'a register -> 'a -> bool = "caml_read_bit" [@@noalloc]
+external lchip_digital_write_lled: level -> unit = "caml_lchip_digital_write_lled" [@@noalloc]
+external lchip_digital_write_rled: level -> unit = "caml_lchip_digital_write_rled" [@@noalloc]
 
 let pin_mode p m =
   let tris = tris_of_pin p in 

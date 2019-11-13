@@ -836,8 +836,8 @@ let () =
     let cmd = cmd @ [ "-mprocessor=" ^ !device_config.mmcu ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "pic32" ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "pic32" !device_config.folder) ] in
-    let cmd = cmd @ [ input_path; "-o"; output_path ] in
     let cmd = cmd @ collect_linker_scripts !device_config.linker_scripts in 
+    let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
   )
 

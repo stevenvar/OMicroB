@@ -37,6 +37,7 @@ volatile uint32_t *get_reg_addr(uint8_t reg) {
 /*****************************************************************************/
 
 
+
 void pic32_set_bit(uint8_t reg, uint8_t bit) {
   *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
 }
@@ -57,6 +58,17 @@ uint8_t pic32_read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
+
+
+void lchip_digital_write_lled(uint8_t level) {
+  TRISDbits.TRISD5 = 0;
+  LATDbits.LATD5 = 1;
+}
+
+void lchip_digital_write_rled(uint8_t level) {
+  TRISDbits.TRISD3 = 0;
+  LATDbits.LATD3 = 1;
+}
 
 void pic32_delay(int ms) {
   int i;

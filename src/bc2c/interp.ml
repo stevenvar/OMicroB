@@ -524,6 +524,7 @@ let ccall arch ooid prim args =
       | "caml_write_register" | "caml_read_register" 
       | "caml_serial_init" | "caml_serial_write" | "caml_serial_read"
       | "caml_debut_trace" | "caml_debug_tracei"
+      | "caml_lchip_digital_write_lled" | "caml_lchip_digital_write_rled"
       | "caml_random_init" | "caml_random_bits" | "caml_random_bool" -> ()
       | _ -> 
         let print_arg arg =

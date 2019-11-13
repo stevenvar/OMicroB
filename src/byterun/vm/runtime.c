@@ -1,5 +1,4 @@
 /* Entry point including the whole runtime */
-
 #include "arch-specific.c"
 #include "array.c"
 #include "compare.c"
@@ -28,3 +27,4 @@
 #include "../prims/bindings.c"
 #include "../stdlib/random.c"
 #include "../stdlib/trace.c"
+

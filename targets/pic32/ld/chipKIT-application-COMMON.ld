@@ -35,9 +35,9 @@
  * For interrupt vector handling
  *************************************************************************/
 PROVIDE(_vector_spacing = 0x00000001);
-INPUT("crtbegin.o")
+/*INPUT("crtbegin.o")
 INPUT("crtend.o")
-INPUT("crtn.o")
+INPUT("crtn.o")*/
 OPTIONAL("libmchp_peripheral.a")
 
 /*************************************************************************
@@ -581,7 +581,7 @@ SECTIONS
     LONG(_vector_spacing << 5)                 /* spacing of both org/new vec  */
     _image_header_info_end = . ;
   } > kseg0_program_mem
-  ASSERT (SIZEOF(.header_info) == 76, "MPIDE Version not specfied correctly")
+/*  ASSERT (SIZEOF(.header_info) == 76, "MPIDE Version not specfied correctly")*/
 
   .rodata  ALIGN(4) :
   {

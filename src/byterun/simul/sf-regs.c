@@ -340,10 +340,12 @@ int avr_random(int max){
 /***************************************************/
 
 void pic32_set_bit(uint8_t reg, uint8_t bit) {
+  // printf("pic32_set_bit(%d, %d)\n", Int_val(reg), Int_val(bit));
   printf("pic32_set_bit(%d, %d)\n", (int) reg, (int)bit);
 }
 
 void pic32_clear_bit(uint8_t reg, uint8_t bit) {
+    // printf("pic32_clear_bit(%d, %d)\n", Int_val(reg), Int_val(bit));
    printf("pic32_clear_bit(%d, %d)\n", (int) reg, (int)bit);
 }
 
@@ -358,6 +360,13 @@ uint8_t pic32_read_register(uint8_t reg) {
   return 0;
 }
 
+void lchip_digital_write_rled(uint8_t level) {
+
+}
+
+void lchip_digital_write_lled(uint8_t level) {
+  
+}
 
 void pic32_delay(int ms) {
     printf("random delay\n");
