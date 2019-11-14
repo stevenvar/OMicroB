@@ -37,8 +37,6 @@ module type Pic32Pins = sig
   val set_bit : 'a register -> 'a -> unit
   val clear_bit : 'a register -> 'a -> unit
   val read_bit : 'a register -> 'a -> bool
-  val lchip_digital_write_lled: level -> unit
-  val lchip_digital_write_rled: level -> unit
 end
 
 val delay : int -> unit 

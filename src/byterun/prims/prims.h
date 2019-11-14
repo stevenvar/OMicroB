@@ -13,7 +13,3 @@ bool pic32_read_bit(uint8_t reg, uint8_t bit);
 void pic32_write_register(uint8_t reg, uint8_t val);
 uint8_t pic32_read_register(uint8_t reg);
 void pic32_delay(int ms);
-
-
-void lchip_digital_write_rled(uint8_t level);
-void lchip_digital_write_lled(uint8_t level);

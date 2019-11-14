@@ -31,17 +31,6 @@ value caml_delay(value ms) {
 
 
 
-// For lchip only
-value caml_lchip_digital_write_lled(value level) {
-  lchip_digital_write_lled(Int_val(level));
-  return Val_unit;
-}
-
-// For lchip only
-value caml_lchip_digital_write_rled(value level) {
-  lchip_digital_write_rled(Int_val(level));
-  return Val_unit;
-}
 
 
 /******************************************************************************/

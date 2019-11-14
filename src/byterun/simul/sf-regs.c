@@ -360,13 +360,6 @@ uint8_t pic32_read_register(uint8_t reg) {
   return 0;
 }
 
-void lchip_digital_write_rled(uint8_t level) {
-
-}
-
-void lchip_digital_write_lled(uint8_t level) {
-  
-}
 
 void pic32_delay(int ms) {
     printf("random delay\n");

@@ -1,8 +1,13 @@
 open Pic32
 
 let _ =
-  while 
   pin_mode PIN78 OUTPUT;
   pin_mode PIN82 OUTPUT;
-  digital_write PIN78 HIGH;
-  digital_write PIN82 HIGH;
+  while true do 
+    digital_write PIN78 HIGH;
+    digital_write PIN82 HIGH;
+    delay 2500,
+    digital_write PIN78 LOW;
+    digital_write PIN82 LOW;
+    delay 2500;
+  done
