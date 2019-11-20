@@ -812,11 +812,6 @@ let available_hex = !available_hex
 
 let available_pic32_elf = ref input_pic32_elf
 
-let pic32dir =
-  if local then Filename.concat Config.builddir "src/byterun/pic32"
-  else Filename.concat Config.includedir "pic32"
-
-let conc_pic32 s = Filename.concat pic32dir s
 
 let () =
   if !device_config.typeD = PIC32 && available_c <> None &&

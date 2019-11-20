@@ -23,31 +23,38 @@ An article describing our generic virtual machine approach has been published in
 - gcc (for simulation)
 - avr-gcc, avr-libc (for AVR microcontrollers)
 - avrdude (for flashing to an AVR)
+- xc32 (for PIC32 microcontrollers)
+- pic32prog (for fashing to a PIC32)
 
 ## Installing
 
+OMicroB currently supports AVR and PIC32 microcontrollers. 
+The installation process requires to specify which type of microcontrollers OMicroB should be compiled for.
+
 ```console
-./configure && make && make install
+./configure -target $MCU_TARGET && make && make install
 ```
+where ```$MCU_TARGET=avr|pic32```.
 
 
 ## Compiling an OCaml program
 
-OMicroB is, at the moment, tied to the AVR C compiler. In order to compile an OCaml file for an AVR microcontroller, run
+In order to compile an OCaml file, run
 
 ```
-omicrob <file.ml>
+omicrob <file.ml> -device $DEVICE
 ```
 
-that will generate a ```<file.hex>``` executable.
+that will generate a ```<file.hex>``` executable. 
+The ```omicrob -list-devices``` command lists possible values for ```$DEVICE```. 
+Note that available devices vary depending on whether OMicroB is compiled for AVR or PIC32. 
 
 (The ```omicrob -help``` command will display the various available options, such as setting the stack size, the garbage collector algorithm, etc)
-
 
 ## Flashing on a microcontroller
 
 ```console
-omicrob -flash <file.hex>
+omicrob -flash <file.hex> -device $DEVICE
 ```
 
 ## Simulator
@@ -58,3 +65,4 @@ OMicroB comes with a circuit simulator, for example running
 make simul
 ```
 in the ```tests/snake-mustard``` folder will simulate an [Arduboy]([https://arduboy.com) device on your computer, running the Snake game described in this folder.
+

@@ -7,6 +7,7 @@
 **/*.byte
 **/*.native
 **/*.elf
+**/*.pic32_elf
 **/*.avr
 **/*.hex
 **/*.elf.dSYM
