@@ -647,8 +647,8 @@ let () =
   if (
     available_byte <> None
   ) && (
-    simul || flash || no_output_requested || output_c <> None || output_elf <> None || output_avr <> None || output_hex <> None
-  ) then (
+      simul || flash || no_output_requested || output_c <> None || output_elf <> None || output_avr <> None || output_hex <> None
+    ) then (
     should_be_none_file input_avr;
     should_be_none_file input_elf;
     should_be_none_file input_hex;
@@ -677,11 +677,11 @@ let () =
     let cmd = [ bc2c ] in
     let cmd = if local then cmd @ [ "-local" ] else cmd in
     let cmd = cmd @ [
-      "-stack-size"; string_of_int stack_size;
-      "-heap-size"; string_of_int heap_size;
-      "-gc"; gc;
-      "-arch"; string_of_int arch;
-    ] in
+        "-stack-size"; string_of_int stack_size;
+        "-heap-size"; string_of_int heap_size;
+        "-gc"; gc;
+        "-arch"; string_of_int arch;
+      ] in
     let cmd = if no_clean_interp then cmd @ [ "-no-clean-interpreter" ] else cmd in
     let cmd = if no_shortcut_init then cmd @ [ "-no-shortcut-initialization" ] else cmd in
     let cmd = if no_flash_heap then cmd @ [ "-no-flash-heap" ] else cmd in
@@ -732,7 +732,7 @@ let () =
     run cmd
   )
 
-let available_elf = !available_elf 
+let available_elf = !available_elf
 
 (******************************************************************************)
 (* Compile a .c into a .avr *)
@@ -740,7 +740,8 @@ let available_elf = !available_elf
 let available_avr = ref input_avr
 
 let () =
-  if !device_config.typeD = AVR && (available_c <> None && (flash || output_avr <> None || no_output_requested)) then (
+  if !device_config.typeD = AVR && available_c <> None &&
+     (flash || output_avr <> None || output_hex <> None || no_output_requested) then (
     should_be_none_file input_avr;
     should_be_none_file input_elf;
     should_be_none_file input_hex;
@@ -780,7 +781,7 @@ let available_avr = !available_avr
 let available_hex = ref input_hex
 
 let () =
-  if !device_config.typeD = AVR && (available_avr <> None && (flash || output_hex <> None || no_output_requested)) then (
+  if !device_config.typeD = AVR && available_avr <> None && (flash || output_hex <> None || no_output_requested) then (
     should_be_none_file input_hex;
 
     let input_path =
@@ -804,28 +805,39 @@ let () =
     should_be_empty_options "-avrobjcopts" avrobjcopts;
   )
 
+let available_hex = !available_hex
+
 (******************************************************************************)
 (* Compile a .c into a .pic32_elf *)
 
 let available_pic32_elf = ref input_pic32_elf
 
+let pic32dir =
+  if local then Filename.concat Config.builddir "src/byterun/pic32"
+  else Filename.concat Config.includedir "pic32"
+
+let conc_pic32 s = Filename.concat pic32dir s
+
 let () =
-  if !device_config.typeD = PIC32 && (available_c <> None && (flash || output_pic32_elf <> None || no_output_requested)) then (
-    should_be_none_file input_pic32_elf;
+  if !device_config.typeD = PIC32 && available_c <> None &&
+  (flash || output_pic32_elf <> None || output_pic32_hex <> None || no_output_requested) then (
+ should_be_none_file input_pic32_elf;
+ (* should_be_none_file input_elf;
+ should_be_none_file input_hex; *)
 
-    let input_path =
-      match available_c with
-      | None -> error "no input file to generate a .pic32_elf"
-      | Some path -> path in
+ let input_path =
+   match available_c with
+   | None -> error "no input file to generate a .avr"
+   | Some path -> path in
 
-    let output_path =
-      get_first_defined [
-        output_pic32_elf;
-        Some input_path;
-      ] ".pic32_elf" in
+ let output_path =
+   get_first_defined [
+     output_pic32_elf;
+     output_pic32_hex;
+     Some input_path;
+   ] ".pic32_elf" in
 
-    available_pic32_elf := Some output_path;
-
+ available_pic32_elf := Some output_path;
 
     let append_linker_script (ls) = [ "-T"; Filename.concat includedir (Filename.concat "pic32/ld" ls) ] in
     let rec collect_linker_scripts script_list = 
@@ -842,16 +854,16 @@ let () =
   )
 
 let available_pic32_elf = !available_pic32_elf
-    
 
 (******************************************************************************)
 (* Compile a .pic32_elf into a .hex targetting pic32 *)
 
 let available_pic32_hex = ref input_pic32_hex
 
+
 let () =
-  if !device_config.typeD = PIC32 && (available_pic32_elf <> None && (flash || output_pic32_hex <> None || no_output_requested)) then (
-    should_be_none_file input_pic32_hex;
+  if !device_config.typeD = PIC32 && available_pic32_elf <> None && (flash || output_pic32_hex <> None || no_output_requested) then (
+    should_be_none_file input_hex;
 
     let input_path =
       match available_pic32_elf with
@@ -860,7 +872,7 @@ let () =
 
     let output_path =
       get_first_defined [
-        output_pic32_elf;
+        output_pic32_hex;
         Some input_path;
       ] ".hex" in
 
@@ -869,18 +881,10 @@ let () =
     let cmd = [ Config.xc32_bin2hex  ] in
     let cmd = cmd @ [ "-a"; input_path ] in
     run cmd
-  ) 
+  )
 
-let available_pic32_hex = !available_pic32_hex 
+let available_pic32_hex = !available_pic32_hex
 
-
-(******************************************************************************)
-(* Compile a .c into a .arm.elf TODO *)
-
-(******************************************************************************)
-(* Compile a .arm.elf into a .hex targetting microbit TODO *)
-
-let available_hex = !available_hex
 
 (******************************************************************************)
 (* Simul *)
@@ -957,7 +961,7 @@ let () =
     ) else if !device_config.typeD = PIC32 then (
       should_be_empty_options "-avrdudeopts" avrdudeopts;
       let path =
-        match available_pic32_hex with
+        match available_hex with
         | None -> error "no input file to flash the micro-controller"
         | Some path -> path in
 
@@ -972,4 +976,4 @@ let () =
 
 (******************************************************************************)
 (******************************************************************************)
-
+(******************************************************************************)
