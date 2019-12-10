@@ -2,7 +2,7 @@
 #include <p32xxxx.h>
 //#include <plib.h>
 
-// #define SYS_FREQ(80000000L)
+#define SYS_FREQ 80000000L
 // #define COUNTS_PER_MICRO_SEC ((SYS_FREQ/2L/1000000L))
 
 
@@ -59,17 +59,31 @@ uint8_t pic32_read_register(uint8_t reg) {
 }
 
 
+uint32_t millis(void) {
+  uint32_t ui;
+  uint32_t ms_ticks;
+  ui = _CP0_GET_COUNT();
+  ms_ticks = (uint32_t)((ui * 2.0) / (SYS_FREQ / 1000));
+
+  return ms_ticks;
+}
 
 void pic32_delay(int ms) {
-  int i;
-  for (i = 0; i <= 14000000; i++);
+  // int i;
+  // for (i = 0; i <= 14000000; i++);
 
-  // int begin = ReadCoreTimer();
-  // int end;
-  // if (end >= begin) {
-  //   while (ReadCoreTimer() < end);
-  // } else {
-  //   while (ReadCoreTimer() > begin);
-  //   while (ReadCoreTimer() < end);
-  // }
+  // Count the number of ticks corresponding to ms
+  int ticks_to_count;
+  ticks_to_count = (ms * (SYS_FREQ / 1000)) / 2;
+
+  // Set core timer to 0
+  _CP0_SET_COUNT(0);
+
+  // Wait until core timer increments to wanted ticks
+  while (_CP0_GET_COUNT() != ticks_to_count);
+
+  // uint32_t begin = millis();
+  // while ((millis() - begin) != (uint32_t)ms);
+
+  return;
 }

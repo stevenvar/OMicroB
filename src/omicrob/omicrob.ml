@@ -13,7 +13,7 @@ let default_arch       = 32
 let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequence"; "-strict-formats"; "-ccopt"; "-D__OCAML__" ]
 let default_cxx_options = [ "-g"; "-Wall"; "-O"; "-std=c++11" ]
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
-let default_xc32_cxx_options = [ "-std=c++11"; "-Wl,--defsym=_min_heap_size=1024" ]
+let default_xc32_cxx_options = [ "-Wl,--defsym=_min_heap_size=1024" ]
 
 let device_config = ref Device_config.defConfig
 let set_config name =
@@ -834,19 +834,34 @@ let () =
 
  available_pic32_elf := Some output_path;
 
-    let append_linker_script (ls) = [ "-T"; Filename.concat includedir (Filename.concat "pic32/ld" ls) ] in
+ (* let conc_pic32 s = Filename.concat includedir (Filename.concat "pic32/ld" s) in  *)
+     let append_linker_script (ls) = [ "-T"; Filename.concat includedir (Filename.concat "pic32/ld" ls) ] in
     let rec collect_linker_scripts script_list = 
       match script_list with
       | [] -> []
       | head::body -> append_linker_script (head) @ collect_linker_scripts body in
-    let cmd = [ Config.xc32_cxx  ] @ default_xc32_cxx_options in
+    let cmd = [ Config.xc32_cxx ] @ default_xc32_cxx_options in
     let cmd = cmd @ [ "-mprocessor=" ^ !device_config.mmcu ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "pic32" ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "pic32" !device_config.folder) ] in
     let cmd = cmd @ collect_linker_scripts !device_config.linker_scripts in 
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
     run cmd
-  )
+
+    (* let cmd = [ "xc32-g++" ] @ default_xc32_cxx_options in
+    let cmd = cmd @ [ "-mprocessor=" ^ !device_config.mmcu ] in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir "pic32" ] in
+    let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "pic32" !device_config.folder) ] in
+    let cmd = cmd @ [ input_path; "-o"; output_path ] in
+    let cmd = cmd @ [ "-D_BOARD_FUBARINO_MINI_"; "-DMPIDEVER=16777998"; "-DMPIDE=150 -DIDE=Arduino"; ] in
+    let cmd = cmd @ [ "-G1024"; "-D__USB_ENABLED__"; "-D__USB_CDCACM__"; "-D__SERIAL_IS_USB__" ] in
+    let cmd = cmd @ [ (conc_pic32 "crtn.S"); (conc_pic32 "pic32_software_reset.S"); (conc_pic32 "cpp-startup.S"); (conc_pic32 "crti.S") ] in
+    let cmd = cmd @ [ "-lm";"-T"; (conc_pic32 "chipKIT-application-32MX250F128.ld"); "-T"; (conc_pic32 "chipKIT-application-COMMON.ld") ] in *)
+
+    (* run cmd *)
+  ) 
+
+
 
 let available_pic32_elf = !available_pic32_elf
 
@@ -873,7 +888,7 @@ let () =
 
     available_pic32_hex := Some output_path;
 
-    let cmd = [ Config.xc32_bin2hex  ] in
+    let cmd = [ Config.xc32_bin2hex ] in
     let cmd = cmd @ [ "-a"; input_path ] in
     run cmd
   )
