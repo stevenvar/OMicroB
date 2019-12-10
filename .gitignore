@@ -13,4 +13,5 @@
 **/*.elf.dSYM
 **/*~
 .build/
+.vscode/
 config.ml
