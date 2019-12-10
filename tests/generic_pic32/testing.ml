@@ -8,8 +8,8 @@ let _ =
   while true do
   digital_write r HIGH;
   digital_write p HIGH;
-  delay 300; 
+  delay 4000; 
   digital_write r LOW;
   digital_write p LOW;
-  delay 300;
+  delay 4000;
  done

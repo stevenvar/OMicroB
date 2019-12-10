@@ -45,17 +45,19 @@ uint8_t pic32_read_register(uint8_t reg) {
 }
 
 
+uint32_t millis() {
+  uint32_t time_ticks, time_ms;
+
+  time_ticks = _CP0_GET_COUNT();
+  time_ms = (uint32_t)((time_ticks * 2.0) / (SYS_FREQ / 1000));
+
+  return time_ms;
+}
 
 void pic32_delay(int ms) {
-  int i;
-  for (i = 0; i <= 14000000; i++);
-
-  // int begin = ReadCoreTimer();
-  // int end;
-  // if (end >= begin) {
-  //   while (ReadCoreTimer() < end);
-  // } else {
-  //   while (ReadCoreTimer() > begin);
-  //   while (ReadCoreTimer() < end);
-  // }
+  uint32_t begin;
+  
+  begin = millis();
+  while ((millis() - begin) < (uint32_t) ms);
 }
+

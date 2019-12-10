@@ -59,31 +59,19 @@ uint8_t pic32_read_register(uint8_t reg) {
 }
 
 
-uint32_t millis(void) {
-  uint32_t ui;
-  uint32_t ms_ticks;
-  ui = _CP0_GET_COUNT();
-  ms_ticks = (uint32_t)((ui * 2.0) / (SYS_FREQ / 1000));
+uint32_t millis() {
+  uint32_t time_ticks, time_ms;
 
-  return ms_ticks;
+  time_ticks = _CP0_GET_COUNT();
+  time_ms = (uint32_t)((time_ticks * 2.0) / (SYS_FREQ / 1000));
+
+  return time_ms;
 }
 
 void pic32_delay(int ms) {
-  // int i;
-  // for (i = 0; i <= 14000000; i++);
-
-  // Count the number of ticks corresponding to ms
-  int ticks_to_count;
-  ticks_to_count = (ms * (SYS_FREQ / 1000)) / 2;
-
-  // Set core timer to 0
-  _CP0_SET_COUNT(0);
-
-  // Wait until core timer increments to wanted ticks
-  while (_CP0_GET_COUNT() != ticks_to_count);
-
-  // uint32_t begin = millis();
-  // while ((millis() - begin) != (uint32_t)ms);
-
-  return;
+  uint32_t begin;
+  
+  begin = millis();
+  while ((millis() - begin) < (uint32_t) ms);
 }
+
