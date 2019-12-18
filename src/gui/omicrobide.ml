@@ -16,6 +16,12 @@ let omicrob =
 
 (* Parameters *)
 type device = Arduboy | ArduinoUno | ArduinoMega
+
+let string_of_device = function
+  | Arduboy -> "arduboy"
+  | ArduinoUno -> "arduino-uno"
+  | ArduinoMega -> "arduino-mega"
+
 let device = ref Arduboy
 let stack_size = ref 200
 let heap_size = ref 200
@@ -107,13 +113,14 @@ let run_for_output_and_errors cmd =
 
 (** Compilation command 1 : .ml -> .byte *)
 let compilation_command_1 filename =
-  Printf.sprintf "%s -v %s -o %s" omicrob
-    filename
+  Printf.sprintf "%s -v -device %s %s -o %s" omicrob
+    (string_of_device !device) filename
     ((Filename.remove_extension filename)^".byte")
 
 (** Compilation command 2 : .byte -> end *)
 let compilation_command_2 filename =
-  Printf.sprintf "%s -v %s -stack-size %d -heap-size %d" omicrob
+  Printf.sprintf "%s -v -device %s %s -stack-size %d -heap-size %d"
+    omicrob (string_of_device !device)
     ((Filename.remove_extension filename)^".byte")
     !stack_size !heap_size
 
