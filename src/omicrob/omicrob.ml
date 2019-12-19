@@ -805,6 +805,12 @@ let () =
     should_be_empty_options "-avrobjcopts" avrobjcopts;
   )
 
+(******************************************************************************)
+(* Compile a .c into a .arm.elf TODO *)
+
+(******************************************************************************)
+(* Compile a .arm.elf into a .hex targetting microbit TODO *)
+
 let available_hex = !available_hex
 
 (******************************************************************************)

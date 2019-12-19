@@ -1,4 +1,3 @@
-
 let arduinoMegaConfig: config = {
   typeD = AVR;
   mmcu = "atmega2560";
