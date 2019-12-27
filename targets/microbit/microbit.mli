@@ -32,13 +32,13 @@ external millis: unit -> int = "caml_microbit_millis" [@@noalloc]
 
 module Screen: Circuits.Display
 
-(* module Serial: sig
- *   val init: unit -> unit
- *   val write: string -> unit
- *   val read: unit -> string
- * end
- * 
- * module Accelerometer: sig
+module Serial: sig
+  val init: unit -> unit
+  val write: string -> unit
+  val read: unit -> string
+end
+
+(* module Accelerometer: sig
  *   val x: unit -> int
  *   (\** Returns the x acceleration in milli-gs *\)
  * 

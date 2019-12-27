@@ -81,23 +81,23 @@ module Screen = struct
     unsafe_set_pixel x y l
 end
 
-(* module Serial = struct
- *   let init () = ()
- *   external write_char: char -> unit = "caml_microbit_serial_write_char" [@@noalloc]
- *   let write s = String.iter write_char s
- * 
- *   external read_char: unit -> char = "caml_microbit_serial_read_char" [@@noalloc]
- *   let read () =
- *     let s = ref ""
- *     and c = ref (read_char ()) in
- *     while((int_of_char !c) <> 0) do
- *       s := (!s^(String.make 1 !c));
- *       c := (read_char ())
- *     done;
- *     if(String.length !s > 0) then String.sub !s 0 ((String.length !s)-1) else !s
- * end
- * 
- * module Accelerometer = struct
+module Serial = struct
+  let init () = ()
+  external write_char: char -> unit = "caml_microbit_serial_write_char" [@@noalloc]
+  let write s = String.iter write_char s
+
+  external read_char: unit -> char = "caml_microbit_serial_read_char" [@@noalloc]
+  let read () =
+    let s = ref ""
+    and c = ref (read_char ()) in
+    s := (!s^(String.make 1 !c));
+    while((int_of_char !c) <> 0 && !c <> '\n' && !c <> '\r') do
+      c := (read_char ());
+      s := (!s^(String.make 1 !c))
+    done; String.sub !s 0 (String.length !s - 1)
+end
+
+(* module Accelerometer = struct
  *   external x: unit -> int = "caml_microbit_accelerometer_x" [@@noalloc]
  *   external y: unit -> int = "caml_microbit_accelerometer_y" [@@noalloc]
  *   external z: unit -> int = "caml_microbit_accelerometer_z" [@@noalloc]
