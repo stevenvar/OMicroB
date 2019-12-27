@@ -18,23 +18,31 @@ void device_finish() {
 /******************************************************************************/
 
 void debug_blink_error(void) {
-  /* TODO */
-  return;
+  while(1) {
+    char s[] = "E";
+    microbit_print_string(s);
+    microbit_delay(300);
+  }
 }
 
 void debug_blink_uncatched_exception(void) {
-  /* TODO */
-  return;
+  while(1) {
+    char s[] = "U";
+    microbit_print_string(s);
+    microbit_delay(300);
+  }
 }
 
 void debug_blink_message(int n) {
-  /* TODO */
-  return;
+  char buf[50];
+  sprintf(buf, "%d", n);
+  microbit_print_string(buf);
 }
 
 void debug_blink_pause(void) {
-  /* TODO */
-  return;
+  char s[] = "P";
+  microbit_print_string(s);
+  microbit_delay(1000);
 }
 
 #if DEBUG > 0
