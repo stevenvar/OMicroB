@@ -1,5 +1,3 @@
-#ifndef __AVR__
-
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
@@ -29,5 +27,3 @@ value caml_string_of_int64(value v) {
   snprintf(buf, sizeof(buf), "%" PRId64, (int64_t) Field(v, 1));
   return caml_copy_string(buf);
 }
-
-#endif

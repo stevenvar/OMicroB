@@ -2,9 +2,6 @@
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#ifdef __PC__
-#include <stdlib.h>
-#endif
 
 #include "debug.h"
 #include "values.h"
@@ -28,67 +25,25 @@ value *sp;
 value trapSp;
 uint8_t extra_args;
 
-#if defined(__PC__) && DEBUG >= 1
-    unsigned int cpt_instr = 0;
-#endif
-
-
-#ifdef __AVR__
-#include <avr/interrupt.h>
-#endif
-
 PROGMEM extern void * const ocaml_primitives[];
 
 /******************************************************************************/
 /* Read tools for program memory */
 
 static inline void *get_primitive(uint8_t prim_ind) {
-#ifdef __AVR__
-  return (void *) pgm_read_word_near(ocaml_primitives + prim_ind);
-#else
-  return ocaml_primitives[prim_ind];
-#endif
+  return do_get_primitive(ocaml_primitives, prim_ind);
 }
 
 static inline value read_flash_global_data_1B(uint8_t glob_ind) {
-#ifdef __AVR__
-#if OCAML_VIRTUAL_ARCH == 16
-  return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 32
-  return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 64
-  value v1 = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-  value v2 = pgm_read_dword_near((char *) (ocaml_flash_global_data + glob_ind) + 4);
-  return (v2 << 32) | v1;
-#endif
-#else
-  return ocaml_flash_global_data[glob_ind];
-#endif
+  return do_read_flash_data_1B(ocaml_flash_global_data, glob_ind);
 }
 
 static inline value read_flash_global_data_2B(uint16_t glob_ind) {
-#ifdef __AVR__
-#if OCAML_VIRTUAL_ARCH == 16
-  return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 32
-  return (value) pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-#elif OCAML_VIRTUAL_ARCH == 64
-  value v1 = pgm_read_dword_near(ocaml_flash_global_data + glob_ind);
-  value v2 = pgm_read_dword_near((char *) (ocaml_flash_global_data + glob_ind) + 4);
-  return (v2 << 32) | v1;
-#endif
-#else
-  return ocaml_flash_global_data[glob_ind];
-#endif
+  return do_read_flash_data_2B(ocaml_flash_global_data, glob_ind);
 }
 
 static inline char read_byte(void) {
-  char c;
-#ifdef __AVR__
-  c = pgm_read_byte_near(ocaml_bytecode + pc);
-#else
-  c = ocaml_bytecode[pc];
-#endif
+  char c = do_read_byte(ocaml_bytecode, pc);
   pc ++;
   return c;
 }
@@ -187,11 +142,7 @@ static inline void pop_n(int n) {
 static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, uint16_t size) {
   uint16_t ind = 0;
   for (ind = 0; ind < size; ind ++) {
-#ifdef __AVR__
-    uint8_t byte = pgm_read_byte_near(&((uint8_t *) flash_ptr)[ind]);
-#else
-    uint8_t byte = ((uint8_t *) flash_ptr)[ind];
-#endif
+    uint8_t byte = do_read_byte_from_flash(flash_ptr, ind);
     ((uint8_t *) ram_ptr)[ind] = byte;
   }
 }
@@ -237,7 +188,7 @@ static inline void interp(void) {
 
   while (1) {
 
-#if defined(__PC__) && DEBUG >= 4 // DUMP STACK AND HEAP
+#if DEBUG >= 4 // DUMP STACK AND HEAP
     {
       printf("=========\n");
       /* print_global(); */
@@ -252,23 +203,6 @@ static inline void interp(void) {
       printf("pc = %d\n", pc);
       printf("extra_args = %d\n", extra_args);
     }
-#endif
-
-
-
-#ifdef __AVR__
-#if DEBUG >=3
-    /* char str[20]; */
-    /* itoa( pc, str, 10); */
-    /* avr_serial_write('['); */
-    /* for(int i = 0; i < 20; i++){ */
-      /* if(str[i]=='\0') break; */
-      /* avr_serial_write(str[i]); */
-    /* } */
-    /* avr_serial_write(']'); */
-    /* avr_serial_write('\n'); */
-    /* printf("[%d]",pc); */
-#endif
 #endif
 
     assert(pc >= 0 && pc < OCAML_BYTECODE_BSIZE);
@@ -1603,40 +1537,8 @@ static inline void interp(void) {
       ocaml_raise:
       TRACE_INSTRUCTION("RAISE");
       if (trapSp == Val_int(-1)) {
-#if defined (__PC__)
-        value str;
-        int i;
-        char c;
-        if (Is_block(acc) && Tag_val(acc) == Object_tag && Wosize_val(acc) > 0 && Is_block(Field(acc, 0)) && Tag_val(Field(acc, 0)) == String_tag) {
-          str = Field(acc, 0);
-        } else {
-          str = Field(Field(acc, 0), 0);
-        }
-        printf("Error: uncaught exception: ");
-        i = 0;
-        c = String_field(str, 0);
-        while (c != '\0') {
-          printf("%c", c);
-          i ++;
-          c = String_field(str, i);
-        }
-        if (Is_block(acc) && Tag_val(acc) == 0 && Wosize_val(acc) > 1 && Is_block(Field(acc, 1)) && Tag_val(Field(acc, 1)) == String_tag) {
-          printf(" \"");
-          str = Field(acc, 1);
-          i = 0;
-          c = String_field(str, 0);
-          while (c != '\0') {
-            printf("%c", c);
-            i ++;
-            c = String_field(str, i);
-          }
-          printf("\"");
-        }
-        printf("\n");
+        uncaught_exception(acc);
         return;
-#else
-        debug_blink_error();
-#endif
       } else {
         sp = ocaml_stack + Int_val(trapSp);
         pc = Codeptr_val(pop());
@@ -2427,16 +2329,13 @@ static inline void interp(void) {
 #ifdef OCAML_STOP
     case OCAML_STOP : {
       TRACE_INSTRUCTION("STOP");
-      #ifndef __PC__
-      while(1){ /* This is needed to easily soft reset the AVR  */}
-      #endif
       return;
     }
 #endif
 
     default:
 
-#if defined(__PC__) && DEBUG >= 2
+#if DEBUG >= 2
       printf("UNKNOWN INSTRUCTION %d", opcode);
 #endif
       assert(0);
@@ -2449,51 +2348,14 @@ static inline void interp(void) {
 /******************************************************************************/
 /* Main function */
 
-#ifdef __PC__
-extern const char **global_argv; // used by simulator
-#endif
-
 int main(int argc, const char **argv) {
-#ifdef __PC__
-  global_argv = argv;
-#endif
-
-#ifdef __AVR__
-
-  unsigned long ctc_match_overflow;
-
-cli();
-  ctc_match_overflow = ((F_CPU / 1000) / 8); //when timer1 is this value, 1ms has passed
-
-  // (Set timer to clear when matching ctc_match_overflow) | (Set clock divisor to 8)
-  TCCR1B |= (1 << WGM12) | (1 << CS11);
-
-  // high byte first, then low byte
-  OCR1AH = (ctc_match_overflow >> 8);
-  OCR1AL = ctc_match_overflow;
-
-  // Enable the compare match interrupt
-TIMSK1 |= (1 << OCIE1A);
-
-avr_serial_init();
-
-
-#endif
+  device_init(argv);
 
   interp_init();
   gc_init();
   interp();
 
-
-#if defined(__PC__) && DEBUG >= 1
-  printf("# of instructions = %d\n", cpt_instr);
-  printf("# of gc = %d\n", gc_count);
-#endif
-
-
-#ifdef __AVR__
-  while(1) _delay_ms(10);
-#endif
+  device_finish();
 
   return 0;
 }

@@ -1,7 +1,3 @@
-#ifdef __PC__
-#include <stdio.h>
-#endif
-
 #include <string.h>
 #include "values.h"
 #include "fail.h"
@@ -312,16 +308,12 @@ static void compact_blocks(void) {
 
 void gc(void) {
   gc_count ++;
-#if defined(__AVR__) && DEBUG >= 3
+#if DEBUG >= 3
   printf("#################### MARK & COMPACT ####################\n");
   print_dynamic_heap();
 #endif
 
-
-#if defined(__PC__) && DEBUG >= 1 // TRACE GC RUNS
-  printf("#################### MARK & COMPACT ####################\n");
-#endif
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+#if DEBUG >= 3 // DUMP STACK AND HEAP
   printf("&acc = %p\n", &acc);
   printf("&env = %p\n", &env);
   printf("acc = "); print_value(acc);
@@ -336,13 +328,13 @@ void gc(void) {
   mark_roots();
   wipe_dead_blocks();
 
-#if defined(__AVR__) && DEBUG >= 3
+#if DEBUG >= 3
   printf("#################### MARK AFTER WIPE ####################\n");
   print_dynamic_heap();
 #endif
 
 
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+#if DEBUG >= 3 // DUMP STACK AND HEAP
   printf("MARK AFTER WIPE \n");
   print_dynamic_heap();
 #endif
@@ -351,57 +343,30 @@ void gc(void) {
   reverse_root_pointers();
 
 
-#if defined(__AVR__) && DEBUG >= 3
+#if DEBUG >= 3
   printf("#################### MARK BEFORE REVERSE HEAP ####################\n");
   print_dynamic_heap();
 #endif
 
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-  printf("MARK BEFORE REVERSE HEAP\n");
-  print_dynamic_heap();
-#endif
-
-
   reverse_heap_pointers();
 
-
-#if defined(__AVR__) && DEBUG >= 3
+#if DEBUG >= 3
   printf("#################### MARK BEFORE UPDATE ####################\n");
   print_dynamic_heap();
 #endif
 
-
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-  printf("MARK BEFORE UPDATE\n");
-  print_dynamic_heap();
-#endif
-
-
   update_pointers();
 
 
-#if defined(__AVR__) && DEBUG >= 3
+#if DEBUG >= 3
   printf("#################### MARK BEFORE COMPACT ####################\n");
   print_dynamic_heap();
 #endif
 
-
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-  printf("MARK BEFORE COMPACT\n");
-  print_dynamic_heap();
-#endif
-
-
   compact_blocks();
 
-#if defined(__AVR__) && DEBUG >= 3
-  printf("#################### AFTER MARK & COMPACT ####################\n");
-  print_dynamic_heap();
-#endif
-
-
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
-  printf("END OF MARK & COMPACT\n");
+#if DEBUG >= 3 // DUMP STACK AND HEAP
+  printf("################### END OF MARK & COMPACT ####################\n");
   printf("&acc = %p\n", &acc);
   printf("&env = %p\n", &env);
   printf("acc = "); print_value(acc);

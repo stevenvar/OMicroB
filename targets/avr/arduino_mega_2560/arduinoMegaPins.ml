@@ -1,3 +1,5 @@
+open Avr
+
 type porta_bit = PA0 | PA1 | PA2 | PA3 | PA4 | PA5 | PA6 | PA7
 type portb_bit = PB0 | PB1 | PB2 | PB3 | PB4 | PB5 | PB6 | PB7
 type portc_bit = PC0 | PC1 | PC2 | PC3 | PC4 | PC5 | PC6 | PC7
@@ -76,12 +78,6 @@ type 'a register =
   | SPSR : spsr_bit register
   | SPDR : spsr_bit register
 
-type yes
-type no
-type 'a analog_pin =
-  | YES : yes analog_pin
-  | NO : no analog_pin
-
 type ('a,'b,'c,'d) pin =
   | PIN0  : (porte_bit register, ddre_bit register, pine_bit register, no analog_pin) pin
   | PIN1  : (porte_bit register, ddre_bit register, pine_bit register, no analog_pin) pin
@@ -153,10 +149,6 @@ type ('a,'b,'c,'d) pin =
   | PINA13 : (portk_bit register, ddrk_bit register, pink_bit register, yes analog_pin) pin
   | PINA14 : (portk_bit register, ddrk_bit register, pink_bit register, yes analog_pin) pin
   | PINA15 : (portk_bit register, ddrk_bit register, pink_bit register, yes analog_pin) pin
-
-type mode = INPUT | OUTPUT | INPUT_PULLUP
-
-type level = LOW | HIGH
 
 let port_of_pin : type a b c d. (a register,b register, c register, d analog_pin) pin -> a register =
   function
@@ -303,7 +295,6 @@ let ddr_of_pin : type a b c d. (a register , b register, c register, d analog_pi
   | PINA13 -> DDRK
   | PINA14 -> DDRK
   | PINA15 -> DDRK
-
 
 let input_of_pin : type a b c d. (a register , b register, c register, d analog_pin) pin -> c register=
   function
@@ -525,8 +516,6 @@ let ddr_bit_of_pin : type a b c d. (a register, b register, c register, d analog
   | PINA14 -> DK6
   | PINA15 -> DK7
 
-
-
 let input_bit_of_pin : type a b c d. (a register, b register, c register, d analog_pin) pin -> c =
   function
   | PIN0 -> IE0
@@ -600,17 +589,11 @@ let input_bit_of_pin : type a b c d. (a register, b register, c register, d anal
   | PINA14 -> IK6
   | PINA15 -> IK7
 
-
 external write_register : 'a register -> int -> unit = "caml_avr_write_register" [@@noalloc]
 external read_register : 'a register -> int = "caml_avr_read_register" [@@noalloc]
 external set_bit : 'a register -> 'a -> unit = "caml_avr_set_bit" [@@noalloc]
 external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit" [@@noalloc]
 external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit" [@@noalloc]
-external delay : int -> unit = "caml_avr_delay" [@@noalloc]
-external millis : unit -> int = "caml_avr_millis" [@@noalloc]
-
-let bool_of_level = function LOW -> false | HIGH -> true
-let level_of_bool = function false -> LOW | true -> HIGH
 
 let pin_mode p m =
   let port = port_of_pin p in
@@ -636,49 +619,7 @@ let digital_write p b =
 
 let digital_read p =
   let input = input_of_pin p in
-  let ibit = input_bit_of_pin p in
-  match read_bit input ibit with
+  let bit = input_bit_of_pin p in
+  match read_bit input bit with
   | true -> HIGH
   | false -> LOW
-
-external adc_init : unit -> unit = "caml_avr_adc_init"
-
-external avr_analog_read : int -> int = "caml_avr_analog_read"
-
-
-let channel_of_pin : type a b c. (a register , b register, c register, yes analog_pin) pin -> int = function
-  | PINA0 -> 0
-  | PINA1 -> 1
-  | PINA2 -> 2
-  | PINA3 -> 3
-  | PINA4 -> 4
-  | PINA5 -> 5
-  | PINA6 -> 6
-  | PINA7 -> 7
-  | PINA8 -> 8
-  | PINA9 -> 9
-  | PINA10 -> 10
-  | PINA11 -> 11
-  | PINA12 -> 12
-  | PINA13 -> 13
-  | PINA14 -> 14
-  | PINA15 -> 15
-
-let analog_read p =
-  let channel = channel_of_pin p in
-  avr_analog_read channel
-
-
-module Serial = struct
-
-  external init: unit -> unit = "caml_avr_serial_init" [@@noalloc]
-  external read : unit -> char = "caml_avr_serial_read" [@@noalloc]
-  external write : char -> unit = "caml_avr_serial_write" [@@noalloc]
-
-  let write_string s =
-    String.iter write s
-
-  let write_int n =
-    write_string (string_of_int n)
-
-end

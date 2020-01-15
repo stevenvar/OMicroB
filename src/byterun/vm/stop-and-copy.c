@@ -67,7 +67,7 @@ void gc_init(void) {
   current_heap = 0;
 }
 
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+#if DEBUG >= 3 // DUMP STACK AND HEAP
 
 static void clean_heap(){
   value* from = tab_heap_start[(current_heap+1)%2];
@@ -162,11 +162,11 @@ void gc_one_val(value* ptr, int update) {
 void gc(void) {
   gc_count ++;
   
-#if defined(__PC__) && DEBUG >= 1 // TRACE GC RUNS
+#if DEBUG >= 1 // TRACE GC RUNS
   printf("#################### STOP & COPY ####################\n");
 #endif
 
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+#if DEBUG >= 3 // DUMP STACK AND HEAP
   print_static_heap();
   print_dynamic_heap();
   print_flash_heap();
@@ -212,7 +212,7 @@ void gc(void) {
   gc_one_val(&acc,1);
   gc_one_val(&env,1);
 
-#if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
+#if DEBUG >= 3 // DUMP STACK AND HEAP
   printf("End of GC number %d\n", gc_count);
   clean_heap();
   print_static_heap();

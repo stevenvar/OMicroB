@@ -7,7 +7,6 @@
 #include "prims.h"
 #include "../stdlib/random.h"
 #include "../stdlib/trace.h"
-#include "../stdlib/delay.h"
 
 /******************************************************************************/
 /******************************************************************************/
@@ -28,7 +27,7 @@ value caml_avr_read_bit(value reg, value bit) {
 }
 
 value caml_avr_delay(value ms) {
-  delay(Int_val(ms));
+  avr_delay(Int_val(ms));
   return Val_unit;
 }
 

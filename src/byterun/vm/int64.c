@@ -5,14 +5,6 @@
 #include "gc.h"
 #include "str.h"
 
-#if OCAML_VIRTUAL_ARCH == 16
-#define Int64_val(v) (Is_int(v) ? (int64_t) Int_val(v) : ((int64_t) (uint16_t) Field(v, 1)) | ((int64_t) (uint16_t) Field(v, 2) << 16) | ((int64_t) (uint16_t) Field(v, 3) << 32) | ((int64_t) Field(v, 4) << 48))
-#elif OCAML_VIRTUAL_ARCH == 32
-#define Int64_val(v) (Is_int(v) ? (int64_t) Int_val(v) : ((int64_t) (uint32_t) Field(v, 1)) | ((int64_t) Field(v, 2) << 32))
-#elif OCAML_VIRTUAL_ARCH == 64
-#define Int64_val(v) (Is_int(v) ? (int64_t) Int_val(v) : ((int64_t) Field(v, 1)))
-#endif
-
 static value value_of_int64(int64_t n) {
 #if OCAML_VIRTUAL_ARCH == 16
   if (-0x4000 <= n && n <= 0x3FFF) {
@@ -135,11 +127,7 @@ value caml_int64_to_float(value v) {
 
 value caml_string_of_int64(value v) {
   char buf[26];
-#ifndef __AVR__
-  snprintf(buf, sizeof(buf), "%" PRId64, Int64_val(v));
-#else
-  snprintf(buf, sizeof(buf), "%lld", Int64_val(v));
-#endif
+  format_int64(buf, sizeof(buf), v);
   return copy_bytes(buf);
 }
 
