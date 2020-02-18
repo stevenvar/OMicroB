@@ -1,4 +1,4 @@
-include ../../etc/Makefile.conf
+include ../../../../etc/Makefile.conf
 
 ATTY     := /dev/tty.usbmodem14331
 # CFLAGS   := -mmcu=atmega32u4 -DUSB_VID=0x2341 -DUSB_PID=0x8036 -DF_CPU=16000000L -DARDUINO=105 -ffunction-sections -fdata-sections -Os -w -fno-exceptions -I/usr/share/arduino/hardware/arduino/cores/arduino/avr-libc
@@ -12,42 +12,27 @@ TARGETS := ardulib.byte ardulib.c ardulib.elf ardulib.avr ardulib.hex
 
 ardulib: $(TARGETS)
 
-run: ardulib.elf
-	./ardulib.elf
-
-
-simul : ardulib.elf
-	./ardulib.elf ../../bin/omicrob_pin_simulator
+$(TARGETS): spi.ml oled.ml ardulib.ml
+	$(BIN)/omicrob -v $^ -device arduboy
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)
-	@rm -rf *.elf.dSYM
-
-.PHONY: ardulib run clean flash
+	@rm -Rf *.elf.dSYM
 
 ################################################################################
 
-ardulib.byte: spi.ml ardulib.ml
-	CAMLLIB=$(LIB) ocamlc -custom -I $(SRC)/byterun $^ -o $@
-	ocamlclean $@ -o $@
+run: ardulib.elf
+	./ardulib.elf
 
-ardulib.c: ardulib.byte $(BIN)/bc2c
-	$(BIN)/bc2c -local -arch 32 -heap-size 300 -stack-size 32 $< -o $@
-
-ardulib.elf: ardulib.c
-	$(GXX) -I $(OCAMLWHERE) $(INCLUDES) $(OPT) -g $^ -o $@
+simul : ardulib.elf
+	./ardulib.elf '../../bin/omicrob_circuit_simulator circuit.txt'
+	#./ardulib.elf '../../bin/omicrob_lcd_simulator 128x8 dc=PIN4 cs=PIN12 rst=PIN6'
 
 ################################################################################
-
-ardulib.avr: $(wildcard $(SRC)/stdlib/*.c) ardulib.c
-	$(AVR_GXX) -O2 $(INCLUDES) $(CFLAGS) $(LFLAGS) -Wall  $^ -o $@
-
-ardulib.hex: ardulib.avr
-	$(AVR_OBJCOPY) -O ihex -R .eeprom $< $@
 
 flash: ardulib.avr
 	stty -f $(ATTY) 1200
-	sleep 1
+	sleep 0
 	$(AVRDUDE) -c avr109 -P $(ATTY) -p ATmega32U4 -b 57600 -v -D -U flash:w:$<:e
 
 listen:
@@ -55,3 +40,5 @@ listen:
 	cat $(ATTY)
 
 ################################################################################
+
+.PHONY: ardulib run clean flash

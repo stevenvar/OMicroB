@@ -1,5 +1,3 @@
-open Avr
-
 let _ =
   pin_mode PIN13 OUTPUT;
   pin_mode PIN5 OUTPUT;

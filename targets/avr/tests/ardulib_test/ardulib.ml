@@ -1,5 +1,3 @@
-open Avr
-
 let _ = 
   write_register PORTB 0xFF
 

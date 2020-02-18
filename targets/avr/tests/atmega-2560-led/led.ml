@@ -1,5 +1,3 @@
-open Avr
-
 let () =
   set_bit DDRB DB7;
   while true do

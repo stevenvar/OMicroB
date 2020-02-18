@@ -1,9 +1,7 @@
-open Avr
-
 let init_rgb r g b =
-  digital_write r true;
-  digital_write g true;
-  digital_write b true
+  digital_write r HIGH;
+  digital_write g HIGH;
+  digital_write b HIGH
 
 
 let boot_pins () =
@@ -32,9 +30,9 @@ let boot_pins () =
   pin_mode dc OUTPUT;
   pin_mode rst OUTPUT;
   init_rgb r g b;
-  digital_write rst true;
-  digital_write rst false;
-  digital_write rst true
+  digital_write rst HIGH;
+  digital_write rst LOW;
+  digital_write rst HIGH
 
 let sleep x =
   for i = 0 to x do
@@ -53,7 +51,7 @@ let () =
   let buttonA = PIN7 in
   let buttonB = PIN8 in
   let buttonUp = PINA0 in
-  digital_write PIN9 false;
+  digital_write PIN9 LOW;
   for i = 0 to 1000 do
     (* let (i,j) = !bidule in *)
     (* let new_i = (i+1) mod 64 in *)

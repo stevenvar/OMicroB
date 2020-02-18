@@ -1,4 +1,4 @@
-include ../../etc/Makefile.conf
+include ../../../../etc/Makefile.conf
 
 SOURCES := test.ml
 TARGETS := test.byte test.c test.elf test.avr test.hex
@@ -7,10 +7,10 @@ ATTY := /dev/tty.usbmodem1411
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -device arduino-mega -mlopt -verbose -stack-size 200 -heap-size 200
+	$(BIN)/omicrob -v $^ -device arduino-uno -mlopt -verbose -stack-size 200 -heap-size 200
 
 flash: test.hex
-	$(BIN)/omicrob -device arduino-mega -flash -sudo $<
+	$(BIN)/omicrob -device arduino-uno -flash -sudo $<
 
 simul: test.elf
 	./$< '../../bin/omicrob_pin_simulator' '../../bin/omicrob_circuit_simulator circuit.txt'

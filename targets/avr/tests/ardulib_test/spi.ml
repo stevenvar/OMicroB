@@ -1,5 +1,3 @@
-open Avr
-
 type direction = LSB_first | MSB_first
 
 (* Initialise SPI connection *)

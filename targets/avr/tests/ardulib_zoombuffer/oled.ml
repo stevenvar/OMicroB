@@ -1,6 +1,4 @@
 open Spi
-open Avr
-
 
 external write_buffer : int -> int -> bool -> unit = "caml_buffer_write"
 external read_buffer : int -> int -> bool = "caml_buffer_read"
@@ -23,14 +21,14 @@ let transfer_program prog =
 
 (* Put the display in command mode *)
 let command_mode cs dc =
-  digital_write cs true;
-  digital_write dc false;
-  digital_write cs false
+  digital_write cs HIGH;
+  digital_write dc LOW;
+  digital_write cs LOW
 
 (* Put the display in data mode *)
 let data_mode cs dc =
-  digital_write dc true;
-  digital_write cs false
+  digital_write dc HIGH;
+  digital_write cs LOW
 
 let send_lcd_command cs dc com =
   command_mode cs dc;
