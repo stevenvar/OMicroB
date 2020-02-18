@@ -1,7 +1,7 @@
-include ../../etc/Makefile.conf
+include ../../../etc/Makefile.conf
 
 SOURCES := testing.ml
-TARGETS := testing.byte testing.c testing.elf testing.avr testing.hex
+TARGETS := testing.byte testing.c testing.elf testing.hex
 ATTY := /dev/tty.usbmodem1411
 
 all: $(TARGETS)
