@@ -31,10 +31,11 @@ An article describing our generic virtual machine approach has been published in
 OMicroB currently supports AVR and PIC32 microcontrollers. 
 The installation process requires to specify which type of microcontrollers OMicroB should be compiled for.
 
+For this, you should edit the *configure* file and comment/uncomment the calls to `target_avr`, `target_pic32`, ... depending on the architectures you would like to enable. The configuration script will then check that you do have the right dependencies installed for the architectures you selected.
+
 ```console
-./configure -target $MCU_TARGET && make && make install
+./configure && make && make install
 ```
-where ```$MCU_TARGET=avr|pic32```.
 
 
 ## Compiling an OCaml program
