@@ -165,7 +165,6 @@ SRC         := $ROOT/src
 BIN         := $ROOT/bin
 LIB         := $ROOT/lib
 ETC         := $ROOT/etc
-TARGET      := $TARGET
 
 define compile
         @\$(MAKE) --no-print-directory -q -C \$1 && \$(MAKE) --no-print-directory -C \$1 || \$(MAKE) -C \$1
@@ -174,6 +173,8 @@ endef
 define clean
         @\$(MAKE) --no-print-directory -C \$1 clean > /dev/null
 endef
+
+TARGETS      := \\
 " > etc/Makefile.conf
 
 ################################################################################
@@ -200,10 +201,18 @@ let version     = \"$VERSION\"
 ################################################################################
 
 # Refresh targets files
-cp "targets/device_config.ml" "src/omicrob/device_config.ml"
+function reset_targets() {
+    cp "targets/device_config.ml" "src/omicrob/device_config.ml"
+    rm -f "src/byterun/prims/prims.h"
+    cat "src/byterun/prims/indep-prims.h" > "src/byterun/prims/prims.h"
+    cat "src/byterun/prims/indep-bindings.c" > "src/byterun/prims/bindings.c"
+    cat "src/byterun/simul/indep-sf-regs.h" > "src/byterun/simul/sf-regs.h"
+    cat "src/byterun/simul/indep-sf-regs.c" > "src/byterun/simul/sf-regs.c"
+    rm -rf "src/byterun/avr/"
+    rm -rf "src/byterun/pic32"
+}
 
-rm -rf "src/stdlib/avr.mli" "src/stdlib/avr.ml" "src/byterun/avr/"
-rm -rf "src/stdlib/pic32.mli" "src/stdlib/pic32.ml" "src/byterun/pic32/"
+reset_targets
 
 function target_avr () {
     check_command "avr-g++"
@@ -216,12 +225,19 @@ function target_avr () {
     mkdir -p "src/byterun/avr"
     cp -f "targets/avr/arch-specific.c" "src/byterun/avr/"
     cp -f "targets/avr/arch-specific.h" "src/byterun/avr/"
-    cp -fr "targets/avr/prims" "src/byterun/"
+
+    cat "targets/avr/prims/prims.h" >> "src/byterun/prims/prims.h"
+    cat "targets/avr/prims/bindings.c" >> "src/byterun/prims/bindings.c"
+    cat "targets/avr/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
+    cat "targets/avr/simul/sf-regs.c" >> "src/byterun/simul/sf-regs.c"
+
     for f in "arduboy" "arduino_uno" "arduino_mega_2560"
     do
         mkdir -p "src/byterun/avr/$f/"
         cp -f "targets/avr/$f/avrlib.c" "src/byterun/avr/$f/"
     done
+
+    echo "avr \\" >> etc/Makefile.conf
 }
 
 function target_pic32 () {
@@ -235,28 +251,27 @@ function target_pic32 () {
     mkdir -p "src/byterun/pic32"
     cp -f "targets/pic32/arch-specific.c" "src/byterun/pic32/"
     cp -f "targets/pic32/arch-specific.h" "src/byterun/pic32/"
-    cp -fr "targets/pic32/prims" "src/byterun/"
     cp -fr "targets/pic32/ld" "src/byterun/pic32/"
+
+    cat "targets/pic32/prims/prims.h" >> "src/byterun/prims/prims.h"
+    cat "targets/pic32/prims/bindings.c" >> "src/byterun/prims/bindings.c"
+    cat "targets/pic32/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
+
     for f in "fubarino_mini" "lchip"
-    do  
+    do
         mkdir -p "src/byterun/pic32/$f/"
         cp -f "targets/pic32/$f/pic32lib.c" "src/byterun/pic32/$f/"
     done
+
+    echo "pic32 \\" >> etc/Makefile.conf
 }
 
 
 ################################################################################
 ## Choose your targets
 
-if [[ $TARGET = "avr" ]]
-then 
-    target_avr
-elif [[ $TARGET = "pic32" ]]
-then
-    target_pic32
-else
-    error "Error: No target has been selected. Please specify target (avr, pic32, or esp) using -target."
-fi
+target_avr
+target_pic32
 
 ################################################################################
 

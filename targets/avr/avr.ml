@@ -43,9 +43,9 @@ external delay : int -> unit = "caml_delay" [@@noalloc]
 external millis : unit -> int = "caml_millis" [@@noalloc]
 
 module Serial = struct
-  external init: unit -> unit = "caml_serial_init" [@@noalloc]
-  external read : unit -> char = "caml_serial_read" [@@noalloc]
-  external write : char -> unit = "caml_serial_write" [@@noalloc]
+  external init: unit -> unit = "caml_avr_serial_init" [@@noalloc]
+  external read : unit -> char = "caml_avr_serial_read" [@@noalloc]
+  external write : char -> unit = "caml_avr_serial_write" [@@noalloc]
 
   let write_string s =
     String.iter write s

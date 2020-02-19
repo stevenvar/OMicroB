@@ -216,7 +216,7 @@ static int is_reg_need_synchro(uint8_t reg){
     (reg >= LOWER_PORT && reg <= HIGHER_PORT);
 }
 
-static void avr_write_register_gen(int reg, uint8_t new_val){
+static void write_register_gen(int reg, uint8_t new_val){
   uint8_t old_val = regs[reg];
   if(reg >= LOWER_PORT && reg <= HIGHER_PORT){
     if(old_val != new_val){
@@ -248,15 +248,15 @@ static void avr_write_register_gen(int reg, uint8_t new_val){
   may_sleep();
 }
 
-void avr_write_register(uint8_t reg, uint8_t new_val){
+void write_register(uint8_t reg, uint8_t new_val){
   /* printf("avr_write_register(%d, %d)\n", (int) reg, (int) new_val); */
   init_simulator();
   P(sem_regs);
-  avr_write_register_gen(reg, new_val);
+  write_register_gen(reg, new_val);
   V(sem_regs);
 }
 
-uint8_t avr_read_register(uint8_t reg){
+uint8_t read_register(uint8_t reg){
   /* printf("avr_read_register(%d)\n", (int) reg); */
   uint8_t val;
   init_simulator();
@@ -268,7 +268,7 @@ uint8_t avr_read_register(uint8_t reg){
   return val;
 }
 
-bool avr_read_bit(uint8_t reg, uint8_t bit){
+bool read_bit(uint8_t reg, uint8_t bit){
     /* printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit); */
   /* Dirty hack  */
   if (reg == SPSR){
@@ -286,8 +286,8 @@ bool avr_read_bit(uint8_t reg, uint8_t bit){
   return val;
 }
 
-void avr_clear_bit(uint8_t reg, uint8_t bit){
-  printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit); 
+void clear_bit(uint8_t reg, uint8_t bit){
+  /* printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit);  */
   init_simulator();
   P(sem_regs);
   {
@@ -321,55 +321,8 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
   may_sleep();
 }
 
-int avr_millis(){
-  printf("millis()\n");
-  return 0;
-}
-
-void avr_delay(int ms) {
-  printf("delay(%d)\n", ms);
-  usleep((useconds_t) ms * 1000);
-}
-
-int avr_random(int max){
-  return 0;
-}
-
-
-
-/***************************************************/
-
-void pic32_set_bit(uint8_t reg, uint8_t bit) {
-  // printf("pic32_set_bit(%d, %d)\n", Int_val(reg), Int_val(bit));
-  printf("pic32_set_bit(%d, %d)\n", (int) reg, (int)bit);
-}
-
-void pic32_clear_bit(uint8_t reg, uint8_t bit) {
-    // printf("pic32_clear_bit(%d, %d)\n", Int_val(reg), Int_val(bit));
-   printf("pic32_clear_bit(%d, %d)\n", (int) reg, (int)bit);
-}
-
-bool pic32_read_bit(uint8_t reg, uint8_t bit) {
-  return true;
-}
-
-void pic32_write_register(uint8_t reg, uint8_t val) {
-}
-
-uint8_t pic32_read_register(uint8_t reg) {
-  return 0;
-}
-
-
-void pic32_delay(int ms) {
-    printf("random delay\n");
-}
-
-
-/***************************************************/
-
-void avr_set_bit(uint8_t reg, uint8_t bit){
-  printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit); 
+void set_bit(uint8_t reg, uint8_t bit){
+  /* printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit);  */
   init_simulator();
   P(sem_regs);
   uint8_t old_val = regs[reg];
@@ -409,6 +362,18 @@ void avr_set_bit(uint8_t reg, uint8_t bit){
   /* printf("set bit %d on reg %d \n", bit, reg); */
   V(sem_regs);
   may_sleep();
+}
+
+/***************************************************/
+
+void delay(int ms) {
+  printf("delay(%d)\n", ms);
+  usleep((useconds_t) ms * 1000);
+}
+
+int millis() {
+  printf("millis\n");
+  return 0;
 }
 
 /******************************/
@@ -591,43 +556,3 @@ void exec_instr(char *instr, int size){
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-
-
-void avr_adc_init(){
-  printf("adc init\n");
-  init_simulator();
-
-}
-
-#include <unistd.h>
-
-uint16_t avr_analog_read(uint8_t ch){
-  /* printf("analog read (%d)\n", ch); */
-  /* out_set_analog(ch,0b11111111); */
-  /* usleep(50000); */
-  /* out_set_analog(ch,analogs[ch]); */
-  return analogs[ch];
-}
-
-void avr_serial_init(){
-  init_simulator();
-  printf("serial init\n");
-  avr_set_bit(DDRD,3);
-}
-
-
-
-char avr_serial_read(){
-  printf("serial read\n");
-  avr_set_bit(PORTD,2);
-  usleep(10000);
-  avr_clear_bit(PORTD,2);
-  return '0';
-}
-
-void avr_serial_write(char c){
-  printf("serial write(%c)\n",c);
-  avr_set_bit(PORTD,3);
-  usleep(10000);
-  avr_clear_bit(PORTD,3);
-}

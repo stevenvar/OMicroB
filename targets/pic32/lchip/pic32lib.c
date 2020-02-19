@@ -38,28 +38,28 @@ volatile uint32_t *get_reg_addr(uint8_t reg) {
 
 
 
-void pic32_set_bit(uint8_t reg, uint8_t bit) {
+void set_bit(uint8_t reg, uint8_t bit) {
   *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
 }
 
-void pic32_clear_bit(uint8_t reg, uint8_t bit) {
+void clear_bit(uint8_t reg, uint8_t bit) {
   *(get_reg_addr(reg)) &= ~((uint8_t) 1 << bit);
 }
 
-bool pic32_read_bit(uint8_t reg, uint8_t bit) {
+bool read_bit(uint8_t reg, uint8_t bit) {
   return *(get_reg_addr(reg)) & ((uint8_t) 1 << bit);
 }
 
-void pic32_write_register(uint8_t reg, uint8_t val) {
+void write_register(uint8_t reg, uint8_t val) {
   *(get_reg_addr(reg)) = val;
 }
 
-uint8_t pic32_read_register(uint8_t reg) {
+uint8_t read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
 
-uint32_t millis() {
+int millis() {
   uint32_t time_ticks, time_ms;
 
   time_ticks = _CP0_GET_COUNT();
@@ -68,7 +68,7 @@ uint32_t millis() {
   return time_ms;
 }
 
-void pic32_delay(int ms) {
+void delay(int ms) {
   uint32_t begin;
   
   begin = millis();

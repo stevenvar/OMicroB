@@ -624,7 +624,7 @@ let () =
         output_hex;
         output_elf;
         Some input_path;
-      ] ".avr" in
+      ] ".hex" in
 
     DeviceConfig.compile_c_to_hex ~trace ~verbose input_path output_path;
 

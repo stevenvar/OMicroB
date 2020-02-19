@@ -1,6 +1,8 @@
 include etc/Makefile.conf
 
-all: config
+all: internals $(TARGETS)
+
+internals: config
 	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
 	$(call compile, src/h15ppx)
@@ -11,7 +13,12 @@ all: config
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
-	$(call compile, targets/$(TARGET))
+
+avr: internals
+	$(call compile, targets/avr)
+
+pic32: internals
+	$(call compile, targets/pic32)
 
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
@@ -46,7 +53,8 @@ install: all
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
-	cp -a src/byterun/$(TARGET) "$(INCLUDEDIR)/"
+	cp -a src/byterun/avr "$(INCLUDEDIR)" 2> /dev/null
+	cp -a src/byterun/pic32 "$(INCLUDEDIR)/" 2> /dev/null
 	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:
@@ -104,6 +112,7 @@ clean:
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
-	$(call clean, targets/$(TARGET))
+	$(call clean, targets/avr)
+	$(call clean, targets/pic32)
 
 .PHONY: all config install uninstall tests clean

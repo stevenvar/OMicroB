@@ -1,5 +1,5 @@
 let _ =
-  let r = PIN1 in
+  let r = PIN6 in
   let p = PIN13 in
   pin_mode r OUTPUT;
   pin_mode p OUTPUT;

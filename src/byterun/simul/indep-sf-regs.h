@@ -1,6 +1,3 @@
-/* C-interface between:                             */
-/*   -> prims/bindings.c                            */
-/*   -> simul/sf-regs.c | avr/avrlib.c              */
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -9,18 +6,30 @@
 /******************************************************************************/
 /******************************************************************************/
 
-#ifndef PRIMS_H_AVR
-#define PRIMS_H_AVR
+#ifndef SF_REG_H
+#define SF_REG_H
 
-int avr_random(int max);
-void avr_adc_init();
-uint16_t avr_analog_read(uint8_t);
+
+void init_regs(int nb_proc, int is_slow);
+void destroy_regs(void);
+void dump_regs(void);
+void exec_instr(char *instr, int size);
 
 /******************************************************************************/
 
-void avr_serial_init();
-void avr_serial_write(char val);
-char avr_serial_read();
+bool read_bit(uint8_t reg, uint8_t bit);
+void set_bit(uint8_t reg, uint8_t bit);
+void clear_bit(uint8_t reg, uint8_t bit);
+void write_register(uint8_t reg, uint8_t val);
+uint8_t read_register(uint8_t reg);
+void delay(int ms);
+int millis();
+
+/******************************************************************************/
+
+void serial_init();
+char serial_read();
+void serial_write(char c);
 
 #endif
 
