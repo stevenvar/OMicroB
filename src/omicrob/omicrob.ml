@@ -46,6 +46,7 @@ let no_flash_heap    = ref false
 let no_flash_globals = ref false
 
 let mlopts           = ref []
+let bc2copts         = ref []
 let cxxopts          = ref []
 
 (******************************************************************************)
@@ -122,6 +123,10 @@ let spec =
      "<option> Pass the given option to the C compiler");
     ("-cxxopts", Arg.String (fun opts -> cxxopts := List.rev (split opts ',') @ !cxxopts),
      "<opt1,opt2,...> Pass the given options to the C compiler");
+    ("-bc2copt", Arg.String (fun opt -> bc2copts := opt :: !bc2copts),
+     "<option> Pass the given option to bc2c");
+    ("-bc2copts", Arg.String (fun opts -> bc2copts := List.rev (split opts ',') @ !bc2copts),
+     "<opt1,opt2,...> Pass the given options to bc2c");
     ("-where", Arg.Unit (fun () -> Printf.printf "%s\n%!" (if !local then Filename.concat Config.builddir "lib" else Config.libdir); exit 0),
      " Print location of standard library and exit");
     ("-ocaml", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocaml; exit 0),
@@ -262,6 +267,7 @@ let no_flash_heap    = !no_flash_heap
 let no_flash_globals = !no_flash_globals
 
 let mlopts           = List.rev !mlopts
+let bc2copts         = List.rev !bc2copts
 let cxxopts          = List.rev !cxxopts
 
 let input_files      = List.rev !input_files
@@ -514,7 +520,7 @@ let () =
 
     available_c := Some output_path;
 
-    let cmd = [ bc2c ] in
+    let cmd = bc2c :: bc2copts in
     let cmd = if local then cmd @ [ "-local" ] else cmd in
     let cmd = cmd @ [
         "-stack-size"; string_of_int stack_size;
@@ -528,7 +534,7 @@ let () =
     let cmd = if no_flash_globals then cmd @ [ "-no-flash-globals" ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun path -> [ "-i"; path ]) input_cs) in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in
-    run cmd
+    run ~verbose cmd
 
   ) else (
     should_be_none_option "-stack-size" stack_size;
@@ -562,7 +568,7 @@ let () =
 
     available_elf := Some output_path;
 
-    let cmd = [ Config.cxx ] @ default_cxx_options @ cxxopts in
+    let cmd = [ Config.cxx ; "-D"; "__PC__" ] @ default_cxx_options @ cxxopts in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "simul" ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in

@@ -21,7 +21,7 @@ void device_init(const char **argv) {
   // Enable the compare match interrupt
   TIMSK1 |= (1 << OCIE1A);
 
-  serial_init();
+  avr_serial_init();
 }
 
 void device_finish() {

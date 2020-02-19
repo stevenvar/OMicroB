@@ -13,7 +13,8 @@ TARGETS := ardulib.byte ardulib.c ardulib.elf ardulib.avr ardulib.hex
 ardulib: $(TARGETS)
 
 $(TARGETS): spi.ml oled.ml ardulib.ml
-	$(BIN)/omicrob -v $^ -device arduboy
+	$(BIN)/omicrob -mlopts -I,lib,buffer.c -bc2copts -i,buffer.c \
+		-v $^ -device arduboy
 
 clean:
 	@rm -f *.cmi *.cmo *.cmx *.o *~ *.byte $(TARGETS)

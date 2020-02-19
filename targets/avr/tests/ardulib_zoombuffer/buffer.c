@@ -44,8 +44,8 @@ value caml_buffer_get_byte(value x) {
 
 #ifdef __AVR__
 
-#include "../../src/byterun/vm/values.h"
-#include "lib/buffer.h"
+#include "../../../../src/byterun/vm/values.h"
+#include "lib/buffer.c"
 
 value caml_buffer_write(value x, value y, value color) {
   buffer_write(Int_val(x), Int_val(y), Int_val(color));
