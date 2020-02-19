@@ -111,3 +111,20 @@ let tty ?ttyopts:(ttyopts=[]) () =
       Printf.eprintf "> Please specify a tty with option -avrdudeopts -P,/dev/ttyXXX.\n";
       exit 1;
     | [ tty ] -> tty
+
+(******************************************************************************)
+(******************************************************************************)
+(******************************************************************************)
+(* Config *)
+
+let libdir local =
+  if local then Filename.concat Config.builddir "lib"
+  else Config.libdir
+
+let includedir local =
+  if local then Filename.concat Config.builddir "src/byterun"
+  else Config.includedir
+
+let libexecdir local =
+  if local then Filename.concat Config.builddir "bin"
+  else Config.libexecdir

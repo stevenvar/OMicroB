@@ -47,9 +47,6 @@ let no_flash_globals = ref false
 
 let mlopts           = ref []
 let cxxopts          = ref []
-let avrcxxopts       = ref []
-let avrobjcopts      = ref []
-let avrdudeopts      = ref []
 
 (******************************************************************************)
 (* Specification of command line options *)
@@ -87,17 +84,17 @@ let spec =
     ("-trace", Arg.Set_int trace,
      " Set verbosity of traces: print informations about execution at runtime (default: 0)");
     ("-sudo", Arg.Set sudo,
-     " Use sudo when flashing the micro-controller with avrdude");
+     " Use sudo when flashing the micro-controller");
     ("-simul", Arg.Set simul,
      " Execute the program in simulation mode on the computer");
     ("-flash", Arg.Set flash,
-     " Transfer the program to the micro-controller with avrdude\n");
+     " Transfer the program to the micro-controller\n");
 
     ("-device", Arg.String set_config,
      "<device-name> Set the device to compile for; see -list-devices");
-    ("-list-devices", Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
-                                   (Device_config.all_config_names ());
-                                 exit 0),
+    ("-list-devices",
+     Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
+                  (Device_config.all_config_names ()); exit 0),
      " List available devices\n");
 
     ("-stack-size", Arg.Int (fun sz -> stack_size := Some sz),
@@ -125,19 +122,6 @@ let spec =
      "<option> Pass the given option to the C compiler");
     ("-cxxopts", Arg.String (fun opts -> cxxopts := List.rev (split opts ',') @ !cxxopts),
      "<opt1,opt2,...> Pass the given options to the C compiler");
-    ("-avrcxxopt", Arg.String (fun opt -> avrcxxopts := opt :: !avrcxxopts),
-     "<option> Pass the given option to the AVR C++ compiler");
-    ("-avrcxxopts", Arg.String (fun opts -> avrcxxopts := List.rev (split opts ',') @ !avrcxxopts),
-     "<opt1,opt2,...> Pass the given options to the AVR C++ compiler");
-    ("-avrobjcopt", Arg.String (fun opt -> avrobjcopts := opt :: !avrobjcopts),
-     "<option> Pass the given option to the AVR objcopy tool");
-    ("-avrobjcopts", Arg.String (fun opts -> avrobjcopts := List.rev (split opts ',') @ !avrobjcopts),
-     "<opt1,opt2,...> Pass the given options to the AVR objcopy tool");
-    ("-avrdudeopt", Arg.String (fun opt -> avrdudeopts := opt :: !avrdudeopts),
-     "<option> Pass the given option to the avrdude flashing program");
-    ("-avrdudeopts", Arg.String (fun opts -> avrdudeopts := List.rev (split opts ',') @ !avrdudeopts),
-     "<opt1,opt2,...> Pass the given options to the avrdude flashing program\n");
-
     ("-where", Arg.Unit (fun () -> Printf.printf "%s\n%!" (if !local then Filename.concat Config.builddir "lib" else Config.libdir); exit 0),
      " Print location of standard library and exit");
     ("-ocaml", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocaml; exit 0),
@@ -150,20 +134,14 @@ let spec =
      " Print location of bc2c and exit");
     ("-cxx", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.cxx; exit 0),
      " Print location of C compiler and exit");
-    ("-avr-c++", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avr_cxx; exit 0),
-     " Print location of AVR C++ compiler and exit");
-    ("-avr-objcopy", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avr_objcopy; exit 0),
-     " Print location of avr-objcopy and exit");
-    ("-avrdude", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avrdude; exit 0),
-     " Print location of avrdude and exit\n");
 
     ("-version", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.version; exit 0),
      " Print version and exit");
     ("-help", Arg.Unit (fun () -> !help ()),
-     " Print list of options and exit");
+     " Print list of options and exit\n");
     ("--help", Arg.Unit (fun () -> !help ()),
      "");
-  ])
+  ]@arch_args)
 
 (******************************************************************************)
 (* Documentation of command line options *)
@@ -177,12 +155,11 @@ Usages:\n\
 \  %s [ OPTIONS ] <src.cmo> -o <out.byte>      (compile .cmo  -> .byte using ocamlc)\n\
 \  %s [ OPTIONS ] <in.byte> -o <out.c>         (compile .byte -> .c    using bc2c)\n\
 \  %s [ OPTIONS ] <in.c> -o <out.elf>          (compile .c    -> .elf  using c++)\n\
-\  %s [ OPTIONS ] <in.c> -o <out.avr>          (compile .c    -> .avr  using c++ for avr)\n\
-\  %s [ OPTIONS ] <in.avr> -o <out.hex>        (compile .avr  -> .hex  using objcopy for avr)\n\
+\  %s [ OPTIONS ] <in.c> -o <out.hex>        (compile .c -> .hex  using architecture-specific chain)\n\
 \  %s [ OPTIONS ] -simul <in.elf> [ sim_prog ] (execute the program in simulation mode)\n\
-\  %s [ OPTIONS ] -flash <in.hex>              (flash the micro-controller using avrdude)\n\
+\  %s [ OPTIONS ] -flash <in.hex>              (flash the micro-controller using the architecture-specific programmer)\n\
 \n\
-Options:" me me me me me me me me me
+Options:" me me me me me me me me
 
 (******************************************************************************)
 (* Error and help tools *)
@@ -286,9 +263,6 @@ let no_flash_globals = !no_flash_globals
 
 let mlopts           = List.rev !mlopts
 let cxxopts          = List.rev !cxxopts
-let avrcxxopts       = List.rev !avrcxxopts
-let avrobjcopts      = List.rev !avrobjcopts
-let avrdudeopts      = List.rev !avrdudeopts
 
 let input_files      = List.rev !input_files
 let input_mls        = List.rev !input_mls
@@ -407,9 +381,6 @@ let () =
     should_be_false "-c" "-no-flash-heap" no_flash_heap;
     should_be_false "-c" "-no-flash-globals" no_flash_globals;
     should_be_empty_options "-cxxopt" cxxopts;
-    should_be_empty_options "-avrcxxopts" avrcxxopts;
-    should_be_empty_options "-avrobjcopts" avrobjcopts;
-    should_be_empty_options "-avrdudeopts" avrdudeopts;
     should_be_empty_files input_cmos;
     should_be_empty_files input_cs;
     should_be_none_file input_byte;
@@ -447,9 +418,6 @@ let () =
     should_be_false "-i" "-no-flash-heap" no_flash_heap;
     should_be_false "-i" "-no-flash-globals" no_flash_globals;
     should_be_empty_options "-cxxopt" cxxopts;
-    should_be_empty_options "-avrcxxopts" avrcxxopts;
-    should_be_empty_options "-avrobjcopts" avrobjcopts;
-    should_be_empty_options "-avrdudeopts" avrdudeopts;
     should_be_empty_files input_cmos;
     should_be_empty_files input_cs;
     should_be_none_file input_byte;
@@ -502,7 +470,7 @@ let () =
     available_byte := Some output_path;
 
     DeviceConfig.compile_ml_to_byte
-      ~ppx_options ~mlopts ~cxxopts ~trace ~verbose
+      ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
       input_paths output_path;
 
     let cmd = [ Config.ocamlclean; output_path; "-o"; output_path ] in
@@ -626,12 +594,9 @@ let () =
         Some input_path;
       ] ".hex" in
 
-    DeviceConfig.compile_c_to_hex ~trace ~verbose input_path output_path;
+    DeviceConfig.compile_c_to_hex ~local ~trace ~verbose input_path output_path;
 
     available_hex := Some output_path)
-  (* else (
-   *   should_be_empty_options "-avrcxxopts" avrcxxopts;
-   * ) *)
 
 let available_hex = !available_hex
 
