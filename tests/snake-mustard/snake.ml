@@ -117,16 +117,16 @@ let move apple snake =
   )
 
 let update_direction =
-  let old_left_state = ref Avr.HIGH in
-  let old_right_state = ref Avr.HIGH in
+  let old_left_state = ref HIGH in
+  let old_right_state = ref HIGH in
   fun snake ->
-    let new_left_state = Avr.digital_read Arduboy.button_left in
-    let new_right_state = Avr.digital_read Arduboy.button_right in
+    let new_left_state = digital_read Arduboy.button_left in
+    let new_right_state = digital_read Arduboy.button_right in
     if new_left_state <> !old_left_state then (
-      if new_left_state = Avr.HIGH then (
-        old_left_state := Avr.HIGH;
+      if new_left_state = HIGH then (
+        old_left_state := HIGH;
       ) else (
-        old_left_state := Avr.LOW;
+        old_left_state := LOW;
         snake.direction <- (
           match snake.direction with
           | North -> East
@@ -136,10 +136,10 @@ let update_direction =
         );
       )
     ) else if new_right_state <> !old_right_state then (
-      if new_right_state = Avr.HIGH then (
-        old_right_state := Avr.HIGH;
+      if new_right_state = HIGH then (
+        old_right_state := HIGH;
       ) else (
-        old_right_state := Avr.LOW;
+        old_right_state := LOW;
         snake.direction <- (
           match snake.direction with
           | North -> West
@@ -171,11 +171,11 @@ let play () =
     while true do
       move apple snake;
       update_direction snake;
-      Avr.delay (total_len - snake_length snake);
+      delay (total_len - snake_length snake);
     done
   with
-  | Win  -> Avr.(digital_write Arduboy.g LOW)
-  | Lose -> Avr.(digital_write Arduboy.r LOW)
+  | Win  -> (digital_write Arduboy.g LOW)
+  | Lose -> (digital_write Arduboy.r LOW)
 
 let () =
   Arduboy.init ();

@@ -1,6 +1,8 @@
 include etc/Makefile.conf
 
-all: config
+all: internals $(TARGETS)
+
+internals: config
 	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
 	$(call compile, src/h15ppx)
@@ -11,7 +13,12 @@ all: config
 	$(call compile, src/byterun)
 	$(call compile, src/omicrob)
 	$(call compile, src/stdlib)
+
+avr: internals
 	$(call compile, targets/avr)
+
+pic32: internals
+	$(call compile, targets/pic32)
 
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
@@ -41,12 +48,13 @@ install: all
 	cp lib/*.cmo "$(LIBDIR)/"
 	cp lib/*.cmi "$(LIBDIR)/"
 	cp lib/lcd_cgrom.txt "$(LIBDIR)/"
-	cp -a lib/extra "$(LIBDIR)/extra"
-	cp -a lib/targets "$(LIBDIR)/targets"
+	cp -a lib/extra "$(LIBDIR)/"
+	cp -a lib/targets "$(LIBDIR)/"
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
-	cp -a src/byterun/avr "$(INCLUDEDIR)/"
+	cp -a src/byterun/avr "$(INCLUDEDIR)" 2> /dev/null
+	cp -a src/byterun/pic32 "$(INCLUDEDIR)/" 2> /dev/null
 	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:
@@ -67,7 +75,7 @@ uninstall:
 	-rm -f "$(INCLUDEDIR)/vm/"*
 	-rm -f "$(INCLUDEDIR)/prims/"*
 	-rm -f "$(INCLUDEDIR)/simul/"*
-	-rm -f "$(INCLUDEDIR)/avr/"*
+	-rm -rf "$(INCLUDEDIR)/$(TARGET)/"*
 	-rm -f "$(INCLUDEDIR)/stdlib/"*
 	@for mod in $(MAN_3P_BASES); do \
 	  rm -f "$(MAN3DIR)/"$$mod.3p;	\
@@ -80,7 +88,7 @@ uninstall:
 	@if [ -d "$(INCLUDEDIR)/vm" ]; then rmdir "$(INCLUDEDIR)/vm"; fi
 	@if [ -d "$(INCLUDEDIR)/prims" ]; then rmdir "$(INCLUDEDIR)/prims"; fi
 	@if [ -d "$(INCLUDEDIR)/simul" ]; then rmdir "$(INCLUDEDIR)/simul"; fi
-	@if [ -d "$(INCLUDEDIR)/avr" ]; then rmdir "$(INCLUDEDIR)/avr"; fi
+	@if [ -d "$(INCLUDEDIR)/$(TARGET)" ]; then rmdir "$(INCLUDEDIR)/$(TARGET)"; fi
 	@if [ -d "$(INCLUDEDIR)/stdlib" ]; then rmdir "$(INCLUDEDIR)/stdlib"; fi
 	@if [ -d "$(INCLUDEDIR)" ]; then rmdir "$(INCLUDEDIR)"; fi
 
@@ -105,5 +113,6 @@ clean:
 	$(call clean, src/stdlib)
 	$(call clean, lib/extra)
 	$(call clean, targets/avr)
+	$(call clean, targets/pic32)
 
 .PHONY: all config install uninstall tests clean

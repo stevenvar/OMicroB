@@ -227,11 +227,11 @@ let input_bit_of_pin : type a b c d. (a register, b register, c register, d anal
   | PINA4 -> IF1
   | PINA5 -> IF0
 
-external write_register : 'a register -> int -> unit = "caml_avr_write_register" [@@noalloc]
-external read_register : 'a register -> int = "caml_avr_read_register" [@@noalloc]
-external set_bit : 'a register -> 'a -> unit = "caml_avr_set_bit" [@@noalloc]
-external clear_bit : 'a register -> 'a -> unit = "caml_avr_clear_bit" [@@noalloc]
-external read_bit : 'a register -> 'a -> bool = "caml_avr_read_bit" [@@noalloc]
+external write_register : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
+external read_register : 'a register -> int = "caml_read_register" [@@noalloc]
+external set_bit : 'a register -> 'a -> unit = "caml_set_bit" [@@noalloc]
+external clear_bit : 'a register -> 'a -> unit = "caml_clear_bit" [@@noalloc]
+external read_bit : 'a register -> 'a -> bool = "caml_read_bit" [@@noalloc]
 
 let pin_mode p m =
   let port = port_of_pin p in

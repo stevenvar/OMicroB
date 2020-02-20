@@ -1,5 +1,4 @@
 /* Entry point including the whole runtime */
-
 #include "arch-specific.c"
 #include "array.c"
 #include "compare.c"
@@ -24,7 +23,7 @@
 #error "Unknown garbage collector to use, please define OCAML_GC_MARK_AND_COMPACT or OCAML_GC_STOP_AND_COPY"
 #endif
 
-#include "../prims/prims.h"
+//#include "../prims/prims.h"
 #include "../prims/bindings.c"
 #include "../stdlib/random.c"
 #include "../stdlib/trace.c"

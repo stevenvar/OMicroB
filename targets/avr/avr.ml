@@ -39,8 +39,8 @@ module type AvrPins = sig
   val read_bit : 'a register -> 'a -> bool
 end
 
-external delay : int -> unit = "caml_avr_delay" [@@noalloc]
-external millis : unit -> int = "caml_avr_millis" [@@noalloc]
+external delay : int -> unit = "caml_delay" [@@noalloc]
+external millis : unit -> int = "caml_millis" [@@noalloc]
 
 module Serial = struct
   external init: unit -> unit = "caml_avr_serial_init" [@@noalloc]

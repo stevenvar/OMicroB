@@ -21,15 +21,15 @@ volatile uint8_t *get_reg_addr(uint8_t reg) {
 
 /******************************************************************************/
 
-void avr_set_bit(uint8_t reg, uint8_t bit) {
+void set_bit(uint8_t reg, uint8_t bit) {
   *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
 }
 
-void avr_clear_bit(uint8_t reg, uint8_t bit) {
+void clear_bit(uint8_t reg, uint8_t bit) {
   *(get_reg_addr(reg)) &= ~((uint8_t) 1 << bit);
 }
 
-bool avr_read_bit(uint8_t reg, uint8_t bit) {
+bool read_bit(uint8_t reg, uint8_t bit) {
   return *(get_reg_addr(reg)) & ((uint8_t) 1 << bit);
 }
 
@@ -37,11 +37,11 @@ bool avr_read_bit(uint8_t reg, uint8_t bit) {
 
 #include <avr/interrupt.h>
 
-void avr_write_register(uint8_t reg, uint8_t val) {
+void write_register(uint8_t reg, uint8_t val) {
   *(get_reg_addr(reg)) = val;
 }
 
-uint8_t avr_read_register(uint8_t reg) {
+uint8_t read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
@@ -77,7 +77,7 @@ uint16_t avr_analog_read(uint8_t ch) {
 
 /******************************************************************************/
 
-void avr_delay(int ms) {
+void delay(int ms) {
   while(ms--) {
     _delay_ms(1);
   }
@@ -97,7 +97,7 @@ ISR(TIMER1_COMPA_vect)
   timer1_millis++;
 }
 
-int avr_millis() {
+int millis() {
   int millis_return;
 
   // Ensure this cannot be disrupted
@@ -108,12 +108,7 @@ int avr_millis() {
 
 }
 
-
-
-
-
 /******************************************************************************/
-
 
 #ifndef BAUD
 #define BAUD 9600
