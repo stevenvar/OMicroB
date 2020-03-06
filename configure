@@ -256,6 +256,7 @@ function target_pic32 () {
     cat "targets/pic32/prims/prims.h" >> "src/byterun/prims/prims.h"
     cat "targets/pic32/prims/bindings.c" >> "src/byterun/prims/bindings.c"
     cat "targets/pic32/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
+    cat "targets/pic32/simul/sf-regs.c" >> "src/byterun/simul/sf-regs.c"
 
     for f in "fubarino_mini" "lchip"
     do

@@ -16,6 +16,10 @@ module type PIC32CONFIG = sig
   val clock : int
   val folder : string
   val pins_module : string
+  val adc_module : string
+  val features : string
+  val timers_module : string 
+  val uart_module : string 
   val linker_scripts : string list
 end
 
@@ -24,7 +28,11 @@ module FubarinoMiniConfig : PIC32CONFIG = struct
   let baud = 115_200
   let clock = 48_000_000
   let folder = "fubarino_mini"
-  let pins_module = "FubarinoMiniPins"
+  let pins_module = ""
+  let adc_module = ""
+  let features = ""
+  let timers_module = ""
+  let uart_module = ""
   let linker_scripts = []
 end
 
@@ -34,6 +42,10 @@ module LchipConfig : PIC32CONFIG = struct
   let clock = 48_000_000
   let folder = "lchip"
   let pins_module = "LchipPins"
+  let adc_module = "LchipADC"
+  let features = "LchipFeatures"
+  let timers_module = "LchipTimers"
+  let uart_module = "LchipUarts"
   let linker_scripts = ["32MX795F512L-lchip.ld"]
 end
 
@@ -57,8 +69,23 @@ module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
                   (Filename.concat "targets/pic32"
                      (Filename.concat P.folder
                         ((String.uncapitalize_ascii P.pins_module)^".cmo")));
+                Filename.concat libdir
+                  (Filename.concat "targets/pic32"
+                     (Filename.concat P.folder
+                        ((String.uncapitalize_ascii P.adc_module)^".cmo")));
+                Filename.concat libdir
+                  (Filename.concat "targets/pic32"
+                     (Filename.concat P.folder
+                        ((String.uncapitalize_ascii P.uart_module)^".cmo")));
+                Filename.concat libdir
+                  (Filename.concat "targets/pic32"
+                     (Filename.concat P.folder
+                        ((String.uncapitalize_ascii P.timers_module)^".cmo")));
                 "-open"; Printf.sprintf "Pic32";
-                "-open"; Printf.sprintf "%s" P.pins_module ] in
+                "-open"; Printf.sprintf "%s" P.pins_module;
+                "-open"; Printf.sprintf "%s" P.adc_module;
+                "-open"; Printf.sprintf "%s" P.uart_module;
+                "-open"; Printf.sprintf "%s" P.timers_module ] in
     let cmd = cmd @ inputs @ [ "-o"; output ] in
     run ~vars ~verbose cmd
 
@@ -67,10 +94,10 @@ module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
     let pic32elf_file = (Filename.remove_extension output)^".pic32_elf" in
     (* Compile a .c into a .pic32_elf *)
     let append_linker_script (ls) = [ "-T"; Filename.concat includedir (Filename.concat "pic32/ld" ls) ] in
-    let rec collect_linker_scripts script_list = 
+    let rec collect_linker_scripts script_list =
       match script_list with
       | [] -> []
-      | head::body -> append_linker_script (head) @ collect_linker_scripts body in
+      | head::body -> append_linker_script (head) @ collect_linker_scripts body in 
     let cmd = [ Config.xc32_cxx ] @ default_xc32_cxx_options in
     let cmd = cmd @ [ "-mprocessor=" ^ P.mmcu ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "pic32" ] in

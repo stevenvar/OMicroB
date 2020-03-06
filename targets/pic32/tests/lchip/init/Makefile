@@ -1,7 +1,7 @@
-include ../../../etc/Makefile.conf
+include ../../../../../etc/Makefile.conf
 
-SOURCES := testing.ml
-TARGETS := testing.byte testing.c testing.elf testing.hex
+SOURCES := init.ml
+TARGETS := init.byte init.c init.elf init.avr init.hex
 ATTY := /dev/tty.usbmodem1411
 
 all: $(TARGETS)
@@ -9,10 +9,10 @@ all: $(TARGETS)
 $(TARGETS): $(SOURCES)
 	$(BIN)/omicrob -v $^ -device lchip -mlopt -verbose -stack-size 200 -heap-size 200
 
-flash: testing.hex
+flash: init.hex
 	$(BIN)/omicrob -v -flash -device lchip $^
 
-simul: testing.elf
+simul: init.elf
 	./$< '../../bin/omicrob_pin_simulator' '../../bin/omicrob_circuit_simulator circuit.txt'
 
 clean:

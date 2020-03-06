@@ -2,13 +2,16 @@ include ../../etc/Makefile.conf
 
 LIBPIC32 := $(LIB)/targets/pic32
 
-FOLDERS := fubarino_mini lchip
+FOLDERS := lchip #fubarino_mini
 
 LIB_FOLDERS := $(foreach f,$(FOLDERS),$(LIBPIC32)/$(f))
 
 MODULES := pic32
-SUBMODULES := fubarino_mini/fubarinoMiniPins \
-							lchip/lchipPins 
+SUBMODULES := lchip/lchipPins \
+							lchip/lchipADC \
+							lchip/lchipUarts \
+							lchip/lchipTimers
+							# fubarino_mini/fubarinoMiniPins \
 
 MLS := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
