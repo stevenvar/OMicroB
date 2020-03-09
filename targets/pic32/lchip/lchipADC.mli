@@ -100,7 +100,7 @@ type ad1cssl_bit = CSSL0 | CSSL1 | CSSL2 | CSSL3 | CSSL4 | CSSL5 |
 type adc1buf0_bit = ADC1BUF0
 
 
-type 'a register +=
+type 'a register =
   | AD1CON1 : ad1con1_bit register
   | AD1CON2 : ad1con2_bit register
   | AD1CON3 : ad1con3_bit register
@@ -111,7 +111,7 @@ type 'a register +=
 
 
 include Pic32ADC
-  (* with type 'a register := 'a register *)
+  with type 'a register := 'a register
   with type ad1con1_param := ad1con1_param
   with type ad1con2_param := ad1con2_param
   with type ad1con3_param := ad1con3_param

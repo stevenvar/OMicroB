@@ -52,7 +52,7 @@ type latf_bit = LF0 | LF1 | LF2 | LF3 | LF4 | LF5 | LF6 | LF7 |
 type latg_bit = LG0 | LG1 | LG2 | LG3 | LG4 | LG5 | LG6 | LG7 |
                 LG8 | LG9 | LG10 | LG11 | LG12 | LG13 | LG14 | LG15
 
-type 'a register +=
+type 'a register =
   | LATA : lata_bit register 
   | LATB : latb_bit register
   | LATC : latc_bit register
@@ -170,5 +170,5 @@ type ('a,'b,'c,'d) pin =
 
 
 include Pic32Pins
-  (* with type 'a register := 'a register *)
+  with type 'a register := 'a register
   with type ('a, 'b, 'c, 'd)pin := ('a, 'b, 'c, 'd)pin

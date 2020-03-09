@@ -45,10 +45,6 @@ value caml_read_adc10(value index) {
 
 
 
-/**********************************************************************/
-/**********************************************************************/
-/************************ For timer module ***************************/
-
 
 value caml_enable_int_timer(value reg) {
   enable_int_timer(Int_val(reg));
@@ -74,13 +70,6 @@ value caml_configure_int_timer(value reg, value val1, value val2) {
   configure_int_timer(Int_val(reg), Int_val(val1), Int_val(val2));
   return Val_unit;
 }
-
-
-
-
-/**********************************************************************/
-/**********************************************************************/
-/************************ For UART module ***************************/
 
 
 
@@ -164,3 +153,91 @@ value caml_set_subpriority_int_uart(value reg, value val) {
   set_subpriority_int_uart(Int_val(reg), Int_val(val));
   return Val_unit;
 }
+
+
+
+
+
+
+
+
+value caml_set_bit_adc(value reg, value bit) {
+  set_bit_adc(Int_val(reg), Int_val(bit));
+  return Val_unit;
+}
+
+value caml_clear_bit_adc(value reg, value bit) {
+  clear_bit_adc(Int_val(reg), Int_val(bit));
+  return Val_unit;
+}
+
+value caml_read_bit_adc(value reg, value bit) {
+  return Val_bool(read_bit_adc(Int_val(reg), Int_val(bit)));
+}
+
+value caml_write_register_adc(value reg, value val) {
+  write_register_adc(Int_val(reg), Int_val(val));
+  return Val_unit;
+}
+
+value caml_read_register_adc(value reg) {
+  return Val_int(read_register_adc(Int_val(reg)));
+}
+
+
+/**********************************************************************/
+/**********************************************************************/
+/************************ For timer module ***************************/
+
+value caml_set_bit_timer(value reg, value bit) {
+  set_bit_timer(Int_val(reg), Int_val(bit));
+  return Val_unit;
+}
+
+value caml_clear_bit_timer(value reg, value bit) {
+  clear_bit_timer(Int_val(reg), Int_val(bit));
+  return Val_unit;
+}
+
+value caml_read_bit_timer(value reg, value bit) {
+  return Val_bool(read_bit_timer(Int_val(reg), Int_val(bit)));
+}
+
+value caml_write_register_timer(value reg, value val) {
+  write_register_timer(Int_val(reg), Int_val(val));
+  return Val_unit;
+}
+
+value caml_read_register_timer(value reg) {
+  return Val_int(read_register_timer(Int_val(reg)));
+}
+
+
+
+
+
+value caml_set_bit_uart(value reg, value bit) {
+  set_bit_uart(Int_val(reg), Int_val(bit));
+  return Val_unit;
+}
+
+value caml_clear_bit_uart(value reg, value bit) {
+  clear_bit_uart(Int_val(reg), Int_val(bit));
+  return Val_unit;
+}
+
+value caml_read_bit_uart(value reg, value bit) {
+  return Val_bool(read_bit_uart(Int_val(reg), Int_val(bit)));
+}
+
+value caml_write_register_uart(value reg, value val) {
+  write_register_uart(Int_val(reg), Int_val(val));
+  return Val_unit;
+}
+
+value caml_read_register_uart(value reg) {
+  return Val_int(read_register_uart(Int_val(reg)));
+}
+
+
+

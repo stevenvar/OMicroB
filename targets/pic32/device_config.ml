@@ -17,7 +17,6 @@ module type PIC32CONFIG = sig
   val folder : string
   val pins_module : string
   val adc_module : string
-  val features : string
   val timers_module : string 
   val uart_module : string 
   val linker_scripts : string list
@@ -30,7 +29,6 @@ module FubarinoMiniConfig : PIC32CONFIG = struct
   let folder = "fubarino_mini"
   let pins_module = ""
   let adc_module = ""
-  let features = ""
   let timers_module = ""
   let uart_module = ""
   let linker_scripts = []
@@ -43,7 +41,6 @@ module LchipConfig : PIC32CONFIG = struct
   let folder = "lchip"
   let pins_module = "LchipPins"
   let adc_module = "LchipADC"
-  let features = "LchipFeatures"
   let timers_module = "LchipTimers"
   let uart_module = "LchipUarts"
   let linker_scripts = ["32MX795F512L-lchip.ld"]

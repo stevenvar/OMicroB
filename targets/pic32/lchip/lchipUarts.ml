@@ -1,4 +1,4 @@
-open Pic32
+(* open Pic32 *)
 
 type uxmode_param = ON_ 
       | SIDL_ 
@@ -131,7 +131,7 @@ type u4brg_bit = U4BRG0
 type u5brg_bit = U5BRG0
 type u6brg_bit = U6BRG0
 
-type 'a register +=
+type 'a register =
   | U1MODE : u1mode_bit register
   | U2MODE : u2mode_bit register
   | U3MODE : u3mode_bit register
@@ -507,11 +507,11 @@ let adm_en_bit_of_uart : type a b c d e. (a register, b register, c register, d 
 
 
 
-external write_register : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
-external read_register : 'a register -> int = "caml_read_register" [@@noalloc]
-external set_bit : 'a register -> 'a -> unit = "caml_set_bit" [@@noalloc]
-external clear_bit : 'a register -> 'a -> unit = "caml_clear_bit" [@@noalloc]
-external read_bit : 'a register -> 'a -> bool = "caml_read_bit" [@@noalloc]
+external write_register_uart : 'a register -> int -> unit = "caml_write_register_uart" [@@noalloc]
+external read_register_uart : 'a register -> int = "caml_read_register_uart" [@@noalloc]
+external set_bit_uart : 'a register -> 'a -> unit = "caml_set_bit_uart" [@@noalloc]
+external clear_bit_uart : 'a register -> 'a -> unit = "caml_clear_bit_uart" [@@noalloc]
+external read_bit_uart : 'a register -> 'a -> bool = "caml_read_bit_uart" [@@noalloc]
 
 external enable_tx_int_ec_uart : 
   ('a register, 'b register, 'c register, 'd register, 'e register) uart -> unit = "caml_enable_tx_int_ec_uart" [@@noalloc]
@@ -564,47 +564,47 @@ let uxmode_set u params =
 
   let pdsel_set n =
     match n with
-      | 0 -> clear_bit umode pdsel1; clear_bit umode pdsel2
-      | 1 -> set_bit umode pdsel1; clear_bit umode pdsel2
-      | 2 -> clear_bit umode pdsel1; set_bit umode pdsel2
-      | 3 -> set_bit umode pdsel1; set_bit umode pdsel2
+      | 0 -> clear_bit_uart umode pdsel1; clear_bit_uart umode pdsel2
+      | 1 -> set_bit_uart umode pdsel1; clear_bit_uart umode pdsel2
+      | 2 -> clear_bit_uart umode pdsel1; set_bit_uart umode pdsel2
+      | 3 -> set_bit_uart umode pdsel1; set_bit_uart umode pdsel2
       | _ -> ()
   in 
 
   let uen_set n = 
     match n with 
-      | 0 -> clear_bit umode uen1; clear_bit umode uen2
-      | 1 -> set_bit umode uen1; clear_bit umode uen2
-      | 2 -> clear_bit umode uen1; set_bit umode uen2
-      | 3 -> set_bit umode uen1; set_bit umode uen2
+      | 0 -> clear_bit_uart umode uen1; clear_bit_uart umode uen2
+      | 1 -> set_bit_uart umode uen1; clear_bit_uart umode uen2
+      | 2 -> clear_bit_uart umode uen1; set_bit_uart umode uen2
+      | 3 -> set_bit_uart umode uen1; set_bit_uart umode uen2
       | _ -> ()
 
   in
 
   let set_bits param =
     match param with 
-      | ON_ -> set_bit umode on
-      | SIDL_ -> set_bit umode sidl
-      | IREN_ -> set_bit umode iren
-      | RTSMD_ -> set_bit umode rtsmd
+      | ON_ -> set_bit_uart umode on
+      | SIDL_ -> set_bit_uart umode sidl
+      | IREN_ -> set_bit_uart umode iren
+      | RTSMD_ -> set_bit_uart umode rtsmd
       | UEN_0 -> uen_set 0
       | UEN_1 -> uen_set 1
       | UEN_2 -> uen_set 2
       | UEN_3 -> uen_set 3
-      | WAKE_ -> set_bit umode wake
-      | LPBACK_ -> set_bit umode lpback
-      | ABAUD_ -> set_bit umode abaud
-      | RXINV_ -> set_bit umode rxinv
-      | BRGH_ -> set_bit umode brgh
+      | WAKE_ -> set_bit_uart umode wake
+      | LPBACK_ -> set_bit_uart umode lpback
+      | ABAUD_ -> set_bit_uart umode abaud
+      | RXINV_ -> set_bit_uart umode rxinv
+      | BRGH_ -> set_bit_uart umode brgh
       | PDSEL_0 -> pdsel_set 0
       | PDSEL_1 -> pdsel_set 1
       | PDSEL_2 -> pdsel_set 2
       | PDSEL_3 -> pdsel_set 3
-      | STSEL_ -> set_bit umode stsel
+      | STSEL_ -> set_bit_uart umode stsel
 
   in
 
-  write_register umode 0; (* set to POR state *)
+  write_register_uart umode 0; (* set to POR state *)
   List.iter set_bits params
 
 
@@ -630,73 +630,73 @@ let uxsta_set u params =
 
   let urxisel_set n = (* The MX795F512L features a 8-level deep FIFO UART module *)
     match n with
-      | 0 -> clear_bit sta urxisel1; clear_bit sta urxisel2
-      | 1 -> set_bit sta urxisel1; clear_bit sta urxisel2
-      | 2 -> clear_bit sta urxisel1; set_bit sta urxisel2
-      | 3 -> set_bit sta urxisel1; set_bit sta urxisel2
+      | 0 -> clear_bit_uart sta urxisel1; clear_bit_uart sta urxisel2
+      | 1 -> set_bit_uart sta urxisel1; clear_bit_uart sta urxisel2
+      | 2 -> clear_bit_uart sta urxisel1; set_bit_uart sta urxisel2
+      | 3 -> set_bit_uart sta urxisel1; set_bit_uart sta urxisel2
       | _ -> ()
 
   in 
 
   let utxisel_set n = 
     match n with
-      | 0 -> clear_bit sta utxisel1; clear_bit sta utxisel2
-      | 1 -> set_bit sta utxisel1; clear_bit sta utxisel2
-      | 2 -> clear_bit sta utxisel1; set_bit sta utxisel2
-      | 3 -> set_bit sta utxisel1; set_bit sta utxisel2
+      | 0 -> clear_bit_uart sta utxisel1; clear_bit_uart sta utxisel2
+      | 1 -> set_bit_uart sta utxisel1; clear_bit_uart sta utxisel2
+      | 2 -> clear_bit_uart sta utxisel1; set_bit_uart sta utxisel2
+      | 3 -> set_bit_uart sta utxisel1; set_bit_uart sta utxisel2
       | _ -> ()
 
   in 
 
   let set_bits param = 
     match param with 
-      | ADM_EN_ -> set_bit sta adm_en
+      | ADM_EN_ -> set_bit_uart sta adm_en
       | UTXISEL_0 -> utxisel_set 0
       | UTXISEL_1 -> utxisel_set 1
       | UTXISEL_2 -> utxisel_set 2
       | UTXISEL_3 -> utxisel_set 3
-      | UTXINV_ -> set_bit sta utxinv
-      | URXEN_ -> set_bit sta urxen
-      | UTXBRK_ -> set_bit sta utxbrk
-      | UTXEN_ -> set_bit sta utxen
-      | UTXBF_ -> set_bit sta utxbf
-      | TRMT_ -> set_bit sta trmt
+      | UTXINV_ -> set_bit_uart sta utxinv
+      | URXEN_ -> set_bit_uart sta urxen
+      | UTXBRK_ -> set_bit_uart sta utxbrk
+      | UTXEN_ -> set_bit_uart sta utxen
+      | UTXBF_ -> set_bit_uart sta utxbf
+      | TRMT_ -> set_bit_uart sta trmt
       | URXISEL_0 -> urxisel_set 0
       | URXISEL_1 -> urxisel_set 1
       | URXISEL_2 -> urxisel_set 2
       | URXISEL_3 -> urxisel_set 3
-      | ADDEN_ -> set_bit sta adden
-      | RIDLE_ -> set_bit sta ridle
-      | PERR_ -> set_bit sta perr
-      | FERR_ -> set_bit sta ferr
-      | OERR_ -> set_bit sta oerr
-      | URXDA_ -> set_bit sta urxda
+      | ADDEN_ -> set_bit_uart sta adden
+      | RIDLE_ -> set_bit_uart sta ridle
+      | PERR_ -> set_bit_uart sta perr
+      | FERR_ -> set_bit_uart sta ferr
+      | OERR_ -> set_bit_uart sta oerr
+      | URXDA_ -> set_bit_uart sta urxda
 
   in
 
-  write_register sta 0; (* set to POR state *)
+  write_register_uart sta 0; (* set to POR state *)
   List.iter set_bits params  
 
 let read_tx_reg u =
   let utxreg = utxreg_of_uart u in 
-    read_register utxreg
+    read_register_uart utxreg
 
 let write_tx_reg u v =
   let utxreg = utxreg_of_uart u in
-    write_register utxreg v
+    write_register_uart utxreg v
 
 let read_rx_reg u =
   let urxreg = urxreg_of_uart u in 
-    read_register urxreg
+    read_register_uart urxreg
 
 let write_rx_reg u v = 
   let urxreg = urxreg_of_uart u in 
-    write_register urxreg v 
+    write_register_uart urxreg v 
 
 let read_baud_rate u = 
   let brg = ubrg_of_uart u in 
-    read_register brg
+    read_register_uart brg
 
 let write_baud_rate u v = 
   let brg = ubrg_of_uart u in
-    write_register brg v
+    write_register_uart brg v

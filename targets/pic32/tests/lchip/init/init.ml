@@ -22,22 +22,22 @@ let nr_f__set_inter_pic_trame_values ms_tick cycle safety =
 
  let set_pin_analog pin =
   match pin with
-    | PIN25 -> clear_bit AD1PCFG PCFG0
-    | PIN24 -> clear_bit AD1PCFG PCFG1
-    | PIN23 -> clear_bit AD1PCFG PCFG2
-    | PIN22 -> clear_bit AD1PCFG PCFG3
-    | PIN21 -> clear_bit AD1PCFG PCFG4
-    | PIN20 -> clear_bit AD1PCFG PCFG5
-    | PIN26 -> clear_bit AD1PCFG PCFG6
-    | PIN27 -> clear_bit AD1PCFG PCFG7
-    | PIN32 -> clear_bit AD1PCFG PCFG8
-    | PIN33 -> clear_bit AD1PCFG PCFG9
-    | PIN34 -> clear_bit AD1PCFG PCFG10
-    | PIN35 -> clear_bit AD1PCFG PCFG11
-    | PIN41 -> clear_bit AD1PCFG PCFG12
-    | PIN42 -> clear_bit AD1PCFG PCFG13
-    | PIN43 -> clear_bit AD1PCFG PCFG14
-    | PIN44 -> clear_bit AD1PCFG PCFG15
+    | PIN25 -> clear_bit_adc AD1PCFG PCFG0
+    | PIN24 -> clear_bit_adc AD1PCFG PCFG1
+    | PIN23 -> clear_bit_adc AD1PCFG PCFG2
+    | PIN22 -> clear_bit_adc AD1PCFG PCFG3
+    | PIN21 -> clear_bit_adc AD1PCFG PCFG4
+    | PIN20 -> clear_bit_adc AD1PCFG PCFG5
+    | PIN26 -> clear_bit_adc AD1PCFG PCFG6
+    | PIN27 -> clear_bit_adc AD1PCFG PCFG7
+    | PIN32 -> clear_bit_adc AD1PCFG PCFG8
+    | PIN33 -> clear_bit_adc AD1PCFG PCFG9
+    | PIN34 -> clear_bit_adc AD1PCFG PCFG10
+    | PIN35 -> clear_bit_adc AD1PCFG PCFG11
+    | PIN41 -> clear_bit_adc AD1PCFG PCFG12
+    | PIN42 -> clear_bit_adc AD1PCFG PCFG13
+    | PIN43 -> clear_bit_adc AD1PCFG PCFG14
+    | PIN44 -> clear_bit_adc AD1PCFG PCFG15
 
 
 let _ =
@@ -73,25 +73,25 @@ let _ =
   let u = UART1 in 
   let u1mode = umode_of_uart u in
     let brgh = brgh_bit_of_uart u in
-      clear_bit u1mode brgh;
+      clear_bit_uart u1mode brgh;
     let ubrg = ubrg_of_uart u in 
-      write_register ubrg 9600;
+      write_register_uart ubrg 9600;
 
     let stsel = stsel_bit_of_uart u in
-      clear_bit u1mode stsel ;
+      clear_bit_uart u1mode stsel ;
     let pdsel1 = pdsel_bit1_of_uart u in
     let pdsel2 = pdsel_bit2_of_uart u in
-      clear_bit u1mode pdsel1; 
-      clear_bit u1mode pdsel2;
+      clear_bit_uart u1mode pdsel1; 
+      clear_bit_uart u1mode pdsel2;
   
   let u1sta = usta_of_uart u in 
     let utxen = utxen_bit_of_uart u in 
     let urxen = urxen_bit_of_uart u in 
-      set_bit u1sta utxen;
-      set_bit u1sta urxen;
+      set_bit_uart u1sta utxen;
+      set_bit_uart u1sta urxen;
   
   let on = on_bit_of_uart u in 
-    set_bit u1mode on;
+    set_bit_uart u1mode on;
 
  
 
@@ -130,27 +130,27 @@ let _ =
       else 0
     in
 
-    ()
+    
 
-    (* if pic_id () == 0 (* MCU 1 (celui à gauche) *)
+    if pic_id () == 0 (* MCU 1 (celui à gauche) *)
     then 
       let tosend1 = 12 in 
 
       let u1txreg = utxreg_of_uart u in        
         let utxbf = utxbf_bit_of_uart u in
         (* On s'assure d'abord que le buffer de transmission est vide *)        
-        while (read_bit u1sta utxbf) do () done;
+        while (read_bit_uart u1sta utxbf) do () done;
         (* On envoie le chiffre 12 au MCU 2 *)
-        write_register u1txreg tosend1;
+        write_register_uart u1txreg tosend1;
         toggleRed tosend1;
    
       let urxda = urxda_bit_of_uart u in 
         (* On s'assure qu'il y a bien une donnée dans le buffer de réception *)
-        while (not (read_bit u1sta urxda)) do () done;
+        while (not (read_bit_uart u1sta urxda)) do () done;
 
         (* On récupère le chiffre 6 envoyé par MCU 2 pour faire blinker la LED verte 6 fois *)
         let u1rxreg = urxreg_of_uart u in 
-          toggleGreen (read_register u1rxreg)
+          toggleGreen (read_register_uart u1rxreg)
 
     else if pic_id () == 1
     then
@@ -159,19 +159,19 @@ let _ =
 
         let utxbf = utxbf_bit_of_uart u in
          (* On s'assure d'abord que le buffer de transmission est vide *)  
-          while (read_bit u1sta utxbf) do () done;
+          while (read_bit_uart u1sta utxbf) do () done;
          (* On envoie le chiffre 6 au MCU 2 *)
-          write_register u1txreg tosend2;
+          write_register_uart u1txreg tosend2;
           toggleRed tosend2;
 
 
       let urxda = urxda_bit_of_uart u in 
         (* On s'assure qu'il y a bien une donnée dans le buffer de réception *)
-        while (not (read_bit u1sta urxda)) do () done;
+        while (not (read_bit_uart u1sta urxda)) do () done;
       (* On récupère le chiffre 12 envoyé par MCU 2 pour faire blinker la LED verte 12 fois *)
       let u1rxreg = urxreg_of_uart u in
-        toggleGreen (read_register u1rxreg)
+        toggleGreen (read_register_uart u1rxreg)
     else 
-      () *)
+      ()
 
    

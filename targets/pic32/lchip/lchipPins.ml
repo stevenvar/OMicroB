@@ -1,6 +1,5 @@
 open Pic32
 
-
 (* Lchip is based on a 32MX795F512L microcontroller that has 7 ports: A, B, C, D, E, F and G *)
 
 (* TRISx, PORTx and LATx registers specification: 
@@ -54,7 +53,8 @@ type latf_bit = LF0 | LF1 | LF2 | LF3 | LF4 | LF5 | LF6 | LF7 |
 type latg_bit = LG0 | LG1 | LG2 | LG3 | LG4 | LG5 | LG6 | LG7 |
                 LG8 | LG9 | LG10 | LG11 | LG12 | LG13 | LG14 | LG15
 
-type 'a register +=
+
+type 'a register =
   | LATA : lata_bit register 
   | LATB : latb_bit register
   | LATC : latc_bit register
@@ -76,6 +76,7 @@ type 'a register +=
   | PORTE : porte_bit register
   | PORTF : portf_bit register
   | PORTG : portg_bit register
+
 
 
 (* 32MX795F512L has 83 I/O pins available. 
@@ -168,7 +169,6 @@ type ('a,'b,'c,'d) pin =
   | PIN98 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
   | PIN99 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
   | PIN100 : (late_bit register, trise_bit register, porte_bit register, no analog_pin) pin
-
 
 
 let lat_of_pin : type a b c d. (a register, b register, c register, d analog_pin) pin -> a register = 
@@ -688,6 +688,7 @@ let port_bit_of_pin : type a b c d. (a register, b register, c register, d analo
     | PIN99 -> PE3
     | PIN100 -> PE4
 
+      
 
 external write_register : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
 external read_register : 'a register -> int = "caml_read_register" [@@noalloc]
@@ -716,3 +717,4 @@ let digital_read p =
   match read_bit port bit with
   | true -> HIGH
   | false -> LOW
+

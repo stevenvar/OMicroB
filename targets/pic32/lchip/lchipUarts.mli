@@ -134,7 +134,7 @@ type u4brg_bit = U4BRG0
 type u5brg_bit = U5BRG0
 type u6brg_bit = U6BRG0
 
-type 'a register +=
+type 'a register =
   | U1MODE : u1mode_bit register
   | U2MODE : u2mode_bit register
   | U3MODE : u3mode_bit register
@@ -177,7 +177,7 @@ type ('a,'b,'c,'d,'e) uart =
 
 
 include Pic32Uarts
-  (* with type 'a register := 'a register *)
+  with type 'a register := 'a register
   with type ('a, 'b, 'c, 'd, 'e) uart := ('a, 'b, 'c, 'd, 'e) uart
   with type uxmode_param := uxmode_param
   with type uxsta_param := uxsta_param

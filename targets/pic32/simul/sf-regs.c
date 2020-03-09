@@ -1,8 +1,10 @@
 
 void init_system() {
+  printf("Init system\n");
 }
 
 void init_interrupts(uint8_t mode) {
+  printf("Init interrupts\n");
 }
 
 
@@ -129,4 +131,76 @@ void set_subpriority_int_uart(uint8_t uart, uint8_t subpriority) {
 
 
 
+void set_bit_timer(uint8_t reg, uint8_t bit) {
+  // printf("set_bit_timer(%d, %d)\n", Int_val(reg), Int_val(bit));
+  printf("set_bit_timer(%d, %d)\n", (int) reg, (int)bit);
+}
 
+void clear_bit_timer(uint8_t reg, uint8_t bit) {
+    // printf("clear_bit_timer(%d, %d)\n", Int_val(reg), Int_val(bit));
+   printf("clear_bit_timer(%d, %d)\n", (int) reg, (int)bit);
+}
+
+bool read_bit_timer(uint8_t reg, uint8_t bit) {
+  return true;
+}
+
+void write_register_timer(uint8_t reg, uint8_t val) {
+  printf("write_register_timer(%d, %d)\n", (int) reg, (int)val);
+}
+
+uint32_t read_register_timer(uint8_t reg) {
+  return 0;
+}
+
+
+
+
+
+void set_bit_uart(uint8_t reg, uint8_t bit) {
+  // printf("set_bit_uart(%d, %d)\n", Int_val(reg), Int_val(bit));
+  printf("set_bit_uart(%d, %d)\n", (int) reg, (int)bit);
+}
+
+void clear_bit_uart(uint8_t reg, uint8_t bit) {
+    // printf("clear_bit_uart(%d, %d)\n", Int_val(reg), Int_val(bit));
+   printf("clear_bit_uart(%d, %d)\n", (int) reg, (int)bit);
+}
+
+bool read_bit_uart(uint8_t reg, uint8_t bit) {
+  return true;
+}
+
+void write_register_uart(uint8_t reg, uint8_t val) {
+  printf("write_register_uart(%d, %d)\n", (int) reg, (int)val);
+}
+
+uint32_t read_register_uart(uint8_t reg) {
+  return 0;
+}
+
+
+
+
+
+void set_bit_adc(uint8_t reg, uint8_t bit) {
+  // printf("set_bit_adc(%d, %d)\n", Int_val(reg), Int_val(bit));
+  printf("set_bit_adc(%d, %d)\n", (int) reg, (int)bit);
+}
+
+void clear_bit_adc(uint8_t reg, uint8_t bit) {
+    // printf("clear_bit_adc(%d, %d)\n", Int_val(reg), Int_val(bit));
+   printf("clear_bit_adc(%d, %d)\n", (int) reg, (int)bit);
+}
+
+bool read_bit_adc(uint8_t reg, uint8_t bit) {
+  return true;
+}
+
+void write_register_adc(uint8_t reg, uint8_t val) {
+  printf("write_register_adc(%d, %d)\n", (int) reg, (int)val);
+}
+
+uint32_t read_register_adc(uint8_t reg) {
+  return 0;
+}

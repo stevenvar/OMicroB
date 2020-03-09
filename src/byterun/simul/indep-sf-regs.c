@@ -249,7 +249,7 @@ static void write_register_gen(int reg, uint8_t new_val){
 }
 
 void write_register(uint8_t reg, uint8_t new_val){
-  /* printf("avr_write_register(%d, %d)\n", (int) reg, (int) new_val); */
+  printf("write_register(%d, %d)\n", (int) reg, (int) new_val);
   init_simulator();
   P(sem_regs);
   write_register_gen(reg, new_val);
@@ -257,7 +257,7 @@ void write_register(uint8_t reg, uint8_t new_val){
 }
 
 uint8_t read_register(uint8_t reg){
-  /* printf("avr_read_register(%d)\n", (int) reg); */
+  printf("read_register(%d)\n", (int) reg); 
   uint8_t val;
   init_simulator();
   if (is_reg_need_synchro(reg)) synchronize();
@@ -269,7 +269,7 @@ uint8_t read_register(uint8_t reg){
 }
 
 bool read_bit(uint8_t reg, uint8_t bit){
-    /* printf("avr_read_bit(%d, %d)\n", (int) reg, (int) bit); */
+  printf("read_bit(%d, %d)\n", (int) reg, (int) bit);
   /* Dirty hack  */
   if (reg == SPSR){
       return 1;
@@ -287,7 +287,7 @@ bool read_bit(uint8_t reg, uint8_t bit){
 }
 
 void clear_bit(uint8_t reg, uint8_t bit){
-  /* printf("avr_clear_bit(%d, %d)\n", (int) reg, (int) bit);  */
+  printf("clear_bit(%d, %d)\n", (int) reg, (int) bit);  
   init_simulator();
   P(sem_regs);
   {
@@ -322,7 +322,7 @@ void clear_bit(uint8_t reg, uint8_t bit){
 }
 
 void set_bit(uint8_t reg, uint8_t bit){
-  /* printf("avr_set_bit(%d, %d)\n", (int) reg, (int) bit);  */
+  printf("set_bit(%d, %d)\n", (int) reg, (int) bit); 
   init_simulator();
   P(sem_regs);
   uint8_t old_val = regs[reg];

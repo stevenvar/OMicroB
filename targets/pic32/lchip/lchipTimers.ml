@@ -1,4 +1,4 @@
-open Pic32
+(* open Pic32 *)
 
 (* Even though there are unused bits or bits that could be represented 
    with a single name (e.g. TCKPS), we assume all bits so that, thanks 
@@ -46,7 +46,7 @@ type pr4_bit = PR40
 type pr5_bit = PR50
 
 
-type 'a register +=
+type 'a register =
   | T1CON : t1con_bit register
   | T2CON : t2con_bit register
   | T3CON : t3con_bit register
@@ -194,11 +194,11 @@ let tsync_bit_of_timer : type a b c. (a register, b register, c register) timer 
   | TIMER5 -> T5CON2
 
 
-external write_register : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
-external read_register : 'a register -> int = "caml_read_register" [@@noalloc]
-external set_bit : 'a register -> 'a -> unit = "caml_set_bit" [@@noalloc]
-external clear_bit : 'a register -> 'a -> unit = "caml_clear_bit" [@@noalloc]
-external read_bit : 'a register -> 'a -> bool = "caml_read_bit" [@@noalloc]
+external write_register_timer : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
+external read_register_timer : 'a register -> int = "caml_read_register_timer" [@@noalloc]
+external set_bit_timer : 'a register -> 'a -> unit = "caml_set_bit_timer" [@@noalloc]
+external clear_bit_timer : 'a register -> 'a -> unit = "caml_clear_bit_timer" [@@noalloc]
+external read_bit_timer : 'a register -> 'a -> bool = "caml_read_bit_timer" [@@noalloc]
 
 external enable_int_timer : 
   ('a register, 'b register, 'c register) timer -> unit = "caml_enable_int_timer" [@@noalloc]
@@ -230,22 +230,22 @@ let t1con_set params =
 
   let tckps_set n = 
     match n with 
-      | 1 -> clear_bit T1CON T1TCKPS1; clear_bit T1CON T1TCKPS2
-      | 8 -> set_bit T1CON T1TCKPS1
-      | 64 -> set_bit T1CON T1TCKPS2
-      | 256 -> set_bit T1CON T1TCKPS1; set_bit T1CON T1TCKPS2
+      | 1 -> clear_bit_timer T1CON T1TCKPS1; clear_bit_timer T1CON T1TCKPS2
+      | 8 -> set_bit_timer T1CON T1TCKPS1
+      | 64 -> set_bit_timer T1CON T1TCKPS2
+      | 256 -> set_bit_timer T1CON T1TCKPS1; set_bit_timer T1CON T1TCKPS2
       | _ -> ()
   in
 
   let set_bits param = 
     match param with 
-      | ON_ -> set_bit T1CON T1ON
-      | SIDL_ -> set_bit T1CON T1SIDL
-      | TGATE_ -> set_bit T1CON T1TGATE
-      | TCS_ -> set_bit T1CON T1TCS
-      | TSYNC_ -> set_bit T1CON T1TSYNC
-      | TWDIS_ -> set_bit T1CON T1TWDIS
-      | TWIP_ -> set_bit T1CON T1TWIP
+      | ON_ -> set_bit_timer T1CON T1ON
+      | SIDL_ -> set_bit_timer T1CON T1SIDL
+      | TGATE_ -> set_bit_timer T1CON T1TGATE
+      | TCS_ -> set_bit_timer T1CON T1TCS
+      | TSYNC_ -> set_bit_timer T1CON T1TSYNC
+      | TWDIS_ -> set_bit_timer T1CON T1TWDIS
+      | TWIP_ -> set_bit_timer T1CON T1TWIP
       | PS_1_1 -> tckps_set 1
       | PS_1_8 -> tckps_set 8
       | PS_1_64 -> tckps_set 64 
@@ -257,7 +257,7 @@ let t1con_set params =
       | PS_1_32 -> ()
   in 
   
-  write_register T1CON 0; (* set to POR state before enabling bits according to params *)
+  write_register_timer T1CON 0; (* set to POR state before enabling bits according to params *)
   List.iter set_bits params
 
 
@@ -276,24 +276,24 @@ let txcon_set t params =
 
   let tckps_set n = 
     match n with 
-      | 1 -> clear_bit tcon ps1; clear_bit tcon ps2; clear_bit tcon ps3
-      | 2 -> set_bit tcon ps1 
-      | 4 -> set_bit tcon ps2
-      | 8 -> set_bit tcon ps1; set_bit tcon ps2
-      | 16 -> set_bit tcon ps3
-      | 32 -> set_bit tcon ps1; set_bit tcon ps3
-      | 64 -> set_bit tcon ps2; set_bit tcon ps3
-      | 256 -> set_bit tcon ps1; set_bit tcon ps2; set_bit tcon ps3 
+      | 1 -> clear_bit_timer tcon ps1; clear_bit_timer tcon ps2; clear_bit_timer tcon ps3
+      | 2 -> set_bit_timer tcon ps1 
+      | 4 -> set_bit_timer tcon ps2
+      | 8 -> set_bit_timer tcon ps1; set_bit_timer tcon ps2
+      | 16 -> set_bit_timer tcon ps3
+      | 32 -> set_bit_timer tcon ps1; set_bit_timer tcon ps3
+      | 64 -> set_bit_timer tcon ps2; set_bit_timer tcon ps3
+      | 256 -> set_bit_timer tcon ps1; set_bit_timer tcon ps2; set_bit_timer tcon ps3 
       | _ -> ()
   in
 
   let set_bits param = 
     match param with 
-      | ON_ -> set_bit tcon on
-      | SIDL_ -> set_bit tcon sidl
-      | TGATE_ -> set_bit tcon tgate
-      | T32_ -> set_bit tcon t32
-      | TCS_ -> set_bit tcon tcs
+      | ON_ -> set_bit_timer tcon on
+      | SIDL_ -> set_bit_timer tcon sidl
+      | TGATE_ -> set_bit_timer tcon tgate
+      | T32_ -> set_bit_timer tcon t32
+      | TCS_ -> set_bit_timer tcon tcs
       | PS_1_1 -> tckps_set 1
       | PS_1_2 -> tckps_set 2
       | PS_1_4 -> tckps_set 4
@@ -307,7 +307,7 @@ let txcon_set t params =
       | TWIP_ -> ()
   in 
   
-  write_register tcon 0; (* set to POR state before enabling bits according to params *)
+  write_register_timer tcon 0; (* set to POR state before enabling bits according to params *)
   List.iter set_bits params
 
 
@@ -315,19 +315,19 @@ let txcon_set t params =
 
 let read_timer t = 
   let tmr = tmr_of_timer t in
-    read_register tmr 
+    read_register_timer tmr 
 
 let write_timer t v =
   let tmr = tmr_of_timer t in 
-    write_register tmr v
+    write_register_timer tmr v
 
 let read_period_timer t = 
   let pr = pr_of_timer t in 
-    read_register pr
+    read_register_timer pr
 
 let write_period_timer t v = 
   let pr = pr_of_timer t in
-    write_register pr v
+    write_register_timer pr v
 
 (* let open_timer t params period =
   write_timer t 0;
@@ -339,6 +339,6 @@ let write_period_timer t v =
 let close_timer t =
   disable_int_timer t;
   let tcon = tcon_of_timer t in
-    write_register tcon 0
+    write_register_timer tcon 0
 
 

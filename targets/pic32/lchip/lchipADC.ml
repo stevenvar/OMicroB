@@ -1,6 +1,3 @@
-open Pic32
-
-
 type ad1con1_param = DONE_ | SAMP_ | ASAM_ | CLRASAM_ | SSRC_0 |
                      SSRC_1 | SSRC_2 | SSRC_3 | SSRC_7 | FORM_0 |
                     FORM_1 | FORM_2 | FORM_3 | FORM_4 | 
@@ -103,7 +100,7 @@ type ad1cssl_bit = CSSL0 | CSSL1 | CSSL2 | CSSL3 | CSSL4 | CSSL5 |
 type adc1buf0_bit = ADC1BUF0
 
 
-type 'a register +=
+type 'a register =
   | AD1CON1 : ad1con1_bit register 
   | AD1CON2 : ad1con2_bit register
   | AD1CON3 : ad1con3_bit register
@@ -112,11 +109,11 @@ type 'a register +=
   | AD1CSSL : ad1cssl_bit register
   | ADC1BUF0 : adc1buf0_bit register
 
-external write_register : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
-external read_register : 'a register -> int = "caml_read_register" [@@noalloc]
-external set_bit : 'a register -> 'a -> unit = "caml_set_bit" [@@noalloc]
-external clear_bit : 'a register -> 'a -> unit = "caml_clear_bit" [@@noalloc]
-external read_bit : 'a register -> 'a -> bool = "caml_read_bit" [@@noalloc]
+external write_register_adc : 'a register -> int -> unit = "caml_write_register_adc" [@@noalloc]
+external read_register_adc : 'a register -> int = "caml_read_register_adc" [@@noalloc]
+external set_bit_adc : 'a register -> 'a -> unit = "caml_set_bit_adc" [@@noalloc]
+external clear_bit_adc : 'a register -> 'a -> unit = "caml_clear_bit_adc" [@@noalloc]
+external read_bit_adc : 'a register -> 'a -> bool = "caml_read_bit_adc" [@@noalloc]
 
 external enable_int_adc : unit -> unit = "caml_enable_int_adc" [@@noalloc]
 external disable_int_adc : unit -> unit = "caml_disable_int_adc" [@@noalloc]
@@ -126,33 +123,33 @@ external disable_int_adc : unit -> unit = "caml_disable_int_adc" [@@noalloc]
 let ad1con1_set params = 
   let ssrc_set n =
     match n with 
-      | 0 -> clear_bit AD1CON1 SSRC1; clear_bit AD1CON1 SSRC2; clear_bit AD1CON1 SSRC3
-      | 1 -> set_bit AD1CON1 SSRC1; clear_bit AD1CON1 SSRC2; clear_bit AD1CON1 SSRC3
-      | 2 -> clear_bit AD1CON1 SSRC1; set_bit AD1CON1 SSRC2; clear_bit AD1CON1 SSRC3
-      | 3 -> set_bit AD1CON1 SSRC1; set_bit AD1CON1 SSRC2; clear_bit AD1CON1 SSRC3
-      | 7 -> set_bit AD1CON1 SSRC1; set_bit AD1CON1 SSRC2; set_bit AD1CON1 SSRC3
+      | 0 -> clear_bit_adc AD1CON1 SSRC1; clear_bit_adc AD1CON1 SSRC2; clear_bit_adc AD1CON1 SSRC3
+      | 1 -> set_bit_adc AD1CON1 SSRC1; clear_bit_adc AD1CON1 SSRC2; clear_bit_adc AD1CON1 SSRC3
+      | 2 -> clear_bit_adc AD1CON1 SSRC1; set_bit_adc AD1CON1 SSRC2; clear_bit_adc AD1CON1 SSRC3
+      | 3 -> set_bit_adc AD1CON1 SSRC1; set_bit_adc AD1CON1 SSRC2; clear_bit_adc AD1CON1 SSRC3
+      | 7 -> set_bit_adc AD1CON1 SSRC1; set_bit_adc AD1CON1 SSRC2; set_bit_adc AD1CON1 SSRC3
       | _ -> () 
   
   in 
   let form_set n =
     match n with 
-    | 0 -> clear_bit AD1CON1 FORM1; clear_bit AD1CON1 FORM2; clear_bit AD1CON1 FORM3
-    | 1 -> set_bit AD1CON1 FORM1; clear_bit AD1CON1 FORM2; clear_bit AD1CON1 FORM3
-    | 2 -> clear_bit AD1CON1 FORM1; set_bit AD1CON1 FORM2; clear_bit AD1CON1 FORM3
-    | 3 -> set_bit AD1CON1 FORM1; set_bit AD1CON1 FORM2; clear_bit AD1CON1 FORM3
-    | 4 -> clear_bit AD1CON1 FORM1; clear_bit AD1CON1 FORM2; set_bit AD1CON1 FORM3
-    | 5 -> set_bit AD1CON1 FORM1; clear_bit AD1CON1 FORM2; set_bit AD1CON1 FORM3
-    | 6 -> clear_bit AD1CON1 FORM1; set_bit AD1CON1 FORM2; set_bit AD1CON1 FORM3
-    | 7 -> set_bit AD1CON1 FORM1; set_bit AD1CON1 FORM2; set_bit AD1CON1 FORM3
+    | 0 -> clear_bit_adc AD1CON1 FORM1; clear_bit_adc AD1CON1 FORM2; clear_bit_adc AD1CON1 FORM3
+    | 1 -> set_bit_adc AD1CON1 FORM1; clear_bit_adc AD1CON1 FORM2; clear_bit_adc AD1CON1 FORM3
+    | 2 -> clear_bit_adc AD1CON1 FORM1; set_bit_adc AD1CON1 FORM2; clear_bit_adc AD1CON1 FORM3
+    | 3 -> set_bit_adc AD1CON1 FORM1; set_bit_adc AD1CON1 FORM2; clear_bit_adc AD1CON1 FORM3
+    | 4 -> clear_bit_adc AD1CON1 FORM1; clear_bit_adc AD1CON1 FORM2; set_bit_adc AD1CON1 FORM3
+    | 5 -> set_bit_adc AD1CON1 FORM1; clear_bit_adc AD1CON1 FORM2; set_bit_adc AD1CON1 FORM3
+    | 6 -> clear_bit_adc AD1CON1 FORM1; set_bit_adc AD1CON1 FORM2; set_bit_adc AD1CON1 FORM3
+    | 7 -> set_bit_adc AD1CON1 FORM1; set_bit_adc AD1CON1 FORM2; set_bit_adc AD1CON1 FORM3
     | _ -> ()
   in
 
   let set_bits param =
   match param with 
-    | DONE_ -> set_bit AD1CON1 DONE
-    | SAMP_ -> set_bit AD1CON1 SAMP
-    | ASAM_ -> set_bit AD1CON1 ASAM
-    | CLRASAM_ -> set_bit AD1CON1 CLRASAM
+    | DONE_ -> set_bit_adc AD1CON1 DONE
+    | SAMP_ -> set_bit_adc AD1CON1 SAMP
+    | ASAM_ -> set_bit_adc AD1CON1 ASAM
+    | CLRASAM_ -> set_bit_adc AD1CON1 CLRASAM
     | SSRC_0 -> ssrc_set 0
     | SSRC_1 -> ssrc_set 1
     | SSRC_2 -> ssrc_set 2
@@ -166,54 +163,54 @@ let ad1con1_set params =
     | FORM_5 -> form_set 5
     | FORM_6 -> form_set 6
     | FORM_7 -> form_set 7
-    | SIDL_ -> set_bit AD1CON1 SIDL
-    | ON_ -> set_bit AD1CON1 ON 
+    | SIDL_ -> set_bit_adc AD1CON1 SIDL
+    | ON_ -> set_bit_adc AD1CON1 ON 
 
 
   in 
-  write_register AD1CON1 0;
+  write_register_adc AD1CON1 0;
   List.iter set_bits params
 
 
 let ad1con2_set params =
   let smpi_set n = 
     match n with
-    | 0 -> clear_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 1 -> set_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 2 -> clear_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 3 -> set_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 4 -> clear_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 5 -> set_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 6 -> clear_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 7 -> set_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; clear_bit AD1CON2 SMPI4
-    | 8 -> clear_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
-    | 9 -> set_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
-    | 10 -> clear_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
-    | 11 -> set_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; clear_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
-    | 12 -> clear_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
-    | 13 -> set_bit AD1CON2 SMPI1; clear_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
-    | 14 -> clear_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
-    | 15 -> set_bit AD1CON2 SMPI1; set_bit AD1CON2 SMPI2; set_bit AD1CON2 SMPI3; set_bit AD1CON2 SMPI4
+    | 0 -> clear_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 1 -> set_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 2 -> clear_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 3 -> set_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 4 -> clear_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 5 -> set_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 6 -> clear_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 7 -> set_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; clear_bit_adc AD1CON2 SMPI4
+    | 8 -> clear_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
+    | 9 -> set_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
+    | 10 -> clear_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
+    | 11 -> set_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; clear_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
+    | 12 -> clear_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
+    | 13 -> set_bit_adc AD1CON2 SMPI1; clear_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
+    | 14 -> clear_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
+    | 15 -> set_bit_adc AD1CON2 SMPI1; set_bit_adc AD1CON2 SMPI2; set_bit_adc AD1CON2 SMPI3; set_bit_adc AD1CON2 SMPI4
     | _ -> ()
  
   in
   let vcfg_set n = 
     match n with 
-    | 0 -> clear_bit AD1CON2 VCFG1; clear_bit AD1CON2 VCFG2; clear_bit AD1CON2 VCFG3
-    | 1 -> set_bit AD1CON2 VCFG1; clear_bit AD1CON2 VCFG2; clear_bit AD1CON2 VCFG3
-    | 2 -> clear_bit AD1CON2 VCFG1; set_bit AD1CON2 VCFG2; clear_bit AD1CON2 VCFG3
-    | 3 -> set_bit AD1CON2 VCFG1; set_bit AD1CON2 VCFG2; clear_bit AD1CON2 VCFG3
-    | 4 -> clear_bit AD1CON2 VCFG1; clear_bit AD1CON2 VCFG2; set_bit AD1CON2 VCFG3
-    (* | 5 -> set_bit AD1CON2 VCFG1; clear_bit AD1CON2 VCFG2; set_bit AD1CON2 VCFG3
-    | 6 -> clear_bit AD1CON2 VCFG1; set_bit AD1CON2 VCFG2; set_bit AD1CON2 VCFG3
-    | 7 -> set_bit AD1CON2 VCFG1; set_bit AD1CON2 VCFG2; set_bit AD1CON2 VCFG3 *)
+    | 0 -> clear_bit_adc AD1CON2 VCFG1; clear_bit_adc AD1CON2 VCFG2; clear_bit_adc AD1CON2 VCFG3
+    | 1 -> set_bit_adc AD1CON2 VCFG1; clear_bit_adc AD1CON2 VCFG2; clear_bit_adc AD1CON2 VCFG3
+    | 2 -> clear_bit_adc AD1CON2 VCFG1; set_bit_adc AD1CON2 VCFG2; clear_bit_adc AD1CON2 VCFG3
+    | 3 -> set_bit_adc AD1CON2 VCFG1; set_bit_adc AD1CON2 VCFG2; clear_bit_adc AD1CON2 VCFG3
+    | 4 -> clear_bit_adc AD1CON2 VCFG1; clear_bit_adc AD1CON2 VCFG2; set_bit_adc AD1CON2 VCFG3
+    (* | 5 -> set_bit_adc AD1CON2 VCFG1; clear_bit_adc AD1CON2 VCFG2; set_bit_adc AD1CON2 VCFG3
+    | 6 -> clear_bit_adc AD1CON2 VCFG1; set_bit_adc AD1CON2 VCFG2; set_bit_adc AD1CON2 VCFG3
+    | 7 -> set_bit_adc AD1CON2 VCFG1; set_bit_adc AD1CON2 VCFG2; set_bit_adc AD1CON2 VCFG3 *)
     | _ -> ()
 
   in 
   let set_bits param = 
     match param with 
-      | ALTS_ -> set_bit AD1CON2 ALTS
-      | BUFM_ -> set_bit AD1CON2 BUFM
+      | ALTS_ -> set_bit_adc AD1CON2 ALTS
+      | BUFM_ -> set_bit_adc AD1CON2 BUFM
       | SMPI_0 -> smpi_set 0
       | SMPI_1 -> smpi_set 1
       | SMPI_2 -> smpi_set 2
@@ -230,9 +227,9 @@ let ad1con2_set params =
       | SMPI_13 -> smpi_set 13
       | SMPI_14 -> smpi_set 14
       | SMPI_15 -> smpi_set 15
-      | BUFS_ -> set_bit AD1CON2 BUFS
-      | CSCNA_ -> set_bit AD1CON2 CSCNA
-      | OFFCAL_ -> set_bit AD1CON2 OFFCAL
+      | BUFS_ -> set_bit_adc AD1CON2 BUFS
+      | CSCNA_ -> set_bit_adc AD1CON2 CSCNA
+      | OFFCAL_ -> set_bit_adc AD1CON2 OFFCAL
       | VCFG_0 -> vcfg_set 0
       | VCFG_1 -> vcfg_set 1
       | VCFG_2 -> vcfg_set 2
@@ -247,7 +244,7 @@ let ad1con2_set params =
 
 
   in 
-  write_register AD1CON2 0;
+  write_register_adc AD1CON2 0;
   List.iter set_bits params
 
 
@@ -255,13 +252,13 @@ let ad1con3_set params =
   let samc_set n =
     match n with
     (* Just specifying what is necessary for lchip for the moment *)
-    | 15 -> set_bit AD1CON3 SAMC1; set_bit AD1CON3 SAMC2; set_bit AD1CON3 SAMC3; set_bit AD1CON3 SAMC4; clear_bit AD1CON3 SAMC5
+    | 15 -> set_bit_adc AD1CON3 SAMC1; set_bit_adc AD1CON3 SAMC2; set_bit_adc AD1CON3 SAMC3; set_bit_adc AD1CON3 SAMC4; clear_bit_adc AD1CON3 SAMC5
     | _ -> ()
   in
 
   let set_bits param =
     match param with
-      | ADRC_ -> set_bit AD1CON3 ADRC
+      | ADRC_ -> set_bit_adc AD1CON3 ADRC
       (* | SAMC_0 -> samc_set 0
       | SAMC_1 -> samc_set 1
       | SAMC_2 -> samc_set 2
@@ -299,79 +296,79 @@ let ad1con3_set params =
          ADRC is set to 1 which resuluts into ADCS 
          not being used anyway. *)
 
-  in write_register AD1CON3 0;
+  in write_register_adc AD1CON3 0;
   List.iter set_bits params
 
 
 let ad1cssl_set params = 
   let set_bits param = 
     match param with 
-      | CSSL_0 -> set_bit AD1CSSL CSSL0
-      | CSSL_1 -> set_bit AD1CSSL CSSL1
-      | CSSL_2 -> set_bit AD1CSSL CSSL2
-      | CSSL_3 -> set_bit AD1CSSL CSSL3
-      | CSSL_4 -> set_bit AD1CSSL CSSL4
-      | CSSL_5 -> set_bit AD1CSSL CSSL5
-      | CSSL_6 -> set_bit AD1CSSL CSSL6
-      | CSSL_7 -> set_bit AD1CSSL CSSL7
-      | CSSL_8 -> set_bit AD1CSSL CSSL8
-      | CSSL_9 -> set_bit AD1CSSL CSSL9
-      | CSSL_10 -> set_bit AD1CSSL CSSL10
-      | CSSL_11 -> set_bit AD1CSSL CSSL11
-      | CSSL_12 -> set_bit AD1CSSL CSSL12
-      | CSSL_13 -> set_bit AD1CSSL CSSL13
-      | CSSL_14 -> set_bit AD1CSSL CSSL14
-      | CSSL_15 -> set_bit AD1CSSL CSSL15
+      | CSSL_0 -> set_bit_adc AD1CSSL CSSL0
+      | CSSL_1 -> set_bit_adc AD1CSSL CSSL1
+      | CSSL_2 -> set_bit_adc AD1CSSL CSSL2
+      | CSSL_3 -> set_bit_adc AD1CSSL CSSL3
+      | CSSL_4 -> set_bit_adc AD1CSSL CSSL4
+      | CSSL_5 -> set_bit_adc AD1CSSL CSSL5
+      | CSSL_6 -> set_bit_adc AD1CSSL CSSL6
+      | CSSL_7 -> set_bit_adc AD1CSSL CSSL7
+      | CSSL_8 -> set_bit_adc AD1CSSL CSSL8
+      | CSSL_9 -> set_bit_adc AD1CSSL CSSL9
+      | CSSL_10 -> set_bit_adc AD1CSSL CSSL10
+      | CSSL_11 -> set_bit_adc AD1CSSL CSSL11
+      | CSSL_12 -> set_bit_adc AD1CSSL CSSL12
+      | CSSL_13 -> set_bit_adc AD1CSSL CSSL13
+      | CSSL_14 -> set_bit_adc AD1CSSL CSSL14
+      | CSSL_15 -> set_bit_adc AD1CSSL CSSL15
 
-  in write_register AD1CSSL 0;
+  in write_register_adc AD1CSSL 0;
   List.iter set_bits params
  
 
 let enable_adc10 () =
-  set_bit AD1CON1 ON
+  set_bit_adc AD1CON1 ON
 
 let close_adc10 () = 
   disable_int_adc ();
-  clear_bit AD1CON1 ON
+  clear_bit_adc AD1CON1 ON
 
 
 let set_chan_adc10 v = 
   match v with 
-  | CH0SA_0 -> clear_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_1 -> set_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_2 -> clear_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_3 -> set_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_4 -> clear_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_5 -> set_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_6 -> clear_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_7 -> set_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; clear_bit AD1CHS CH0SA4
-  | CH0SA_8 -> clear_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0SA_9 -> set_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0SA_10 -> clear_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0SA_11 -> set_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; clear_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0SA_12 -> clear_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0SA_13 -> set_bit AD1CHS CH0SA1; clear_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0SA_14 -> clear_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0SA_15 -> set_bit AD1CHS CH0SA1; set_bit AD1CHS CH0SA2; set_bit AD1CHS CH0SA3; set_bit AD1CHS CH0SA4
-  | CH0NA_0 -> clear_bit AD1CHS CH0NA
-  | CH0NA_1 -> set_bit AD1CHS CH0NA
-  | CH0SB_0 -> clear_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_1 -> set_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_2 -> clear_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_3 -> set_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_4 -> clear_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_5 -> set_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_6 -> clear_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_7 -> set_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; clear_bit AD1CHS CH0SB4
-  | CH0SB_8 -> clear_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0SB_9 -> set_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0SB_10 -> clear_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0SB_11 -> set_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; clear_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0SB_12 -> clear_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0SB_13 -> set_bit AD1CHS CH0SB1; clear_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0SB_14 -> clear_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0SB_15 -> set_bit AD1CHS CH0SB1; set_bit AD1CHS CH0SB2; set_bit AD1CHS CH0SB3; set_bit AD1CHS CH0SB4
-  | CH0NB_0 -> clear_bit AD1CHS CH0NB
-  | CH0NB_1 -> set_bit AD1CHS CH0NB
+  | CH0SA_0 -> clear_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_1 -> set_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_2 -> clear_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_3 -> set_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_4 -> clear_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_5 -> set_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_6 -> clear_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_7 -> set_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; clear_bit_adc AD1CHS CH0SA4
+  | CH0SA_8 -> clear_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0SA_9 -> set_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0SA_10 -> clear_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0SA_11 -> set_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; clear_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0SA_12 -> clear_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0SA_13 -> set_bit_adc AD1CHS CH0SA1; clear_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0SA_14 -> clear_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0SA_15 -> set_bit_adc AD1CHS CH0SA1; set_bit_adc AD1CHS CH0SA2; set_bit_adc AD1CHS CH0SA3; set_bit_adc AD1CHS CH0SA4
+  | CH0NA_0 -> clear_bit_adc AD1CHS CH0NA
+  | CH0NA_1 -> set_bit_adc AD1CHS CH0NA
+  | CH0SB_0 -> clear_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_1 -> set_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_2 -> clear_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_3 -> set_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_4 -> clear_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_5 -> set_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_6 -> clear_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_7 -> set_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; clear_bit_adc AD1CHS CH0SB4
+  | CH0SB_8 -> clear_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0SB_9 -> set_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0SB_10 -> clear_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0SB_11 -> set_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; clear_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0SB_12 -> clear_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0SB_13 -> set_bit_adc AD1CHS CH0SB1; clear_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0SB_14 -> clear_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0SB_15 -> set_bit_adc AD1CHS CH0SB1; set_bit_adc AD1CHS CH0SB2; set_bit_adc AD1CHS CH0SB3; set_bit_adc AD1CHS CH0SB4
+  | CH0NB_0 -> clear_bit_adc AD1CHS CH0NB
+  | CH0NB_1 -> set_bit_adc AD1CHS CH0NB
 
 

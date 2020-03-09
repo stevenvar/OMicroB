@@ -11,14 +11,9 @@ type yes
 type no
 type 'a analog_pin = YES : yes analog_pin | NO : no analog_pin
 
-type 'a register = ..
-
 module type Pic32Pins = sig
-(* module type Pic32Features = sig *)
-
   type ('a, 'b, 'c, 'd) pin
-
-
+  type 'a register
   val lat_of_pin :
     ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'a register
   val tris_of_pin :
@@ -37,45 +32,90 @@ module type Pic32Pins = sig
     ('a register, 'b register, 'c register, 'd analog_pin) pin -> level -> unit
   val digital_read :
     ('a register, 'b register, 'c register, 'd analog_pin) pin -> level
-
   val write_register : 'a register -> int -> unit
   val read_register : 'a register -> int 
   val set_bit : 'a register -> 'a -> unit
   val clear_bit : 'a register -> 'a -> unit
   val read_bit : 'a register -> 'a -> bool
-
 end
 
-module type Pic32ADC = sig
-  type ad1con1_param
-  type ad1con2_param
-  type ad1con3_param
-  type ad1cssl_param
-  type adc_chan
-
-  val ad1con1_set : ad1con1_param list -> unit
-  val ad1con2_set : ad1con2_param list -> unit
-  val ad1con3_set : ad1con3_param list -> unit
-  val ad1cssl_set : ad1cssl_param list -> unit 
-
-  val enable_adc10 : unit -> unit 
-  val close_adc10 : unit -> unit 
-  val set_chan_adc10 : adc_chan -> unit
-
-  val enable_int_adc : unit -> unit 
-  val disable_int_adc : unit -> unit
 
 
-  val write_register : 'a register -> int -> unit
-  val read_register : 'a register -> int 
-  val set_bit : 'a register -> 'a -> unit
-  val clear_bit : 'a register -> 'a -> unit
-  val read_bit : 'a register -> 'a -> bool
+module type Pic32Timers = sig
+  type ('a, 'b, 'c) timer
+  type 'a register
+  type txcon_param 
 
+  val tcon_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a register
+  val tmr_of_timer : 
+    ('a register, 'b register, 'c register) timer -> 'b register
+  val pr_of_timer : 
+    ('a register, 'b register, 'c register) timer -> 'c register
+  val on_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val sidl_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val tgate_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val tckps_bit1_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val tckps_bit2_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val tckps_bit3_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val t32_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val tcs_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val twip_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val twdis_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+  val tsync_bit_of_timer :
+    ('a register, 'b register, 'c register) timer -> 'a 
+
+  val write_register_timer : 'a register -> int -> unit
+  val read_register_timer : 'a register -> int 
+  val set_bit_timer : 'a register -> 'a -> unit
+  val clear_bit_timer : 'a register -> 'a -> unit
+  val read_bit_timer : 'a register -> 'a -> bool 
+
+  val enable_int_timer : 
+    ('a register, 'b register, 'c register) timer -> unit 
+  val disable_int_timer : 
+    ('a register, 'b register, 'c register) timer -> unit 
+  val set_priority_int_timer : 
+    ('a register, 'b register, 'c register) timer -> int -> unit 
+  val set_subpriority_int_timer : 
+    ('a register, 'b register, 'c register) timer -> int -> unit 
+  val configure_int_timer : 
+    ('a register, 'b register, 'c register) timer -> int -> int -> unit 
+
+  val t1con_set : 
+    txcon_param list -> unit
+  val txcon_set : 
+    ('a register, 'b register, 'c register) timer -> txcon_param list -> unit
+
+
+  val read_timer : 
+    ('a register, 'b register, 'c register) timer -> int
+  val write_timer : 
+    ('a register, 'b register, 'c register) timer -> int -> unit 
+  val read_period_timer : 
+    ('a register, 'b register, 'c register) timer -> int
+  val write_period_timer : 
+    ('a register, 'b register, 'c register) timer -> int -> unit
+  (* val open_timer : 
+    ('a register, 'b register, 'c register) timer -> txcon_param list -> int -> unit *)
+  val close_timer : 
+    ('a register, 'b register, 'c register) timer -> unit
 end
+
 
 module type Pic32Uarts = sig
   type ('a, 'b, 'c, 'd, 'e) uart
+  type 'a register
   type uxmode_param
   type uxsta_param
 
@@ -154,11 +194,11 @@ module type Pic32Uarts = sig
   val adm_en_bit_of_uart : 
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> 'b
 
-  val write_register : 'a register -> int -> unit
-  val read_register : 'a register -> int 
-  val set_bit : 'a register -> 'a -> unit
-  val clear_bit : 'a register -> 'a -> unit
-  val read_bit : 'a register -> 'a -> bool
+  val write_register_uart : 'a register -> int -> unit
+  val read_register_uart : 'a register -> int 
+  val set_bit_uart : 'a register -> 'a -> unit
+  val clear_bit_uart : 'a register -> 'a -> unit
+  val read_bit_uart : 'a register -> 'a -> bool
 
   val enable_tx_int_ec_uart : 
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> unit 
@@ -184,11 +224,10 @@ module type Pic32Uarts = sig
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> unit
   val disable_err_int_fs_uart : 
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> unit
-  
   val set_priority_int_uart : 
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> int -> unit 
   val set_subpriority_int_uart : 
-    ('a register, 'b register, 'c register, 'd register, 'e register) uart -> int -> unit 
+    ('a register, 'b register, 'c register, 'd register, 'e register) uart -> int -> unit
 
 
   val uxsta_set :
@@ -196,7 +235,6 @@ module type Pic32Uarts = sig
 
   val uxmode_set :
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> uxmode_param list -> unit
-
 
   val read_tx_reg : 
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> int
@@ -209,84 +247,41 @@ module type Pic32Uarts = sig
   val read_baud_rate :
     ('a register, 'b register, 'c register, 'd register, 'e register) uart -> int
   val write_baud_rate :
-    ('a register, 'b register, 'c register, 'd register, 'e register) uart -> int -> unit
-
+    ('a register, 'b register, 'c register, 'd register, 'e register) uart -> int -> unit 
 end
 
 
+module type Pic32ADC = sig
+  type 'a register
+  type ad1con1_param
+  type ad1con2_param
+  type ad1con3_param
+  type ad1cssl_param
+  type adc_chan
 
-module type Pic32Timers = sig
-  type ('a, 'b, 'c) timer
-  type txcon_param 
+  val write_register_adc : 'a register -> int -> unit
+  val read_register_adc : 'a register -> int 
+  val set_bit_adc : 'a register -> 'a -> unit
+  val clear_bit_adc : 'a register -> 'a -> unit
+  val read_bit_adc : 'a register -> 'a -> bool
 
-   val tcon_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a register
-  val tmr_of_timer : 
-    ('a register, 'b register, 'c register) timer -> 'b register
-  val pr_of_timer : 
-    ('a register, 'b register, 'c register) timer -> 'c register
-  val on_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val sidl_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val tgate_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val tckps_bit1_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val tckps_bit2_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val tckps_bit3_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val t32_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val tcs_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val twip_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val twdis_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
-  val tsync_bit_of_timer :
-    ('a register, 'b register, 'c register) timer -> 'a 
 
-  val write_register : 'a register -> int -> unit
-  val read_register : 'a register -> int 
-  val set_bit : 'a register -> 'a -> unit
-  val clear_bit : 'a register -> 'a -> unit
-  val read_bit : 'a register -> 'a -> bool 
- 
-  val enable_int_timer : 
-    ('a register, 'b register, 'c register) timer -> unit 
-  val disable_int_timer : 
-    ('a register, 'b register, 'c register) timer -> unit 
-  val set_priority_int_timer : 
-    ('a register, 'b register, 'c register) timer -> int -> unit 
-  val set_subpriority_int_timer : 
-    ('a register, 'b register, 'c register) timer -> int -> unit 
-  val configure_int_timer : 
-    ('a register, 'b register, 'c register) timer -> int -> int -> unit 
+  val ad1con1_set : ad1con1_param list -> unit
+  val ad1con2_set : ad1con2_param list -> unit
+  val ad1con3_set : ad1con3_param list -> unit
+  val ad1cssl_set : ad1cssl_param list -> unit 
 
-  val t1con_set : 
-    txcon_param list -> unit
-  val txcon_set : 
-    ('a register, 'b register, 'c register) timer -> txcon_param list -> unit
-  
-  val read_timer : 
-    ('a register, 'b register, 'c register) timer -> int
-  val write_timer : 
-    ('a register, 'b register, 'c register) timer -> int -> unit 
-  val read_period_timer : 
-    ('a register, 'b register, 'c register) timer -> int
-  val write_period_timer : 
-    ('a register, 'b register, 'c register) timer -> int -> unit
-  (* val open_timer : 
-    ('a register, 'b register, 'c register) timer -> txcon_param list -> int -> unit *)
-  val close_timer : 
-    ('a register, 'b register, 'c register) timer -> unit
-end
+  val enable_adc10 : unit -> unit 
+  val close_adc10 : unit -> unit 
+  val set_chan_adc10 : adc_chan -> unit
 
+  val enable_int_adc : unit -> unit 
+  val disable_int_adc : unit -> unit
+end 
 
 val delay : int -> unit 
 val init_system : unit -> unit 
 val init_interrupts : int -> unit 
 val wait_int_flag_ad1 : unit -> unit
 val read_adc10 : int -> int
+

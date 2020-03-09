@@ -46,7 +46,7 @@ type pr4_bit = PR40
 type pr5_bit = PR50
 
 
-type 'a register +=
+type 'a register =
   | T1CON : t1con_bit register
   | T2CON : t2con_bit register
   | T3CON : t3con_bit register
@@ -74,6 +74,6 @@ type ('a,'b,'c) timer =
 
 
 include Pic32Timers
-  (* with type 'a register := 'a register *)
   with type ('a, 'b, 'c)timer := ('a, 'b, 'c)timer
+  with type 'a register := 'a register
   with type txcon_param := txcon_param

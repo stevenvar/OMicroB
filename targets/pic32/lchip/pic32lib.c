@@ -1,14 +1,18 @@
 #include <xc.h>
 #include <p32xxxx.h>
-//#include <plib.h>
+#include <plib.h>
 
-#define SYS_FREQ 80000000L
+#define SYS_FREQ                80000000L
+
+
 // #define COUNTS_PER_MICRO_SEC ((SYS_FREQ/2L/1000000L))
 
 
 
 /*****************************************************************************/
 volatile uint32_t *get_reg_addr(uint8_t reg) {
+
+  /* I/O ports module registers */
   if (reg == 0)  return &LATA;
   if (reg == 1)  return &LATB;
   if (reg == 2)  return &LATC;
@@ -30,68 +34,78 @@ volatile uint32_t *get_reg_addr(uint8_t reg) {
   if (reg == 18) return &PORTE;
   if (reg == 19) return &PORTF;
   if (reg == 20) return &PORTG;
-
-  if (reg == 21) return &AD1CON1;
-  if (reg == 22) return &AD1CON2;
-  if (reg == 23) return &AD1CON3;
-  if (reg == 24) return &AD1CHS;
-  if (reg == 25) return &AD1PCFG;
-  if (reg == 26) return &AD1CSSL;
-  if (reg == 27) return &ADC1BUF0;
-
-  if (reg == 28) return &U1MODE;
-  if (reg == 29) return &U2MODE;
-  if (reg == 30) return &U3MODE;
-  if (reg == 31) return &U4MODE;
-  if (reg == 32) return &U5MODE;
-  if (reg == 33) return &U6MODE;
-  if (reg == 34) return &U1STA;
-  if (reg == 35) return &U2STA;
-  if (reg == 36) return &U3STA;
-  if (reg == 37) return &U4STA;
-  if (reg == 38) return &U5STA;
-  if (reg == 39) return &U6STA;
-  if (reg == 40) return &U1TXREG; 
-  if (reg == 41) return &U2TXREG;
-  if (reg == 42) return &U3TXREG;
-  if (reg == 43) return &U4TXREG;
-  if (reg == 44) return &U5TXREG;
-  if (reg == 45) return &U6TXREG;
-  if (reg == 46) return &U1RXREG;
-  if (reg == 47) return &U2RXREG;
-  if (reg == 48) return &U3RXREG;
-  if (reg == 49) return &U4RXREG;
-  if (reg == 50) return &U5RXREG;
-  if (reg == 51) return &U6RXREG;
-  if (reg == 52) return &U1BRG;
-  if (reg == 53) return &U2BRG;
-  if (reg == 54) return &U3BRG;
-  if (reg == 55) return &U4BRG;
-  if (reg == 56) return &U5BRG;
-  if (reg == 57) return &U6BRG;
-
-  if (reg == 58) return &T1CON;
-  if (reg == 59) return &T2CON;
-  if (reg == 60) return &T3CON;
-  if (reg == 61) return &T4CON;
-  if (reg == 62) return &T5CON;
-  if (reg == 63) return &TMR1;
-  if (reg == 64) return &TMR2;
-  if (reg == 65) return &TMR3;
-  if (reg == 66) return &TMR4;
-  if (reg == 67) return &TMR5;
-  if (reg == 68) return &PR1;
-  if (reg == 69) return &PR2;
-  if (reg == 70) return &PR3;
-  if (reg == 71) return &PR4;
-  if (reg == 72) return &PR5;
   return NULL;
 }
 
 
+
+volatile uint32_t *get_reg_addr_uart(uint8_t reg) {
+  if (reg == 0) return &U1MODE;
+  if (reg == 1) return &U2MODE;
+  if (reg == 2) return &U3MODE;
+  if (reg == 3) return &U4MODE;
+  if (reg == 4) return &U5MODE;
+  if (reg == 5) return &U6MODE;
+  if (reg == 6) return &U1STA;
+  if (reg == 7) return &U2STA;
+  if (reg == 8) return &U3STA;
+  if (reg == 9) return &U4STA;
+  if (reg == 10) return &U5STA;
+  if (reg == 11) return &U6STA;
+  if (reg == 12) return &U1TXREG; 
+  if (reg == 13) return &U2TXREG;
+  if (reg == 14) return &U3TXREG;
+  if (reg == 15) return &U4TXREG;
+  if (reg == 16) return &U5TXREG;
+  if (reg == 17) return &U6TXREG;
+  if (reg == 18) return &U1RXREG;
+  if (reg == 19) return &U2RXREG;
+  if (reg == 20) return &U3RXREG;
+  if (reg == 21) return &U4RXREG;
+  if (reg == 22) return &U5RXREG;
+  if (reg == 23) return &U6RXREG;
+  if (reg == 24) return &U1BRG;
+  if (reg == 25) return &U2BRG;
+  if (reg == 26) return &U3BRG;
+  if (reg == 27) return &U4BRG;
+  if (reg == 28) return &U5BRG;
+  if (reg == 29) return &U6BRG;
+
+  return NULL;
+}
+
+volatile uint32_t *get_reg_addr_timer(uint8_t reg) {
+  if (reg == 0) return &T1CON;
+  if (reg == 1) return &T2CON;
+  if (reg == 2) return &T3CON;
+  if (reg == 3) return &T4CON;
+  if (reg == 4) return &T5CON;
+  if (reg == 5) return &TMR1;
+  if (reg == 6) return &TMR2;
+  if (reg == 7) return &TMR3;
+  if (reg == 8) return &TMR4;
+  if (reg == 9) return &TMR5;
+  if (reg == 10) return &PR1;
+  if (reg == 11) return &PR2;
+  if (reg == 12) return &PR3;
+  if (reg == 13) return &PR4;
+  if (reg == 14) return &PR5;
+
+  return NULL;
+}
+
+
+volatile uint32_t *get_reg_addr_adc(uint8_t reg) {
+  if (reg == 0) return &AD1CON1;
+  if (reg == 1) return &AD1CON2;
+  if (reg == 2) return &AD1CON3;
+  if (reg == 3) return &AD1CHS;
+  if (reg == 4) return &AD1PCFG;
+  if (reg == 5) return &AD1CSSL;
+  if (reg == 6) return &ADC1BUF0;
+}
+
 /*****************************************************************************/
-
-
 
 void set_bit(uint8_t reg, uint8_t bit) {
   *(get_reg_addr(reg)) |= ((uint8_t) 1 << bit);
@@ -109,12 +123,82 @@ void write_register(uint8_t reg, uint8_t val) {
   *(get_reg_addr(reg)) = val;
 }
 
-uint8_t read_register(uint8_t reg) {
+uint32_t read_register(uint8_t reg) {
   return *(get_reg_addr(reg));
 }
 
 
-int millis() {
+
+
+
+
+void set_bit_adc(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr_adc(reg)) |= ((uint8_t) 1 << bit);
+}
+
+void clear_bit_adc(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr_adc(reg)) &= ~((uint8_t) 1 << bit);
+}
+
+bool read_bit_adc(uint8_t reg, uint8_t bit) {
+  return *(get_reg_addr_adc(reg)) & ((uint8_t) 1 << bit);
+}
+
+void write_register_adc(uint8_t reg, uint8_t val) {
+  *(get_reg_addr_adc(reg)) = val;
+}
+
+uint32_t read_register_adc(uint8_t reg) {
+  return *(get_reg_addr_adc(reg));
+}
+
+
+
+void set_bit_timer(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr_timer(reg)) |= ((uint8_t) 1 << bit);
+}
+
+void clear_bit_timer(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr_timer(reg)) &= ~((uint8_t) 1 << bit);
+}
+
+bool read_bit_timer(uint8_t reg, uint8_t bit) {
+  return *(get_reg_addr_timer(reg)) & ((uint8_t) 1 << bit);
+}
+
+void write_register_timer(uint8_t reg, uint8_t val) {
+  *(get_reg_addr_timer(reg)) = val;
+}
+
+uint32_t read_register_timer(uint8_t reg) {
+  return *(get_reg_addr_timer(reg));
+}
+
+
+void set_bit_uart(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr_uart(reg)) |= ((uint8_t) 1 << bit);
+}
+
+void clear_bit_uart(uint8_t reg, uint8_t bit) {
+  *(get_reg_addr_uart(reg)) &= ~((uint8_t) 1 << bit);
+}
+
+bool read_bit_uart(uint8_t reg, uint8_t bit) {
+  return *(get_reg_addr_uart(reg)) & ((uint8_t) 1 << bit);
+}
+
+void write_register_uart(uint8_t reg, uint8_t val) {
+  *(get_reg_addr_uart(reg)) = val;
+}
+
+uint32_t read_register_uart(uint8_t reg) {
+  return *(get_reg_addr_uart(reg));
+}
+
+
+
+
+uint32_t millis() {
   uint32_t time_ticks, time_ms;
 
   time_ticks = _CP0_GET_COUNT();
@@ -131,6 +215,51 @@ void delay(int ms) {
 }
 
 
+/*****************************************************************************/
+
+// void __attribute__ ((nomips16)) CheKseg0CacheOn() {
+// 	register unsigned long tmp;
+// 	asm("mfc0 %0,$16,0" :  "=r"(tmp));
+// 	tmp = (tmp & ~7) | 3;
+// 	asm("mtc0 %0,$16,0" :: "r" (tmp));
+// }
+
+// void __attribute__((nomips16))  INTRestoreInterrupts(unsigned int status) {
+//     if(status & 0x00000001)
+//         asm volatile("ei");
+//     else
+//         asm volatile("di");
+// }
+
+// unsigned int __attribute__((nomips16)) INTDisableInterrupts(void) {
+//     unsigned int status = 0;
+//     asm volatile("di    %0" : "=r"(status));
+
+//     return status;
+// }
+
+// unsigned int __attribute__((nomips16))  INTEnableInterrupts(void) {
+//     unsigned int status = 0;
+//     asm volatile("ei    %0" : "=r"(status));
+
+//     return status;
+// }
+
+// void __attribute__ ((nomips16)) INTConfigureSystem(uint8_t mode) {
+//     unsigned int val;
+
+//     // set the CP0 cause IV bit high
+//     asm volatile("mfc0   %0,$13" : "=r"(val));
+//     val |= 0x00800000;
+//     asm volatile("mtc0   %0,$13" : "+r"(val));
+
+//     if(mode == 0) // INT_SYSTEM_CONFIG_MULT_VECTOR
+//         INTCONSET = _INTCON_MVEC_MASK;
+//     else
+//         INTCONCLR = _INTCON_MVEC_MASK;
+// }
+
+
 
 
 void init_system() {
@@ -141,26 +270,6 @@ void init_interrupts(uint8_t mode) {
   INTConfigureSystem(mode);
   INTEnableInterrupts();
 }
-
-
-
-void wait_int_flag_ad1() {
-  while(!IFS1bits.AD1IF);
-}
-
-uint16_t read_adc10(int index) {
-  return *(&ADC1BUF0+((index) * 4));
-}
-
-void disable_int_adc() {
-  IEC1CLR = _IEC1_AD1IE_MASK;
-}
-
-void enable_int_adc() {
-  IEC1CLR = _IEC1_AD1IE_MASK;
-  IEC1SET = 1 << _IEC1_AD1IE_POSITION;
-}
-
 
 
 
@@ -278,6 +387,9 @@ void configure_int_timer(uint8_t timer, uint8_t priority, uint8_t subpriority) {
   enable_int_timer(timer); 
 }
 
+
+
+// /*****************************************************************************/
 
 
 
@@ -592,3 +704,46 @@ void set_subpriority_int_uart(uint8_t uart, uint8_t subpriority) {
     IPC12SET = subpriority << _IPC12_U6IS_POSITION;
   }
 }
+
+
+void wait_int_flag_ad1() {
+  while(!IFS1bits.AD1IF);
+}
+
+uint16_t read_adc10(int index) {
+  return *(&ADC1BUF0+((index) * 4));
+}
+
+void disable_int_adc() {
+  IEC1CLR = _IEC1_AD1IE_MASK;
+}
+
+void enable_int_adc() {
+  IEC1CLR = _IEC1_AD1IE_MASK;
+  IEC1SET = 1 << _IEC1_AD1IE_POSITION;
+}
+
+
+
+
+// void __ISR(_UART1_VECTOR, IPL2AUTO) IntUart1Handler(void) {
+//   if (U1STAbits.OERR) {
+//     U1STACLR = _U1STA_OERR_MASK;
+//     IFS0CLR = _IFS0_U1EIF_MASK;
+//   }
+//   if (IFS0bits.U1RXIF == 1) {
+//     if (U1STAbits.URXDA == 1) {
+//       UART1_Buffer = U1RXREG;
+//     }
+//     IFS0CLR = _IFS0_U1RXIF_MASK;
+//     ToggleGreen(UART1_Buffer);
+//   }
+//   if (IFS0bits.U1TXIF == 1) {
+//     ToggleRed(toSend1);
+//     U1TXREG = toSend1;
+//     IEC0CLR = _IEC0_U1TXIE_MASK;
+//     IFS0CLR = _IFS0_U1TXIF_MASK;    
+//   }
+// }
+
+
