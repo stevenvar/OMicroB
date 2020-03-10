@@ -20,6 +20,7 @@ module type PIC32CONFIG = sig
   val timers_module : string 
   val uart_module : string 
   val linker_scripts : string list
+  val is_chipkit : bool 
 end
 
 module FubarinoMiniConfig : PIC32CONFIG = struct
@@ -27,11 +28,11 @@ module FubarinoMiniConfig : PIC32CONFIG = struct
   let baud = 115_200
   let clock = 48_000_000
   let folder = "fubarino_mini"
-  let pins_module = ""
+  let pins_module = "FubarinoMiniPins"
   let adc_module = ""
   let timers_module = ""
   let uart_module = ""
-  let linker_scripts = []
+  let linker_scripts = ["chipKIT-application-32MX250F128.ld"; "chipKIT-application-COMMON.ld"]
 end
 
 module LchipConfig : PIC32CONFIG = struct
@@ -46,7 +47,7 @@ module LchipConfig : PIC32CONFIG = struct
   let linker_scripts = ["32MX795F512L-lchip.ld"]
 end
 
-let default_xc32_cxx_options = [ "-Wl,--defsym=_min_heap_size=1024" ]
+let default_xc32_cxx_options = [ "-nostartfiles"; "-Wl,--defsym=_min_heap_size=1024" ]
 
 module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
   let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
@@ -66,7 +67,7 @@ module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
                   (Filename.concat "targets/pic32"
                      (Filename.concat P.folder
                         ((String.uncapitalize_ascii P.pins_module)^".cmo")));
-                Filename.concat libdir
+                (* Filename.concat libdir
                   (Filename.concat "targets/pic32"
                      (Filename.concat P.folder
                         ((String.uncapitalize_ascii P.adc_module)^".cmo")));
@@ -77,12 +78,13 @@ module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
                 Filename.concat libdir
                   (Filename.concat "targets/pic32"
                      (Filename.concat P.folder
-                        ((String.uncapitalize_ascii P.timers_module)^".cmo")));
+                        ((String.uncapitalize_ascii P.timers_module)^".cmo"))); *)
                 "-open"; Printf.sprintf "Pic32";
-                "-open"; Printf.sprintf "%s" P.pins_module;
-                "-open"; Printf.sprintf "%s" P.adc_module;
+                "-open"; Printf.sprintf "%s" P.pins_module
+                (* "-open"; Printf.sprintf "%s" P.adc_module;
                 "-open"; Printf.sprintf "%s" P.uart_module;
-                "-open"; Printf.sprintf "%s" P.timers_module ] in
+                "-open"; Printf.sprintf "%s" P.timers_module  *)
+                ] in
     let cmd = cmd @ inputs @ [ "-o"; output ] in
     run ~vars ~verbose cmd
 
@@ -99,6 +101,7 @@ module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
     let cmd = cmd @ [ "-mprocessor=" ^ P.mmcu ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "pic32" ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir (Filename.concat "pic32" P.folder) ] in
+    let cmd = cmd @ [ Filename.concat includedir "pic32/ld/chipKIT-core.a" ] in 
     let cmd = cmd @ collect_linker_scripts P.linker_scripts in 
     let cmd = cmd @ [ input ; "-o"; pic32elf_file ] in
     run ~verbose cmd;
