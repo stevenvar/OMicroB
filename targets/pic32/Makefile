@@ -2,7 +2,7 @@ include ../../etc/Makefile.conf
 
 LIBPIC32 := $(LIB)/targets/pic32
 
-FOLDERS := lchip fubarino_mini
+FOLDERS := lchip fubarino_mini pro_mx7
 
 LIB_FOLDERS := $(foreach f,$(FOLDERS),$(LIBPIC32)/$(f))
 
@@ -11,7 +11,11 @@ SUBMODULES := lchip/lchipPins \
 							lchip/lchipADC \
 							lchip/lchipUarts \
 							lchip/lchipTimers \
-							fubarino_mini/fubarinoMiniPins 
+							fubarino_mini/fubarinoMiniPins \
+							pro_mx7/proMX7Pins \
+							pro_mx7/proMX7ADC \
+							pro_mx7/proMX7Uarts \
+							pro_mx7/proMX7Timers
 
 MLS := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)

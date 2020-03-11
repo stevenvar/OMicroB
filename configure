@@ -258,7 +258,7 @@ function target_pic32 () {
     cat "targets/pic32/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
     cat "targets/pic32/simul/sf-regs.c" >> "src/byterun/simul/sf-regs.c"
 
-    for f in "fubarino_mini" "lchip"
+    for f in "fubarino_mini" "lchip" "pro_mx7"
     do
         mkdir -p "src/byterun/pic32/$f/"
         cp -f "targets/pic32/$f/pic32lib.c" "src/byterun/pic32/$f/"

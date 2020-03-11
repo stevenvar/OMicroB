@@ -6,8 +6,8 @@ let _ =
   while true do 
     digital_write PIN10 HIGH;
     digital_write PIN28 HIGH;
-    delay 2500;
+    delay 1000;
     digital_write PIN10 LOW;
     digital_write PIN28 LOW;
-    delay 2500;
+    delay 100;
   done
