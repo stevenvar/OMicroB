@@ -1,5 +1,8 @@
 # OCaml on Microcontroller Boards
 
+![OCaml](https://img.shields.io/badge/OCaml-4.07-orange?logo=OCaml&logoColor=white)
+
+
 OMicroB is an OCaml virtual machine dedicated at running OCaml programs on devices with very limited resources such as AVR Atmega32u4 microcontrollers (2.5 ko of RAM).
 
 This tools, steming from the works of OCaPIC (https://github.com/bvaugon/ocapic) consists of a generic virtual machine, which can be ported on various architectures.
