@@ -40,270 +40,266 @@ type 'a register =
   | PORTC : portc_bit register
 
 
-(* 32MX250F128D has 32 I/O pins available. 
-   The following pin naming convention stricly follows that which is specified in the Fubarino Mini 
-   reference manual (http://ww1.microchip.com/downloads/en/devicedoc/FubarinoMiniUserRefManual.pdf); 
-   the pin naming convention corresponds to 'Arduino pins' instead of the low-level pin naming 
-   convention available in the official 32MX250F128D datasheet 
-   (http://ww1.microchip.com/downloads/en/DeviceDoc/PIC32MX1XX2XX%20283644-PIN_Datasheet_DS60001168L.pdf)
-*)
-
 type ('a,'b,'c,'d) pin =
-  | PIN0 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
-  | PIN1 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN2 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN3 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
-  | PIN4 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
-  | PIN5 : (lata_bit register, trisa_bit register, porta_bit register, yes analog_pin) pin
-  | PIN6 : (lata_bit register, trisa_bit register, porta_bit register, yes analog_pin) pin
-  | PIN7 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
-  | PIN8 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
-  | PIN9 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
-  | PIN10 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
-  | PIN11 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN12 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN13 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
-  | PIN14 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN15 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN16 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN17 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN18 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN19 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
-  | PIN20 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
-  | PIN21 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
-  | PIN22 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
-  | PIN23 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN24 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN25 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN26 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN27 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
-  | PIN28 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
-  | PIN29 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
-  | PIN30 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
-  | PIN31 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-  | PIN32 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
-
+  | PIN1 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN2 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN3 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN4 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN5 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN8 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN9 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN11 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN12 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN13 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN14 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN15 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN19 : (lata_bit register, trisa_bit register, porta_bit register, yes analog_pin) pin
+  | PIN20 : (lata_bit register, trisa_bit register, porta_bit register, yes analog_pin) pin
+  | PIN21 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN22 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN23 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN24 : (latb_bit register, trisb_bit register, portb_bit register, yes analog_pin) pin
+  | PIN25 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
+  | PIN26 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
+  | PIN27 : (latc_bit register, trisc_bit register, portc_bit register, yes analog_pin) pin
+  | PIN30 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN31 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN32 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN33 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN34 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN35 : (lata_bit register, trisa_bit register, porta_bit register, no analog_pin) pin
+  | PIN36 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN37 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN38 : (latc_bit register, trisc_bit register, portc_bit register, no analog_pin) pin
+  | PIN41 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN43 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
+  | PIN44 : (latb_bit register, trisb_bit register, portb_bit register, no analog_pin) pin
 
 let lat_of_pin : type a b c d. (a register,b register,c register,d analog_pin) pin -> a register =
     function
-    | PIN0 -> LATB
-    | PIN1 -> LATA
-    | PIN2 -> LATA
-    | PIN3 -> LATB
-    | PIN4 -> LATB
-    | PIN5 -> LATA
-    | PIN6 -> LATA
-    | PIN7 -> LATB
+    | PIN1 -> LATB
+    | PIN2 -> LATC
+    | PIN3 -> LATC
+    | PIN4 -> LATC
+    | PIN5 -> LATC
     | PIN8 -> LATB
     | PIN9 -> LATB
-    | PIN10 -> LATB
-    | PIN11 -> LATC
-    | PIN12 -> LATC
-    | PIN13 -> LATC
-    | PIN14 -> LATA
-    | PIN15 -> LATA
-    | PIN16 -> LATA
-    | PIN17 -> LATB
-    | PIN18 -> LATA
+    | PIN11 -> LATB
+    | PIN12 -> LATA
+    | PIN13 -> LATA
+    | PIN14 -> LATB
+    | PIN15 -> LATB
     | PIN19 -> LATA
-    | PIN20 -> LATC
-    | PIN21 -> LATC
-    | PIN22 -> LATC
+    | PIN20 -> LATA
+    | PIN21 -> LATB
+    | PIN22 -> LATB
     | PIN23 -> LATB
     | PIN24 -> LATB
-    | PIN25 -> LATB
-    | PIN26 -> LATB
+    | PIN25 -> LATC
+    | PIN26 -> LATC
     | PIN27 -> LATC
-    | PIN28 -> LATC
-    | PIN29 -> LATC
-    | PIN30 -> LATC
-    | PIN31 -> LATB
-    | PIN32 -> LATB
+    | PIN30 -> LATA
+    | PIN31 -> LATA
+    | PIN32 -> LATA
+    | PIN33 -> LATB
+    | PIN34 -> LATA
+    | PIN35 -> LATA
+    | PIN36 -> LATC
+    | PIN37 -> LATC
+    | PIN38 -> LATC
+    | PIN41 -> LATB
+    | PIN43 -> LATB
+    | PIN44 -> LATB
 
   let tris_of_pin : type a b c d. (a register, b register, c register, d analog_pin) pin -> b register =
        function
-    | PIN0 -> TRISB
-    | PIN1 -> TRISA
-    | PIN2 -> TRISA
-    | PIN3 -> TRISB
-    | PIN4 -> TRISB
-    | PIN5 -> TRISA
-    | PIN6 -> TRISA
-    | PIN7 -> TRISB
+    | PIN1 -> TRISB
+    | PIN2 -> TRISC
+    | PIN3 -> TRISC
+    | PIN4 -> TRISC
+    | PIN5 -> TRISC
     | PIN8 -> TRISB
     | PIN9 -> TRISB
-    | PIN10 -> TRISB
-    | PIN11 -> TRISC
-    | PIN12 -> TRISC
-    | PIN13 -> TRISC
-    | PIN14 -> TRISA
-    | PIN15 -> TRISA
-    | PIN16 -> TRISA
-    | PIN17 -> TRISB
-    | PIN18 -> TRISA
+    | PIN11 -> TRISB
+    | PIN12 -> TRISA
+    | PIN13 -> TRISA
+    | PIN14 -> TRISB
+    | PIN15 -> TRISB
     | PIN19 -> TRISA
-    | PIN20 -> TRISC
-    | PIN21 -> TRISC
-    | PIN22 -> TRISC
+    | PIN20 -> TRISA
+    | PIN21 -> TRISB
+    | PIN22 -> TRISB
     | PIN23 -> TRISB
     | PIN24 -> TRISB
-    | PIN25 -> TRISB
-    | PIN26 -> TRISB
+    | PIN25 -> TRISC
+    | PIN26 -> TRISC
     | PIN27 -> TRISC
-    | PIN28 -> TRISC
-    | PIN29 -> TRISC
-    | PIN30 -> TRISC
-    | PIN31 -> TRISB
-    | PIN32 -> TRISB
+    | PIN30 -> TRISA
+    | PIN31 -> TRISA
+    | PIN32 -> TRISA
+    | PIN33 -> TRISB
+    | PIN34 -> TRISA
+    | PIN35 -> TRISA
+    | PIN36 -> TRISC
+    | PIN37 -> TRISC
+    | PIN38 -> TRISC
+    | PIN41 -> TRISB
+    | PIN43 -> TRISB
+    | PIN44 -> TRISB
+
 
 
   let port_of_pin : type a b c d. (a register, b register, c register, d analog_pin) pin -> c register = 
     function
-    | PIN0 -> PORTB
-    | PIN1 -> PORTA
-    | PIN2 -> PORTA
-    | PIN3 -> PORTB
-    | PIN4 -> PORTB
-    | PIN5 -> PORTA
-    | PIN6 -> PORTA
-    | PIN7 -> PORTB
+    | PIN1 -> PORTB
+    | PIN2 -> PORTC
+    | PIN3 -> PORTC
+    | PIN4 -> PORTC
+    | PIN5 -> PORTC
     | PIN8 -> PORTB
     | PIN9 -> PORTB
-    | PIN10 -> PORTB
-    | PIN11 -> PORTC
-    | PIN12 -> PORTC
-    | PIN13 -> PORTC
-    | PIN14 -> PORTA
-    | PIN15 -> PORTA
-    | PIN16 -> PORTA
-    | PIN17 -> PORTB
-    | PIN18 -> PORTA
+    | PIN11 -> PORTB
+    | PIN12 -> PORTA
+    | PIN13 -> PORTA
+    | PIN14 -> PORTB
+    | PIN15 -> PORTB
     | PIN19 -> PORTA
-    | PIN20 -> PORTC
-    | PIN21 -> PORTC
-    | PIN22 -> PORTC
+    | PIN20 -> PORTA
+    | PIN21 -> PORTB
+    | PIN22 -> PORTB
     | PIN23 -> PORTB
     | PIN24 -> PORTB
-    | PIN25 -> PORTB
-    | PIN26 -> PORTB
+    | PIN25 -> PORTC
+    | PIN26 -> PORTC
     | PIN27 -> PORTC
-    | PIN28 -> PORTC
-    | PIN29 -> PORTC
-    | PIN30 -> PORTC
-    | PIN31 -> PORTB
-    | PIN32 -> PORTB
+    | PIN30 -> PORTA
+    | PIN31 -> PORTA
+    | PIN32 -> PORTA
+    | PIN33 -> PORTB
+    | PIN34 -> PORTA
+    | PIN35 -> PORTA
+    | PIN36 -> PORTC
+    | PIN37 -> PORTC
+    | PIN38 -> PORTC
+    | PIN41 -> PORTB
+    | PIN43 -> PORTB
+    | PIN44 -> PORTB
+
 
 
   let lat_bit_of_pin : type a b c d. (a register, b register, c register, d analog_pin) pin -> a =
     function 
-    | PIN0 -> LB13
-    | PIN1 -> LA10
-    | PIN2 -> LA7
-    | PIN3 -> LB14
-    | PIN4 -> LB15
-    | PIN5 -> LA0
-    | PIN6 -> LA1
-    | PIN7 -> LB0
-    | PIN8 -> LB1
-    | PIN9 -> LB2
-    | PIN10 -> LB3
-    | PIN11 -> LC0
-    | PIN12 -> LC1
-    | PIN13 -> LC2
-    | PIN14 -> LA2
-    | PIN15 -> LA3
-    | PIN16 -> LA8
-    | PIN17 -> LB4
-    | PIN18 -> LA4
-    | PIN19 -> LA9
-    | PIN20 -> LC3
-    | PIN21 -> LC4
-    | PIN22 -> LC5
-    | PIN23 -> LB5
-    | PIN24 -> LB7
-    | PIN25 -> LB8
-    | PIN26 -> LB9
-    | PIN27 -> LC6
-    | PIN28 -> LC7
-    | PIN29 -> LC8
-    | PIN30 -> LC9
-    | PIN31 -> LB10
-    | PIN32 -> LB11
+    | PIN1 -> LB9
+    | PIN2 -> LC6
+    | PIN3 -> LC7
+    | PIN4 -> LC8
+    | PIN5 -> LC9
+    | PIN8 -> LB10
+    | PIN9 -> LB11
+    | PIN11 -> LB13
+    | PIN12 -> LA10
+    | PIN13 -> LA7
+    | PIN14 -> LB14
+    | PIN15 -> LB15
+    | PIN19 -> LA0
+    | PIN20 -> LA1
+    | PIN21 -> LB0
+    | PIN22 -> LB1
+    | PIN23 -> LB2
+    | PIN24 -> LB3
+    | PIN25 -> LC0
+    | PIN26 -> LC1
+    | PIN27 -> LC2
+    | PIN30 -> LA2
+    | PIN31 -> LA3
+    | PIN32 -> LA8
+    | PIN33 -> LB4
+    | PIN34 -> LA4
+    | PIN35 -> LA9
+    | PIN36 -> LC3
+    | PIN37 -> LC4
+    | PIN38 -> LC5
+    | PIN41 -> LB5
+    | PIN43 -> LB7
+    | PIN44 -> LB8
+
 
 
   
   let tris_bit_of_pin : type a b c d. (a register, b register, c register, d analog_pin) pin -> b =
     function 
-    | PIN0 -> TB13
-    | PIN1 -> TA10
-    | PIN2 -> TA7
-    | PIN3 -> TB14
-    | PIN4 -> TB15
-    | PIN5 -> TA0
-    | PIN6 -> TA1
-    | PIN7 -> TB0
-    | PIN8 -> TB1
-    | PIN9 -> TB2
-    | PIN10 -> TB3
-    | PIN11 -> TC0
-    | PIN12 -> TC1
-    | PIN13 -> TC2
-    | PIN14 -> TA2
-    | PIN15 -> TA3
-    | PIN16 -> TA8
-    | PIN17 -> TB4
-    | PIN18 -> TA4
-    | PIN19 -> TA9
-    | PIN20 -> TC3
-    | PIN21 -> TC4
-    | PIN22 -> TC5
-    | PIN23 -> TB5
-    | PIN24 -> TB7
-    | PIN25 -> TB8
-    | PIN26 -> TB9
-    | PIN27 -> TC6
-    | PIN28 -> TC7
-    | PIN29 -> TC8
-    | PIN30 -> TC9
-    | PIN31 -> TB10
-    | PIN32 -> TB11
+    | PIN1 -> TB9
+    | PIN2 -> TC6
+    | PIN3 -> TC7
+    | PIN4 -> TC8
+    | PIN5 -> TC9
+    | PIN8 -> TB10
+    | PIN9 -> TB11
+    | PIN11 -> TB13
+    | PIN12 -> TA10
+    | PIN13 -> TA7
+    | PIN14 -> TB14
+    | PIN15 -> TB15
+    | PIN19 -> TA0
+    | PIN20 -> TA1
+    | PIN21 -> TB0
+    | PIN22 -> TB1
+    | PIN23 -> TB2
+    | PIN24 -> TB3
+    | PIN25 -> TC0
+    | PIN26 -> TC1
+    | PIN27 -> TC2
+    | PIN30 -> TA2
+    | PIN31 -> TA3
+    | PIN32 -> TA8
+    | PIN33 -> TB4
+    | PIN34 -> TA4
+    | PIN35 -> TA9
+    | PIN36 -> TC3
+    | PIN37 -> TC4
+    | PIN38 -> TC5
+    | PIN41 -> TB5
+    | PIN43 -> TB7
+    | PIN44 -> TB8
+
 
 
   let port_bit_of_pin : type a b c d. (a register, b register, c register, d analog_pin) pin -> c =
     function 
-    | PIN0 -> PB13
-    | PIN1 -> PA10
-    | PIN2 -> PA7
-    | PIN3 -> PB14
-    | PIN4 -> PB15
-    | PIN5 -> PA0
-    | PIN6 -> PA1
-    | PIN7 -> PB0
-    | PIN8 -> PB1
-    | PIN9 -> PB2
-    | PIN10 -> PB3
-    | PIN11 -> PC0
-    | PIN12 -> PC1
-    | PIN13 -> PC2
-    | PIN14 -> PA2
-    | PIN15 -> PA3
-    | PIN16 -> PA8
-    | PIN17 -> PB4
-    | PIN18 -> PA4
-    | PIN19 -> PA9
-    | PIN20 -> PC3
-    | PIN21 -> PC4
-    | PIN22 -> PC5
-    | PIN23 -> PB5
-    | PIN24 -> PB7
-    | PIN25 -> PB8
-    | PIN26 -> PB9
-    | PIN27 -> PC6
-    | PIN28 -> PC7
-    | PIN29 -> PC8
-    | PIN30 -> PC9
-    | PIN31 -> PB10
-    | PIN32 -> PB11
+    | PIN1 -> PB9
+    | PIN2 -> PC6
+    | PIN3 -> PC7
+    | PIN4 -> PC8
+    | PIN5 -> PC9
+    | PIN8 -> PB10
+    | PIN9 -> PB11
+    | PIN11 -> PB13
+    | PIN12 -> PA10
+    | PIN13 -> PA7
+    | PIN14 -> PB14
+    | PIN15 -> PB15
+    | PIN19 -> PA0
+    | PIN20 -> PA1
+    | PIN21 -> PB0
+    | PIN22 -> PB1
+    | PIN23 -> PB2
+    | PIN24 -> PB3
+    | PIN25 -> PC0
+    | PIN26 -> PC1
+    | PIN27 -> PC2
+    | PIN30 -> PA2
+    | PIN31 -> PA3
+    | PIN32 -> PA8
+    | PIN33 -> PB4
+    | PIN34 -> PA4
+    | PIN35 -> PA9
+    | PIN36 -> PC3
+    | PIN37 -> PC4
+    | PIN38 -> PC5
+    | PIN41 -> PB5
+    | PIN43 -> PB7
+    | PIN44 -> PB8
+
 
 
 external write_register : 'a register -> int -> unit = "caml_write_register" [@@noalloc]
