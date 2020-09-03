@@ -1,0 +1,9 @@
+build
+yotta_modules
+yotta_targets/*
+
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+CMakeFiles/
+*.a

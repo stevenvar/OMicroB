@@ -1,0 +1,15 @@
+build
+.yotta.json
+yotta_modules
+yotta_targets
+*.swp
+*~
+Makefile
+
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+source/asm/CortexContextSwitch.s
+
+*.a

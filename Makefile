@@ -20,6 +20,9 @@ avr: internals
 pic32: internals
 	$(call compile, targets/pic32)
 
+microbit: internals
+	$(call compile, targets/microbit)
+
 config:
 	@if [ $(ETC)/Makefile.conf -ot VERSION -o                     \
              $(ETC)/Makefile.conf -ot configure ]; then               \
@@ -55,6 +58,7 @@ install: all
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
 	cp -a src/byterun/avr "$(INCLUDEDIR)" 2> /dev/null
 	cp -a src/byterun/pic32 "$(INCLUDEDIR)/" 2> /dev/null
+	cp -a src/byterun/microbit "$(INCLUDEDIR)/" 2> /dev/null
 	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:

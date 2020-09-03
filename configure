@@ -85,6 +85,8 @@ AVRDUDE="$(which avrdude 2> /dev/null)"
 XC32_GXX="$(which xc32-g++)"
 XC32_BIN2HEX="$(which xc32-bin2hex)"
 PIC32PROG="$(which pic32prog)"
+ARM_GXX="$(which arm-none-eabi-g++)"
+ARM_OBJCOPY="$(which arm-none-eabi-objcopy)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -156,6 +158,8 @@ AVRDUDE     := $AVRDUDE
 XC32_GXX    := $XC32_GXX
 XC32_BIN2HEX:= $XC32_BIN2HEX
 PIC32PROG   := $PIC32PROG
+ARM_GXX     := $ARM_GXX
+ARM_OBJCOPY := $ARM_OBJCOPY
 OCAMLC      := $OCAMLC -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLOPT    := $OCAMLOPT -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLDOC    := $OCAMLDOC
@@ -195,6 +199,8 @@ let avrdude     = \"$AVRDUDE\"
 let xc32_cxx    = \"$XC32_GXX\"
 let xc32_bin2hex= \"$XC32_BIN2HEX\"
 let pic32prog   = \"$PIC32PROG\"
+let arm_cxx     = \"$ARM_GXX\"
+let arm_objcopy = \"$ARM_OBJCOPY\"
 let version     = \"$VERSION\"
 " > etc/config.ml
 
@@ -210,6 +216,7 @@ function reset_targets() {
     cat "src/byterun/simul/indep-sf-regs.c" > "src/byterun/simul/sf-regs.c"
     rm -rf "src/byterun/avr/"
     rm -rf "src/byterun/pic32"
+    rm -rf "src/byterun/microbit"
 }
 
 reset_targets
@@ -267,12 +274,30 @@ function target_pic32 () {
     echo "pic32 \\" >> etc/Makefile.conf
 }
 
+function target_microbit () {
+    check_command "arm-none-eabi-g++"
+    check_command "arm-none-eabi-objcopy"
+    check_command "srec_cat"
+
+    cat "targets/microbit/device_config.ml" >> "src/omicrob/device_config.ml"
+
+    mkdir -p "src/byterun/microbit"
+
+    cat "targets/microbit/prims/prims.h" >> "src/byterun/prims/prims.h"
+    cat "targets/microbit/prims/bindings.c" >> "src/byterun/prims/bindings.c"
+    cat "targets/microbit/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
+    cat "targets/microbit/simul/sf-regs.c" >> "src/byterun/simul/sf-regs.c"
+
+    echo "microbit \\" >> etc/Makefile.conf
+}
+
 
 ################################################################################
 ## Choose your targets
 
-target_avr
-target_pic32
+#target_avr
+#target_pic32
+target_microbit
 
 ################################################################################
 

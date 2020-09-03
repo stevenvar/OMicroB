@@ -1,0 +1,5 @@
+{
+  "build": {
+    "target": "bbc-microbit-classic-gcc,*"
+  }
+}
