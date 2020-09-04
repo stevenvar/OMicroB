@@ -39,3 +39,11 @@ module Serial : sig
   val write_string : string -> unit
   val write_int : int -> unit
 end
+
+module type Timer = sig
+  val set_period : int -> unit
+  val set_callback : (unit -> unit) -> unit
+end
+
+module Timer0: Timer
+module Timer2: Timer
