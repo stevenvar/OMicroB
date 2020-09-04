@@ -41,3 +41,13 @@ void avr_serial_write(char c){
   usleep(10000);
   clear_bit(PORTD,3);
 }
+
+/******************************************************************************/
+
+void avr_timer_set_period(int num, unsigned int cmp) {
+  printf("Setting period of %dms for timer %d\n", cmp, num);
+}
+
+void avr_timer_set_callback(int num, int closure) {
+  printf("Setting callback for timer %d\n", num);
+}

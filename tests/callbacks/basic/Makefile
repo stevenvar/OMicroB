@@ -1,4 +1,4 @@
-include ../../etc/Makefile.conf
+include ../../../etc/Makefile.conf
 
 SOURCES := callbacks.ml
 TARGETS := callbacks.byte callbacks.c callbacks.elf callbacks.o callbacklib.o #callbacks.avr callbacks.hex

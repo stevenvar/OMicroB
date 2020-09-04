@@ -7,6 +7,8 @@
 #include "values.h"
 #include "fail.h"
 #include "gc.h"
+#include "callback.h"
+
 
 /******************************************************************************/
 
@@ -26,6 +28,8 @@ value trapSp;
 uint8_t extra_args;
 
 PROGMEM extern void * const ocaml_primitives[];
+
+volatile value interrupt_callback = 0;
 
 /******************************************************************************/
 /* Read tools for program memory */
@@ -2340,6 +2344,13 @@ static inline void interp(void) {
 #endif
       assert(0);
       break;
+    }
+
+    // Treat a callback interrupt
+    if(interrupt_callback != 0) {
+      value closure = interrupt_callback;
+      interrupt_callback = 0;
+      caml_callback(closure, Val_unit);
     }
   }
   return;

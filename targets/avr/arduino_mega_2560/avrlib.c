@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <avr/io.h>
+#include "../vm/callback.h"
 
 /******************************************************************************/
 
@@ -127,6 +128,68 @@ int millis() {
   }
   return millis_return;
 
+}
+
+/******************************************************************************/
+/* TIMER0 and TIMER2 are used for interrupts                                  */
+
+// https://www.instructables.com/id/Arduino-Timer-Interrupts/
+// En utilisant le timer1 avec un prescaler 64, pour une interruption toutes les ms, compare match register de 249
+// Prescaler 64: (1<<CS01)|(1<<CS00) pour timer0 et (1<<CS22) pour timer2
+
+value timer0_closure = 0;
+unsigned int timer0_cmp = 0;
+value timer2_closure = 0;
+unsigned int timer2_cmp = 0;
+
+void avr_timer_set_period(int num, unsigned int cmp) {
+  if(num == 0) {
+    if(timer0_cmp == 0) { // Initialize TIMER0
+      TCCR0B = (1<<CS01)|(1<<CS00);
+      OCR0A = 249;
+      TIMSK0 |= (1 << OCIE0A);
+      sei();
+    }
+    timer0_cmp = cmp;
+  } else if(num == 2) {
+    if(timer2_cmp == 0) { // Initialize TIMER2
+      TCCR2B = (1<<CS22);
+      OCR2A = 249;
+      TIMSK2 |= (1 << OCIE2A);
+      sei();
+    }
+    timer2_cmp = cmp;
+  }
+}
+
+void avr_timer_set_callback(int num, value closure) {
+  if(num == 0) {
+    timer0_closure = closure;
+  } else if(num == 2) {
+    timer2_closure = closure;
+  }
+}
+
+unsigned int timer0_counter = 0;
+ISR(TIMER0_COMPA_vect) { // TIMER0 interrupts
+  timer0_counter++;
+
+  if(timer0_cmp != 0 && timer0_closure != 0 && timer0_counter >= timer0_cmp) {
+    timer0_counter = 0;
+    set_interrupt_callback(timer0_closure);
+  }
+}
+
+// TIMER1 is used for millis()
+
+unsigned int timer2_counter = 0;
+ISR(TIMER2_COMPA_vect) { // TIMER2 interrupts
+  timer2_counter++;
+
+  if(timer2_cmp != 0 && timer2_closure != 0 && timer2_counter >= timer2_cmp) {
+    timer2_counter = 0;
+    set_interrupt_callback(timer2_closure);
+  }
 }
 
 /******************************************************************************/

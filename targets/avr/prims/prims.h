@@ -22,6 +22,11 @@ void avr_serial_init();
 void avr_serial_write(char val);
 char avr_serial_read();
 
+/******************************************************************************/
+
+void avr_timer_set_period(int num, unsigned int cmp);
+void avr_timer_set_callback(int num, int closure);
+
 #endif
 
 /******************************************************************************/

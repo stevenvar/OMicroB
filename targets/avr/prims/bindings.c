@@ -39,6 +39,18 @@ value caml_avr_serial_read(value unit) {
   return Val_int(avr_serial_read());
 }
 
+/******************************************************************************/
+
+value caml_avr_timer_set_period(value num, value cmp) {
+  avr_timer_set_period(Int_val(num), Int_val(cmp));
+  return Val_unit;
+}
+
+value caml_avr_timer_set_callback(value num, value closure) {
+  avr_timer_set_callback(Int_val(num), closure);
+  return Val_unit;
+}
+
 #endif
 
 /******************************************************************************/

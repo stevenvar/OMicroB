@@ -22,4 +22,6 @@ value caml_callbackN(value closure, int narg, value args[]);
 value caml_callback_exn(value closure, value arg);
 value caml_callbackN_exn(value closure, int narg, value args[]);
 
+void set_interrupt_callback(value closure);
+
 #endif

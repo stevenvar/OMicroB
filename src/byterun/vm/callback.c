@@ -67,3 +67,7 @@ value caml_callbackN_exn(value closure, int narg, value args[]) {
 
   return Val_unit;
 }
+
+void set_interrupt_callback(value closure) {
+  interrupt_callback = closure;
+}
