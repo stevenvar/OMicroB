@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <avr/io.h>
+#include "../vm/callback.h"
 
 /******************************************************************************/
 
@@ -107,6 +108,138 @@ int millis() {
   return millis_return;
 
 }
+
+/******************************************************************************/
+/* TIMER0 and TIMER2 are used for interrupts                                  */
+
+// https://www.instructables.com/id/Arduino-Timer-Interrupts/
+// En utilisant le timer1 avec un prescaler 64, pour une interruption toutes les ms, compare match register de 249
+// Prescaler 64: (1<<CS01)|(1<<CS00) pour timer0 et (1<<CS22) pour timer2
+
+value timer0_closure = 0;
+unsigned int timer0_cmp = 0;
+value timer2_closure = 0;
+unsigned int timer2_cmp = 0;
+
+void avr_timer_set_period(int num, unsigned int cmp) {
+  if(num == 0) {
+    if(timer0_cmp == 0) { // Initialize TIMER0
+      TCCR0B = (1<<CS01)|(1<<CS00);
+      OCR0A = 249;
+      TIMSK0 |= (1 << OCIE0A);
+      sei();
+    }
+    timer0_cmp = cmp;
+  } else if(num == 2) {
+    if(timer2_cmp == 0) { // Initialize TIMER2
+      TCCR2B = (1<<CS22);
+      OCR2A = 249;
+      TIMSK2 |= (1 << OCIE2A);
+      sei();
+    }
+    timer2_cmp = cmp;
+  }
+}
+
+void avr_timer_set_callback(int num, value closure) {
+  declare_waiting_for_interrupt();
+  if(num == 0) {
+    timer0_closure = closure;
+  } else if(num == 2) {
+    timer2_closure = closure;
+  }
+}
+
+unsigned int timer0_counter = 0;
+ISR(TIMER0_COMPA_vect) { // TIMER0 interrupts
+  timer0_counter++;
+
+  if(timer0_cmp != 0 && timer0_closure != 0 && timer0_counter >= timer0_cmp) {
+    timer0_counter = 0;
+    set_interrupt_callback(timer0_closure);
+  }
+}
+
+// TIMER1 is used for millis()
+
+unsigned int timer2_counter = 0;
+ISR(TIMER2_COMPA_vect) { // TIMER2 interrupts
+  timer2_counter++;
+
+  if(timer2_cmp != 0 && timer2_closure != 0 && timer2_counter >= timer2_cmp) {
+    timer2_counter = 0;
+    set_interrupt_callback(timer2_closure);
+  }
+}
+
+/******************************************************************************/
+/* PIN change interrupts                                                      */
+
+uint8_t get_pc_int_enable(uint8_t reg) {
+  if(reg == 6) return PCIE0;
+  if(reg == 7) return PCIE1;
+  if(reg == 8) return PCIE2;
+  else return 0;
+}
+
+volatile uint8_t *get_pc_mask_reg(uint8_t reg) {
+  if(reg == 6) return &PCMSK0;
+  if(reg == 7) return &PCMSK1;
+  if(reg == 8) return &PCMSK2;
+  else return NULL;
+}
+
+uint8_t get_pc_int(uint8_t reg, uint8_t bit) {
+  if(reg == 6) {
+    if(bit == 0) return PCINT0;
+    if(bit == 1) return PCINT1;
+    if(bit == 2) return PCINT2;
+    if(bit == 3) return PCINT3;
+    if(bit == 4) return PCINT4;
+    if(bit == 5) return PCINT5;
+    if(bit == 6) return PCINT6;
+    if(bit == 7) return PCINT7;
+  } else if(reg == 7) {
+    if(bit == 0) return PCINT8;
+    if(bit == 1) return PCINT9;
+    if(bit == 2) return PCINT10;
+    if(bit == 3) return PCINT11;
+    if(bit == 4) return PCINT12;
+    if(bit == 5) return PCINT13;
+    if(bit == 6) return PCINT14;
+  } else if(reg == 8) {
+    if(bit == 0) return PCINT16;
+    if(bit == 1) return PCINT17;
+    if(bit == 2) return PCINT18;
+    if(bit == 3) return PCINT19;
+    if(bit == 4) return PCINT20;
+    if(bit == 5) return PCINT21;
+    if(bit == 6) return PCINT22;
+    if(bit == 7) return PCINT23;
+  }
+  return 0;
+}
+
+value pcint_closure = 0;
+
+void avr_pin_change_callback(uint8_t reg, uint8_t bit, int closure) {
+  declare_waiting_for_interrupt();
+  // Set interruption
+  PCICR |= (1 << get_pc_int_enable(reg));
+  *(get_pc_mask_reg(reg)) |= (1 << get_pc_int(reg, bit));
+  sei();
+  // Set mask
+  pcint_closure = closure;
+}
+
+ISR(PCINT0_vect) {
+  if(pcint_closure) {
+    set_interrupt_callback(pcint_closure);
+  }
+}
+
+ISR_ALIAS(PCINT1_vect, PCINT0_vect);
+ISR_ALIAS(PCINT2_vect, PCINT0_vect);
 
 /******************************************************************************/
 
