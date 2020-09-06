@@ -51,6 +51,13 @@ value caml_avr_timer_set_callback(value num, value closure) {
   return Val_unit;
 }
 
+/******************************************************************************/
+
+value caml_avr_pin_change_callback(value reg, value bit, value closure) {
+  avr_pin_change_callback(Int_val(reg), Int_val(bit), closure);
+  return Val_unit;
+}
+
 #endif
 
 /******************************************************************************/

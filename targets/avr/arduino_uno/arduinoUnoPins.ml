@@ -189,3 +189,10 @@ let channel_of_pin (p: [ `AREAD] pin) =
 
 let analog_read (p: [ `AREAD ] pin) =
   avr_analog_read (channel_of_pin p)
+
+external do_pin_change_callback : register -> bit -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
+
+let pin_change_callback p closure =
+  let input = input_of_pin p in
+  let bit = input_bit_of_pin p in
+  do_pin_change_callback input bit closure

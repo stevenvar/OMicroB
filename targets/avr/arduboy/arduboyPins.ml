@@ -155,3 +155,10 @@ let digital_read p =
 
 let analog_read (p: [ `AREAD ] pin) =
   match p with _ -> .
+
+external do_pin_change_callback : register -> bit -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
+
+let pin_change_callback p closure =
+  let input = input_of_pin p in
+  let bit = input_bit_of_pin p in
+  do_pin_change_callback input bit closure

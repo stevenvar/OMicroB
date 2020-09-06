@@ -27,6 +27,7 @@ module type AvrPins = sig
   val set_bit : register -> bit -> unit
   val clear_bit : register -> bit -> unit
   val read_bit : register -> bit -> bool
+  val pin_change_callback: [ `DREAD ] pin -> (unit -> unit) -> unit
 end
 
 val delay : int -> unit
@@ -47,3 +48,4 @@ end
 
 module Timer0: Timer
 module Timer2: Timer
+

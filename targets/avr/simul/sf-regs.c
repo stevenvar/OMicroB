@@ -51,3 +51,9 @@ void avr_timer_set_period(int num, unsigned int cmp) {
 void avr_timer_set_callback(int num, int closure) {
   printf("Setting callback for timer %d\n", num);
 }
+
+/******************************************************************************/
+
+void avr_pin_change_callback(uint8_t reg, uint8_t bit, int closure) {
+  printf("Setting callback for pin (%d, %d)\n", reg, bit);
+}

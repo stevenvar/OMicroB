@@ -27,6 +27,10 @@ char avr_serial_read();
 void avr_timer_set_period(int num, unsigned int cmp);
 void avr_timer_set_callback(int num, int closure);
 
+/******************************************************************************/
+
+void avr_pin_change_callback(uint8_t reg, uint8_t bit, int closure);
+
 #endif
 
 /******************************************************************************/
