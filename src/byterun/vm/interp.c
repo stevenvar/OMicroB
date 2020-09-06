@@ -29,6 +29,7 @@ uint8_t extra_args;
 
 PROGMEM extern void * const ocaml_primitives[];
 
+int waiting_for_interrupt = false;
 volatile value interrupt_callback = 0;
 
 /******************************************************************************/
@@ -2333,7 +2334,10 @@ static inline void interp(void) {
 #ifdef OCAML_STOP
     case OCAML_STOP : {
       TRACE_INSTRUCTION("STOP");
-      return;
+      if (waiting_for_interrupt) {
+        pc--;
+        break;
+      } else return;
     }
 #endif
 

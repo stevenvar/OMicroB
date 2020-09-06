@@ -4,9 +4,12 @@ SOURCES := timer.ml
 TARGETS := timer.byte timer.c timer.elf timer.o timer.hex
 ATTY := /dev/tty.usbmodem*
 
-all: timer.hex
+all: timer.hex timer.elf
 
 timer.hex: timer.ml
+	$(BIN)/omicrob -device arduino-uno -v timer.ml -o $@
+
+timer.elf: timer.ml
 	$(BIN)/omicrob -device arduino-uno -v timer.ml -o $@
 
 flash: timer.hex

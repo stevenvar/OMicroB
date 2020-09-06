@@ -142,6 +142,7 @@ void avr_timer_set_period(int num, unsigned int cmp) {
 }
 
 void avr_timer_set_callback(int num, value closure) {
+  declare_waiting_for_interrupt();
   if(num == 0) {
     timer0_closure = closure;
   } else if(num == 2) {
