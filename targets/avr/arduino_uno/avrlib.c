@@ -173,6 +173,75 @@ ISR(TIMER2_COMPA_vect) { // TIMER2 interrupts
 }
 
 /******************************************************************************/
+/* PIN change interrupts                                                      */
+
+uint8_t get_pc_int_enable(uint8_t reg) {
+  if(reg == 6) return PCIE0;
+  if(reg == 7) return PCIE1;
+  if(reg == 8) return PCIE2;
+  else return 0;
+}
+
+volatile uint8_t *get_pc_mask_reg(uint8_t reg) {
+  if(reg == 6) return &PCMSK0;
+  if(reg == 7) return &PCMSK1;
+  if(reg == 8) return &PCMSK2;
+  else return NULL;
+}
+
+uint8_t get_pc_int(uint8_t reg, uint8_t bit) {
+  if(reg == 6) {
+    if(bit == 0) return PCINT0;
+    if(bit == 1) return PCINT1;
+    if(bit == 2) return PCINT2;
+    if(bit == 3) return PCINT3;
+    if(bit == 4) return PCINT4;
+    if(bit == 5) return PCINT5;
+    if(bit == 6) return PCINT6;
+    if(bit == 7) return PCINT7;
+  } else if(reg == 7) {
+    if(bit == 0) return PCINT8;
+    if(bit == 1) return PCINT9;
+    if(bit == 2) return PCINT10;
+    if(bit == 3) return PCINT11;
+    if(bit == 4) return PCINT12;
+    if(bit == 5) return PCINT13;
+    if(bit == 6) return PCINT14;
+  } else if(reg == 8) {
+    if(bit == 0) return PCINT16;
+    if(bit == 1) return PCINT17;
+    if(bit == 2) return PCINT18;
+    if(bit == 3) return PCINT19;
+    if(bit == 4) return PCINT20;
+    if(bit == 5) return PCINT21;
+    if(bit == 6) return PCINT22;
+    if(bit == 7) return PCINT23;
+  }
+  return 0;
+}
+
+value pcint_closure = 0;
+
+void avr_pin_change_callback(uint8_t reg, uint8_t bit, int closure) {
+  declare_waiting_for_interrupt();
+  // Set interruption
+  PCICR |= (1 << get_pc_int_enable(reg));
+  *(get_pc_mask_reg(reg)) |= (1 << get_pc_int(reg, bit));
+  sei();
+  // Set mask
+  pcint_closure = closure;
+}
+
+ISR(PCINT0_vect) {
+  if(pcint_closure) {
+    set_interrupt_callback(pcint_closure);
+  }
+}
+
+ISR_ALIAS(PCINT1_vect, PCINT0_vect);
+ISR_ALIAS(PCINT2_vect, PCINT0_vect);
+
+/******************************************************************************/
 
 #ifndef BAUD
 #define BAUD 9600
