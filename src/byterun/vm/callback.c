@@ -68,6 +68,13 @@ value caml_callbackN_exn(value closure, int narg, value args[]) {
   return Val_unit;
 }
 
+/**************************************************************************/
+/* Interrupt handling                                                     */
+
+void declare_waiting_for_interrupt() {
+  waiting_for_interrupt = true;
+}
+
 void set_interrupt_callback(value closure) {
   interrupt_callback = closure;
 }

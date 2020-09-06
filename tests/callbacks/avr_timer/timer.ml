@@ -7,8 +7,4 @@ let _ =
       digital_write l HIGH;
       delay 500;
       digital_write l LOW
-    );
-
-  while true do (* The program needs to live in a loop *)
-    delay 10;
-  done
+    )
