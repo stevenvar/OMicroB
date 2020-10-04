@@ -1,4 +1,4 @@
-include ../../../etc/Makefile.conf
+include ../../../../etc/Makefile.conf
 
 all: referee.hex playerRad.hex playerSpi.hex
 
@@ -15,4 +15,4 @@ flash-uno: playerSpi.hex
 	$(BIN)/omicrob -v -device=arduino-uno $^ -flash
 
 clean:
-	rm *.cmi *.cmo *.byte *.c *.arm_o *.elf *.arm_elf *.hex
+	rm -f *.cmi *.cmo *.byte *.c *.arm_o *.elf *.arm_elf *.hex
