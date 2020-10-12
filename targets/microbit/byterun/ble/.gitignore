@@ -1,0 +1,9 @@
+# Ignore the generated Doxygen output
+apidoc/
+
+# CMake stuff
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.a

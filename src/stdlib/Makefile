@@ -4,7 +4,7 @@ BASES :=                                                         \
   char bytes bytesLabels string stringLabels                     \
   list listLabels map array arrayLabels uchar sys buffer random  \
   complex gc int32 int64 obj hashtbl set moreLabels queue sort   \
-  stack stdLabels
+  stack stdLabels circuits
 
 MODULES := stdlib $(BASES) camlinternalOO std_exit
 
