@@ -1,6 +1,6 @@
-module%component MyLed = Circuits.MakeLed(struct connectedPin = PIN8 end)
+module%component MyLed = Circuits.MakeLed(struct let connectedPin = PIN8 end)
 
-module%component MyButton = Circuits.MakeButton(struct connectedPin = PIN9 end)
+module%component MyButton = Circuits.MakeButton(struct let connectedPin = PIN9 end)
 
 let _ =
   MyLed.init ();

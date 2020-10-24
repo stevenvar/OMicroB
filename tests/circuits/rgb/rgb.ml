@@ -4,9 +4,9 @@
  *     bluePin = PIN2) *) (* Pins for microbit*)
 
 module%comp MyRGBLed = Circuits.MakeRGBLed(struct
-    redPin = PIN3;
-    greenPin = PIN5;
-    bluePin = PIN11;
+    let redPin = PIN3
+    let greenPin = PIN5
+    let bluePin = PIN11
   end) (* Pins for arduino uno *)
 
 let rgb_of_hsv (h, s, v) =

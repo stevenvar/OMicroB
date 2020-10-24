@@ -1,13 +1,13 @@
 (* Print some stuff on a screen *)
 
 (* Use an external, LiquidCrystal type screen *)
-module%comp MyDisp = LiquidCrystal.MakeLCD(struct
-    rsPin = PIN12;
-    enablePin = PIN11;
-    d4Pin = PIN5;
-    d5Pin = PIN4;
-    d6Pin = PIN3;
-    d7Pin = PIN2;
+module%comp MyDisp = Circuits.MakeLCD(struct
+    let rsPin = PIN12
+    let enablePin = PIN11
+    let d4Pin = PIN5
+    let d5Pin = PIN4
+    let d6Pin = PIN3
+    let d7Pin = PIN2
 end)
 
 let smiley = [[false;true;false;true;false];

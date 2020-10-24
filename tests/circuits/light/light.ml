@@ -1,4 +1,4 @@
-module%comp MyLightSensor = Circuits.MakeAnalogSensor(struct connectedPin = PINA0 end)
+module%comp MyLightSensor = Circuits.MakeAnalogSensor(struct let connectedPin = PINA0 end)
 
 let _ =
   Serial.init ();
