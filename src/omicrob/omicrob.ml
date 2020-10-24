@@ -35,6 +35,7 @@ let simul            = ref false
 let flash            = ref false
 let verbose          = ref false
 let local            = ref false
+let circuitppx       = ref false
 
 let stack_size       = ref None
 let heap_size        = ref None
@@ -97,6 +98,9 @@ let spec =
      Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
                   (Device_config.all_config_names ()); exit 0),
      " List available devices\n");
+
+    ("-circuitppx", Arg.Set circuitppx,
+     " Use the circuit extensions points\n");
 
     ("-stack-size", Arg.Int (fun sz -> stack_size := Some sz),
      Printf.sprintf "<word-nb> Set stack size (default: %d)" default_stack_size);
@@ -305,6 +309,12 @@ let ppx_options =
   if arch <> Some 16 then []
   else if local then [ "-ppx"; Filename.concat (Filename.concat Config.builddir "bin") "h15ppx" ]
   else [ "-ppx"; Filename.concat Config.bindir "h15ppx" ]
+
+let ppx_options = ppx_options@(
+    if not !circuitppx then []
+    else if local then [ "-ppx"; Filename.concat (Filename.concat Config.builddir "bin") "circuitppx" ]
+    else [ "-ppx"; Filename.concat Config.bindir "circuitppx" ]
+  )
 
 let () =
   if sudo && not flash then error "the option -sudo is meaningless without -flash"

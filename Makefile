@@ -6,6 +6,7 @@ internals: config
 	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
 	$(call compile, src/h15ppx)
+	$(call compile, src/circuitppx)
 	$(call compile, src/simulators/lcd)
 	$(call compile, src/simulators/lcd_16x2)
 	$(call compile, src/simulators/dip)

@@ -25,7 +25,7 @@ function usage () {
  -prefix <dir>       Set bindir, libdir, libexecdir includedir and mandir to <dir>/bin, <dir>/lib/omicrob,
                      <dir>/libexec/omicrob, <dir>/include/omicrob and <dir>/man respectively
  -target <opt>       Select one target for which OMicroB will be installed
-                     (e.g. -target avr|pic32)"
+                     (e.g. -target avr|pic32|microbit)"
 }
 
 function check_command () {
