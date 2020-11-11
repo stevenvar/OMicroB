@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 sf-regs.c
 sf-regs.h
+=======
+sf-regs.h
+sf-regs.c
+>>>>>>> By copying things around, we isolate the arch-specifics parts

@@ -85,6 +85,8 @@ AVRDUDE="$(which avrdude 2> /dev/null)"
 XC32_GXX="$(which xc32-g++)"
 XC32_BIN2HEX="$(which xc32-bin2hex)"
 PIC32PROG="$(which pic32prog)"
+ARM_GXX="$(which arm-none-eabi-g++ 2> /dev/null)"
+ARM_OBJCOPY="$(which arm-none-eabi-objcopy 2> /dev/null)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
 OCAMLC="$(which ocamlc.opt 2> /dev/null || which ocamlc)"
@@ -102,7 +104,6 @@ LIBDIR=/usr/local/lib/omicrob
 LIBEXECDIR=/usr/local/libexec/omicrob
 INCLUDEDIR=/usr/local/include/omicrob
 MANDIR=/usr/local/man
-TARGET=""
 
 while [ $# -ne 0 ]; do
     case "$1" in
@@ -129,8 +130,6 @@ while [ $# -ne 0 ]; do
             LIBEXECDIR="$PREFIX/libexec/omicrob"
             INCLUDEDIR="$PREFIX/include/omicrob"
             MANDIR="$PREFIX/man" ;;
-        -target)
-            TARGET="$2";;
         *)
         usage "Don't know what to do with \"$1\""
     esac
@@ -156,6 +155,8 @@ AVRDUDE     := $AVRDUDE
 XC32_GXX    := $XC32_GXX
 XC32_BIN2HEX:= $XC32_BIN2HEX
 PIC32PROG   := $PIC32PROG
+ARM_GXX     := $ARM_GXX
+ARM_OBJCOPY := $ARM_OBJCOPY
 OCAMLC      := $OCAMLC -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLOPT    := $OCAMLOPT -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLDOC    := $OCAMLDOC
@@ -174,7 +175,7 @@ define clean
         @\$(MAKE) --no-print-directory -C \$1 clean > /dev/null
 endef
 
-TARGETS      := \\
+ARCHS := \\
 " > etc/Makefile.conf
 
 ################################################################################
@@ -195,6 +196,8 @@ let avrdude     = \"$AVRDUDE\"
 let xc32_cxx    = \"$XC32_GXX\"
 let xc32_bin2hex= \"$XC32_BIN2HEX\"
 let pic32prog   = \"$PIC32PROG\"
+let arm_cxx     = \"$ARM_GXX\"
+let arm_objcopy = \"$ARM_OBJCOPY\"
 let version     = \"$VERSION\"
 " > etc/config.ml
 
@@ -203,13 +206,15 @@ let version     = \"$VERSION\"
 # Refresh targets files
 function reset_targets() {
     cp "targets/device_config.ml" "src/omicrob/device_config.ml"
-    rm -f "src/byterun/prims/prims.h"
+
     cat "src/byterun/prims/indep-prims.h" > "src/byterun/prims/prims.h"
     cat "src/byterun/prims/indep-bindings.c" > "src/byterun/prims/bindings.c"
     cat "src/byterun/simul/indep-sf-regs.h" > "src/byterun/simul/sf-regs.h"
     cat "src/byterun/simul/indep-sf-regs.c" > "src/byterun/simul/sf-regs.c"
+
     rm -rf "src/byterun/avr/"
     rm -rf "src/byterun/pic32"
+    rm -rf "src/byterun/microbit"
 }
 
 reset_targets
@@ -267,12 +272,28 @@ function target_pic32 () {
     echo "pic32 \\" >> etc/Makefile.conf
 }
 
+function target_microbit () {
+    check_command "arm-none-eabi-g++"
+
+    cat "targets/microbit/device_config.ml" >> "src/omicrob/device_config.ml"
+
+    cat "targets/microbit/byterun/prims/prims.h" >> "src/byterun/prims/prims.h"
+    cat "targets/microbit/byterun/prims/bindings.c" >> "src/byterun/prims/bindings.c"
+    cat "targets/microbit/byterun/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
+    cat "targets/microbit/byterun/simul/sf-regs.c" >> "src/byterun/simul/sf-regs.c"
+
+    cp -rf "targets/microbit/byterun" "src/byterun/microbit"
+
+    echo "microbit \\" >> "etc/Makefile.conf"
+}
+
 
 ################################################################################
 ## Choose your targets
 
 target_avr
-target_pic32
+#target_pic32
+target_microbit
 
 ################################################################################
 
