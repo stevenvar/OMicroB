@@ -4,7 +4,7 @@
 (*                                                                             *)
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
-
+(*
 type level = LOW | HIGH
 type _level = level
 
@@ -96,7 +96,7 @@ module Serial = struct
       s := (!s^(String.make 1 !c))
     done; String.sub !s 0 (String.length !s - 1)
 end
-
+*)
 (* module Accelerometer = struct
  *   external x: unit -> int = "caml_microbit_accelerometer_x" [@@noalloc]
  *   external y: unit -> int = "caml_microbit_accelerometer_y" [@@noalloc]
