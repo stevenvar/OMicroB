@@ -4,7 +4,7 @@
 (*                                                                             *)
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
-
+(*
 type level = LOW | HIGH
 
 type pin = PIN0 | PIN1 | PIN2 | PIN8 | PIN12 | PIN16
@@ -40,7 +40,7 @@ module Serial: sig
   val write: string -> unit
   val read: unit -> string
 end
-
+*)
 (* module Accelerometer: sig
  *   val x: unit -> int
  *   (\** Returns the x acceleration in milli-gs *\)
