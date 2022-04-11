@@ -1,9 +1,9 @@
-type 'a _register = 'a register
-type ('a, 'b, 'c, 'd)_pin = ('a, 'b, 'c, 'd) pin
+type _register = register
+type 'a _pin = 'a pin
 
 module LCD = LiquidCrystal.MakeLCD(struct
-    type 'a register = 'a _register
-    type ('a, 'b, 'c, 'd) pin = ('a, 'b, 'c, 'd) _pin
+    type register = _register
+    type 'a pin = 'a _pin
     let pin_mode = pin_mode
     let digital_write = digital_write
   end)
@@ -11,7 +11,8 @@ open LCD
 
 let () =
   delay 1000;
-  let lcd = create4bitmode PIN11 PIN12 PIN9 PIN8 PIN7 PIN6 in
+  (* rs enable d0 d1 d2 d3 *)
+  let lcd = create4bitmode PIN11 PIN12 PIN2 PIN3 PIN4 PIN5 in
 
 
   (* The function int_of_string is not available in OMicroB, so we'll convert binary to decimal ourselves ! *)

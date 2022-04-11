@@ -9,55 +9,55 @@
 open Avr
 
 module type Writeable = sig
-  type 'a register
-  type ('a, 'b, 'c, 'd) pin
-  val pin_mode: ('a register, 'b register, 'c register, 'd analog_pin) pin -> mode -> unit
-  val digital_write: ('a register, 'b register, 'c register, 'd analog_pin) pin -> level -> unit
+  type register
+  type 'a pin
+  val pin_mode: 'a pin -> mode -> unit
+  val digital_write: [> `DWRITE ] pin -> level -> unit
 end
 
 module type LCD = sig
-  type 'a register
-  type ('a, 'b, 'c, 'd) pin
-  type ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
+  type register
+  type 'a pin
+  type lcd
   val create4bitmode :
-    ('a register, 'b register, 'c register, no analog_pin) pin ->
-    ('d register, 'e register, 'f register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    lcd
   val create8bitmode :
-    ('a register, 'b register, 'c register, no analog_pin) pin ->
-    ('d register, 'e register, 'f register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('g register, 'h register, 'i register, no analog_pin) pin ->
-    ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd
-  val lcdBegin : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> int -> int -> unit
-  val clear : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val home : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val noDisplay : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val display : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val noBlink : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val blink : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val noCursor : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val cursor : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val scrollDisplayLeft : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val scrollDisplayRight : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val leftToRight : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val rightToLeft : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val autoscroll : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val noAutoscroll : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> unit
-  val setCursor : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> int -> int -> unit
-  val write : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> int -> unit
-  val print : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> string -> unit
-  val createChar : ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd -> int -> int array -> unit
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    [ `DWRITE ] pin ->
+    lcd
+  val lcdBegin : lcd -> int -> int -> unit
+  val clear : lcd -> unit
+  val home : lcd -> unit
+  val noDisplay : lcd -> unit
+  val display : lcd -> unit
+  val noBlink : lcd -> unit
+  val blink : lcd -> unit
+  val noCursor : lcd -> unit
+  val cursor : lcd -> unit
+  val scrollDisplayLeft : lcd -> unit
+  val scrollDisplayRight : lcd -> unit
+  val leftToRight : lcd -> unit
+  val rightToLeft : lcd -> unit
+  val autoscroll : lcd -> unit
+  val noAutoscroll : lcd -> unit
+  val setCursor : lcd -> int -> int -> unit
+  val write : lcd -> int -> unit
+  val print : lcd -> string -> unit
+  val createChar : lcd -> int -> int array -> unit
 end
 
 (* Commands *)
@@ -96,16 +96,16 @@ and lcd_2line = 0x08 and lcd_1line = 0x00
 (* and lcd_5x10dots = 0x04 *) and lcd_5x8dots = 0x00;
 
 module MakeLCD(W: Writeable) :
-  LCD with type ('a, 'b, 'c, 'd) pin = ('a, 'b, 'c, 'd) W.pin
-  with type 'a register = 'a W.register
+  LCD with type 'a pin = 'a W.pin
+  with type register = W.register
 = struct
-  type 'a register = 'a W.register
-  type ('a, 'b, 'c, 'd) pin = ('a, 'b, 'c, 'd) W.pin
-  type ('a, 'b, 'c, 'd, 'e, 'f, 'g, 'h, 'i) lcd = {
+  type register = W.register
+  type 'a pin = 'a W.pin
+  type lcd = {
     is4bitmode : bool;
-    rsPin : ('a register, 'b register, 'c register, no analog_pin) pin;
-    enablePin : ('d register, 'e register, 'f register, no analog_pin) pin;
-    dpins : ('g register, 'h register, 'i register, no analog_pin) pin array;
+    rsPin : [ `DWRITE ] pin;
+    enablePin : [ `DWRITE ] pin;
+    dpins : [ `DWRITE ] pin array;
     mutable displayFunction : int;
     mutable displayMode : int;
     mutable displayControl : int;
