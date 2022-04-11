@@ -7,36 +7,25 @@
 type level = HIGH | LOW
 type mode = INPUT | OUTPUT | INPUT_PULLUP
 
-type yes
-type no
-type 'a analog_pin = YES : yes analog_pin | NO : no analog_pin
+type bit = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7
 
 module type AvrPins = sig
-  type ('a, 'b, 'c, 'd) pin
-  type 'a register
-  val port_of_pin:
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'a register
-  val ddr_of_pin:
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'b register
-  val input_of_pin:
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'c register
-  val port_bit_of_pin :
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'a
-  val ddr_bit_of_pin :
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'b
-  val input_bit_of_pin :
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> 'c
-  val pin_mode :
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> mode -> unit
-  val digital_write :
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> level -> unit
-  val digital_read :
-    ('a register, 'b register, 'c register, 'd analog_pin) pin -> level
-  val write_register : 'a register -> int -> unit
-  val read_register : 'a register -> int
-  val set_bit : 'a register -> 'a -> unit
-  val clear_bit : 'a register -> 'a -> unit
-  val read_bit : 'a register -> 'a -> bool
+  type 'a pin
+  type register
+  val port_of_pin: 'a pin -> register
+  val ddr_of_pin: 'a pin -> register
+  val input_of_pin: 'a pin -> register
+  val port_bit_of_pin : 'a pin -> bit
+  val ddr_bit_of_pin : 'a pin -> bit
+  val input_bit_of_pin : 'a pin -> bit
+  val pin_mode : 'a pin -> mode -> unit
+  val digital_write : [> `DWRITE ] pin -> level -> unit
+  val digital_read : [> `DREAD ] pin -> level
+  val write_register : register -> int -> unit
+  val read_register : register -> int
+  val set_bit : register -> bit -> unit
+  val clear_bit : register -> bit -> unit
+  val read_bit : register -> bit -> bool
 end
 
 val delay : int -> unit
