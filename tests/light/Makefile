@@ -7,12 +7,10 @@ ATTY := /dev/ttyACM0
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -gc MAC -arch 16 -no-flash-heap -stack-size 300 -heap-size 2000 -avrcxxopt -DF_CPU=16000000L
-	# $(BIN)/omicrob -v $^ -gc SC -arch 16 -no-flash-heap -no-flash-globals -stack-size 300 -heap-size 800
+	$(BIN)/omicrob -device arduino-uno -v $^ -gc MAC -arch 16
 
 flash: light.hex
-	sudo ./reset.py $(ATTY)
-	$(BIN)/omicrob -v -flash -sudo $<
+	$(BIN)/omicrob -device arduino-uno -v -flash -sudo $<
 
 
 simul: light.elf

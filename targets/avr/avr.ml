@@ -19,8 +19,9 @@ module type AvrPins = sig
   val ddr_bit_of_pin : 'a pin -> bit
   val input_bit_of_pin : 'a pin -> bit
   val pin_mode : 'a pin -> mode -> unit
-  val digital_write : [> `DWRITE ] pin -> level -> unit
-  val digital_read : [> `DREAD ] pin -> level
+  val digital_write : [ `DWRITE ] pin -> level -> unit
+  val digital_read : [ `DREAD ] pin -> level
+  val analog_read : [ `AREAD ] pin -> int
   val write_register : register -> int -> unit
   val read_register : register -> int
   val set_bit : register -> bit -> unit
