@@ -147,3 +147,6 @@ let digital_read p =
   match read_bit input bit with
   | true -> HIGH
   | false -> LOW
+
+let analog_read (p: [ `AREAD ] pin) =
+  match p with _ -> .
