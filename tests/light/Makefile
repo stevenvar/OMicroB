@@ -1,5 +1,7 @@
 include ../../etc/Makefile.conf
 
+DEVICE ?= arduino-uno
+
 SOURCES := light.ml
 TARGETS := light.byte light.c light.elf light.avr light.hex
 ATTY := /dev/ttyACM0
@@ -7,10 +9,10 @@ ATTY := /dev/ttyACM0
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -device arduino-uno -v $^ -gc MAC -arch 16
+	$(BIN)/omicrob -device $(DEVICE) -v $^ -gc MAC -arch 16
 
 flash: light.hex
-	$(BIN)/omicrob -device arduino-uno -v -flash -sudo $<
+	$(BIN)/omicrob -device $(DEVICE) -v -flash -sudo $<
 
 
 simul: light.elf
