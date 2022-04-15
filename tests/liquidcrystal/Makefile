@@ -1,15 +1,17 @@
 include ../../etc/Makefile.conf
 
+DEVICE ?= arduino-uno
+
 SOURCES := lcdexample.ml
 TARGETS := lcdexample.byte lcdexample.c lcdexample.elf lcdexample.avr lcdexample.hex
 
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -device arduino-uno -heap-size 256
+	$(BIN)/omicrob -v $^ -device $(DEVICE) -heap-size 256
 
 flash: lcdexample.hex
-	$(BIN)/omicrob -device arduino-uno -flash -sudo $<
+	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: lcdexample.elf
 	./$< ../../bin/omicrob_pin_simulator '../../bin/omicrob_lcd_16x2_simulator e=PIN12 rs=PIN11 rw=PIN10 d4=PIN9 d5=PIN8 d6=PIN7 d7=PIN6 16x2'
