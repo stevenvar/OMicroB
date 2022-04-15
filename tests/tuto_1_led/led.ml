@@ -1,5 +1,3 @@
-open Avr
-
 let l = ref [ 1; 2; 3; 4 ]
 let m = Array.make_matrix 10 10 1
 let _ =
