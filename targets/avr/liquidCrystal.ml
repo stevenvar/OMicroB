@@ -12,7 +12,7 @@ module type Writeable = sig
   type register
   type 'a pin
   val pin_mode: 'a pin -> mode -> unit
-  val digital_write: [> `DWRITE ] pin -> level -> unit
+  val digital_write: [ `DWRITE ] pin -> level -> unit
 end
 
 module type LCD = sig
