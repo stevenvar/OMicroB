@@ -50,7 +50,7 @@ value caml_buffer_get_byte(value x) {
 value caml_buffer_display(value x){
   for(int i = 0; i < 1024; i++){
     int b = buffer_get_byte ();
-    avr_write_register(SPDR,b);
+    write_register(SPDR,b);
   }
   return Val_unit;
 }

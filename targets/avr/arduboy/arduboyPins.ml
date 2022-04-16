@@ -8,19 +8,20 @@ type register =
 
 type 'a pin =
   | PIN2  : [< `CART_CS ] pin
-  | PIN4  : [< `OLED_DC ] pin
+  | PIN4  : [< `OLED_DC | `DWRITE ] pin
   | PIN5  : [< `SPEAKER_PLUS ] pin
-  | PIN6  : [< `OLED_RST ] pin
+  | PIN6  : [< `OLED_RST | `DWRITE ] pin
   | PIN7  : [< `BUTTON_A | `DREAD ] pin
   | PIN8  : [< `BUTTON_B | `DREAD ] pin
   | PIN9  : [< `LED_BLUE | `DWRITE ] pin
   | PIN10 : [< `LED_RED | `DWRITE ] pin
-  | PIN12 : [< `OLED_CS ] pin
+  | PIN12 : [< `OLED_CS | `DWRITE ] pin
   | PIN11 : [< `LED_GREEN | `DWRITE ] pin
   | PIN13 : [< `SPEAKER_MINUS ] pin
   | MISO  : [< `MISO ] pin
   | SCK   : [< `SCK ] pin
   | MOSI  : [< `MOSI ] pin
+  | SS    : [< `SS ] pin
   | PINA0 : [< `BUTTON_UP | `DREAD ] pin
   | PINA1 : [< `BUTTON_RIGHT | `DREAD ] pin
   | PINA2 : [< `BUTTON_LEFT | `DREAD ] pin
@@ -42,6 +43,7 @@ let port_of_pin : type a. a pin -> register =
   | MISO -> PORTB
   | SCK -> PORTB
   | MOSI -> PORTB
+  | SS -> PORTB
   | PINA0 -> PORTF
   | PINA1 -> PORTF
   | PINA2 -> PORTF
@@ -63,6 +65,7 @@ let ddr_of_pin : type a. a pin -> register =
   | MISO -> DDRB
   | SCK -> DDRB
   | MOSI -> DDRB
+  | SS -> DDRB
   | PINA0 -> DDRF
   | PINA1 -> DDRF
   | PINA2 -> DDRF
@@ -84,6 +87,7 @@ let input_of_pin : type a. a pin -> register =
   | MISO -> PINB
   | SCK -> PINB
   | MOSI -> PINB
+  | SS -> PINB
   | PINA0 -> PINF
   | PINA1 -> PINF
   | PINA2 -> PINF
@@ -105,6 +109,7 @@ let port_bit_of_pin : type a. a pin -> bit =
   | MISO -> BIT3
   | SCK -> BIT1
   | MOSI -> BIT2
+  | SS -> BIT0
   | PINA0 -> BIT7
   | PINA1 -> BIT6
   | PINA2 -> BIT5
