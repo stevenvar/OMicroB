@@ -1,7 +1,0 @@
-window width=350 height=150 bgcolor=lightgray title="Simulator"
-
-lcd x=30 y=10 column_nb=128 line_nb=8 cs=PIN12 dc=PIN4 rst=PIN6
-
-button x=310 y=100 width=40 height=40 label="SMILE" pin=PIN7 color=green inverse=true
-
-button x=310 y=50 width=40 height=40 label="FROWN" pin=PIN8 color=red inverse=true

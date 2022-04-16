@@ -1,15 +1,17 @@
 include ../../etc/Makefile.conf
 
+DEVICE ?= arduino-uno
+
 SOURCES := buffer.c spi.ml oled.ml arduboy.ml display.ml
 TARGETS := display.byte display.c display.elf display.avr display.hex
 
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -mlopt -verbose -stack-size 32 -heap-size 300
+	$(BIN)/omicrob -device $(DEVICE) -v $^ -mlopt -verbose -stack-size 32 -heap-size 300
 
 flash: display.hex
-	$(BIN)/omicrob -flash -sudo $<
+	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: display.elf
 	./$< '../../bin/omicrob_circuit_simulator circuit.txt'
