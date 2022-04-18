@@ -772,7 +772,7 @@ let exec arch prims globals code cycle_limit =
           extra_args := !extra_args - n;
           incr pc;
         ) else (
-          let blk = Array.make (!extra_args + 2) !accu in
+          let blk = Array.make (!extra_args + 2) !env in
           for i = 1 to !extra_args + 1 do blk.(i) <- pop stack done;
           accu       := Closure { ofs = 0; ptrs = [| !pc - 1 |]; env = blk };
           pc         := code_ptr_of_value (pop stack);
