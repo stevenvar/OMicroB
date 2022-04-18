@@ -710,7 +710,7 @@ let opcodes_of_bytecode bytecode =
     | OPCODE op -> Hashtbl.replace htbl op ()
   ) bytecode;
   let lst = Hashtbl.fold (fun op () acc -> op :: acc) htbl [] in
-  List.sort Pervasives.compare lst
+  List.sort compare lst
 
 (******************************************************************************)
 

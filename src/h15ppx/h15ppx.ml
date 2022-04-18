@@ -84,11 +84,13 @@ let rec typ_mapper mapper typ =
   | Ptyp_variant (row_fields, closed_tag, labels) ->
     let row_fields =
       List.map (fun row_field ->
-        match row_field with
-        | Rtag (label, attributes, flag, args) ->
-          Rtag (mangle_label label, attributes, flag, List.map (typ_mapper mapper) args)
-        | Rinherit ct ->
-          Rinherit (typ_mapper mapper ct)
+        let prf_desc =
+          match row_field.prf_desc with
+          | Rtag (label, flag, args) ->
+            Rtag (mangle_label label, flag, List.map (typ_mapper mapper) args)
+          | Rinherit ct ->
+            Rinherit (typ_mapper mapper ct) in
+        { row_field with prf_desc }
       ) row_fields in
     let labels =
       match labels with

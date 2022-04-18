@@ -47,7 +47,7 @@ liquidCrystal.cmi: liquidCrystal.mli
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
 
 liquidCrystal.cmo: liquidCrystal.ml liquidCrystal.cmi
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
+	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a-69 $< -o $@
 
 $(SCMIS): %.cmi: %.mli
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $^ -o $@

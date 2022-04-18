@@ -5,7 +5,7 @@
 #include <caml/alloc.h>
 
 value caml_string_of_int(value v) {
-  char buf[13];
+  char buf[21];
   snprintf(buf, sizeof(buf), "%ld", Long_val(v));
   return caml_copy_string(buf);
 }

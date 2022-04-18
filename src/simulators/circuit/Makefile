@@ -5,7 +5,7 @@ TARG = $(BIN)/omicrob_circuit_simulator
 SRCS = $(wildcard *.ml *.mli *.mll *.mly)
 BUILD = main.native
 EXTRA = $(LIB)/extra
-CFLAGS = -thread,-I,$(EXTRA)
+CFLAGS = -thread,-I,$(EXTRA),-I,+../graphics
 LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx #,$(LCD_MODS)
 OPTIONS = -cflags $(CFLAGS) -lflags $(LFLAGS)
 

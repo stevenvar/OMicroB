@@ -363,12 +363,12 @@ let caml_hash =
 
 let rec caml_compare v0 v1 =
   match v0, v1 with
-  | Int i0, Int i1 -> Pervasives.compare i0 i1
+  | Int i0, Int i1 -> compare i0 i1
   | Int32 i0, Int32 i1 -> Int32.compare i0 i1
   | Int64 i0, Int64 i1 -> Int64.compare i0 i1
   | Nativeint i0, Nativeint i1 -> Nativeint.compare i0 i1
-  | Float f0, Float f1 -> Pervasives.compare f0 f1 (* May be incorrect with runtime representation of floats *)
-  | Float_array (_mut0, tbl0), Float_array(_mut1, tbl1) -> Pervasives.compare tbl0 tbl1
+  | Float f0, Float f1 -> compare f0 f1 (* May be incorrect with runtime representation of floats *)
+  | Float_array (_mut0, tbl0), Float_array(_mut1, tbl1) -> compare tbl0 tbl1
   | Bytes (_mut0, b0), Bytes (_mut1, b1) -> Bytes.compare b0 b1
   | Object (_mut0, tbl0), Object (_mut1, tbl1) -> caml_compare_arrays tbl0 tbl1
   | Block (_mut0, tag0, tbl0), Block (_mut1, tag1, tbl1) ->
@@ -462,14 +462,12 @@ let ccall arch ooid prim args =
   | "caml_hypot_float", [ Float x; Float y ] -> Float (hypot x y)
   | "caml_int32_bits_of_float", [ Float x ] -> Int32 (Int32.bits_of_float x)
   | "caml_int32_float_of_bits", [ Int32 i ] -> Float (Int32.float_of_bits i)
-  | "caml_int32_format", [ Bytes (_mut, b); Int32 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int32.format (Bytes.unsafe_to_string b) i))
   | "caml_string_of_int32", [ Int32 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int32.to_string i))
   | "caml_int32_of_float", [ Float x ] -> Int32 (Int32.of_float x)
   | "caml_int32_of_string", [ Bytes (_mut, b) ] -> Int32 (Int32.of_string (Bytes.unsafe_to_string b))
   | "caml_int32_to_float", [ Int32 i ] -> Float (Int32.to_float i)
   | "caml_int64_bits_of_float", [ Float x ] -> Int64 (Int64.bits_of_float x)
   | "caml_int64_float_of_bits", [ Int64 i ] -> Float (Int64.float_of_bits i)
-  | "caml_int64_format", [ Bytes (_mut, b); Int64 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int64.format (Bytes.unsafe_to_string b) i))
   | "caml_string_of_int64", [ Int64 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int64.to_string i))
   | "caml_int64_of_float", [ Float x ] -> Int64 (Int64.of_float x)
   | "caml_int64_of_string", [ Bytes (_mut, b) ] -> Int64 (Int64.of_string (Bytes.unsafe_to_string b))
@@ -484,7 +482,6 @@ let ccall arch ooid prim args =
   | "caml_make_vect", [ Int i; Float x ] -> Float_array (Mutable, Array.make i x)
   | "caml_make_vect", [ Int i; v ] -> Block (Mutable, ref 0, Array.make i v)
   | "caml_modf_float", [ Float x ] -> let y, z = modf x in Block (Immutable, ref 0, [| Float y; Float z |])
-  | "caml_nativeint_format", [ Bytes (_mut, b); Nativeint i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Nativeint.format (Bytes.unsafe_to_string b) i))
   | "caml_int_of_float", [ Float x ] -> Int (int_of_float x)
   | "caml_nativeint_of_float", [ Float x ] -> Nativeint (Nativeint.of_float x)
   | "caml_nativeint_of_string", [ Bytes (_mut, b) ] -> Nativeint (Nativeint.of_string (Bytes.unsafe_to_string b))
@@ -510,7 +507,7 @@ let ccall arch ooid prim args =
   | "caml_compare", [ v0; v1 ] -> Int (caml_compare v0 v1)
   | "caml_string_compare", [ Bytes (_mut1, b1); Bytes (_mut2, b2) ] -> Int (Bytes.compare b1 b2)
   | "caml_string_notequal", [ Bytes (_mut1, b1); Bytes (_mut2, b2) ] -> if Bytes.equal b1 b2 then Int 0 else Int 1
-  | "caml_int_compare", [ Int n1; Int n2 ] -> Int (Pervasives.compare n1 n2)
+  | "caml_int_compare", [ Int n1; Int n2 ] -> Int (compare n1 n2)
   | "caml_alloc_dummy", [ Int sz ] -> Block (Mutable, ref 0, Array.make sz (Int 0))
   | "caml_alloc_dummy_function", [ Int sz; Int _ ] -> Closure { ofs = 0; ptrs = [||]; env = Array.make sz (Int 0) }
   | "caml_update_dummy", [ Block (_mut1, tag1, tbl1); Block (_mut2, tag2, tbl2) ] -> assert (Array.length tbl1 = Array.length tbl2); tag1 := !tag2; Array.blit tbl2 0 tbl1 0 (Array.length tbl1); Int 0

@@ -156,10 +156,10 @@ AVRDUDE     := $AVRDUDE
 XC32_GXX    := $XC32_GXX
 XC32_BIN2HEX:= $XC32_BIN2HEX
 PIC32PROG   := $PIC32PROG
-OCAMLC      := $OCAMLC -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
-OCAMLOPT    := $OCAMLOPT -w A-58-e -warn-error A -safe-string -strict-formats -strict-sequence
+OCAMLC      := $OCAMLC -w A-4-58-70 -warn-error A -safe-string -strict-formats -strict-sequence
+OCAMLOPT    := $OCAMLOPT -w A-4-58-70 -warn-error A -safe-string -strict-formats -strict-sequence
 OCAMLDOC    := $OCAMLDOC
-OCAMLBUILD  := $OCAMLBUILD -cflags -w,A-58-e,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -lflags -w,A-58-e,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -no-links -classic-display -build-dir .build
+OCAMLBUILD  := $OCAMLBUILD -cflags -w,A-4-58-70,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -lflags -w,A-4-58-70,-warn-error,A,-safe-string,-strict-formats,-strict-sequence -no-links -classic-display -build-dir .build
 OCAMLWHERE  := $OCAMLWHERE
 SRC         := $ROOT/src
 BIN         := $ROOT/bin
@@ -272,7 +272,6 @@ function target_pic32 () {
 ## Choose your targets
 
 target_avr
-target_pic32
 
 ################################################################################
 

@@ -40,7 +40,7 @@ value caml_unsafe_bytes_of_string(value s) {
 #endif
 
 value caml_debug_trace(value msg) {
-  mlsize_t sz = string_length(msg);
+  mlsize_t sz = caml_string_length(msg);
   mlsize_t i;
   debug_trace_open();
   for (i = 0; i < sz; i ++) {
