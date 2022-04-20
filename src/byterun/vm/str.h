@@ -3,12 +3,11 @@
 
 #include "values.h"
 
-mlsize_t string_length(value s);
+mlsize_t caml_string_length(value s);
 int string_compare(value s1, value s2);
 value copy_bytes(const char *str);
 
 value caml_create_bytes(value len);
-value caml_string_length(value s);
 value caml_ml_string_length(value s);
 value caml_ml_bytes_length(value b);
 value caml_blit_string(value s, value sofs, value b, value bofs, value len);

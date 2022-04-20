@@ -4,7 +4,7 @@
 #include "values.h"
 #include "str.h"
 
-mlsize_t string_length(value s) {
+mlsize_t caml_string_length(value s) {
   mlsize_t temp;
   temp = Bosize_val(s) - 1;
   return temp - String_field(s, temp);
@@ -32,7 +32,7 @@ value caml_create_bytes(value ml_len) {
 }
 
 value caml_ml_string_length(value s) {
-  return Val_int(string_length(s));
+  return Val_int(caml_string_length(s));
 }
 
 value caml_ml_bytes_length(value b) {
@@ -117,7 +117,7 @@ value caml_string_notequal(value s1, value s2) {
 
 value caml_string_get(value s, value i) {
   mlsize_t idx = Int_val(i);
-  mlsize_t len = string_length(s);
+  mlsize_t len = caml_string_length(s);
   if (idx >= len) caml_raise_index_out_of_bounds();
   return Val_int(String_field(s, idx));
 }
@@ -130,7 +130,7 @@ value caml_bytes_set(value b, value i, value c) {
   assert(Is_block(b));
   assert(Is_in_ram(b));
   mlsize_t idx = Int_val(i);
-  mlsize_t len = string_length(b);
+  mlsize_t len = caml_string_length(b);
   if (idx >= len) caml_raise_index_out_of_bounds();
   Ram_string_field(b, idx) = Int_val(c);
   return Val_unit;
