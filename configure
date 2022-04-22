@@ -85,7 +85,7 @@ AVRDUDE="$(which avrdude 2> /dev/null)"
 XC32_GXX="$(which xc32-g++ 2> /dev/null)"
 XC32_BIN2HEX="$(which xc32-bin2hex 2> /dev/null)"
 PIC32PROG="$(which pic32prog 2> /dev/null)"
-ARM_GXX="$(which arm-none-eabi-g++ 2> /dev/null)"
+ARM_GXX="$(which arm-none-eabi-gcc 2> /dev/null)"
 ARM_OBJCOPY="$(which arm-none-eabi-objcopy 2> /dev/null)"
 OCAML="$(which ocaml.opt 2> /dev/null || which ocaml)"
 OCAMLOPT="$(which ocamlopt.opt 2> /dev/null || which ocamlopt)"
@@ -276,7 +276,7 @@ function target_pic32 () {
 }
 
 function target_microbit () {
-    check_command "arm-none-eabi-g++"
+    check_command "arm-none-eabi-gcc"
 
     cat "targets/microbit/device_config.ml" >> "src/omicrob/device_config.ml"
 

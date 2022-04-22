@@ -1,267 +1,337 @@
-/*
- * startup.c
- *
- * This file is part of the Phos operating system for microcontrollers
- * Copyright (c) 2018 J. M. Spivey
- * All rights reserved
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote products
- *    derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+/* common/startup.c */
+/* Copyright (c) 2018 J. M. Spivey */
 
 #include "hardware.h"
+#include "microbian.h"
+
+extern void main(void);
+
+void omicrob_task(int n) {
+  timer_delay(10);
+  main();
+}
 
 /* init -- main program, creates application processes */
-int main(int argc, const char **argv);
+void init(void) {
+  serial_init();
+  timer_init();
+  display_init();
+  start("OMicroB", omicrob_task, 0, STACK);
+}
+
+void default_start(void)
+{
+    init();                    /* Call the main program. */
+    while (1) pause();         /* Halt if init() returns */
+}
+
+void __start(void) __attribute((weak, alias("default_start")));
+
+/* The next four routines can be used in C compiler output, even
+if not mentioned in the source. */
+
+/* memcpy -- copy n bytes from src to dest (non-overlapping) */
+void *memcpy(void *dest, const void *src, unsigned n)
+{
+    unsigned char *p = dest;
+    const unsigned char *q = src;
+    while (n-- > 0) *p++ = *q++;
+    return dest;
+}
+
+/* memmove -- copy n bytes from src to dest, allowing overlaps */
+void *memmove(void *dest, const void *src, unsigned n)
+{
+    unsigned char *p = dest;
+    const unsigned char *q = src;
+    if (dest <= src)
+        while (n-- > 0) *p++ = *q++;
+    else {
+        p += n; q += n;
+        while (n-- > 0) *--p = *--q;
+    }
+    return dest;
+}
+    
+/* memset -- set n bytes of dest to byte x */
+void *memset(void *dest, unsigned x, unsigned n)
+{
+    unsigned char *p = dest;
+    while (n-- > 0) *p++ = x;
+    return dest;
+}
+
+/* memcmp -- compare n bytes */
+int memcmp(const void *pp, const void *qq, int n)
+{
+    const unsigned char *p = pp, *q = qq;
+    while (n-- > 0) {
+        if (*p++ != *q++)
+            return (p[-1] < q[-1] ? -1 : 1);
+    }
+    return 0;
+}
 
 /* Addresses set by the linker */
-extern unsigned __data_start[], __data_end[],
-     __bss_start[], __bss_end[], __etext[], __stack[];
+extern unsigned char __xram_start[], __xram_end[],
+    __data_start[], __data_end[], __bss_start[], __bss_end[],
+    __etext[], __stack[];
 
 /* __reset -- the system starts here */
-void __reset(void) {
-     unsigned *p, *q;
+void __reset(void)
+{
+    /* Activate the crystal clock */
+    CLOCK.HFCLKSTARTED = 0;
+    CLOCK.HFCLKSTART = 1;
+    while (! CLOCK.HFCLKSTARTED) { }
 
-     /* Make sure all RAM banks are powered on */
-     POWER_RAMON |= BIT(0) | BIT(1);
+    /* Enable the instruction cache */
+    SET_BIT(NVMC.ICACHECONF, NVMC_ICACHECONF_CACHEEN);
 
-     /* Copy data segment and zero out bss */
-     p = __data_start; q = __etext;
-     while (p < __data_end) *p++ = *q++;
-     p = __bss_start;
-     while (p < __bss_end) *p++ = 0;
+    /* Copy xram and data segments and zero out bss. */
+    int xram_size = __xram_end - __xram_start;
+    int data_size = __data_end - __data_start;
+    int bss_size = __bss_end - __bss_start;
+    memcpy(__xram_start, __etext, xram_size);
+    memcpy(__data_start, __etext+xram_size, data_size);
+    memset(__bss_start, 0, bss_size);
 
-     /* Let the program initialise itself */
-     main(0, nullptr);
-
-     /* If there is no scheduler, spin */
-     while (1) pause();
+    __start();
 }
 
 
 /* NVIC SETUP FUNCTIONS */
 
-/* On Cortex-M0, only the top two bits of each interrupt priority are
-   implemented, so setting the priority to 0xff has the same effect as
-   setting it to 0xc0.  Smaller numbers correspond to more urgency. */
+/* On Cortex-M4, only the top three bits of each interrupt priority
+are implemented, but for portability priorities should be specified
+with integers in the range [0..255]. */
 
-/* irq_priority -- set priority for an IRQ to a value [0..0xff] */
-void irq_priority(int irq, unsigned prio) {
-     if (irq < 0)
-          SET_BYTE(SCB_SHPR[(irq+8) >> 2], irq & 0x3, prio);
-     else
-          SET_BYTE(NVIC_IPR[irq >> 2], irq & 0x3, prio);
+/* irq_priority -- set priority for an IRQ to a value [0..255] */
+void irq_priority(int irq, unsigned prio)
+{
+    if (irq < 0)
+        SET_BYTE(SCB.SHPR[(irq+8) >> 2], irq & 0x3, prio);
+    else
+        SET_BYTE(NVIC.IPR[irq >> 2], irq & 0x3, prio);
 }
+     
+/* See hardware.h for macros enable_irq, disable_irq, clear_pending, 
+reschedule */
 
-void enable_irq(int irq) {
-     NVIC_ISER[0] = BIT(irq);
-}
 
-void disable_irq(int irq) {
-     NVIC_ICER[0] = BIT(irq);
-}
+/* Device register arrays */
+volatile _DEVICE _gpio * const GPIO[2] = {
+    &GPIO0, &GPIO1
+};
 
-void clear_pending(int irq) {
-     NVIC_ICPR[0] = BIT(irq);
-}
+volatile _DEVICE _i2c * const I2C[2] = {
+    &I2C0, &I2C1
+};
+
+volatile _DEVICE _timer * const TIMER[5] = {
+    &TIMER0, &TIMER1, &TIMER2, &TIMER3, &TIMER4
+};
+
+volatile _DEVICE _pwm * const PWM[4] = {
+    &PWM0, &PWM1, &PWM2, &PWM3
+};
 
 
 /*  INTERRUPT VECTORS */
 
-/* We use GCC features to define each handler name as an alias for the
-   wrap_default() function if it is not defined elsewhere.
-   Applications can subsitute their own definitions for default_handler()
-   or for individual handler names like uart_handler(). */
+/* We use the linker script to define each handler name as an alias
+for default_handler if it is not defined elsewhere.  Applications can
+subsitute their own definitions for individual handler names like
+uart_handler(). */
 
-void spin(void) {
-     int n;
-
-     intr_disable();
-
-     /* Flash the seven stars of death */
-     GPIO_DIR = 0xfff0;
-     while (1) {
-          GPIO_OUT = 0x4000;
-          for (n = 1000000; n > 0; n--) {
-               nop(); nop(); nop();
-          }
-          GPIO_OUT = 0;
-          for (n = 200000; n > 0; n--) {
-               nop(); nop(); nop();
-          }
-     }
+/* delay_loop -- timed delay */
+void delay_loop(unsigned usecs)
+{
+    /* Without executing from RAM, this delay loop may go slowly, but
+       it isn't used anywhere it matters. */
+    unsigned t = usecs << 4;
+    while (t > 0) {
+        /* 62.5nsec per iteration */
+        nop();
+        t--;
+    }
 }
 
-void default_handler(void);
-#pragma weak default_handler = _Z4spinv
+/* spin -- show Seven Stars of Death */
+void spin(void)
+{
+    /* The SSOD was easy on micro:bit-v1 and is harder on v2, but it
+       has proven so popular that it is worth the effort to keep it.
+       We assume the icache is enabled -- if not, the flashing will
+       just go at about half speed. */
 
-static void wrap_default(void) {
-     default_handler();
+    int i, k;
+
+    static const unsigned ssod[] = {
+        __ROW(ROW1, 0,1,0,1,0),
+        __ROW(ROW3, 1,0,1,0,1),
+        __ROW(ROW5, 0,1,0,1,0)
+    };
+
+    intr_disable();
+
+    GPIO0.DIR = LED_MASK0;
+    GPIO1.DIR = LED_MASK1;
+    
+    while (1) {
+        for (k = 33; k > 0; k--) { /* 0.5s on */
+            for (i = 0; i < 6; i += 2) { /* 15ms per loop */
+                GPIO0.OUT = ssod[i];
+                GPIO1.OUT = ssod[i+1];
+                delay_loop(5000);
+            }
+        }
+        GPIO0.OUT = 0;
+        GPIO0.OUT = 0;
+        delay_loop(100000); /* 0.1s off */
+    }          
 }
+
+void default_handler(void) __attribute((weak, alias("spin")));
+
+/* The linker script makes all these handlers into weak aliases 
+for default_handler. */
 
 void nmi_handler(void);
-#pragma weak nmi_handler = _ZL12wrap_defaultv
-
 void hardfault_handler(void);
-#pragma weak hardfault_handler = _ZL12wrap_defaultv
-
+void memmgt_handler(void);
+void busfault_handler(void);
+void usagefault_handler(void);
 void svc_handler(void);
-#pragma weak svc_handler = _ZL12wrap_defaultv
-
+void debugmon_handler(void);
 void pendsv_handler(void);
-#pragma weak pendsv_handler = _ZL12wrap_defaultv
-
 void systick_handler(void);
-#pragma weak systick_handler = _ZL12wrap_defaultv
-
-void uart_handler(void);
-#pragma weak uart_handler = _ZL12wrap_defaultv
-
-void timer0_handler(void);
-#pragma weak timer0_handler = _ZL12wrap_defaultv
-
-void timer1_handler(void);
-#pragma weak timer1_handler = _ZL12wrap_defaultv
-
-void timer2_handler(void);
-#pragma weak timer2_handler = _ZL12wrap_defaultv
-
 void power_clock_handler(void);
-#pragma weak power_clock_handler = _ZL12wrap_defaultv
-
 void radio_handler(void);
-#pragma weak radio_handler = _ZL12wrap_defaultv
-
-void spi0_twi0_handler(void);
-#pragma weak spi0_twi0_handler = _ZL12wrap_defaultv
-
-void spi1_twi1_handler(void);
-#pragma weak spi1_twi1_handler = _ZL12wrap_defaultv
-
+void uart0_handler(void);
+void i2c0_handler(void);
+void i2c1_handler(void);
+void nfc_handler(void);
 void gpiote_handler(void);
-#pragma weak gpiote_handler = _ZL12wrap_defaultv
-
 void adc_handler(void);
-#pragma weak adc_handler = _ZL12wrap_defaultv
-
+void timer0_handler(void);
+void timer1_handler(void);
+void timer2_handler(void);
 void rtc0_handler(void);
-#pragma weak rtc0_handler = _ZL12wrap_defaultv
-
 void temp_handler(void);
-#pragma weak temp_handler = _ZL12wrap_defaultv
-
 void rng_handler(void);
-#pragma weak rng_handler = _ZL12wrap_defaultv
-
 void ecb_handler(void);
-#pragma weak ecb_handler = _ZL12wrap_defaultv
-
 void ccm_aar_handler(void);
-#pragma weak ccm_aar_handler = _ZL12wrap_defaultv
-
 void wdt_handler(void);
-#pragma weak wdt_handler = _ZL12wrap_defaultv
-
 void rtc1_handler(void);
-#pragma weak rtc1_handler = _ZL12wrap_defaultv
-
 void qdec_handler(void);
-#pragma weak qdec_handler = _ZL12wrap_defaultv
-
 void lpcomp_handler(void);
-#pragma weak lpcomp_handler = _ZL12wrap_defaultv
-
 void swi0_handler(void);
-#pragma weak swi0_handler = _ZL12wrap_defaultv
-
 void swi1_handler(void);
-#pragma weak swi1_handler = _ZL12wrap_defaultv
-
 void swi2_handler(void);
-#pragma weak swi2_handler = _ZL12wrap_defaultv
-
 void swi3_handler(void);
-#pragma weak swi3_handler = _ZL12wrap_defaultv
-
 void swi4_handler(void);
-#pragma weak swi4_handler = _ZL12wrap_defaultv
-
 void swi5_handler(void);
-#pragma weak swi5_handler = _ZL12wrap_defaultv
+void timer3_handler(void);
+void timer4_handler(void);
+void pwm0_handler(void);
+void pdm_handler(void);
+void mwu_handler(void);
+void pwm1_handler(void);
+void pwm2_handler(void);
+void spi0_handler(void);
+void rtc2_handler(void);
+void i2s_handler(void);
+void fpu_handler(void);
+void usbd_handler(void);
+void uart1_handler(void);
+void pwm3_handler(void);
+void spi1_handler(void);
 
-typedef void (*handler)(void);
+/* This vector table is placed at address 0 in the flash by directives
+in the linker script. */
 
-// Entries filled with default_handler are unused by the hardware.  Getting
-// such an interrupt would be a real surprise!
-
-handler __vectors[] __attribute((section(".vectors"))) = {
-    (handler) __stack,          // -16
+void *__vectors[] __attribute((section(".vectors"))) = {
+    __stack,                    /* -16 */
     __reset,
     nmi_handler,
     hardfault_handler,
-    default_handler,            // -12
-    default_handler,
-    default_handler,
-    default_handler,
-    default_handler,           // -8
-    default_handler,
-    default_handler,
+    hardfault_handler,          /* -12 */
+    hardfault_handler,
+    hardfault_handler,
+    0,
+    0,                          /*  -8 */
+    0,
+    0,
     svc_handler,
-    default_handler,           // -4
-    default_handler,
+    debugmon_handler,           /* -4 */
+    0,
     pendsv_handler,
     systick_handler,
-
+    
     /* external interrupts */
-    power_clock_handler,        //  0
+    power_clock_handler,        /*  0 */
     radio_handler,
-    uart_handler,
-    spi0_twi0_handler,
-    spi1_twi1_handler,          //  4
-    default_handler,
+    uart0_handler,
+    i2c0_handler,
+    i2c1_handler,               /*  4 */
+    nfc_handler,
     gpiote_handler,
     adc_handler,
-    timer0_handler,             //  8
+    timer0_handler,             /*  8 */
     timer1_handler,
     timer2_handler,
     rtc0_handler,
-    temp_handler,               // 12
+    temp_handler,               /* 12 */
     rng_handler,
     ecb_handler,
     ccm_aar_handler,
-    wdt_handler,                // 16
+    wdt_handler,                /* 16 */
     rtc1_handler,
     qdec_handler,
     lpcomp_handler,
-    swi0_handler,               // 20
+    swi0_handler,               /* 20 */
     swi1_handler,
     swi2_handler,
     swi3_handler,
-    swi4_handler,               // 24
+    swi4_handler,               /* 24 */
     swi5_handler,
-    default_handler,
-    default_handler,
-    default_handler,            // 28
-    default_handler,
-    default_handler,
-    default_handler
+    timer3_handler,
+    timer4_handler,
+    pwm0_handler,               /* 28 */
+    pdm_handler,
+    0,
+    0,
+    mwu_handler,                /* 32 */
+    pwm1_handler,
+    pwm2_handler,
+    spi0_handler,
+    rtc2_handler,               /* 36 */
+    i2s_handler,
+    fpu_handler,
+    usbd_handler,
+    uart1_handler,              /* 40 */
+    0,
+    0,
+    0,
+    0,                          /* 44 */
+    pwm3_handler,
+    0,
+    spi1_handler,
+    0,                          /* 48 */
+    0,
+    0,
+    0,
+    0,                          /* 52 */
+    0,
+    0,
+    0,
+    0,                          /* 56 */
+    0,
+    0,
+    0,
+    0,                          /* 60 */
+    0,
+    0,
+    0
 };

@@ -1,12 +1,35 @@
-all: startup.o microbitlib.o
+all: startup.o microbian.a mpx-m4.s
 
-CPU = -mcpu=cortex-m0 -mthumb
-CFLAGS = -Os -g -Wall -fdata-sections -ffunction-sections
+CPU = -mcpu=cortex-m4 -mthumb
+CFLAGS = -Os -g -Wall -ffreestanding
 LDFLAGS = -Wl,--gc-sections
-CC = arm-none-eabi-g++
+CC = arm-none-eabi-gcc
+AS = arm-none-eabi-as
+
+DRIVERS = serial.o timer.o i2c.o radio.o adc.o display.o
+MICROBIAN = microbian.o mpx-m4.o $(DRIVERS) lib.o
+
+AR = arm-none-eabi-ar
+
+microbian.a: $(MICROBIAN)
+	$(AR) cr $@ $^
+
+%.o: %.s
+	$(AS) $(CPU) $< -o $@
 
 %.o: %.c
-	$(CC) $(CPU) $(CFLAGS) -c $< -o $@
+	$(CC) -Wno-narrowing $(CPU) $(CFLAGS) -c $< -o $@
 
-clean:
-	rm -f *.o
+clean: force
+	rm -f *.hex *.elf *.map *.o microbian.a
+
+.PHONY: examples
+
+# Don't delete intermediate files
+.SECONDARY:
+
+force:
+
+###
+
+$(MICROBIAN): microbian.h
