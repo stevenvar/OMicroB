@@ -1,16 +1,18 @@
 #include "arch-specific.h"
-#include "microbitlib.h"
+#include "microbian.h"
+#include "hardware.h"
 
 /******************************************************************************/
 /************************ General operations **********************************/
 /******************************************************************************/
 
 void device_init(const char **argv) {
-  microbit_init();
+    /* timer_init(); */
+    /* serial_init(); */
 }
 
 void device_finish() {
-  delay(10);
+  /* delay_loop(10); */
 }
 
 /******************************************************************************/
@@ -20,29 +22,29 @@ void device_finish() {
 void debug_blink_error(void) {
   while(1) {
     char s[] = "E";
-    microbit_print_string(s);
-    delay(300);
+    //microbit_print_string(s);
+    delay_loop(300);
   }
 }
 
 void debug_blink_uncatched_exception(void) {
   while(1) {
     char s[] = "U";
-    microbit_print_string(s);
-    delay(300);
+    //microbit_print_string(s);
+    delay_loop(300);
   }
 }
 
 void debug_blink_message(int n) {
   char buf[50];
   sprintf(buf, "%d", n);
-  microbit_print_string(buf);
+  //microbit_print_string(buf);
 }
 
 void debug_blink_pause(void) {
   char s[] = "P";
-  microbit_print_string(s);
-  delay(1000);
+  //microbit_print_string(s);
+  delay_loop(1000);
 }
 
 #if DEBUG > 0
