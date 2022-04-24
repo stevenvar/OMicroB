@@ -4,11 +4,11 @@
 #include "hardware.h"
 #include "microbian.h"
 
-extern void main(void);
+extern int main(int, char**);
 
 void omicrob_task(int n) {
   timer_delay(10);
-  main();
+  main(0, NULL);
 }
 
 /* init -- main program, creates application processes */

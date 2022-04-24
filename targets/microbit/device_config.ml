@@ -29,13 +29,12 @@ module MicroBitConfig : DEVICECONFIG = struct
 
     let arm_o_file = (Filename.remove_extension input)^".arm_o" in
     let arm_elf_file = (Filename.remove_extension input)^".arm_elf" in
-    let arm_map_file = (Filename.remove_extension input)^".map" in
+    (* let arm_map_file = (Filename.remove_extension input)^".map" in *)
 
     (* Compile a .c into a .arm_o *)
     
     let conc_microbit s = Filename.concat microbitdir s in
     let cmd = [ Config.arm_cxx ] @ default_arm_cxx_options in
-    let cmd = cmd @ [ "--specs=nosys.specs" ] in
     let cmd = cmd @ [ "-D__MICROBIT__" ] in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "microbit" ] in
     let cmd = cmd @ [ "-o"; arm_o_file ] @ [ "-c"; input ] in
@@ -45,13 +44,14 @@ module MicroBitConfig : DEVICECONFIG = struct
 
     (* Compile a .arm_o into a .arm_elf *)
     let cmd = [ Config.arm_cxx ] @ default_arm_cxx_options in
+    let cmd = cmd @ [ "-specs=nosys.specs" ] in
     let cmd = cmd @ [ "-D__MICROBIT__" ] in
     let cmd = cmd @ [ "-T"; conc_microbit "nRF52833.ld"; "-nostdlib" ] in
     let cmd = cmd @ [ arm_o_file;
                       conc_microbit "startup.o";
                       conc_microbit "microbian.a"] in
-    let cmd = cmd @ [ "-lc"; "-lgcc" ] in
-    let cmd = cmd @ [ "-o" ; arm_elf_file; "-Wl,-Map,"^arm_map_file ] in
+    let cmd = cmd @ [ "-lc"; "-lgcc"; "-lnosys" ] in
+    let cmd = cmd @ [ "-o" ; arm_elf_file ] in
     List.iter (Printf.printf "%s ") cmd;
     run ~verbose cmd;
     Printf.printf "################## Compiled a .arm_o into a .arm_elf\n";
