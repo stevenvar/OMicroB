@@ -2,7 +2,6 @@ all: startup.o microbian.a mpx-m4.s
 
 CPU = -mcpu=cortex-m4 -mthumb
 CFLAGS = -Os -g -Wall -ffreestanding
-LDFLAGS = -Wl,--gc-sections
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
 

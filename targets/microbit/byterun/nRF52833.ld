@@ -69,6 +69,12 @@ SECTIONS {
         PROVIDE(spi1_handler = default_handler);
     } > FLASH
 
+    /DISCARD/ :
+    {
+        *(.ARM.exidx*)
+        *(.gnu.linkonce.armexidx.*)
+    }
+
     .xram : AT (LOADADDR(.text) + SIZEOF(.text)) {
         __xram_start = .;
         *(.xram*)
@@ -90,6 +96,7 @@ SECTIONS {
         . = ALIGN(4);
         __bss_end = .;
         __end = .;
+        end = __end;
     } > RAM
 
     /* Set stack top to end of RAM, and move stack limit down by
