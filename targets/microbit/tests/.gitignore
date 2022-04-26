@@ -1,3 +1,4 @@
 *.arm_elf
 *.arm_o
 *.c
+*.map

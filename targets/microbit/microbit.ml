@@ -4,7 +4,7 @@
 (*                                                                             *)
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
-(*
+
 type level = LOW | HIGH
 type _level = level
 
@@ -28,35 +28,35 @@ module ButtonB = struct
   let is_on () = button_is_pressed B
 end
 
-external pin_mode: pin -> mode -> unit = "caml_microbit_pin_mode" [@@noalloc]
+(* external pin_mode: pin -> mode -> unit = "caml_microbit_pin_mode" [@@noalloc] *)
 
-external digital_write: pin -> level -> unit = "caml_microbit_digital_write" [@@noalloc]
+(* external digital_write: pin -> level -> unit = "caml_microbit_digital_write" [@@noalloc] *)
 
-external unsafe_digital_read: pin -> bool = "caml_microbit_digital_read" [@@noalloc]
+(* external unsafe_digital_read: pin -> bool = "caml_microbit_digital_read" [@@noalloc] *)
 
-let digital_read p =
-  match unsafe_digital_read p with
-  | true -> HIGH
-  | false -> LOW
+(* let digital_read p = *)
+(*   match unsafe_digital_read p with *)
+(*   | true -> HIGH *)
+(*   | false -> LOW *)
 
-external unsafe_analog_write: pin -> int -> unit = "caml_microbit_analog_write" [@@noalloc]
+(* external unsafe_analog_write: pin -> int -> unit = "caml_microbit_analog_write" [@@noalloc] *)
 
-let analog_write p l =
-  if (l < 0 || l > 1024) then invalid_arg "analog_write: value should be between 0 and 1024";
-  if (p <> PIN0 && p <> PIN1 && p <> PIN2)
-  then invalid_arg "analog_write: only pins 0, 1, 2, 3, 4 and 10 are supported";
-  unsafe_analog_write p l
+(* let analog_write p l = *)
+(*   if (l < 0 || l > 1024) then invalid_arg "analog_write: value should be between 0 and 1024"; *)
+(*   if (p <> PIN0 && p <> PIN1 && p <> PIN2) *)
+(*   then invalid_arg "analog_write: only pins 0, 1, 2, 3, 4 and 10 are supported"; *)
+(*   unsafe_analog_write p l *)
 
-external unsafe_analog_read: pin -> int = "caml_microbit_analog_read" [@@noalloc]
+(* external unsafe_analog_read: pin -> int = "caml_microbit_analog_read" [@@noalloc] *)
 
-let analog_read p =
-  if (p <> PIN0 && p <> PIN1 && p <> PIN2)
-  then invalid_arg "analog_write: only pins 0, 1, 2, 3, 4 and 10 are supported";
-  unsafe_analog_read p
+(* let analog_read p = *)
+(*   if (p <> PIN0 && p <> PIN1 && p <> PIN2) *)
+(*   then invalid_arg "analog_write: only pins 0, 1, 2, 3, 4 and 10 are supported"; *)
+(*   unsafe_analog_read p *)
 
 external delay: int -> unit = "caml_delay" [@@noalloc]
 
-external millis : unit -> int = "caml_millis" [@@noalloc]
+(* external millis : unit -> int = "caml_millis" [@@noalloc] *)
 
 module Screen = struct
   let init () = ()
@@ -64,23 +64,22 @@ module Screen = struct
   let print_int i =
     print_string (string_of_int i)
   external clear_screen: unit -> unit = "caml_microbit_clear_screen" [@@noalloc]
-  external unsafe_print_image: bytes -> unit = "caml_microbit_print_image" [@@noalloc]
   external unsafe_set_pixel: int -> int -> bool -> unit = "caml_microbit_write_pixel" [@@noalloc]
 
   let print_newline () = ()
 
-  let print_image i =
-    if (List.length i) <> 5 then invalid_arg "print_image";
-    let b = Bytes.concat (Bytes.create 0) (List.rev (List.rev_map (fun r ->
-        if (List.length r) <> 5 then invalid_arg "print_image";
-        Bytes.init 5 (fun i -> if (List.nth r i) then Char.chr 255 else Char.chr 0)) i)) in
-    unsafe_print_image b
-
   let set_pixel x y l =
     if x < 0 || x > 4 || y < 0 || y > 4 then invalid_arg "write_pixel";
     unsafe_set_pixel x y l
+
+  let print_image i =
+    if (List.length i) <> 5 then invalid_arg "print_image";
+    List.iteri (fun y l ->
+        if List.length l <> 5 then invalid_arg "print_image";
+        List.iteri (fun x l -> set_pixel x y l) l) i
 end
 
+(*
 module Serial = struct
   let init () = ()
   external write_char: char -> unit = "caml_microbit_serial_write" [@@noalloc]

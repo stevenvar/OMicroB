@@ -5,7 +5,7 @@ CFLAGS = -Os -g -Wall -ffreestanding
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
 
-DRIVERS = serial.o timer.o i2c.o radio.o adc.o display.o
+DRIVERS = serial.o timer.o i2c.o radio.o adc.o display.o gpio.o
 MICROBIAN = microbian.o mpx-m4.o $(DRIVERS) lib.o
 
 AR = arm-none-eabi-ar

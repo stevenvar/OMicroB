@@ -109,6 +109,8 @@ unsigned timer_now(void);
 unsigned timer_micros(void);
 void timer_init(void);
 
+#define delay timer_delay
+
 /* i2c.c */
 int i2c_probe(int chan, int addr);
 int i2c_read_reg(int chan, int addr, int cmd);
@@ -131,8 +133,14 @@ void display_show(const unsigned *img);
 void display_init(void);
 extern const unsigned blank[];
 void image_clear(unsigned *img);
-void image_set(int x, int y, unsigned *img);
+void image_set(int x, int y, int l, unsigned *img);
+
 void microbit_write_pixel(int x, int y, int l);
+void microbit_clear_screen();
+void microbit_print_string(char *buf);
+
+/* gpio.c */
+int microbit_button_is_pressed(int b);
 
 /* adc.c */
 int adc_reading(int pin);

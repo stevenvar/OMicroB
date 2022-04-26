@@ -19,12 +19,11 @@ void microbit_analog_write(int p, int l);
 int microbit_analog_read(int p);
 
 /******************************************************************************/
-
+#endif
 void microbit_write_pixel(int x, int y, int l);
 void microbit_print_string(char *str);
-void microbit_print_image(char *str);
 void microbit_clear_screen();
-
+#if 0
 /******************************************************************************/
 
 int microbit_button_is_pressed(int b);

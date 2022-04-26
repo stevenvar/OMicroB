@@ -1,7 +1,7 @@
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
-#if 0
+
 #if defined(__OCAML__) || defined(__PC__) || defined(__MICROBIT__)
 
 #include "prims.h"
@@ -20,20 +20,7 @@ value caml_microbit_print_string(value s) {
 }
 
 value caml_microbit_write_pixel(value x, value y, value l) {
-  microbit_write_pixel(Int_val(x), Int_val(y), Int_val(l)*255);
-  return Val_unit;
-}
-
-value caml_microbit_print_image(value s) {
-  #ifdef __OCAML__
-  microbit_print_image(String_val(s));
-  #else
-  int n = string_length(s); int i;
-  char buf[n+1];
-  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
-  buf[n] = '\0';
-  microbit_print_image(buf);
-  #endif
+  microbit_write_pixel(Int_val(x), Int_val(y), Int_val(l));
   return Val_unit;
 }
 
@@ -46,6 +33,7 @@ value caml_microbit_button_is_pressed(value b) {
   return Val_bool(microbit_button_is_pressed(Int_val(b)));
 }
 
+#if 0
 value caml_microbit_pin_mode(value p, value m) {
   microbit_pin_mode(Int_val(p), Int_val(m));
   return Val_unit;

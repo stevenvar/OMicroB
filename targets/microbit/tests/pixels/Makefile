@@ -1,10 +1,10 @@
 include ../../../../etc/Makefile.conf
 
-TARGETS := mbbasic.elf mbbasic.hex
+TARGETS := mbpixels.elf mbpixels.hex
 
 all: $(TARGETS)
 
-$(TARGETS): mbbasic.ml
+$(TARGETS): mbpixels.ml
 	$(BIN)/omicrob -v -device=microbit $^ -o $@
 
 clean:

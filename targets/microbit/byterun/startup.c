@@ -16,6 +16,12 @@ void init(void) {
   serial_init();
   timer_init();
   display_init();
+
+  // Init some gpio
+  gpio_connect(BUTTON_A);
+  gpio_connect(BUTTON_B);
+
+  // Start the VM
   start("OMicroB", omicrob_task, 0, STACK);
 }
 

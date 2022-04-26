@@ -15,15 +15,6 @@ void microbit_write_pixel(int x, int y, int l) {
   else printf("Turning on pixel %d %d at level %d\n", x, y, l);
 }
 
-void microbit_print_image(char *str) {
-  for(int y = 0; y < 5; y++) {
-    for(int x = 0; x < 5; x++) {
-      printf("%d ", str[y*5+x]);
-    }
-    printf("\n");
-  }
-}
-
 void microbit_clear_screen() {}
 
 int microbit_button_is_pressed(int b) {
