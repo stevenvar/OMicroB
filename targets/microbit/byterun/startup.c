@@ -16,6 +16,7 @@ void init(void) {
   serial_init();
   timer_init();
   display_init();
+  i2c_init(I2C_INTERNAL);
 
   // Init some gpio
   gpio_connect(BUTTON_A);
