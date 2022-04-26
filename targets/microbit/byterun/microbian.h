@@ -1,9 +1,9 @@
 /* microbian.h */
 /* Copyright (c) 2018 J. M. Spivey */
 
-typedef unsigned char byte;
+#include <stddef.h>
 
-#define NULL ((void *) 0)
+typedef unsigned char byte;
 
 /* Standard pids */
 #define HARDWARE -1
@@ -101,6 +101,9 @@ void serial_putc(char ch);
 char serial_getc(void);
 void serial_init(void);
 
+#define microbit_serial_write serial_putc
+#define microbit_serial_read serial_getc
+
 /* timer.c */
 void timer_delay(int msec);
 void timer_pulse(int msec);
@@ -108,6 +111,8 @@ void timer_wait(void);
 unsigned timer_now(void);
 unsigned timer_micros(void);
 void timer_init(void);
+int millis(void);
+
 
 #define delay timer_delay
 

@@ -28,19 +28,19 @@ module ButtonB: Circuits.Button
 
 val delay: int -> unit
 
-(* val millis: unit -> int *)
+val millis: unit -> int
 
 module Screen: sig
   include Circuits.Display
   val set_pixel : int -> int -> bool -> unit
 end
-(*
+
 module Serial: sig
   val init: unit -> unit
   val write: string -> unit
   val read: unit -> string
 end
-*)
+
 (* module Accelerometer: sig
  *   val x: unit -> int
  *   (\** Returns the x acceleration in milli-gs *\)

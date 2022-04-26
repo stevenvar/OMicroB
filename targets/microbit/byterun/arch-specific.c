@@ -22,7 +22,7 @@ void device_finish() {
 void debug_blink_error(void) {
   while(1) {
     char s[] = "E";
-    //microbit_print_string(s);
+    microbit_print_string(s);
     delay_loop(300);
   }
 }
@@ -30,7 +30,7 @@ void debug_blink_error(void) {
 void debug_blink_uncatched_exception(void) {
   while(1) {
     char s[] = "U";
-    //microbit_print_string(s);
+    microbit_print_string(s);
     delay_loop(300);
   }
 }
@@ -38,20 +38,14 @@ void debug_blink_uncatched_exception(void) {
 void debug_blink_message(int n) {
   char buf[50];
   sprintf(buf, "%d", n);
-  //microbit_print_string(buf);
+  microbit_print_string(buf);
 }
 
 void debug_blink_pause(void) {
   char s[] = "P";
-  //microbit_print_string(s);
+  microbit_print_string(s);
   delay_loop(1000);
 }
-
-#if DEBUG > 0
-#define assert(x) do { if (!(x)) debug_blink_error();  } while(0);
-#else
-#define assert(x)
-#endif
 
 void uncaught_exception(value acc) {
   debug_blink_error();
