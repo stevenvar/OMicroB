@@ -56,7 +56,7 @@ end
 
 external delay: int -> unit = "caml_delay" [@@noalloc]
 
-(* external millis : unit -> int = "caml_millis" [@@noalloc] *)
+external millis : unit -> int = "caml_millis" [@@noalloc]
 
 module Screen = struct
   let init () = ()
@@ -79,7 +79,6 @@ module Screen = struct
         List.iteri (fun x l -> set_pixel x y l) l) i
 end
 
-(*
 module Serial = struct
   let init () = ()
   external write_char: char -> unit = "caml_microbit_serial_write" [@@noalloc]
@@ -95,7 +94,7 @@ module Serial = struct
       s := (!s^(String.make 1 !c))
     done; String.sub !s 0 (String.length !s - 1)
 end
-*)
+
 (* module Accelerometer = struct
  *   external x: unit -> int = "caml_microbit_accelerometer_x" [@@noalloc]
  *   external y: unit -> int = "caml_microbit_accelerometer_y" [@@noalloc]

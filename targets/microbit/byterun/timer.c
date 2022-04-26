@@ -18,8 +18,8 @@ static int TIMER_TASK;
 
 /* Millis will overflow in about 46 days, but that's long enough. */
 
-/* millis -- milliseconds since boot */
-static unsigned millis = 0;
+/* mills -- milliseconds since boot */
+static unsigned mills = 0;
 
 /* timer -- array of data for pending timer messages */
 static struct {
@@ -40,7 +40,7 @@ static void check_timers(void)
     message m;
 
     for (i = 0; i < MAX_TIMERS; i++) {
-        if (timer[i].client >= 0 && millis >= timer[i].next) {
+        if (timer[i].client >= 0 && mills >= timer[i].next) {
             m.int1 = timer[i].next;
             send(timer[i].client, PING, &m);
 
@@ -72,7 +72,7 @@ static void create(int client, int delay, int repeat)
        tick, then the effect is what is usually wanted. */
 
     timer[i].client = client;
-    timer[i].next = millis + delay;
+    timer[i].next = mills + delay;
     timer[i].period = repeat;
 }
 
@@ -81,7 +81,7 @@ void timer1_handler(void)
 {
     /* Update the time here so it is accessible to timer_micros */
     if (TIMER1.COMPARE[0]) {
-        millis += TICK;
+        mills += TICK;
         TIMER1.COMPARE[0] = 0;
         interrupt(TIMER_TASK);
     }
@@ -138,7 +138,7 @@ void timer_init(void)
 /* timer_now -- return current time in milliseconds since startup */
 unsigned timer_now(void)
 {
-    return millis;
+    return mills;
 }
 
 /* The result of timer_micros will overflow after 71 minutes, but even
@@ -165,13 +165,17 @@ unsigned timer_micros(void)
     TIMER1.CAPTURE[2] = 1;      /* Capture count afterwards */
     ticks1 = TIMER1.CC[1];
     ticks2 = TIMER1.CC[2];
-    my_millis = millis;
+    my_millis = mills;
     intr_enable();
 
     /* Correct my_millis if the timer expired */
     if (extra && ticks1 <= ticks2) my_millis += TICK;
 
     return 1000 * my_millis + ticks1;
+}
+
+int millis(void) {
+  return timer_micros() / 1000;
 }
 
 /* timer_delay -- one-shot delay */

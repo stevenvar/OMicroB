@@ -56,6 +56,7 @@ value caml_microbit_analog_write(value p, value l) {
 value caml_microbit_analog_read(value p) {
   return Val_int(microbit_analog_read(Int_val(p)));
 }
+#endif
 
 /******************************************************************************/
 
@@ -70,6 +71,7 @@ value caml_microbit_serial_read() {
 
 /******************************************************************************/
 
+#if 0
 value caml_microbit_accelerometer_x() {
   return Val_int(microbit_accelerometer_x());
 }
