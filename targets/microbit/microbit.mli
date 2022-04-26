@@ -41,22 +41,16 @@ module Serial: sig
   val read: unit -> string
 end
 
-(* module Accelerometer: sig
- *   val x: unit -> int
- *   (\** Returns the x acceleration in milli-gs *\)
- * 
- *   val y: unit -> int
- *   (\** Returns the y acceleration in milli-gs *\)
- * 
- *   val z: unit -> int
- *   (\** Returns the z acceleration in milli-gs *\)
- * 
- *   val pitch: unit -> int
- *   (\** Returns the pitch, in degrees *\)
- * 
- *   val roll: unit -> int
- *   (\** Returns the roll, in degrees *\)
- * end *)
+module Accelerometer: sig
+  val x: unit -> int
+  (** Returns the x acceleration in milli-gs *)
+
+  val y: unit -> int
+  (** Returns the y acceleration in milli-gs *)
+
+  val z: unit -> int
+  (** Returns the z acceleration in milli-gs *)
+end
 
 (* module Compass: sig
  *   val calibrate: unit -> unit

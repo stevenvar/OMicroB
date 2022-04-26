@@ -66,8 +66,6 @@ char microbit_serial_read() {
 int microbit_accelerometer_x() { return 0; }
 int microbit_accelerometer_y() { return 0; }
 int microbit_accelerometer_z() { return 0; }
-int microbit_accelerometer_pitch() { return 0; }
-int microbit_accelerometer_roll() { return 0; }
 
 /*****************************************************************************/
 

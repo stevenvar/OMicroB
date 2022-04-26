@@ -95,29 +95,27 @@ module Serial = struct
     done; String.sub !s 0 (String.length !s - 1)
 end
 
-(* module Accelerometer = struct
- *   external x: unit -> int = "caml_microbit_accelerometer_x" [@@noalloc]
- *   external y: unit -> int = "caml_microbit_accelerometer_y" [@@noalloc]
- *   external z: unit -> int = "caml_microbit_accelerometer_z" [@@noalloc]
- *   external pitch: unit -> int = "caml_microbit_accelerometer_pitch" [@@noalloc]
- *   external roll: unit -> int = "caml_microbit_accelerometer_roll" [@@noalloc]
- * end
- * 
- * module Compass = struct
- *   external calibrate: unit -> unit = "caml_microbit_compass_calibrate" [@@noalloc]
- *   external heading: unit -> int = "caml_microbit_compass_heading" [@@noalloc]
- * end
- * 
- * module Radio = struct
- *   external init: unit -> unit = "caml_microbit_radio_init"
- * 
- *   external unsafe_send: string -> unit = "caml_microbit_radio_send"
- *   let send s =
- *     if(String.length s > 32) then invalid_arg "Radio.send";
- *     unsafe_send s
- * 
- *   external recv: unit -> string = "caml_microbit_radio_recv"
- * end *)
+module Accelerometer = struct
+  external x: unit -> int = "caml_microbit_accelerometer_x" [@@noalloc]
+  external y: unit -> int = "caml_microbit_accelerometer_y" [@@noalloc]
+  external z: unit -> int = "caml_microbit_accelerometer_z" [@@noalloc]
+end
+
+(* module Compass = struct *)
+(*   external calibrate: unit -> unit = "caml_microbit_compass_calibrate" [@@noalloc] *)
+(*   external heading: unit -> int = "caml_microbit_compass_heading" [@@noalloc] *)
+(* end *)
+
+(* module Radio = struct *)
+(*   external init: unit -> unit = "caml_microbit_radio_init" *)
+
+(*   external unsafe_send: string -> unit = "caml_microbit_radio_send" *)
+(*   let send s = *)
+(*     if(String.length s > 32) then invalid_arg "Radio.send"; *)
+(*     unsafe_send s *)
+
+(*   external recv: unit -> string = "caml_microbit_radio_recv" *)
+(* end *)
 
 (* module MCUConnection = struct
  *   type pin = _pin

@@ -150,3 +150,9 @@ int microbit_button_is_pressed(int b);
 /* adc.c */
 int adc_reading(int pin);
 void adc_init(void);
+
+/* accel.c */
+
+int microbit_accelerometer_x();
+int microbit_accelerometer_y();
+int microbit_accelerometer_z();

@@ -71,7 +71,6 @@ value caml_microbit_serial_read() {
 
 /******************************************************************************/
 
-#if 0
 value caml_microbit_accelerometer_x() {
   return Val_int(microbit_accelerometer_x());
 }
@@ -84,16 +83,9 @@ value caml_microbit_accelerometer_z() {
   return Val_int(microbit_accelerometer_z());
 }
 
-value caml_microbit_accelerometer_pitch() {
-  return Val_int(microbit_accelerometer_pitch());
-}
-
-value caml_microbit_accelerometer_roll() {
-  return Val_int(microbit_accelerometer_roll());
-}
-
 /******************************************************************************/
 
+#if 0
 value caml_microbit_compass_calibrate() {
   microbit_compass_calibrate();
   return Val_unit;

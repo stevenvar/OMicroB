@@ -56,6 +56,7 @@ void accel_start(void)
 /* accel_reading -- obtain accelerometer reading */
 void accel_reading(int *x, int *y, int *z)
 {
+    if (accel == 0) accel_start();
     switch (accel) {
     case 1:
         acc1_read(x, y, z);
@@ -66,4 +67,22 @@ void accel_reading(int *x, int *y, int *z)
     default:
         panic("Unknown accelerometer");
     }
+}
+
+int microbit_accelerometer_x() {
+  int x, y, z;
+  accel_reading(&x, &y, &z);
+  return x;
+}
+
+int microbit_accelerometer_y() {
+  int x, y, z;
+  accel_reading(&x, &y, &z);
+  return y;
+}
+
+int microbit_accelerometer_z() {
+  int x, y, z;
+  accel_reading(&x, &y, &z);
+  return z;
 }

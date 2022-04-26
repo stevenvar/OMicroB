@@ -38,8 +38,6 @@ char microbit_serial_read();
 int microbit_accelerometer_x();
 int microbit_accelerometer_y();
 int microbit_accelerometer_z();
-int microbit_accelerometer_pitch();
-int microbit_accelerometer_roll();
 
 /******************************************************************************/
 
