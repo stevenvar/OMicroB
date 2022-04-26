@@ -4,7 +4,7 @@
 (*                                                                             *)
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
-(*
+
 type level = LOW | HIGH
 
 type pin = PIN0 | PIN1 | PIN2 | PIN8 | PIN12 | PIN16
@@ -16,25 +16,25 @@ module ButtonA: Circuits.Button
 
 module ButtonB: Circuits.Button
 
-val pin_mode: pin -> mode -> unit
+(* val pin_mode: pin -> mode -> unit *)
 
-val digital_write: pin -> level -> unit
+(* val digital_write: pin -> level -> unit *)
 
-val digital_read: pin -> level
+(* val digital_read: pin -> level *)
 
-val analog_write: pin -> int -> unit
+(* val analog_write: pin -> int -> unit *)
 
-val analog_read: pin -> int
+(* val analog_read: pin -> int *)
 
 val delay: int -> unit
 
-val millis: unit -> int
+(* val millis: unit -> int *)
 
 module Screen: sig
   include Circuits.Display
   val set_pixel : int -> int -> bool -> unit
 end
-
+(*
 module Serial: sig
   val init: unit -> unit
   val write: string -> unit
