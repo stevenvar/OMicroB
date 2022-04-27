@@ -47,7 +47,7 @@ static unsigned img_map[5][5] = {
 /* map_pixel -- find logical row and column for a pixel */
 static unsigned map_pixel(int x, int y)
 {
-    return img_map[y][x];
+    return img_map[4-y][x];
 }
 #endif
 
