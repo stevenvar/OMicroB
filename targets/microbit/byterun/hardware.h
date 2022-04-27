@@ -2,7 +2,6 @@
 /* Copyright (c) 2018-20 J. M. Spivey */
 
 #define UBIT 1
-#define UBIT_V2 1
 
 /* Hardware register definitions for nRF52833 */
 
@@ -33,6 +32,70 @@ argument to be a macro that expands the a 'position, width' pair. */
 
 #define __MASK0(wid)  (~((-2) << (wid-1)))
 
+#ifdef UBIT_V1
+
+/* Device pins */
+#define PAD19 0
+#define  I2C_SCL PAD19
+#define PAD2 1
+#define PAD1 2
+#define PAD0 3
+/* LED columns are GPIO 4-12 */
+#define PAD3 4
+#define PAD4 5
+#define PAD10 6
+#define PAD9 10
+#define PAD7 11
+#define PAD6 12
+#define ROW1 13
+#define ROW2 14
+#define ROW3 15
+#define PAD16 16
+#define PAD5 17
+#define  BUTTON_A PAD5
+#define PAD8 18
+#define PAD12 20
+#define PAD15 21
+#define   SPI_MOSI PAD15
+#define PAD14 22
+#define  SPI_MISO PAD14
+#define PAD13 23
+#define  SPI_SCK PAD13
+#define USB_TX 24
+#define USB_RX 25
+#define PAD11 26
+#define  BUTTON_B PAD11
+#define PAD20 30
+#define  I2C_SDA PAD20
+
+/* Only one I2C interface */
+#define I2C_INTERNAL 0
+#define I2C_EXTERNAL 0
+#define N_I2C 1
+
+
+/* Interrupts */
+#define SVC_IRQ    -5
+#define PENDSV_IRQ -2
+#define RADIO_IRQ   1
+#define UART_IRQ    2
+#define I2C_IRQ     3
+#define SPI_IRQ     4
+#define GPIOTE_IRQ  6
+#define ADC_IRQ     7
+#define TIMER0_IRQ  8
+#define TIMER1_IRQ  9
+#define TIMER2_IRQ 10
+#define RTC0_IRQ   11
+#define TEMP_IRQ   12
+#define RNG_IRQ    13
+#define RTC1_IRQ   17
+
+#define N_INTERRUPTS 32
+
+#endif
+
+#ifdef UBIT_V2
 
 /* Device pins */
 #define DEVPIN(p, i) ((p<<5) + i)
@@ -117,6 +180,8 @@ argument to be a macro that expands the a 'position, width' pair. */
 #define UART_IRQ UART0_IRQ
 #define uart_handler uart0_handler
 
+#endif
+
 /* Device register structures */
 
 /* The structure-like entities that describe hardware devices are in
@@ -198,6 +263,7 @@ _DEVICE _nvic {
 
 #define NVIC (* (volatile _DEVICE _nvic *) 0xe000e000)
 
+#ifdef UBIT_V2
 
 /* Systick timer */
 _DEVICE _systick {
@@ -230,6 +296,8 @@ _DEVICE _dwt {
 
 #define DWT (* (volatile _DEVICE _dwt *) 0xe0001000)
 
+#endif
+
 
 /* Clock control */
 _DEVICE _clock {
@@ -239,6 +307,10 @@ _DEVICE _clock {
     _REGISTER(unsigned LFCLKSTARTED, 0x104);
     _REGISTER(unsigned LFCLKSRC, 0x518);
 #define   CLOCK_LFCLKSRC_RC 0
+#ifdef UBIT_V1
+    _REGISTER(unsigned XTALFREQ, 0x550);
+#define   CLOCK_XTALFREQ_16MHz 0xFF
+#endif
 };
 
 #define CLOCK (* (volatile _DEVICE _clock *) 0x40000000)
@@ -310,11 +382,16 @@ _DEVICE _gpio {
 #define     GPIO_SENSE_Low 3
 };
 
+#ifdef UBIT_V1
+#define GPIO (* (volatile _DEVICE _gpio *) 0x50000500)
+#endif
+
+#ifdef UBIT_V2
 #define GPIO0 (* (volatile _DEVICE _gpio *) 0x50000500)
 #define GPIO1 (* (volatile _DEVICE _gpio *) 0x50000800)
 
 extern volatile _DEVICE _gpio * const GPIO[2]; /* defined in startup.c */
-
+#endif
 
 /* GPIOTE */
 
@@ -346,10 +423,12 @@ _DEVICE _gpiote {
 #define GPIOTE_INT_IN1 1
 #define GPIOTE_INT_IN2 2
 #define GPIOTE_INT_IN3 3
+#ifdef UBIT_V2
 #define GPIOTE_INT_IN4 4
 #define GPIOTE_INT_IN5 5
 #define GPIOTE_INT_IN6 6
 #define GPIOTE_INT_IN7 7
+#endif
 #define GPIOTE_INT_PORT 31
 
 #define GPIOTE (* (volatile _DEVICE _gpiote *) 0x40006000)
@@ -371,9 +450,11 @@ _DEVICE _ppi {
         unsigned volatile *TEP;       
     } CH[20], 0x510);
     _REGISTER(unsigned CHGRP[6], 0x800);
+    #ifdef UBIT_V2
     _REGISTER(struct {
         unsigned volatile *FORK;
     }, 0x910);
+    #endif
 };
 
 #define PPI (* (volatile _DEVICE _ppi *) 0x4001f000)
@@ -503,10 +584,18 @@ _DEVICE _timer {
 #define TIMER0 (* (volatile _DEVICE _timer *) 0x40008000)
 #define TIMER1 (* (volatile _DEVICE _timer *) 0x40009000)
 #define TIMER2 (* (volatile _DEVICE _timer *) 0x4000a000)
+#ifdef UBIT_V2
 #define TIMER3 (* (volatile _DEVICE _timer *) 0x4001a000)
 #define TIMER4 (* (volatile _DEVICE _timer *) 0x4001b000)
+#endif
 
+#ifdef UBIT_V1
+extern volatile _DEVICE _timer * const TIMER[3];
+#endif
+
+#ifdef UBIT_V2
 extern volatile _DEVICE _timer * const TIMER[5];
+#endif
 
 
 /* Random Number Generator */
@@ -600,10 +689,18 @@ _DEVICE _i2c {
 #define I2C_BB_SUSPEND 0
 #define I2C_BB_STOP 1
 
+#ifdef UBIT_V1
+#define I2C0 (* (volatile _DEVICE _i2c *) 0x40003000)
+
+extern volatile _DEVICE _i2c * const I2C[1];
+#endif
+
+#ifdef UBIT_V2
 #define I2C0 (* (volatile _DEVICE _i2c *) 0x40003000)
 #define I2C1 (* (volatile _DEVICE _i2c *) 0x40004000)
 
 extern volatile _DEVICE _i2c * const I2C[2];
+#endif
 
 
 /* UART */
@@ -656,6 +753,7 @@ _DEVICE _uart {
 
 #define UART (* (volatile _DEVICE _uart *) 0x40002000)
 
+#ifdef UBIT_V2
 
 /* UARTE -- UART with EasyDMA */
 _DEVICE _uarte {
@@ -747,6 +845,54 @@ _DEVICE _uarte {
 
 extern volatile _DEVICE _uarte * const UARTE[2];
 
+#endif
+
+#ifdef UBIT_V1
+
+/* ADC */
+_DEVICE _adc {
+/* Tasks */
+    _REGISTER(unsigned START, 0x000);
+    _REGISTER(unsigned STOP, 0x004);
+/* Events */
+    _REGISTER(unsigned END, 0x100);
+/* Registers */
+    _REGISTER(unsigned INTEN, 0x300);
+    _REGISTER(unsigned INTENSET, 0x304);
+    _REGISTER(unsigned INTENCLR, 0x308);
+    _REGISTER(unsigned BUSY, 0x400);
+    _REGISTER(unsigned ENABLE, 0x500);
+    _REGISTER(unsigned CONFIG, 0x504);
+#define   ADC_CONFIG_RES 0, 2
+#define     ADC_RES_8Bit 0
+#define     ADC_RES_9bit 1
+#define     ADC_RES_10bit 2
+#define   ADC_CONFIG_INPSEL 2, 3
+#define     ADC_INPSEL_AIn_1_1 0
+#define     ADC_INPSEL_AIn_2_3 1
+#define     ADC_INPSEL_AIn_1_3 2
+#define     ADC_INPSEL_Vdd_2_3 5
+#define     ADC_INPSEL_Vdd_1_3 6
+#define   ADC_CONFIG_REFSEL 5, 2
+#define     ADC_REFSEL_BGap 0
+#define     ADC_REFSEL_Ext 1
+#define     ADC_REFSEL_Vdd_1_2 2
+#define     ADC_REFSEL_Vdd_1_3 3
+#define   ADC_CONFIG_PSEL 8, 8
+#define   ADC_CONFIG_EXTREFSEL 16, 2
+#define     ADC_EXTREFSEL_Ref0 1
+#define     ADC_EXTREFSEL_Ref1 2
+    _REGISTER(unsigned RESULT, 0x508);
+};
+
+/* Interrupts */
+#define ADC_INT_END 0
+
+#define ADC (* (volatile _DEVICE _adc *) 0x40007000)
+
+#endif
+
+#ifdef UBIT_V2
 
 /* SAADC */
 _DEVICE _adc {
@@ -825,7 +971,6 @@ _DEVICE _adc {
 
 #define ADC (* (volatile _DEVICE _adc *) 0x40007000)
 
-    
 /* PWM */
 _DEVICE _pwm {                       
 /* Tasks */
@@ -903,6 +1048,9 @@ extern volatile _DEVICE _pwm * const PWM[4];
 #define RISING PWM_POLARITY_RisingEdge
 #define FALLING PWM_POLARITY_FallingEdge
 
+#endif
+
+// TODO integrate ubit 1 here
 
 /* NVIC stuff */
 
@@ -932,39 +1080,91 @@ void delay_loop(unsigned usec);
 
 /* gpio_dir -- set GPIO direction */
 static inline void gpio_dir(unsigned pin, unsigned dir) {
-    if (dir)
-        GPIO[PORT(pin)]->DIRSET = BIT(PIN(pin));
-    else
-        GPIO[PORT(pin)]->DIRCLR = BIT(PIN(pin));
+#ifdef UBIT_V1
+  if (dir) GPIO.DIRSET = BIT(pin);
+  else GPIO.DIRCLR = BIT(pin);
+#endif
+#ifdef UBIT_V2
+  if (dir) GPIO[PORT(pin)]->DIRSET = BIT(PIN(pin));
+  else GPIO[PORT(pin)]->DIRCLR = BIT(PIN(pin));
+#endif
 }
 
 /* gpio_connect -- connect pin for input */
 static inline void gpio_connect(unsigned pin) {
-    SET_FIELD(GPIO[PORT(pin)]->PINCNF[PIN(pin)],
-              GPIO_PINCNF_INPUT, GPIO_INPUT_Connect);
+#ifdef UBIT_V1
+  SET_FIELD(GPIO.PINCNF[pin], GPIO_PINCNF_INPUT, GPIO_INPUT_Connect);
+#endif
+#ifdef UBIT_V2
+  SET_FIELD(GPIO[PORT(pin)]->PINCNF[PIN(pin)],
+            GPIO_PINCNF_INPUT, GPIO_INPUT_Connect);
+#endif
 }
 
 /* gpio_drive -- set GPIO drive strength */
 static inline void gpio_drive(unsigned pin, unsigned mode) {
-    SET_FIELD(GPIO[PORT(pin)]->PINCNF[PIN(pin)],
-              GPIO_PINCNF_DRIVE, mode);
+#ifdef UBIT_V1
+  SET_FIELD(GPIO.PINCNF[pin], GPIO_PINCNF_DRIVE, mode);
+#endif
+#ifdef UBIT_V2
+  SET_FIELD(GPIO[PORT(pin)]->PINCNF[PIN(pin)],
+            GPIO_PINCNF_DRIVE, mode);
+#endif
 }
 
 /* gpio_out -- set GPIO output bit */
 static inline void gpio_out(unsigned pin, unsigned value) {
-    if (value)
-        GPIO[PORT(pin)]->OUTSET = BIT(PIN(pin));
-    else
-        GPIO[PORT(pin)]->OUTCLR = BIT(PIN(pin));
+#ifdef UBIT_V1
+  if (value) GPIO.OUTSET = BIT(pin);
+  else GPIO.OUTCLR = BIT(pin);
+#endif
+#ifdef UBIT_V2
+  if (value) GPIO[PORT(pin)]->OUTSET = BIT(PIN(pin));
+  else GPIO[PORT(pin)]->OUTCLR = BIT(PIN(pin));
+#endif
 }
 
 /* gpio_in -- get GPIO input bit */
 static inline unsigned gpio_in(unsigned pin) {
-    return GET_BIT(GPIO[PORT(pin)]->IN, PIN(pin));
+#ifdef UBIT_V1
+  return GET_BIT(GPIO.IN, pin);
+#endif
+#ifdef UBIT_V2
+  return GET_BIT(GPIO[PORT(pin)]->IN, PIN(pin));
+#endif
 }
 
 
 /* Image constants */
+
+#ifdef UBIT_V1
+
+#define NIMG 3
+
+typedef unsigned image[NIMG];
+
+#define __ROW(r, c1, c2, c3, c4, c5, c6, c7, c8, c9)                 \
+    (BIT(r) | !c1<<4 | !c2<<5 | !c3<<6 | !c4<<7 | !c5<<8             \
+     | !c6<<9 | !c7<<10 | !c8<<11 | !c9<<12)
+
+#define IMAGE(x11, x24, x12, x25, x13,                               \
+              x34, x35, x36, x37, x38,                               \
+              x22, x19, x23, x39, x21,                               \
+              x18, x17, x16, x15, x14,                               \
+              x33, x27, x31, x26, x32)                               \
+    { __ROW(ROW1, x11, x12, x13, x14, x15, x16, x17, x18, x19),      \
+      __ROW(ROW2, x21, x22, x23, x24, x25, x26, x27, 0, 0),          \
+      __ROW(ROW3, x31, x32, x33, x34, x35, x36, x37, x38, x39) }
+
+#define LED_MASK 0xfff0
+
+#define led_init()  GPIO.DIRSET = LED_MASK
+#define led_dot()   GPIO.OUTSET = 0x5fbf
+#define led_off()   GPIO.OUTCLR = LED_MASK
+
+#endif
+
+#ifdef UBIT_V2
 
 #define NIMG 10
 
@@ -993,6 +1193,7 @@ typedef unsigned image[NIMG];
 #define led_dot()   GPIO0.OUTSET = LED_DOT0, GPIO1.OUTSET = LED_DOT1
 #define led_off()   GPIO0.OUTCLR = LED_MASK0, GPIO1.OUTCLR = LED_MASK1
 
+#endif
 
 /* CODERAM -- mark function for copying to RAM */
 #define CODERAM  __attribute((noinline, section(".xram")))
@@ -1007,4 +1208,9 @@ typedef unsigned image[NIMG];
 #define syscall(op)     asm volatile ("svc %0" : : "i"(op))
 
 /* pause() -- disabled on V2 owing to long wakeup time */
+#ifdef UBIT_V1
+#define pause()         asm volatile ("wfe")
+#endif
+#ifdef UBIT_V2
 #define pause()         /* asm volatile ("wfe") */
+#endif

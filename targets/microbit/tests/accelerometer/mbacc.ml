@@ -2,10 +2,10 @@
 open Screen
 
 let pixel_of_g g =
-  if g < -50 then 0
-  else if g < -25 then 1
-  else if g < 25 then 2
-  else if g < 50 then 3
+  if g < -20 then 0
+  else if g < -10 then 1
+  else if g < 10 then 2
+  else if g < 20 then 3
   else 4
 
 let _ =
