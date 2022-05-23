@@ -4,7 +4,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#if 0
 /******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
@@ -15,15 +14,18 @@
 void microbit_pin_mode(int p, int m);
 void microbit_digital_write(int p, int l);
 int microbit_digital_read(int p);
+
+#if 0
 void microbit_analog_write(int p, int l);
 int microbit_analog_read(int p);
+#endif
 
 /******************************************************************************/
-#endif
+
 void microbit_write_pixel(int x, int y, int l);
 void microbit_print_string(char *str);
 void microbit_clear_screen();
-#if 0
+
 /******************************************************************************/
 
 int microbit_button_is_pressed(int b);
@@ -41,6 +43,7 @@ int microbit_accelerometer_z();
 
 /******************************************************************************/
 
+#if 0
 void microbit_compass_calibrate();
 int microbit_compass_heading();
 
@@ -59,7 +62,6 @@ int microbit_i2c_read(int a, char *buf);
 
 void microbit_spi_init();
 char microbit_spi_transmit(char c);
-
 #endif
 
 /******************************************************************************/

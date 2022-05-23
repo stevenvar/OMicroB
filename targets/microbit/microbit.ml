@@ -10,7 +10,7 @@ type _level = level
 
 type button = A | B
 
-type pin = PIN0 | PIN1 | PIN2 | PIN8 | PIN12 | PIN16
+type pin = PIN0 | PIN1 | PIN2
 type _pin = pin
 
 type mode = INPUT | OUTPUT
@@ -28,16 +28,11 @@ module ButtonB = struct
   let is_on () = button_is_pressed B
 end
 
-(* external pin_mode: pin -> mode -> unit = "caml_microbit_pin_mode" [@@noalloc] *)
+external pin_mode: pin -> mode -> unit = "caml_microbit_pin_mode" [@@noalloc]
 
-(* external digital_write: pin -> level -> unit = "caml_microbit_digital_write" [@@noalloc] *)
+external digital_write: pin -> level -> unit = "caml_microbit_digital_write" [@@noalloc]
 
-(* external unsafe_digital_read: pin -> bool = "caml_microbit_digital_read" [@@noalloc] *)
-
-(* let digital_read p = *)
-(*   match unsafe_digital_read p with *)
-(*   | true -> HIGH *)
-(*   | false -> LOW *)
+external digital_read: pin -> level = "caml_microbit_digital_read" [@@noalloc]
 
 (* external unsafe_analog_write: pin -> int -> unit = "caml_microbit_analog_write" [@@noalloc] *)
 

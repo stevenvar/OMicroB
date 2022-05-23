@@ -10,7 +10,7 @@ value caml_microbit_print_string(value s) {
   #ifdef __OCAML__
   microbit_print_string(String_val(s));
   #else
-  int n = string_length(s); int i;
+  int n = caml_string_length(s); int i;
   char buf[n+1];
   for(i = 0; i < n; i++) buf[i] = String_field(s, i);
   buf[n] = '\0';
@@ -33,7 +33,6 @@ value caml_microbit_button_is_pressed(value b) {
   return Val_bool(microbit_button_is_pressed(Int_val(b)));
 }
 
-#if 0
 value caml_microbit_pin_mode(value p, value m) {
   microbit_pin_mode(Int_val(p), Int_val(m));
   return Val_unit;
@@ -48,6 +47,7 @@ value caml_microbit_digital_read(value p) {
   return Val_bool(microbit_digital_read(Int_val(p)));
 }
 
+#if 0
 value caml_microbit_analog_write(value p, value l) {
   microbit_analog_write(Int_val(p), Int_val(l));
   return Val_unit;
