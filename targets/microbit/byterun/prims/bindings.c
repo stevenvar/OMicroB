@@ -94,23 +94,19 @@ value caml_microbit_compass_calibrate() {
 value caml_microbit_compass_heading() {
   return Val_int(microbit_compass_heading());
 }
+#endif
 
 /******************************************************************************/
 
-value caml_microbit_radio_init() {
-  microbit_radio_init();
-  return Val_unit;
-}
-
 value caml_microbit_radio_send(value s) {
 #ifdef __OCAML__
-  microbit_radio_send(String_val(s));
+  microbit_radio_send(String_val(s), caml_string_length(s));
 #else
-  int n = string_length(s);
+  int n = caml_string_length(s);
   char buf[n+1];
-  memcpy(buf, Ram_string_val(s), n);
+  for(int i = 0; i < n; i++) buf[i] = String_field(s, i);
   buf[n] = '\0';
-  microbit_radio_send(buf);
+  microbit_radio_send(buf, n);
 #endif
   return Val_unit;
 }
@@ -119,13 +115,15 @@ value caml_microbit_radio_recv() {
 #ifdef __OCAML__
   return alloc_string(0);
 #else
-  const char *buf = microbit_radio_recv();
+  char buf[128];
+  microbit_radio_recv(buf);
   return copy_bytes(buf);
 #endif
 }
 
 /******************************************************************************/
 
+#if 0
 value caml_microbit_i2c_init() {
   microbit_i2c_init();
   return Val_unit;

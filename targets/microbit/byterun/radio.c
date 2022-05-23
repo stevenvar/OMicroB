@@ -187,6 +187,10 @@ void radio_send(void *buf, int n)
     sendrec(RADIO_TASK, SEND, &m);
 }
 
+void microbit_radio_send(void *buf, int n) {
+  radio_send(buf, n);
+}
+
 /* radio_receive -- receive radio packet and return length */
 int radio_receive(void *buf)
 {
@@ -195,6 +199,10 @@ int radio_receive(void *buf)
     m.ptr1 = buf;
     sendrec(RADIO_TASK, RECEIVE, &m);
     return m.int1;
+}
+
+void microbit_radio_recv(char *buf) {
+  radio_receive(buf);
 }
     
 /* radio_init -- start device driver */

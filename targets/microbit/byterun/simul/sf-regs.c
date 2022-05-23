@@ -76,13 +76,11 @@ int microbit_compass_heading() { return 0; }
 
 void microbit_radio_init() {}
 
-void microbit_radio_send(char *s) {
+void microbit_radio_send(char *s, int n) {
   printf("Sending %s by radio\n", s);
 }
 
-const char *microbit_radio_recv() {
-  return "a";
-}
+void microbit_radio_recv(char *buf) {}
 
 /*****************************************************************************/
 

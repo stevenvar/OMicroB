@@ -101,16 +101,14 @@ end
 (*   external heading: unit -> int = "caml_microbit_compass_heading" [@@noalloc] *)
 (* end *)
 
-(* module Radio = struct *)
-(*   external init: unit -> unit = "caml_microbit_radio_init" *)
+module Radio = struct
+  external unsafe_send: string -> unit = "caml_microbit_radio_send"
+  let send s =
+    if(String.length s > 32) then invalid_arg "Radio.send";
+    unsafe_send s
 
-(*   external unsafe_send: string -> unit = "caml_microbit_radio_send" *)
-(*   let send s = *)
-(*     if(String.length s > 32) then invalid_arg "Radio.send"; *)
-(*     unsafe_send s *)
-
-(*   external recv: unit -> string = "caml_microbit_radio_recv" *)
-(* end *)
+  external recv: unit -> string = "caml_microbit_radio_recv"
+end
 
 (* module MCUConnection = struct
  *   type pin = _pin

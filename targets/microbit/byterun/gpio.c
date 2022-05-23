@@ -6,6 +6,7 @@ int pad_of_pin(int pin) {
     case 0: return PAD0;
     case 1: return PAD1;
     case 2: return PAD2;
+    default: return 0;
   }
 }
 

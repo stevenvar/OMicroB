@@ -61,11 +61,10 @@ end
  * end *)
 
 (** Radio communication *)
-(* module Radio: sig
- *   val init: unit -> unit
- *   val send: string -> unit
- *   val recv: unit -> string
- * end *)
+module Radio: sig
+  val send: string -> unit
+  val recv: unit -> string
+end
 
 (* module MCUConnection: Circuits.MCUConnection with type pin = pin with type level = level
  * 
