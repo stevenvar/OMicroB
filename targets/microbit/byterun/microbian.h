@@ -146,6 +146,9 @@ void microbit_print_string(char *buf);
 
 /* gpio.c */
 int microbit_button_is_pressed(int b);
+void microbit_pin_mode(int pin, int mode);
+void microbit_digital_write(int pin, int level);
+int microbit_digital_read(int pin);
 
 /* adc.c */
 int adc_reading(int pin);

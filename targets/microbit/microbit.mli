@@ -7,7 +7,7 @@
 
 type level = LOW | HIGH
 
-type pin = PIN0 | PIN1 | PIN2 | PIN8 | PIN12 | PIN16
+type pin = PIN0 | PIN1 | PIN2
 
 type mode = INPUT | OUTPUT
 type _mode = mode
@@ -16,11 +16,11 @@ module ButtonA: Circuits.Button
 
 module ButtonB: Circuits.Button
 
-(* val pin_mode: pin -> mode -> unit *)
+val pin_mode: pin -> mode -> unit
 
-(* val digital_write: pin -> level -> unit *)
+val digital_write: pin -> level -> unit
 
-(* val digital_read: pin -> level *)
+val digital_read: pin -> level
 
 (* val analog_write: pin -> int -> unit *)
 
