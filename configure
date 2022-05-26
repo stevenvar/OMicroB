@@ -24,8 +24,8 @@ function usage () {
                      (default: /usr/local/man)
  -prefix <dir>       Set bindir, libdir, libexecdir includedir and mandir to <dir>/bin, <dir>/lib/omicrob,
                      <dir>/libexec/omicrob, <dir>/include/omicrob and <dir>/man respectively
- -target <opt>       Select for which target OMicroB will be installed
-                     (e.g. -target pic32|avr|esp)"
+ -target <opt>       Select one target for which OMicroB will be installed
+                     (e.g. -target avr|pic32)"
 }
 
 function check_command () {
@@ -102,7 +102,7 @@ LIBDIR=/usr/local/lib/omicrob
 LIBEXECDIR=/usr/local/libexec/omicrob
 INCLUDEDIR=/usr/local/include/omicrob
 MANDIR=/usr/local/man
-TARGET=""
+TARGETS=()
 
 while [ $# -ne 0 ]; do
     case "$1" in
@@ -130,7 +130,7 @@ while [ $# -ne 0 ]; do
             INCLUDEDIR="$PREFIX/include/omicrob"
             MANDIR="$PREFIX/man" ;;
         -target)
-            TARGET="$2";;
+            TARGETS+=($2);;
         *)
         usage "Don't know what to do with \"$1\""
     esac
@@ -269,9 +269,18 @@ function target_pic32 () {
 
 
 ################################################################################
-## Choose your targets
+## Choose targets
 
-target_avr
+for target in ${TARGETS[@]}
+do
+    case "$target" in
+        avr) target_avr;;
+        pic32) target_pic32;;
+    *) echo "Unsupported target \"$target\""
+    esac
+done
+
+# target_avr
 
 ################################################################################
 
