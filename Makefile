@@ -56,9 +56,9 @@ install: all
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
 	cp -a src/byterun/simul "$(INCLUDEDIR)/"
-	cp -a src/byterun/avr "$(INCLUDEDIR)" 2> /dev/null || :
-	cp -a src/byterun/pic32 "$(INCLUDEDIR)/" 2> /dev/null || :
-	cp -a src/byterun/microbit "$(INCLUDEDIR)/" 2> /dev/null || :
+	cp -Lpr src/byterun/avr "$(INCLUDEDIR)" 2> /dev/null || :
+	cp -Lpr src/byterun/pic32 "$(INCLUDEDIR)/" 2> /dev/null || :
+	cp -Lpr src/byterun/microbit "$(INCLUDEDIR)/" 2> /dev/null || :
 	cp -a src/byterun/stdlib "$(INCLUDEDIR)/"
 
 uninstall:
