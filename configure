@@ -72,7 +72,7 @@ check_command "sed"
 check_command "cp"
 check_command "rm"
 check_command "ar"
-check_command "cp"
+check_command "ln"
 
 check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam install obytelib)"
 
@@ -231,8 +231,8 @@ function target_avr () {
     cat "targets/avr/device_config.ml" >> "src/omicrob/device_config.ml"
 
     mkdir -p "src/byterun/avr"
-    cp -f "targets/avr/arch-specific.c" "src/byterun/avr/"
-    cp -f "targets/avr/arch-specific.h" "src/byterun/avr/"
+    ln -srf "targets/avr/arch-specific.c" "src/byterun/avr/"
+    ln -srf "targets/avr/arch-specific.h" "src/byterun/avr/"
 
     cat "targets/avr/prims/prims.h" >> "src/byterun/prims/prims.h"
     cat "targets/avr/prims/bindings.c" >> "src/byterun/prims/bindings.c"
@@ -242,7 +242,7 @@ function target_avr () {
     for f in "arduboy" "arduino_uno" "arduino_mega_2560"
     do
         mkdir -p "src/byterun/avr/$f/"
-        cp -f "targets/avr/$f/avrlib.c" "src/byterun/avr/$f/"
+        ln -srf "targets/avr/$f/avrlib.c" "src/byterun/avr/$f/"
     done
 
     echo "avr \\" >> etc/Makefile.conf
@@ -285,7 +285,7 @@ function target_microbit () {
     cat "targets/microbit/byterun/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
     cat "targets/microbit/byterun/simul/sf-regs.c" >> "src/byterun/simul/sf-regs.c"
 
-    cp -rf "targets/microbit/byterun" "src/byterun/microbit"
+    ln -srf "targets/microbit/byterun" "src/byterun/microbit"
 
     echo "microbit \\" >> "etc/Makefile.conf"
 }
