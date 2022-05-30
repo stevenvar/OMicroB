@@ -1,12 +1,16 @@
 include ../../../etc/Makefile.conf
 
-uno: light.ml
-	$(BIN)/omicrob -v -device=arduino-uno -circuitppx $^ -o light.hex
+DEVICE ?= arduino-uno
 
-flash-uno: uno
-	$(BIN)/omicrob -v -device=arduino-uno -flash -sudo light.hex
+all: light.hex
+
+light.hex: light.ml
+	$(BIN)/omicrob -v -device=$(DEVICE) -circuitppx $^ -o $@
+
+flash: light.hex
+	$(BIN)/omicrob -v -device=$(DEVICE) -flash -sudo $^
 
 clean:
-	rm -rf *.cmi *.cmo *.byte *.c *.arm_o *.elf *.arm_elf *.hex *.combined_hex *.avr
+	rm -rf *.cmi *.cmo *.byte *.c *.arm_o *.elf *.arm_elf *.hex *.avr
 
-.PHONY: clean uno flash-uno
+.PHONY: all flash clean
