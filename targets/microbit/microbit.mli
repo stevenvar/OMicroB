@@ -7,7 +7,26 @@
 
 type level = LOW | HIGH
 
-type pin = PIN0 | PIN1 | PIN2
+type 'a pin =
+  | PIN0  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN1  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN2  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN3  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN4  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN5  : [< `DREAD | `DWRITE | `PWM | `BUTTON_A ] pin
+  | PIN6  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN7  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN8  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN9  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN10 : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN11 : [< `DREAD | `DWRITE | `PWM | `BUTTON_B ] pin
+  | PIN12 : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN13 : [< `DREAD | `DWRITE | `PWM | `SCK ] pin
+  | PIN14 : [< `DREAD | `DWRITE | `PWM | `MISO ] pin
+  | PIN15 : [< `DREAD | `DWRITE | `PWM | `MOSI ] pin
+  | PIN16 : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN19 : [< `DREAD | `DWRITE | `PWM | `SCL ] pin
+  | PIN20 : [< `DREAD | `DWRITE | `PWM | `SDA ] pin
 
 type mode = INPUT | OUTPUT
 type _mode = mode
@@ -16,11 +35,11 @@ module ButtonA: Circuits.Button
 
 module ButtonB: Circuits.Button
 
-val pin_mode: pin -> mode -> unit
+val pin_mode: 'a pin -> mode -> unit
 
-val digital_write: pin -> level -> unit
+val digital_write: [ `DWRITE ] pin -> level -> unit
 
-val digital_read: pin -> level
+val digital_read: [ `DREAD ] pin -> level
 
 (* val analog_write: pin -> int -> unit *)
 
