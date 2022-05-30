@@ -43,7 +43,7 @@ val digital_read: [ `DREAD ] pin -> level
 
 (* val analog_write: pin -> int -> unit *)
 
-(* val analog_read: pin -> int *)
+val analog_read: [ `AREAD ] pin -> int
 
 val delay: int -> unit
 

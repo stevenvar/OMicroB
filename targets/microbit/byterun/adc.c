@@ -132,3 +132,7 @@ void adc_init(void)
 {
     ADC_TASK = start("ADC", adc_task, 0, 256);
 }
+
+int microbit_analog_read(int pin) {
+  return adc_reading(pad_of_pin(pin));
+}

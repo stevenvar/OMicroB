@@ -52,11 +52,11 @@ value caml_microbit_analog_write(value p, value l) {
   microbit_analog_write(Int_val(p), Int_val(l));
   return Val_unit;
 }
+#endif
 
 value caml_microbit_analog_read(value p) {
   return Val_int(microbit_analog_read(Int_val(p)));
 }
-#endif
 
 /******************************************************************************/
 

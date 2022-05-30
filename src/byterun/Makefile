@@ -24,16 +24,16 @@ $(LIB)/libcamlrun.a: $(OBJECTS)
 .build/%.o: prims/%.c $(HEADERS)
 	mkdir -p .build/
 	$(OCAMLC) -c -ccopt -Wall -ccopt -D__OCAML__ $<
-	mv $*.o .build/
+	mv -f $*.o .build/
 
 .build/%.o: stdlib/%.c $(HEADERS)
 	mkdir -p .build/
 	$(OCAMLC) -c -ccopt -Wall -ccopt -D__OCAML__ $<
-	mv $*.o .build/
+	mv -f $*.o .build/
 
 .build/%.o: simul/%.c $(HEADERS)
 	$(OCAMLC) -c -ccopt -Wall -ccopt -D__OCAML__ $<
-	mv $*.o .build/
+	mv -f $*.o .build/
 
 clean:
 	@rm -Rf .build/ $(TARGETS)
