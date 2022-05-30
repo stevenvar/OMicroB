@@ -56,8 +56,10 @@ end
 
 module Serial: sig
   val init: unit -> unit
-  val write: string -> unit
-  val read: unit -> string
+  val read: unit -> char
+  val write: char -> unit
+  val write_string: string -> unit
+  val read_string: unit -> string
 end
 
 module Accelerometer: sig

@@ -88,16 +88,16 @@ end
 
 module Serial = struct
   let init () = ()
-  external write_char: char -> unit = "caml_microbit_serial_write" [@@noalloc]
-  let write s = String.iter write_char s
+  external write: char -> unit = "caml_microbit_serial_write" [@@noalloc]
+  let write_string s = String.iter write s
 
-  external read_char: unit -> char = "caml_microbit_serial_read" [@@noalloc]
-  let read () =
+  external read: unit -> char = "caml_microbit_serial_read" [@@noalloc]
+  let read_string () =
     let s = ref ""
-    and c = ref (read_char ()) in
+    and c = ref (read ()) in
     s := (!s^(String.make 1 !c));
     while((int_of_char !c) <> 0 && !c <> '\n' && !c <> '\r') do
-      c := (read_char ());
+      c := (read ());
       s := (!s^(String.make 1 !c))
     done; String.sub !s 0 (String.length !s - 1)
 end
