@@ -18,6 +18,7 @@ void init(void) {
   display_init();
   radio_init();
   i2c_init(I2C_INTERNAL);
+  adc_init();
 
   // Init some gpio
   gpio_connect(BUTTON_A);

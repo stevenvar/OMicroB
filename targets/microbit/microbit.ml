@@ -61,12 +61,7 @@ external digital_read: [ `DREAD ] pin -> level = "caml_microbit_digital_read" [@
 (*   then invalid_arg "analog_write: only pins 0, 1, 2, 3, 4 and 10 are supported"; *)
 (*   unsafe_analog_write p l *)
 
-(* external unsafe_analog_read: pin -> int = "caml_microbit_analog_read" [@@noalloc] *)
-
-(* let analog_read p = *)
-(*   if (p <> PIN0 && p <> PIN1 && p <> PIN2) *)
-(*   then invalid_arg "analog_write: only pins 0, 1, 2, 3, 4 and 10 are supported"; *)
-(*   unsafe_analog_read p *)
+external analog_read: [ `AREAD ] pin -> int = "caml_microbit_analog_read" [@@noalloc]
 
 external delay: int -> unit = "caml_delay" [@@noalloc]
 
