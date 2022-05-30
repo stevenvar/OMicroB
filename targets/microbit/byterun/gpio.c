@@ -3,10 +3,26 @@
 
 int pad_of_pin(int pin) {
   switch(pin) {
-    case 0: return PAD0;
-    case 1: return PAD1;
-    case 2: return PAD2;
-    default: return 0;
+  case  0: return PAD0;
+  case  1: return PAD1;
+  case  2: return PAD2;
+  case  3: return PAD3;
+  case  4: return PAD4;
+  case  5: return PAD5;
+  case  6: return PAD6;
+  case  7: return PAD7;
+  case  8: return PAD8;
+  case  9: return PAD9;
+  case 10: return PAD10;
+  case 11: return PAD11;
+  case 12: return PAD12;
+  case 13: return PAD13;
+  case 14: return PAD14;
+  case 15: return PAD15;
+  case 16: return PAD16;
+  case 19: return PAD19;
+  case 20: return PAD20;
+  default: return 0;
   }
 }
 

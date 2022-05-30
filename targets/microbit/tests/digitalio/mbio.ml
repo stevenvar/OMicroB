@@ -1,13 +1,14 @@
 open Screen
 
 let _ =
-  pin_mode PIN0 INPUT;
-  pin_mode PIN1 OUTPUT;
+  let pinin = PIN6 and pinout = PIN13 in
+  pin_mode pinin INPUT;
+  pin_mode pinout OUTPUT;
 
   while true do
-    digital_write PIN1
+    digital_write pinout
       (if ((millis () mod 1000) < 500) then HIGH else LOW);
-    let l = digital_read PIN0 in
-    set_pixel 2 2 (match l with HIGH -> true | _ -> false);
+    let l = digital_read pinin in
+    set_pixel 2 2 (match l with HIGH -> true | LOW -> false);
     delay 100
   done

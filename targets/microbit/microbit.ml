@@ -10,8 +10,27 @@ type _level = level
 
 type button = A | B
 
-type pin = PIN0 | PIN1 | PIN2
-type _pin = pin
+type 'a pin =
+  | PIN0  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN1  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN2  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN3  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN4  : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN5  : [< `DREAD | `DWRITE | `PWM | `BUTTON_A ] pin
+  | PIN6  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN7  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN8  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN9  : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN10 : [< `DREAD | `DWRITE | `PWM | `AREAD ] pin
+  | PIN11 : [< `DREAD | `DWRITE | `PWM | `BUTTON_B ] pin
+  | PIN12 : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN13 : [< `DREAD | `DWRITE | `PWM | `SCK ] pin
+  | PIN14 : [< `DREAD | `DWRITE | `PWM | `MISO ] pin
+  | PIN15 : [< `DREAD | `DWRITE | `PWM | `MOSI ] pin
+  | PIN16 : [< `DREAD | `DWRITE | `PWM ] pin
+  | PIN19 : [< `DREAD | `DWRITE | `PWM | `SCL ] pin
+  | PIN20 : [< `DREAD | `DWRITE | `PWM | `SDA ] pin
+type 'a _pin = 'a pin
 
 type mode = INPUT | OUTPUT
 type _mode = mode
@@ -28,11 +47,11 @@ module ButtonB = struct
   let is_on () = button_is_pressed B
 end
 
-external pin_mode: pin -> mode -> unit = "caml_microbit_pin_mode" [@@noalloc]
+external pin_mode: 'a pin -> mode -> unit = "caml_microbit_pin_mode" [@@noalloc]
 
-external digital_write: pin -> level -> unit = "caml_microbit_digital_write" [@@noalloc]
+external digital_write: [ `DWRITE ] pin -> level -> unit = "caml_microbit_digital_write" [@@noalloc]
 
-external digital_read: pin -> level = "caml_microbit_digital_read" [@@noalloc]
+external digital_read: [ `DREAD ] pin -> level = "caml_microbit_digital_read" [@@noalloc]
 
 (* external unsafe_analog_write: pin -> int -> unit = "caml_microbit_analog_write" [@@noalloc] *)
 
