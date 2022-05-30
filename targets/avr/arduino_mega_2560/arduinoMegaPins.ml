@@ -437,3 +437,23 @@ let pin_change_callback p closure =
   let input = input_of_pin p in
   let bit = input_bit_of_pin p in
   do_pin_change_callback input bit closure
+
+type 'a _pin = 'a pin
+type _mode = mode
+type _level = level
+module MCUConnection = struct
+  type 'a pin = 'a _pin
+  type mode = _mode
+  type level = _level
+  let low = LOW
+  let high = HIGH
+  let input_mode = INPUT
+  let output_mode = OUTPUT
+  let digital_read = digital_read
+  let digital_write = digital_write
+  let analog_read = analog_read
+  let analog_write _ _ = failwith "Not implemented"
+  let pin_mode = pin_mode
+  let delay = delay
+  let millis = millis
+end

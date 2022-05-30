@@ -85,10 +85,10 @@ module Radio: sig
   val recv: unit -> string
 end
 
-(* module MCUConnection: Circuits.MCUConnection with type pin = pin with type level = level
- * 
- * (\** I2C communication for the micro:bit *\)
- * module I2C(A: sig val address: int end): Circuits.I2C
- * 
- * (\** SPI communication for the micro:bit *\)
- * module MakeSPIMaster(SC: sig val slavePin: pin end): Circuits.SPI *)
+module MCUConnection: Circuits.MCUConnection with type 'a pin = 'a pin with type level = level
+
+(** I2C communication for the micro:bit *)
+(* module I2C(A: sig val address: int end): Circuits.I2C *)
+
+(* (\** SPI communication for the micro:bit *\) *)
+(* module MakeSPIMaster(SC: sig val slavePin: pin end): Circuits.SPI *)

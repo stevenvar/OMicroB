@@ -122,22 +122,22 @@ module Radio = struct
   external recv: unit -> string = "caml_microbit_radio_recv"
 end
 
-(* module MCUConnection = struct
- *   type pin = _pin
- *   type mode = _mode
- *   type level = _level
- *   let low = LOW
- *   let high = HIGH
- *   let input_mode = INPUT
- *   let output_mode = OUTPUT
- *   let digital_read = digital_read
- *   let digital_write = digital_write
- *   let analog_read = analog_read
- *   let analog_write = analog_write
- *   let pin_mode = pin_mode
- *   let delay = delay
- *   let millis = millis
- * end *)
+module MCUConnection = struct
+  type 'a pin = 'a _pin
+  type mode = _mode
+  type level = _level
+  let low = LOW
+  let high = HIGH
+  let input_mode = INPUT
+  let output_mode = OUTPUT
+  let digital_read = digital_read
+  let digital_write = digital_write
+  let analog_read = analog_read
+  let analog_write = analog_write
+  let pin_mode = pin_mode
+  let delay = delay
+  let millis = millis
+end
 
 (* module I2C(A: sig val address: int end) = struct
  *   external init: unit -> unit = "caml_microbit_i2c_init"

@@ -77,6 +77,9 @@ type 'a pin =
   | PINA13 : [< `DREAD | `DWRITE | `AREAD ] pin
   | PINA14 : [< `DREAD | `DWRITE | `AREAD ] pin
   | PINA15 : [< `DREAD | `DWRITE | `AREAD ] pin
+
 include AvrPins
   with type register := register
   with type 'a pin := 'a pin
+
+module MCUConnection: Circuits.MCUConnection with type 'a pin = 'a pin with type level = level
