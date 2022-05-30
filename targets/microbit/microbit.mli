@@ -41,7 +41,7 @@ val digital_write: [ `DWRITE ] pin -> level -> unit
 
 val digital_read: [ `DREAD ] pin -> level
 
-(* val analog_write: pin -> int -> unit *)
+val analog_write: [ `PWM ] pin -> int -> unit
 
 val analog_read: [ `AREAD ] pin -> int
 

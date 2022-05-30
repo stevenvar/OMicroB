@@ -19,6 +19,7 @@ void init(void) {
   radio_init();
   i2c_init(I2C_INTERNAL);
   adc_init();
+  pwm_init();
 
   // Init some gpio
   gpio_connect(BUTTON_A);
@@ -164,10 +165,6 @@ volatile _DEVICE _i2c * const I2C[2] = {
 
 volatile _DEVICE _timer * const TIMER[5] = {
     &TIMER0, &TIMER1, &TIMER2, &TIMER3, &TIMER4
-};
-
-volatile _DEVICE _pwm * const PWM[4] = {
-    &PWM0, &PWM1, &PWM2, &PWM3
 };
 #endif
 

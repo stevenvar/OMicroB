@@ -155,6 +155,10 @@ int microbit_digital_read(int pin);
 int adc_reading(int pin);
 void adc_init(void);
 
+/* pwm.c */
+void pwm_init(void);
+void microbit_analog_write(int pin, int l);
+
 /* accel.c */
 
 int microbit_accelerometer_x();

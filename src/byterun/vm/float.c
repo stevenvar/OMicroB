@@ -218,6 +218,10 @@ value caml_div_float(value v1, value v2) {
   return Val_float(Float_val(v1) / Float_val(v2));
 }
 
+value caml_fmod_float(value v1, value v2) {
+  return Val_float(fmod(Float_val(v1), Float_val(v2)));
+}
+
 value caml_sub_float(value v1, value v2){
   return Val_float(Float_val(v1) - Float_val(v2));
 }
