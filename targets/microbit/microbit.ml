@@ -53,13 +53,11 @@ external digital_write: [ `DWRITE ] pin -> level -> unit = "caml_microbit_digita
 
 external digital_read: [ `DREAD ] pin -> level = "caml_microbit_digital_read" [@@noalloc]
 
-(* external unsafe_analog_write: pin -> int -> unit = "caml_microbit_analog_write" [@@noalloc] *)
+external unsafe_analog_write: [ `PWM ] pin -> int -> unit = "caml_microbit_analog_write" [@@noalloc]
 
-(* let analog_write p l = *)
-(*   if (l < 0 || l > 1024) then invalid_arg "analog_write: value should be between 0 and 1024"; *)
-(*   if (p <> PIN0 && p <> PIN1 && p <> PIN2) *)
-(*   then invalid_arg "analog_write: only pins 0, 1, 2, 3, 4 and 10 are supported"; *)
-(*   unsafe_analog_write p l *)
+let analog_write p l =
+  if (l < 0 || l >= 1024) then invalid_arg "analog_write: value should be between 0 and 1024";
+  unsafe_analog_write p l
 
 external analog_read: [ `AREAD ] pin -> int = "caml_microbit_analog_read" [@@noalloc]
 

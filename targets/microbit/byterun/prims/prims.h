@@ -15,9 +15,7 @@ void microbit_pin_mode(int p, int m);
 void microbit_digital_write(int p, int l);
 int microbit_digital_read(int p);
 
-#if 0
 void microbit_analog_write(int p, int l);
-#endif
 int microbit_analog_read(int p);
 
 /******************************************************************************/

@@ -971,86 +971,10 @@ _DEVICE _adc {
 
 #define ADC (* (volatile _DEVICE _adc *) 0x40007000)
 
-/* PWM */
-_DEVICE _pwm {                       
-/* Tasks */
-    _REGISTER(unsigned STOP, 0x004);
-    _REGISTER(unsigned SEQSTART[2], 0x008);
-    _REGISTER(unsigned NEXTSTEP, 0x010);
-/* Events */
-    _REGISTER(unsigned STOPPED, 0x104);
-    _REGISTER(unsigned SEQSTARTED[2], 0x108);
-    _REGISTER(unsigned SEQEND[2], 0x110);
-    _REGISTER(unsigned PWMPERIODEND, 0x118);
-    _REGISTER(unsigned LOOPSDONE, 0x11c);
-/* Registers */
-    _REGISTER(unsigned SHORTS, 0x200);
-    _REGISTER(unsigned INTEN, 0x300);
-    _REGISTER(unsigned INTENSET, 0x304);
-    _REGISTER(unsigned INTENCLR, 0x308);
-    _REGISTER(unsigned ENABLE, 0x500);
-    _REGISTER(unsigned MODE, 0x504);
-#define   PWM_MODE_Up 0
-#define   PWM_MODE_UpAndDown 1
-    _REGISTER(unsigned COUNTERTOP, 0x508);
-    _REGISTER(unsigned PRESCALER, 0x50c);
-    _REGISTER(unsigned DECODER, 0x510);
-#define   PWM_DECODER_LOAD 0, 2
-#define     PWM_LOAD_Common 0
-#define     PWM_LOAD_Grouped 1
-#define     PWM_LOAD_Individual 2
-#define     PWM_LOAD_Waveform 3
-#define   PWM_DECODER_MODE 8, 1
-#define     PWM_MODE_RefreshCount 0
-#define     PWM_MODE_NextStep 1
-    _REGISTER(unsigned LOOP, 0x514);
-    _REGISTER(struct {
-        void *PTR;
-        unsigned CNT;
-        unsigned REFRESH;
-        unsigned ENDDELAY;
-        unsigned char filler[16];
-    } SEQ[2], 0x520);
-    _REGISTER(unsigned PSEL[4], 0x560);
-};
-    
-/* Interrupts */
-#define   PWM_INT_STOPPED 1
-#define   PWM_INT_SEQSTARTED0 2
-#define   PWM_INT_SEQSTARTED1 3
-#define   PWM_INT_SEQEND0 4
-#define   PWM_INT_SEQEND1 5
-#define   PWM_INT_PWMPERIODEND 6
-#define   PWM_INT_LOOPSDONE 7
-
-/* Shortcuts */
-#define   PWM_SEQEND0_STOP 0
-#define   PWM_SEQEND1_STOP 1
-#define   PWM_LOOPSDONE_SEQSTART0 2
-#define   PWM_LOOPSDONE_SEQSTART1 3
-#define   PWM_LOOPSDONE_STOP 4
-
-#define PWM0 (* (volatile _DEVICE _pwm *) 0x4001c000)
-#define PWM1 (* (volatile _DEVICE _pwm *) 0x40021000)
-#define PWM2 (* (volatile _DEVICE _pwm *) 0x40022000)
-#define PWM3 (* (volatile _DEVICE _pwm *) 0x4002d000)
-
-extern volatile _DEVICE _pwm * const PWM[4];
-
-/* PWM sequence parameters */
-#define PWM_SEQ_COMPARE 0, 15
-#define PWM_SEQ_POLARITY 15, 1
-#define   PWM_POLARITY_RisingEdge 0
-#define   PWM_POLARITY_FallingEdge 1
-
-#define PWM_SAMPLE(c, p) \
-    (FIELD(PWM_SEQ_COMPARE, c) | FIELD(PWM_SEQ_POLARITY, p))
-#define RISING PWM_POLARITY_RisingEdge
-#define FALLING PWM_POLARITY_FallingEdge
-
 #endif
 
-// TODO integrate ubit 1 here
+/* PWM */
+#define NB_PWM_CHANNELS 19
 
 /* NVIC stuff */
 

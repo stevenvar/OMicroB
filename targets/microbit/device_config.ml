@@ -49,7 +49,7 @@ let compile_c_to_hex ~cpu ~linkscript ~startup ~microbian ~local ~trace:_ ~verbo
   let cmd = cmd @ [ arm_o_file;
                     conc_microbit startup;
                     conc_microbit microbian] in
-  let cmd = cmd @ [ "-lc"; "-lgcc"; "-lnosys" ] in
+  let cmd = cmd @ [ "-lm"; "-lc"; "-lgcc"; "-lnosys" ] in
   let cmd = cmd @ [ "-o" ; arm_elf_file ] in
   List.iter (Printf.printf "%s ") cmd;
   run ~verbose cmd;

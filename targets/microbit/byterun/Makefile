@@ -6,10 +6,10 @@ CFLAGS = -Os -g -Wall -ffreestanding
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
 
-DRIVERS1 = serial1.o timer1.o i2c1.o radio1.o adc1.o display1.o gpio1.o accel1.o
+DRIVERS1 = serial1.o timer1.o i2c1.o radio1.o adc1.o pwm1.o display1.o gpio1.o accel1.o
 MICROBIAN1 = microbian1.o mpx-m0.o $(DRIVERS1) lib1.o
 
-DRIVERS2 = serial2.o timer2.o i2c2.o radio2.o adc2.o display2.o gpio2.o accel2.o
+DRIVERS2 = serial2.o timer2.o i2c2.o radio2.o adc2.o pwm2.o display2.o gpio2.o accel2.o
 MICROBIAN2 = microbian2.o mpx-m4.o $(DRIVERS2) lib2.o
 
 AR = arm-none-eabi-ar
