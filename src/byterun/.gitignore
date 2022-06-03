@@ -1,4 +1,4 @@
 *.o
 avr/
 pic32/
-microbit
+microbit/
