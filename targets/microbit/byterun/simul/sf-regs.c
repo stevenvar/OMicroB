@@ -2,7 +2,7 @@
 /******************************************************************************/
 /******************************************************************************/
 
-void microbit_print_string(char *str) {
+void microbit_print_string(const char *str) {
   printf("%s\n", str);
 }
 
@@ -76,11 +76,13 @@ int microbit_compass_heading() { return 0; }
 
 void microbit_radio_init() {}
 
-void microbit_radio_send(char *s, int n) {
+void microbit_radio_send(const char *s, int n) {
   printf("Sending %s by radio\n", s);
 }
 
-void microbit_radio_recv(char *buf) {}
+void microbit_radio_recv(char *buf) {
+  *buf = 0;
+}
 
 /*****************************************************************************/
 

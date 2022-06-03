@@ -1056,6 +1056,7 @@ static inline unsigned gpio_in(unsigned pin) {
 #ifdef UBIT_V2
   return GET_BIT(GPIO[PORT(pin)]->IN, PIN(pin));
 #endif
+  return 0;
 }
 
 

@@ -2,6 +2,10 @@
 /******************************************************************************/
 /******************************************************************************/
 
+#ifdef __OCAML__
+#include <caml/alloc.h>
+#endif
+
 #if defined(__OCAML__) || defined(__PC__) || defined(__MICROBIT__)
 
 #include "prims.h"
@@ -111,7 +115,7 @@ value caml_microbit_radio_send(value s) {
 
 value caml_microbit_radio_recv() {
 #ifdef __OCAML__
-  return alloc_string(0);
+  return caml_alloc_string(0);
 #else
   char buf[128];
   microbit_radio_recv(buf);

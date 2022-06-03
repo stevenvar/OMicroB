@@ -187,7 +187,7 @@ void radio_send(void *buf, int n)
     sendrec(RADIO_TASK, SEND, &m);
 }
 
-void microbit_radio_send(void *buf, int n) {
+void microbit_radio_send(const char *buf, int n) {
   radio_send(buf, n);
 }
 

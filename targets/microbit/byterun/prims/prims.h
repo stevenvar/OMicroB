@@ -21,7 +21,7 @@ int microbit_analog_read(int p);
 /******************************************************************************/
 
 void microbit_write_pixel(int x, int y, int l);
-void microbit_print_string(char *str);
+void microbit_print_string(const char *str);
 void microbit_clear_screen();
 
 /******************************************************************************/
@@ -47,7 +47,7 @@ int microbit_compass_heading();
 #endif
 
 /******************************************************************************/
-void microbit_radio_send(char *s, int n);
+void microbit_radio_send(const char *s, int n);
 void microbit_radio_recv(char *s);
 
 /******************************************************************************/

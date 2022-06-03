@@ -142,7 +142,7 @@ void image_set(int x, int y, int l, unsigned *img);
 
 void microbit_write_pixel(int x, int y, int l);
 void microbit_clear_screen();
-void microbit_print_string(char *buf);
+void microbit_print_string(const char *buf);
 
 /* gpio.c */
 int pad_of_pin(int pin);
