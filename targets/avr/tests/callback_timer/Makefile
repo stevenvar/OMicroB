@@ -1,8 +1,7 @@
-include ../../../etc/Makefile.conf
+include ../../../../etc/Makefile.conf
 
 SOURCES := timer.ml
 TARGETS := timer.byte timer.c timer.elf timer.o timer.hex
-ATTY := /dev/tty.usbmodem*
 
 all: timer.hex timer.elf
 
