@@ -1,8 +1,7 @@
-include ../../../etc/Makefile.conf
+include ../../../../etc/Makefile.conf
 
 SOURCES := pinchange.ml
 TARGETS := pinchange.byte pinchange.c pinchange.elf pinchange.o pinchange.hex
-ATTY := /dev/tty.usbmodem*
 
 all: pinchange.hex pinchange.elf
 
