@@ -222,7 +222,7 @@ end
 
 module MakeLCD(L: LCDConnection) = struct
   let lcd_cleardisplay = 0x01
-  (* and lcd_returnhome = 0x02 *)
+  and lcd_returnhome = 0x02
   and lcd_entrymodeset = 0x04
   and lcd_displaycontrol = 0x08
   and lcd_cursorshift = 0x10
@@ -305,7 +305,11 @@ module MakeLCD(L: LCDConnection) = struct
 
   (*********************** High level, user exposed commands *********************)
 
-  let clear_screen () = command lcd_cleardisplay; L.delay 2
+  let clear_screen () =
+    command lcd_cleardisplay;
+    L.delay 2;
+    cursorLine := 0;
+    command lcd_returnhome
 
   let init () =
     (* Set output mode for the pins *)
@@ -346,17 +350,16 @@ module MakeLCD(L: LCDConnection) = struct
   let print_int i = print_string (string_of_int i)
 
   let print_newline () =
-    if !cursorLine > 0 then clear_screen ();
-    cursorLine := (!cursorLine + 1) mod 2;
-    command (lcd_setddramaddr lor if (!cursorLine = 0) then 0x00 else 0x40);
-    cursorColumn := 0
+    (if !cursorLine = 1 then (clear_screen (); cursorLine := 0)
+     else cursorLine := 1);
+    cursorColumn := 0;
+    command (lcd_setddramaddr lor if (!cursorLine = 0) then 0x00 else 0x40)
 
   let print_image img =
     create_char 0 img;
     (* The commands below are necessary for some reason *)
     command (lcd_cursorshift lor lcd_moveleft); command (lcd_cursorshift lor lcd_moveright);
     for _ = !cursorColumn to 7 do command (lcd_cursorshift lor lcd_moveleft) done;
-    tracei !cursorColumn;
     for _ = 8 to !cursorColumn-1 do command (lcd_cursorshift lor lcd_moveright) done;
     print_char 0
 

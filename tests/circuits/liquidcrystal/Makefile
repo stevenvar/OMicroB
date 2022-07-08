@@ -1,4 +1,4 @@
-include ../../etc/Makefile.conf
+include ../../../etc/Makefile.conf
 
 DEVICE ?= arduino-uno
 
@@ -8,7 +8,7 @@ TARGETS := lcdexample.byte lcdexample.c lcdexample.elf lcdexample.avr lcdexample
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -device $(DEVICE) -heap-size 256
+	$(BIN)/omicrob -v $^ -device $(DEVICE) -circuitppx -heap-size 256
 
 flash: lcdexample.hex
 	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
