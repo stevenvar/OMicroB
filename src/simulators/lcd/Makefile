@@ -4,7 +4,7 @@ include ../../../etc/Makefile.conf
 TARG = $(BIN)/omicrob_lcd_simulator
 SRCS = $(wildcard *.ml)
 BUILD = main.native
-EXTRA = $(LIB)/extra
+EXTRA = $(SRC)/simulators
 CFLAGS = -thread,-I,$(EXTRA),-I,+../graphics
 LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx
 OPTIONS = -cflags $(CFLAGS) -lflags $(LFLAGS)

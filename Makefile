@@ -3,10 +3,10 @@ include etc/Makefile.conf
 all: internals $(ARCHS)
 
 internals: config
-	$(call compile, lib/extra)
 	$(call compile, src/bc2c)
 	$(call compile, src/h15ppx)
 	$(call compile, src/circuitppx)
+	$(call compile, src/simulators)
 	$(call compile, src/simulators/lcd)
 	$(call compile, src/simulators/lcd_16x2)
 	$(call compile, src/simulators/dip)
@@ -53,7 +53,6 @@ install: all
 	cp lib/*.cmo "$(LIBDIR)/"
 	cp lib/*.cmi "$(LIBDIR)/"
 	cp lib/lcd_cgrom.txt "$(LIBDIR)/"
-	cp -a lib/extra "$(LIBDIR)/"
 	cp -a lib/targets "$(LIBDIR)/"
 	cp -a src/byterun/vm "$(INCLUDEDIR)/"
 	cp -a src/byterun/prims "$(INCLUDEDIR)/"
@@ -76,7 +75,6 @@ uninstall:
 	-rm -f "$(LIBDIR)/"*.cmi
 	-rm -f "$(LIBDIR)/"*.cmo
 	-rm -f "$(LIBDIR)/lcd_cgrom.txt"
-	-rm -rf "$(LIBDIR)/extra"
 	-rm -f "$(LIBEXECDIR)/"*_simulator
 	-rm -f "$(INCLUDEDIR)/vm/"*
 	-rm -f "$(INCLUDEDIR)/prims/"*
@@ -111,13 +109,13 @@ clean:
 	$(call clean, src/bc2c)
 	$(call clean, src/h15ppx)
 	$(call clean, src/byterun)
+	$(call clean, src/simulators)
 	$(call clean, src/simulators/dip)
 	$(call clean, src/simulators/lcd_16x2)
 	$(call clean, src/simulators/lcd)
 	$(call clean, src/simulators/circuit)
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)
-	$(call clean, lib/extra)
 	$(call clean, targets/avr)
 	$(call clean, targets/pic32)
 	$(call clean, targets/microbit)
