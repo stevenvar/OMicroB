@@ -16,7 +16,7 @@ SRCS = $(wildcard *.ml)
 BUILD = main.native
 EXTRA = $(SRC)/simulators
 CFLAGS = -thread,-I,$(EXTRA),-I,+../graphics
-LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx
+LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx,simul_config.cmxa
 OPTIONS = -cflags $(CFLAGS) -lflags $(LFLAGS)
 
 simu_lcd: $(TARG)

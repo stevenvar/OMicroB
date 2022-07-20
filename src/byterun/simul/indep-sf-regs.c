@@ -11,8 +11,15 @@
 /******************************************************************************/
 /******************************************************************************/
 
-#define NB_REG 255
+#ifdef __SIMUL_ARDUINO_UNO__
+#define NB_PORT 3
+#elif defined(__SIMUL_ARDUINO_MEGA__)
 #define NB_PORT 11
+#else
+#define NB_PORT 0
+#endif
+
+#define NB_REG 255
 #define LOWER_PORT 0x0
 #define HIGHER_PORT (LOWER_PORT + NB_PORT - 1)
 #define LOWER_DDR (HIGHER_PORT + 1)
@@ -20,49 +27,8 @@
 #define LOWER_PIN (HIGHER_DDR + 1)
 #define HIGHER_PIN (LOWER_PIN + NB_PORT - 1)
 
-
-#define PORTA 0
-#define PORTB 1
-#define PORTC 2
-#define PORTD 3
-#define PORTE 4
-#define PORTF 5
-#define PORTG 6
-#define PORTH 7
-#define PORTI 8
-#define PORTJ 9
-#define PORTK 10
-#define PORTL 11
-
-#define DDRA 12
-#define DDRB 13
-#define DDRC 14
-#define DDRD 15
-#define DDRE 16
-#define DDRF 17
-#define DDRG 18
-#define DDRH 19
-#define DDRI 20
-#define DDRJ 21
-#define DDRK 22
-#define DDRL 23
-
-#define PINA 24
-#define PINB 25
-#define PINC 26
-#define PIND 27
-#define PINE 28
-#define PINF 29
-#define PING 30
-#define PINH 31
-#define PINI 32
-#define PINJ 33
-#define PINK 34
-#define PINL 35
-
-
-#define SPSR 36
-#define SPDR 37
+/* #define SPSR 36 */
+/* #define SPDR 37 */
 
 static unsigned char *regs;
 static unsigned int *analogs;
@@ -102,8 +68,8 @@ void destroy_regs(void){
 void dump_regs(void){
   int i, j;
   P(sem_regs);
-  for(i = LOWER_PORT ; i <= HIGHER_PORT ; i ++){
-    printf("%c: 0b", 'A' + i);
+  for(i = 0 ; i <= NB_REG ; i++){
+    printf("%c: 0b", i);
     for(j = 7 ; j >= 0 ; j --) printf("%d", (regs[i] & (1 << j)) != 0);
     printf("  = %3d  = 0x%02x\n", regs[i], regs[i]);
   }
@@ -153,7 +119,7 @@ static void may_sleep(){
 static void send_write(char cmnd, int port, unsigned char val){
   char buf[5];
   buf[0] = cmnd;
-  buf[1] = port + 'A';
+  buf[1] = port;
   buf[2] = hexchar_of_int((val >> 4) & 0x0F);
   buf[3] = hexchar_of_int(val & 0x0F);
   buf[4] = '\n';
@@ -222,7 +188,7 @@ static void write_register_gen(int reg, uint8_t new_val){
       int ddr = reg - LOWER_PORT + LOWER_DDR;
       uint8_t ddr_val = regs[ddr];
       if(ddr_val == 0x00){
-        char port_c = 'A' + reg - LOWER_PORT;
+        char port_c = reg - LOWER_PORT;
         fprintf(stderr, "Warning: the avr writes PORT%c when DDR%c=0xFF\n",
                 port_c, port_c);
       }else{
@@ -237,10 +203,10 @@ static void write_register_gen(int reg, uint8_t new_val){
       regs[reg] = new_val;
     }
   }
-  else if(reg == SPDR){
-    regs[reg] = new_val;
-    send_write_port('G'-'A',new_val);
-  }
+  /* else if(reg == SPDR){ */
+  /*   regs[reg] = new_val; */
+  /*   send_write_port('G'-'A',new_val); */
+  /* } */
   else{
     regs[reg] = new_val;
   }
@@ -270,9 +236,9 @@ uint8_t read_register(uint8_t reg){
 bool read_bit(uint8_t reg, uint8_t bit){
   printf("read_bit(%d, %d)\n", (int) reg, (int) bit);
   /* Dirty hack  */
-  if (reg == SPSR){
-      return 1;
-  }
+  /* if (reg == SPSR){ */
+  /*     return 1; */
+  /* } */
   uint8_t mask = 1 << bit;
   uint8_t val;
   init_simulator();
@@ -286,7 +252,7 @@ bool read_bit(uint8_t reg, uint8_t bit){
 }
 
 void clear_bit(uint8_t reg, uint8_t bit){
-  printf("clear_bit(%d, %d)\n", (int) reg, (int) bit);  
+  printf("clear_bit(%d, %d)\n", (int) reg, (int) bit);
   init_simulator();
   P(sem_regs);
   {
@@ -298,7 +264,7 @@ void clear_bit(uint8_t reg, uint8_t bit){
         int ddr = reg - LOWER_PORT + LOWER_DDR;
         uint8_t ddr_val = regs[ddr];
         if(!(ddr_val & mask)){
-          char port_c = 'A' + reg - LOWER_PORT;
+          char port_c = reg - LOWER_PORT;
           fprintf(stderr,
                   "Warning: the avr clears PORT%c.R%c%d when DDR%c=0x%02X\n",
                   port_c, port_c, bit, port_c, ddr_val);
@@ -321,7 +287,7 @@ void clear_bit(uint8_t reg, uint8_t bit){
 }
 
 void set_bit(uint8_t reg, uint8_t bit){
-  printf("set_bit(%d, %d)\n", (int) reg, (int) bit); 
+  printf("set_bit(%d, %d)\n", (int) reg, (int) bit);
   init_simulator();
   P(sem_regs);
   uint8_t old_val = regs[reg];
@@ -350,7 +316,7 @@ void set_bit(uint8_t reg, uint8_t bit){
     }
   }
   else if (reg >= LOWER_PIN && reg <= HIGHER_PIN){
-    char port_c = 'A' + reg - LOWER_PIN;
+    char port_c = reg - LOWER_PIN;
     fprintf(stderr, "Warning : PIN%c is only a read register, it shouldn't be written\n",
 		port_c);
   }
@@ -366,7 +332,7 @@ void set_bit(uint8_t reg, uint8_t bit){
 /***************************************************/
 
 void delay(int ms) {
-  printf("delay(%d)\n", ms);
+  /* printf("delay(%d)\n", ms); */
   usleep((useconds_t) ms * 1000);
 }
 
@@ -401,7 +367,7 @@ static void out_write_port(int port, unsigned char new_val){
     int ddr_val = regs[ddr];
     int old_val = regs[port];
     if((new_val & ~ddr_val) != 0xFF){
-      char port_c = 'A' + port - LOWER_PORT;
+      char port_c = port - LOWER_PORT;
       fprintf(stderr,
               "Warning: an outside component writes PORT%c=0x%02X when TRIS%c=0x%02X\n",
               port_c, new_val, port_c, ddr_val);
@@ -424,7 +390,7 @@ static void out_clear_port_bit(int port, int bit){
     int old_val = regs[port];
     int new_val = old_val & ~mask;
     if(ddr_val & mask){
-      char port_c = 'A' + port - LOWER_PORT;
+      char port_c = port - LOWER_PORT;
       fprintf(stderr,
         "Warning: an outside component clears PORT%c.R%c%d when TRIS%c=0x%02X\n",
               port_c, port_c, bit, port_c, ddr_val);
@@ -447,7 +413,7 @@ static void out_set_port_bit(int port, int bit){
     int old_val = regs[port];
     int new_val = old_val | mask;
     if(ddr_val & mask){
-      char port_c = 'A' + port - LOWER_PORT;
+      char port_c = port - LOWER_PORT;
       fprintf(stderr,
         "Warning: an outside component sets PORT%c.R%c%d when DDR%c=0x%02X\n",
               port_c, port_c, bit, port_c, ddr_val);
@@ -510,10 +476,8 @@ void exec_instr(char *instr, int size){
     out_set_analog(chan, val);
   }else{
     int port;
-    if(instr[1] >= 'A' && instr[1] <= ('A' + HIGHER_PORT - LOWER_PORT)){
-      port = instr[1] - 'A' + LOWER_PORT;
-    }else if(instr[1] >= 'a' && instr[1] <= ('a' + HIGHER_PORT - LOWER_PORT)){
-      port = instr[1] - 'a' + LOWER_PORT;
+    if(instr[1] <= HIGHER_PIN - LOWER_PORT){
+      port = instr[1];
     }else{
       invalid_instr(instr);
       return;

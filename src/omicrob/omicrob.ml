@@ -578,7 +578,7 @@ let () =
 
     available_elf := Some output_path;
 
-    let cmd = [ Config.cxx ; "-D"; "__PC__" ] @ default_cxx_options @ cxxopts in
+    let cmd = [ Config.cxx ; "-D"; "__PC__"; "-D"; DeviceConfig.simul_flag ] @ default_cxx_options @ cxxopts in
     let cmd = if trace > 0 then cmd @ [ "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ [ "-I"; Filename.concat includedir "simul" ] in
     let cmd = cmd @ [ input_path; "-o"; output_path ] in

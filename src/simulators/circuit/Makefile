@@ -2,11 +2,11 @@
 include ../../../etc/Makefile.conf
 
 TARG = $(BIN)/omicrob_circuit_simulator
-SRCS = $(wildcard *.ml *.mli *.mll *.mly)
+SRCS = $(wildcard *.ml *.mli *.mll)
 BUILD = main.native
 EXTRA = $(SRC)/simulators
-CFLAGS = -thread,-I,$(EXTRA),-I,+../graphics
-LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx #,$(LCD_MODS)
+CFLAGS = -thread,-I,$(EXTRA),-I,+../graphics,"-w -40 -w -42"
+LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx,simul_config.cmxa #,$(LCD_MODS)
 OPTIONS = -cflags $(CFLAGS) -lflags $(LFLAGS)
 
 simu_circuit: $(TARG)
@@ -16,7 +16,7 @@ $(TARG): .build/$(BUILD)
 
 .build/$(BUILD): $(SRCS)
 	@rm -f $@
-	$(OCAMLBUILD) $(OPTIONS) $(BUILD)
+	$(OCAMLBUILD) -use-menhir $(OPTIONS) $(BUILD)
 	@touch $@
 
 clean:

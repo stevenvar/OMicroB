@@ -1,19 +1,21 @@
 include etc/Makefile.conf
 
-all: internals $(ARCHS)
+all: internals $(ARCHS) simulators
 
 internals: config
 	$(call compile, src/bc2c)
 	$(call compile, src/h15ppx)
 	$(call compile, src/circuitppx)
+	$(call compile, src/byterun)
+	$(call compile, src/omicrob)
+	$(call compile, src/stdlib)
+
+simulators: internals $(ARCHS)
 	$(call compile, src/simulators)
 	$(call compile, src/simulators/lcd)
 	$(call compile, src/simulators/lcd_16x2)
 	$(call compile, src/simulators/dip)
 	$(call compile, src/simulators/circuit)
-	$(call compile, src/byterun)
-	$(call compile, src/omicrob)
-	$(call compile, src/stdlib)
 
 avr: internals
 	$(call compile, targets/avr)

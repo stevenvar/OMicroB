@@ -4,6 +4,8 @@ type register =
   | PINB | PINC | PIND | PINE | PINF
   | SPCR | SPSR | SPDR
 
+let nb_registers = 8
+
 type bit = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7
 
 type 'a pin =
@@ -27,6 +29,8 @@ type 'a pin =
   | PINA2 : [< `BUTTON_LEFT | `DREAD ] pin
   | PINA3 : [< `BUTTON_DOWN | `DREAD ] pin
 
+let nb_pins = 19
+
 let port_of_pin : type a. a pin -> register =
   function
   | PIN2 -> PORTD
@@ -48,6 +52,7 @@ let port_of_pin : type a. a pin -> register =
   | PINA1 -> PORTF
   | PINA2 -> PORTF
   | PINA3 -> PORTF
+let register_of_pin = port_of_pin
 
 let ddr_of_pin : type a. a pin -> register =
   function
@@ -117,3 +122,79 @@ let port_bit_of_pin : type a. a pin -> bit =
 
 let ddr_bit_of_pin : type a. a pin -> bit = port_bit_of_pin
 let input_bit_of_pin : type a. a pin -> bit = port_bit_of_pin
+let bit_of_pin = port_bit_of_pin
+
+(** Simulation *)
+
+let spdr = SPDR
+
+exception Invalid_argument of string
+
+external raise : exn -> 'a = "%raise"
+
+let invalid_arg s =
+  raise (Invalid_argument s)
+
+let pin_of_string : _ -> [ `DWRITE ] pin = function
+  | _ -> invalid_arg "pin_of_string"
+
+let name_of_pin : type a. a pin -> string = function
+  | _ -> ""
+
+
+let register_of_char = function
+  | 'B' -> PORTB
+  | 'C' -> PORTC
+  | 'D' -> PORTD
+  | 'E' -> PORTE
+  | 'F' -> PORTF
+  | _ -> invalid_arg "register_of_char"
+
+let char_of_register = function
+  | PORTB -> 'B'
+  | PORTC -> 'C'
+  | PORTD -> 'D'
+  | PORTE -> 'E'
+  | PORTF -> 'F'
+  | _ -> invalid_arg "char_of_register"
+
+let index_of_register = function
+  | PORTB -> 0
+  | PORTC -> 1
+  | PORTD -> 2
+  | PORTE -> 3
+  | PORTF -> 4
+  | _ -> invalid_arg "index_of_register"
+
+let register_of_index = function
+  | 0 -> PORTB
+  | 1 -> PORTC
+  | 2 -> PORTD
+  | 3 -> PORTE
+  | 4 -> PORTF
+  | _ -> invalid_arg "register_of_index"
+
+let index_of_bit = function
+  | BIT0 -> 0
+  | BIT1 -> 1
+  | BIT2 -> 2
+  | BIT3 -> 3
+  | BIT4 -> 4
+  | BIT5 -> 5
+  | BIT6 -> 6
+  | BIT7 -> 7
+
+let bit_of_index = function
+  | 0 -> BIT0
+  | 1 -> BIT1
+  | 2 -> BIT2
+  | 3 -> BIT3
+  | 4 -> BIT4
+  | 5 -> BIT5
+  | 6 -> BIT6
+  | 7 -> BIT7
+  | _ -> invalid_arg "bit_of_index"
+
+let pin_of_register_bit register bit : [ `DWRITE ] pin =
+  match register, bit with
+  | _ -> invalid_arg "pin_of_register_bit"

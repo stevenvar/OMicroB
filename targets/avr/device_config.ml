@@ -33,6 +33,7 @@ module type AVRCONFIG = sig
   val clock : int
   val folder : string
   val pins_module : string
+  val simul_flag : string
 end
 
 module ArduboyConfig : AVRCONFIG = struct
@@ -42,6 +43,7 @@ module ArduboyConfig : AVRCONFIG = struct
   let clock = 16_000_000
   let folder = "arduboy"
   let pins_module = "ArduboyPins"
+  let simul_flag = "__SIMUL_ARDUBOY__"
 end
 
 module ArduinoUnoConfig : AVRCONFIG = struct
@@ -51,6 +53,7 @@ module ArduinoUnoConfig : AVRCONFIG = struct
   let clock = 16_000_000
   let folder = "arduino_uno"
   let pins_module = "ArduinoUnoPins"
+  let simul_flag = "__SIMUL_ARDUINO_UNO__"
 end
 
 module ArduinoMegaConfig : AVRCONFIG = struct
@@ -60,6 +63,7 @@ module ArduinoMegaConfig : AVRCONFIG = struct
   let clock = 16_000_000
   let folder = "arduino_mega_2560"
   let pins_module = "ArduinoMegaPins"
+  let simul_flag = "__SIMUL_ARDUINO_MEGA__"
 end
 
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
@@ -83,10 +87,10 @@ module AvrConfig(A : AVRCONFIG) : DEVICECONFIG = struct
                   ((String.uncapitalize_ascii A.pins_module)^".cmo")));
           Filename.concat libdir
             (Filename.concat "targets/avr"
-               (Filename.concat A.folder "mcuPins.cmo"));
+               (Filename.concat A.folder "mcuConnection.cmo"));
           "-open"; Printf.sprintf "Avr";
           "-open"; A.pins_module;
-          "-open"; "McuPins" ] in
+          "-open"; "McuConnection" ] in
     let cmd = cmd @ inputs @ [ "-o"; output ] in
     run ~vars ~verbose cmd
 
@@ -116,6 +120,7 @@ module AvrConfig(A : AVRCONFIG) : DEVICECONFIG = struct
               !avrobjcopts @ [ avr_file; output ] in
     run ~verbose cmd
 
+  let simul_flag = A.simul_flag
 
   let flash ~sudo ~verbose path =
     let cmd = if sudo then [ "sudo" ] else [] in

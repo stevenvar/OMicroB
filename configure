@@ -178,7 +178,8 @@ define clean
         @\$(MAKE) --no-print-directory -C \$1 clean > /dev/null
 endef
 
-ARCHS := \\
+ARCHS :=
+ARCHLIBS :=
 " > etc/Makefile.conf
 
 ################################################################################
@@ -209,6 +210,7 @@ let version     = \"$VERSION\"
 # Refresh targets files
 function reset_targets() {
     cp "targets/device_config.ml" "src/omicrob/device_config.ml"
+    cp "targets/simul_config.ml" "src/simulators/simul_config.ml"
 
     cat "src/byterun/prims/indep-prims.h" > "src/byterun/prims/prims.h"
     cat "src/byterun/prims/indep-bindings.c" > "src/byterun/prims/bindings.c"
@@ -229,6 +231,7 @@ function target_avr () {
     check_directory "targets/avr"
 
     cat "targets/avr/device_config.ml" >> "src/omicrob/device_config.ml"
+    cat "targets/avr/simul_config.ml" >> "src/simulators/simul_config.ml"
 
     mkdir -p "src/byterun/avr"
     cp -f "targets/avr/arch-specific.c" "src/byterun/avr/"
@@ -245,7 +248,9 @@ function target_avr () {
         cp -f "targets/avr/$f/avrlib.c" "src/byterun/avr/$f/"
     done
 
-    echo "avr \\" >> etc/Makefile.conf
+    echo "ARCHS := avr \$(ARCHS)" >> etc/Makefile.conf
+
+    echo "ARCHLIBS := avr/arduino_uno avr/arduino_mega_2560 avr/arduboy \$(ARCHLIBS)" >> etc/Makefile.conf
 }
 
 function target_pic32 () {
@@ -272,7 +277,7 @@ function target_pic32 () {
         cp -f "targets/pic32/$f/pic32lib.c" "src/byterun/pic32/$f/"
     done
 
-    echo "pic32 \\" >> etc/Makefile.conf
+    echo "ARCHS := pic32 \$(ARCHS)" >> etc/Makefile.conf
 }
 
 function target_microbit () {
@@ -287,7 +292,7 @@ function target_microbit () {
 
     cp -rf "targets/microbit/byterun" "src/byterun/microbit"
 
-    echo "microbit \\" >> "etc/Makefile.conf"
+    echo "ARCHS := microbit \$(ARCHS)" >> "etc/Makefile.conf"
 }
 
 

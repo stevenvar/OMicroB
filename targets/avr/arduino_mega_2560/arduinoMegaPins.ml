@@ -1,4 +1,3 @@
-
 type register =
   | PORTA | PORTB | PORTC | PORTD | PORTE | PORTF | PORTG | PORTH | PORTJ | PORTK | PORTL
   | DDRA | DDRB | DDRC | DDRD | DDRE | DDRF | DDRG | DDRH | DDRJ | DDRK | DDRL
@@ -79,6 +78,8 @@ type 'a pin =
   | PINA14 : [< `DREAD | `DWRITE | `AREAD ] pin
   | PINA15 : [< `DREAD | `DWRITE | `AREAD ] pin
 
+let nb_pins = 70
+
 let port_of_pin : type a. a pin -> register =
   function
   | PIN0 -> PORTE
@@ -151,6 +152,7 @@ let port_of_pin : type a. a pin -> register =
   | PINA13 -> PORTK
   | PINA14 -> PORTK
   | PINA15 -> PORTK
+let register_of_pin = port_of_pin
 
 let ddr_of_pin : type a. a pin -> register=
   function
@@ -373,3 +375,276 @@ let port_bit_of_pin : type a. a pin -> bit =
 
 let ddr_bit_of_pin : type a. a pin -> bit = port_bit_of_pin
 let input_bit_of_pin : type a. a pin -> bit = port_bit_of_pin
+
+(** Simulation *)
+
+let spdr = SPDR
+
+let bit_of_pin = port_bit_of_pin
+
+let nb_registers = 14
+
+exception Invalid_argument of string
+
+external raise : exn -> 'a = "%raise"
+
+let invalid_arg s =
+  raise (Invalid_argument s)
+
+let pin_of_string = function
+  | "PIN0" -> PIN0
+  | "PIN1" -> PIN1
+  | "PIN2" -> PIN2
+  | "PIN3" -> PIN3
+  | "PIN4" -> PIN4
+  | "PIN5" -> PIN5
+  | "PIN6" -> PIN6
+  | "PIN7" -> PIN7
+  | "PIN8" -> PIN8
+  | "PIN9" -> PIN9
+  | "PIN10" -> PIN10
+  | "PIN11" -> PIN11
+  | "PIN12" -> PIN12
+  | "PIN13" -> PIN13
+  | "PINA0" -> PINA0
+  | "PINA1" -> PINA1
+  | "PINA2" -> PINA2
+  | "PINA3" -> PINA3
+  | "PINA4" -> PINA4
+  | "PINA5" -> PINA5
+  | _ -> invalid_arg "TODO pin_of_string"
+
+let name_of_pin : type a. a pin -> string = function
+  | PIN0 -> "PIN0/RXO"
+  | PIN1 -> "PIN1/TX0"
+  | PIN2 -> "PIN2/PWM"
+  | PIN3 -> "PIN3/PWM"
+  | PIN4 -> "PIN4/PWM"
+  | PIN5 -> "PIN5/PWM"
+  | PIN6 -> "PIN6/PWM"
+  | PIN7 -> "PIN7/PWM"
+  | PIN8 -> "PIN8/PWM"
+  | PIN9 -> "PIN9/PWM"
+  (* | 18 -> "PIN53/SS" *)
+  (* | 19 -> "PIN52/SCK" *)
+  (* | 20 -> "PIN51/MOSI" *)
+  (* | 21 -> "PIN50/MISO" *)
+  (* | 22 -> "PIN10/PWM" *)
+  (* | 23 -> "PIN11/PWM" *)
+  (* | 24 -> "PIN12/PWM" *)
+  (* | 25 -> "PIN13/PWM" *)
+
+
+  (* | 29 -> "RESET" *)
+  (* | 30 -> "VCC" *)
+  (* | 31 -> "GND" *)
+  (* | 32 -> "XTAL2" *)
+  (* | 33 -> "XTAL1" *)
+  (* | 34 -> "PIN49" *)
+  (* | 35 -> "PIN48" *)
+  (* | 36 -> "PIN47" *)
+  (* | 37 -> "PIN46/PWM" *)
+  (* | 38 -> "PIN45/PWM" *)
+  (* | 39 -> "PIN44/PWM" *)
+  (* | 40 -> "PIN43" *)
+  (* | 41 -> "PIN42" *)
+  (* | 42 -> "PIN21/SCL" *)
+  (* | 43 -> "PIN20/SDA" *)
+  (* | 44 -> "PIN19/RX1" *)
+  (* | 45 -> "PIN18/TX1" *)
+
+  (* | 49 -> "PIN38" *)
+  (* | 50 -> "PIN41" *)
+  (* | 51 -> "PIN40" *)
+  (* | 52 -> "PIN37" *)
+  (* | 53 -> "PIN36" *)
+  (* | 54 -> "PIN35" *)
+  (* | 55 -> "PIN34" *)
+  (* | 56 -> "PIN33" *)
+  (* | 57 -> "PIN32" *)
+  (* | 58 -> "PIN31" *)
+  (* | 59 -> "PIN30" *)
+  (* | 60 -> "VCC" *)
+  (* | 61 -> "GND" *)
+  (* | 62 -> "PIN15/RX3" *)
+  (* | 63 -> "PIN14/TX3" *)
+
+  (* | 69 -> "PIN39" *)
+  (* | 70 -> "PIN29" *)
+  (* | 71 -> "PIN28" *)
+  (* | 72 -> "PIN27" *)
+  (* | 73 -> "PIN26" *)
+  (* | 74 -> "PIN25" *)
+  (* | 75 -> "PIN24" *)
+  (* | 76 -> "PIN23" *)
+  (* | 77 -> "PIN22" *)
+
+  (* | 79 -> "VCC" *)
+  (* | 80 -> "GND" *)
+  (* | 81 -> "A15" *)
+  (* | 82 -> "A14" *)
+  (* | 83 -> "A13" *)
+  (* | 84 -> "A12" *)
+  (* | 85 -> "A11" *)
+  (* | 86 -> "A10" *)
+  (* | 87 -> "A9" *)
+  (* | 88 -> "A8" *)
+  (* | 89 -> "A7" *)
+  (* | 90 -> "A6" *)
+  (* | 91 -> "A5" *)
+  (* | 92 -> "A4" *)
+  (* | 93 -> "A3" *)
+  (* | 94 -> "A2" *)
+  (* | 95 -> "A1" *)
+  (* | 96  -> "A0" *)
+  (* | 97 -> "ARef" *)
+  (* | 98 -> "GND" *)
+  (* | 99 -> "AVcc" *)
+  | _ -> ""
+
+let register_of_char = function
+  | 'A' -> PORTA
+  | 'B' -> PORTB
+  | 'C' -> PORTC
+  | 'D' -> PORTD
+  | 'E' -> PORTE
+  | 'F' -> PORTF
+  | 'G' -> PORTG
+  | 'H' -> PORTH
+  | 'J' -> PORTJ
+  | 'K' -> PORTK
+  | 'L' -> PORTL
+  | _ -> invalid_arg "register_of_char"
+
+let char_of_register = function
+  | PORTA -> 'A'
+  | PORTB -> 'B'
+  | PORTC -> 'C'
+  | PORTD -> 'D'
+  | PORTE -> 'E'
+  | PORTF -> 'F'
+  | PORTG -> 'G'
+  | PORTH -> 'H'
+  | PORTJ -> 'J'
+  | PORTK -> 'K'
+  | PORTL -> 'L'
+  | _ -> invalid_arg "char_of_register"
+
+let index_of_register = function
+  | PORTA -> 0
+  | PORTB -> 1
+  | PORTC -> 2
+  | PORTD -> 3
+  | PORTE -> 4
+  | PORTF -> 5
+  | PORTG -> 6
+  | PORTH -> 7
+  | PORTJ -> 8
+  | PORTK -> 9
+  | PORTL -> 10
+  | _ -> invalid_arg "index_of_register"
+
+let register_of_index = function
+  | 0 -> PORTA
+  | 1 -> PORTB
+  | 2 -> PORTC
+  | 3 -> PORTD
+  | 4 -> PORTE
+  | 5 -> PORTF
+  | 6 -> PORTG
+  | 7 -> PORTH
+  | 8 -> PORTJ
+  | 9 -> PORTK
+  | 10 -> PORTL
+  | _ -> invalid_arg "index_of_register"
+
+let index_of_bit = function
+  | BIT0 -> 0
+  | BIT1 -> 1
+  | BIT2 -> 2
+  | BIT3 -> 3
+  | BIT4 -> 4
+  | BIT5 -> 5
+  | BIT6 -> 6
+  | BIT7 -> 7
+
+let bit_of_index = function
+  | 0 -> BIT0
+  | 1 -> BIT1
+  | 2 -> BIT2
+  | 3 -> BIT3
+  | 4 -> BIT4
+  | 5 -> BIT5
+  | 6 -> BIT6
+  | 7 -> BIT7
+  | _ -> invalid_arg "bit_of_index"
+
+let pin_of_register_bit register bit : [ `DWRITE ] pin =
+  match register, bit with
+  | (PORTE, BIT0) -> PIN0
+  | (PORTE, BIT1) -> PIN1
+  | (PORTE, BIT4) -> PIN2
+  | (PORTE, BIT5) -> PIN3
+  | (PORTG, BIT5) -> PIN4
+  | (PORTE, BIT3) -> PIN5
+  | (PORTH, BIT3) -> PIN6
+  | (PORTH, BIT4) -> PIN7
+  | (PORTH, BIT5) -> PIN8
+  | (PORTH, BIT6) -> PIN9
+  | (PORTB, BIT4) -> PIN10
+  | (PORTB, BIT5) -> PIN11
+  | (PORTB, BIT6) -> PIN12
+  | (PORTB, BIT7) -> PIN13
+  | (PORTJ, BIT1) -> PIN14
+  | (PORTJ, BIT0) -> PIN15
+  | (PORTH, BIT1) -> PIN16
+  | (PORTH, BIT0) -> PIN17
+  | (PORTD, BIT3) -> PIN18
+  | (PORTD, BIT2) -> PIN19
+  | (PORTD, BIT1) -> PIN20
+  | (PORTD, BIT0) -> PIN21
+  | (PORTA, BIT0) -> PIN22
+  | (PORTA, BIT1) -> PIN23
+  | (PORTA, BIT2) -> PIN24
+  | (PORTA, BIT3) -> PIN25
+  | (PORTA, BIT4) -> PIN26
+  | (PORTA, BIT5) -> PIN27
+  | (PORTA, BIT6) -> PIN28
+  | (PORTA, BIT7) -> PIN29
+  | (PORTC, BIT7) -> PIN30
+  | (PORTC, BIT6) -> PIN31
+  | (PORTC, BIT5) -> PIN32
+  | (PORTC, BIT4) -> PIN33
+  | (PORTC, BIT3) -> PIN34
+  | (PORTC, BIT2) -> PIN35
+  | (PORTC, BIT1) -> PIN36
+  | (PORTC, BIT0) -> PIN37
+  | (PORTD, BIT7) -> PIN38
+  | (PORTG, BIT2) -> PIN39
+  | (PORTG, BIT1) -> PIN40
+  | (PORTG, BIT0) -> PIN41
+  | (PORTL, BIT7) -> PIN42
+  | (PORTL, BIT6) -> PIN43
+  | (PORTL, BIT5) -> PIN44
+  | (PORTL, BIT4) -> PIN45
+  | (PORTL, BIT3) -> PIN46
+  | (PORTL, BIT2) -> PIN47
+  | (PORTL, BIT1) -> PIN48
+  | (PORTL, BIT0) -> PIN49
+  | (PORTF, BIT0) -> PINA0
+  | (PORTF, BIT1) -> PINA1
+  | (PORTF, BIT2) -> PINA2
+  | (PORTF, BIT3) -> PINA3
+  | (PORTF, BIT4) -> PINA4
+  | (PORTF, BIT5) -> PINA5
+  | (PORTF, BIT6) -> PINA6
+  | (PORTF, BIT7) -> PINA7
+  | (PORTK, BIT0) -> PINA8
+  | (PORTK, BIT1) -> PINA9
+  | (PORTK, BIT2) -> PINA10
+  | (PORTK, BIT3) -> PINA11
+  | (PORTK, BIT4) -> PINA12
+  | (PORTK, BIT5) -> PINA13
+  | (PORTK, BIT6) -> PINA14
+  | (PORTK, BIT7) -> PINA15
+  | _ -> invalid_arg "pin_of_register_bit"

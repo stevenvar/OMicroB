@@ -21,30 +21,35 @@ type ddram = char array
 type cgram = bool array array array
 type matrix = bool array array array array
 
-type display = {
-  x : int;
-  y : int;
-  e : Simul.pin;
-  rs : Simul.pin;
-  rw : Simul.pin;
-  d4 : Simul.pin;
-  d5 : Simul.pin;
-  d6 : Simul.pin;
-  d7 : Simul.pin;
-  column_nb : int;
-  line_nb : int;
-  width : int;
-  height : int;
-  matrix : matrix;
-  ddram : ddram;
-  cgram : cgram;
-  mutable ram_addr : int;
-  mutable selected_ram : ram;
-  mutable line_mode : line_mode;
-  mutable cursor_mode : cursor_mode;
-  mutable entry_mode_incr : direction;
-  mutable shift_display : bool;
-  mutable display_mode : display_mode;
-  mutable font : font;
-  mutable bus_mode : bus_mode;
-}
+module DisplayTypes(M : Simul.MCUSimul) = struct
+  open M
+
+  type display = {
+    x : int;
+    y : int;
+    e : [ `DWRITE ] pin;
+    rs : [ `DWRITE ] pin;
+    rw : [ `DWRITE ] pin;
+    d4 : [ `DWRITE ] pin;
+    d5 : [ `DWRITE ] pin;
+    d6 : [ `DWRITE ] pin;
+    d7 : [ `DWRITE ] pin;
+    column_nb : int;
+    line_nb : int;
+    width : int;
+    height : int;
+    matrix : matrix;
+    ddram : ddram;
+    cgram : cgram;
+    mutable ram_addr : int;
+    mutable selected_ram : ram;
+    mutable line_mode : line_mode;
+    mutable cursor_mode : cursor_mode;
+    mutable entry_mode_incr : direction;
+    mutable shift_display : bool;
+    mutable display_mode : display_mode;
+    mutable font : font;
+    mutable bus_mode : bus_mode;
+  }
+
+end

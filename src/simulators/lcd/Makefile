@@ -4,9 +4,9 @@ include ../../../etc/Makefile.conf
 TARG = $(BIN)/omicrob_lcd_simulator
 SRCS = $(wildcard *.ml)
 BUILD = main.native
-EXTRA = $(SRC)/simulators
-CFLAGS = -thread,-I,$(EXTRA),-I,+../graphics
-LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx
+SIMUL = $(SRC)/simulators
+CFLAGS = -thread,-I,$(SIMUL),-I,+../graphics
+LFLAGS = $(CFLAGS),unix.cmxa,graphics.cmxa,threads.cmxa,simul.cmx,simul_config.cmxa
 OPTIONS = -cflags $(CFLAGS) -lflags $(LFLAGS)
 
 lcd: $(TARG)
@@ -14,7 +14,7 @@ lcd: $(TARG)
 $(TARG): .build/$(BUILD)
 	cp $< $@
 
-.build/$(BUILD): $(SRCS) config.ml $(EXTRA)/simul.ml $(EXTRA)/simul.mli
+.build/$(BUILD): $(SRCS) config.ml $(SIMUL)/simul.ml $(SIMUL)/simul.mli
 	$(OCAMLBUILD) $(OPTIONS) $(BUILD)
 	@touch $@
 

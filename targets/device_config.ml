@@ -16,6 +16,9 @@ module type DEVICECONFIG = sig
   val compile_c_to_hex : local: bool -> trace:int -> verbose:bool ->
     string -> string -> unit
 
+  (** Additional defined flag for compilation **)
+  val simul_flag : string
+
   (** Flash an executable file *)
   val flash : sudo:bool -> verbose:bool -> string -> unit
 end
@@ -35,6 +38,8 @@ module DefaultConfig : DEVICECONFIG = struct
 
   let compile_c_to_hex ~local:_ ~trace:_ ~verbose:_ _ _ =
     failwith "The default config doesn't support compiling to hex"
+
+  let simul_flag = "__SIMUL_NONE__"
 
   let flash ~sudo:_ ~verbose:_ _ =
     failwith "The default config doesn't support flashing"

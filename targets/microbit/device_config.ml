@@ -66,6 +66,8 @@ module MicroBitConfig : DEVICECONFIG = struct
   let compile_c_to_hex = compile_c_to_hex
       ~cpu:"cortex-m0" ~linkscript:"nRF51822.ld" ~startup:"startup1.o" ~microbian:"microbian1.a"
 
+  let simul_flag = "__SIMUL_MICROBIT_1__"
+
   let flash ~sudo:_ ~verbose:_ hexfile =
     failwith
       (Printf.sprintf
@@ -75,6 +77,8 @@ end
 
 module MicroBit2Config : DEVICECONFIG = struct
   let compile_ml_to_byte = compile_ml_to_byte
+
+  let simul_flag = "__SIMUL_MICROBIT_2__"
 
   let compile_c_to_hex = compile_c_to_hex
       ~cpu:"cortex-m4" ~linkscript:"nRF52833.ld" ~startup:"startup2.o" ~microbian:"microbian2.a"

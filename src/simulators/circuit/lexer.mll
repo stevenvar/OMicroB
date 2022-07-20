@@ -10,7 +10,8 @@
 (*************************************************************************)
 
 {
-  open Parser;;
+module Lexer(M : Simul.MCUSimul) = struct
+  open Parser.Make(M);;
 
   exception Lexing_error of string
 
@@ -126,3 +127,7 @@ let newline = ('\010' | '\013' | "\013\010")
   and skip_to_eol = parse
       | newline { new_line lexbuf }
       | _       { skip_to_eol lexbuf }
+
+{
+end
+}

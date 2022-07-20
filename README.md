@@ -23,6 +23,7 @@ An article describing our generic virtual machine approach has been published in
 - obytelib (on OPAM)
 - ocamlclean (on OPAM)
 - ocamlbuild (on OPAM)
+- menhir (on OPAM)
 - gcc (for simulation)
 - avr-gcc, avr-libc (for AVR microcontrollers)
 - avrdude (for flashing to an AVR)

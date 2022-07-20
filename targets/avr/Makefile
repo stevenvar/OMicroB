@@ -21,10 +21,10 @@ PINSMLS := $(SUBMODULES:=Pins.ml)
 PINSCMIS := $(SUBMODULES:=Pins.cmi)
 PINSCMOS := $(SUBMODULES:=Pins.cmo)
 
-MCUMLS := $(FOLDERS:=mcuPins.ml)
-MCUMLIS := $(FOLDERS:=mcuPins.mli)
-MCUCMOS := $(FOLDERS:=mcuPins.cmo)
-MCUCMIS := $(FOLDERS:=mcuPins.cmi)
+MCUMLS := $(FOLDERS:=mcuConnection.ml)
+MCUMLIS := $(FOLDERS:=mcuConnection.mli)
+MCUCMOS := $(FOLDERS:=mcuConnection.cmo)
+MCUCMIS := $(FOLDERS:=mcuConnection.cmi)
 
 LIB_MLS  := $(foreach ml,$(MLS),$(LIBAVR)/$(ml)) \
 			$(foreach ml,$(PINSMLS),$(LIBAVR)/$(ml)) \
@@ -57,10 +57,10 @@ $(PINSCMIS): %.cmi: %.ml
 $(PINSCMOS): %.cmo: %.ml
 	$(OCAMLC) -nopervasives -nostdlib -c $< -o $@ -I $*
 
-$(MCUCMIS): %/mcuPins.cmi: %/mcuPins.mli
+$(MCUCMIS): %/mcuConnection.cmi: %/mcuConnection.mli
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $^ -o $@ -I $*
 
-$(MCUCMOS): %/mcuPins.cmo: %/mcuPins.ml %/mcuPins.cmi
+$(MCUCMOS): %/mcuConnection.cmo: %/mcuConnection.ml %/mcuConnection.cmi
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@ -I $*
 
 $(LIB_FOLDERS):

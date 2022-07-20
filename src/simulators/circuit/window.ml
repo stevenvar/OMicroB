@@ -10,7 +10,6 @@
 (*************************************************************************)
 
 open Printf;;
-open Simul;;
 
 type window = {
   win_width   : int;
@@ -174,10 +173,10 @@ let draw_seg7 x y w h bgc =
 ;;
 
 let draw_segs x y w h d c p i m =
-  if match m with None -> true | Some m -> test_pin m = i then
+  if match m with None -> true | Some m -> m = i then
       begin
         let draw_seg (pin, poly) =
-          Graphics.set_color (if test_pin pin = i then Color.lightgray else c);
+          Graphics.set_color (if pin = i then Color.lightgray else c);
           Graphics.fill_poly poly;
           Graphics.set_color Color.gray;
           Graphics.draw_poly poly;
@@ -186,7 +185,7 @@ let draw_segs x y w h d c p i m =
           match p with
             | None -> ()
             | Some p ->
-              Graphics.set_color (if test_pin p = i then Color.lightgray else c);
+              Graphics.set_color (if p = i then Color.lightgray else c);
               Graphics.fill_circle (x+w*2/5) (y-h*2/5) (h/20);
               Graphics.set_color Color.gray;
               Graphics.draw_circle (x+w*2/5) (y-h*2/5) (h/20);

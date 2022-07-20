@@ -11,14 +11,18 @@
 
 include ../../etc/Makefile.conf
 
-MLS = $(wildcard *.ml)
-MLIS = $(wildcard *.mli)
+MLS = simul.ml
+MLIS = simul.mli
 CMOS = $(MLS:.ml=.cmo)
 CMXS = $(MLS:.ml=.cmx)
 CMIS = $(MLIS:.mli=.cmi)
 OBJS = $(CMIS) $(CMOS) $(CMXS)
 
-extra: $(OBJS)
+FARCHS := $(foreach folder,$(ARCHS),$(LIB)/targets/$(folder))
+I_ARCHLIBS := $(foreach folder,$(ARCHLIBS),-I .build/$(folder))
+PINSMLS := $(foreach folder,$(ARCHLIBS),.build/$(folder)/*Pins.ml)
+
+simul: $(OBJS) simul_config.cmxa
 
 serial.cmo: serial.ml serial.cmi
 	$(OCAMLC) -thread -c $<
@@ -38,7 +42,12 @@ simul.cmx: simul.ml simul.cmi
 simul.cmi: simul.mli
 	$(OCAMLC) -thread -c $<
 
-clean:
-	@rm -f *~ *.cmo *.cmx *.cmi *.o *.3o
+simul_config.cmxa: simul_config.ml
+	mkdir -p .build
+	cp -r $(FARCHS) .build
+	$(OCAMLOPT) -a $(PINSMLS) $^ $(I_ARCHLIBS) -o $@
 
-.PHONY: extra clean
+clean:
+	@rm -rf .build/ *~ *.cmo *.cmx *.cmxa *.cmi *.o *.3o *.a
+
+.PHONY: simul clean

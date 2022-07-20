@@ -24,22 +24,22 @@ uint16_t avr_analog_read(uint8_t ch){
 void avr_serial_init(){
   init_simulator();
   printf("serial init\n");
-  set_bit(DDRD,3);
+  //set_bit(DDRD,3);
 }
 
 char avr_serial_read(){
   printf("serial read\n");
-  set_bit(PORTD,2);
+  //set_bit(PORTD,2);
   usleep(10000);
-  clear_bit(PORTD,2);
+  //clear_bit(PORTD,2);
   return '0';
 }
 
 void avr_serial_write(char c){
   printf("serial write(%c)\n",c);
-  set_bit(PORTD,3);
+  //set_bit(PORTD,3);
   usleep(10000);
-  clear_bit(PORTD,3);
+  //clear_bit(PORTD,3);
 }
 
 /******************************************************************************/

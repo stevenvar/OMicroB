@@ -4,6 +4,8 @@ type register =
   | PINB | PINC | PIND
   | SPCR | SPSR | SPDR
 
+let nb_registers = 6
+
 type bit = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7
 
 type 'a pin =
@@ -32,6 +34,8 @@ type 'a pin =
   | PINA4 : [< `DREAD | `DWRITE | `AREAD ] pin
   | PINA5 : [< `DREAD | `DWRITE | `AREAD ] pin
 
+let nb_pins = 24
+
 let port_of_pin : type a. a pin -> register =
   function
   | PIN0 -> PORTD
@@ -58,6 +62,7 @@ let port_of_pin : type a. a pin -> register =
   | PINA3 -> PORTC
   | PINA4 -> PORTC
   | PINA5 -> PORTC
+let register_of_pin = port_of_pin
 
 let ddr_of_pin : type a. a pin -> register=
   function
@@ -142,3 +147,111 @@ let port_bit_of_pin : type a. a pin -> bit =
 
 let ddr_bit_of_pin : type a. a pin -> bit = port_bit_of_pin
 let input_bit_of_pin : type a. a pin -> bit = port_bit_of_pin
+let bit_of_pin = port_bit_of_pin
+
+(** Simulation *)
+
+let spdr = SPDR
+
+exception Invalid_argument of string
+
+external raise : exn -> 'a = "%raise"
+
+let invalid_arg s =
+  raise (Invalid_argument s)
+
+let pin_of_string = function
+  | "PIN0" -> PIN0
+  | "PIN1" -> PIN1
+  | "PIN2" -> PIN2
+  | "PIN3" -> PIN3
+  | "PIN4" -> PIN4
+  | "PIN5" -> PIN5
+  | "PIN6" -> PIN6
+  | "PIN7" -> PIN7
+  | "PIN8" -> PIN8
+  | "PIN9" -> PIN9
+  | "PIN10" -> PIN10
+  | "PIN11" -> PIN11
+  | "PIN12" -> PIN12
+  | "PIN13" -> PIN13
+  | "PINA0" -> PINA0
+  | "PINA1" -> PINA1
+  | "PINA2" -> PINA2
+  | "PINA3" -> PINA3
+  | "PINA4" -> PINA4
+  | "PINA5" -> PINA5
+  | _ -> invalid_arg "pin_of_string"
+
+let name_of_pin : type a. a pin -> string = function
+  | _ -> ""
+
+
+let register_of_char = function
+  | 'B' -> PORTB
+  | 'C' -> PORTC
+  | 'D' -> PORTD
+  | _ -> invalid_arg "register_of_char"
+
+let char_of_register = function
+  | PORTB -> 'B'
+  | PORTC -> 'C'
+  | PORTD -> 'D'
+  | _ -> invalid_arg "char_of_register"
+
+let index_of_register = function
+  | PORTB -> 0
+  | PORTC -> 1
+  | PORTD -> 2
+  | _ -> invalid_arg "index_of_register"
+
+let register_of_index = function
+  | 0 -> PORTB
+  | 1 -> PORTC
+  | 2 -> PORTD
+  | _ -> invalid_arg "register_of_index"
+
+let index_of_bit = function
+  | BIT0 -> 0
+  | BIT1 -> 1
+  | BIT2 -> 2
+  | BIT3 -> 3
+  | BIT4 -> 4
+  | BIT5 -> 5
+  | BIT6 -> 6
+  | BIT7 -> 7
+
+let bit_of_index = function
+  | 0 -> BIT0
+  | 1 -> BIT1
+  | 2 -> BIT2
+  | 3 -> BIT3
+  | 4 -> BIT4
+  | 5 -> BIT5
+  | 6 -> BIT6
+  | 7 -> BIT7
+  | _ -> invalid_arg "bit_of_index"
+
+let pin_of_register_bit register bit : [ `DWRITE ] pin =
+  match register, bit with
+  | (PORTD, BIT0) -> PIN0
+  | (PORTD, BIT1) -> PIN1
+  | (PORTD, BIT2) -> PIN2
+  | (PORTD, BIT3) -> PIN3
+  | (PORTD, BIT4) -> PIN4
+  | (PORTD, BIT5) -> PIN5
+  | (PORTD, BIT6) -> PIN6
+  | (PORTD, BIT7) -> PIN7
+  | (PORTB, BIT0) -> PIN8
+  | (PORTB, BIT1) -> PIN9
+  | (PORTB, BIT2) -> PIN10
+  | (PORTB, BIT3) -> PIN11
+  | (PORTB, BIT4) -> PIN12
+  | (PORTB, BIT5) -> PIN13
+  | (PORTC, BIT0) -> PINA0
+  | (PORTC, BIT1) -> PINA1
+  | (PORTC, BIT2) -> PINA2
+  | (PORTC, BIT3) -> PINA3
+  | (PORTC, BIT4) -> PINA4
+  | (PORTC, BIT5) -> PINA5
+  | _ -> invalid_arg "pin_of_register_bit"
