@@ -2,34 +2,41 @@ include ../../etc/Makefile.conf
 
 LIBAVR := $(LIB)/targets/avr
 
-FOLDERS := arduino_uno arduino_mega_2560 arduboy
+FOLDERS := arduino_uno/ arduino_mega_2560/ arduboy/
 
 LIB_FOLDERS := $(foreach f,$(FOLDERS),$(LIBAVR)/$(f))
 
 MODULES := avr
 SUBMODULES := \
-  arduino_uno/arduinoUnoPins \
-  arduino_mega_2560/arduinoMegaPins \
-  arduboy/arduboyPins \
+  arduino_uno/arduinoUno \
+  arduino_mega_2560/arduinoMega \
+  arduboy/arduboy \
 
 MLS := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
 CMOS := $(MODULES:=.cmo)
 CMIS := $(MODULES:=.cmi)
 
-SMLS := $(SUBMODULES:=.ml)
-SMLIS := $(SUBMODULES:=.mli)
-SCMOS := $(SUBMODULES:=.cmo)
-SCMIS := $(SUBMODULES:=.cmi)
+PINSMLS := $(SUBMODULES:=Pins.ml)
+PINSCMIS := $(SUBMODULES:=Pins.cmi)
+PINSCMOS := $(SUBMODULES:=Pins.cmo)
+
+MCUMLS := $(FOLDERS:=mcuPins.ml)
+MCUMLIS := $(FOLDERS:=mcuPins.mli)
+MCUCMOS := $(FOLDERS:=mcuPins.cmo)
+MCUCMIS := $(FOLDERS:=mcuPins.cmi)
 
 LIB_MLS  := $(foreach ml,$(MLS),$(LIBAVR)/$(ml)) \
-						$(foreach ml,$(SMLS),$(LIBAVR)/$(ml))
+			$(foreach ml,$(PINSMLS),$(LIBAVR)/$(ml)) \
+			$(foreach ml,$(MCUMLS),$(LIBAVR)/$(ml))
 LIB_MLIS := $(foreach mli,$(MLIS),$(LIBAVR)/$(mli)) \
-						$(foreach ml,$(SMLIS),$(LIBAVR)/$(ml))
+			$(foreach ml,$(MCUMLIS),$(LIBAVR)/$(ml))
 LIB_CMIS := $(foreach cmi,$(CMIS),$(LIBAVR)/$(cmi)) \
-						$(foreach cmi,$(SCMIS),$(LIBAVR)/$(cmi))
+			$(foreach cmi,$(PINSCMIS),$(LIBAVR)/$(cmi)) \
+			$(foreach cmi,$(MCUCMIS),$(LIBAVR)/$(cmi))
 LIB_CMOS := $(foreach cmo,$(CMOS),$(LIBAVR)/$(cmo)) \
-						$(foreach cmo,$(SCMOS),$(LIBAVR)/$(cmo))
+			$(foreach cmo,$(PINSCMOS),$(LIBAVR)/$(cmo)) \
+			$(foreach cmo,$(MCUCMOS),$(LIBAVR)/$(cmo))
 
 TARGETS := $(LIB_FOLDERS) $(LIB_MLS) $(LIB_MLIS) $(LIB_CMIS) $(LIB_CMOS) $(LIBAVR)/avr.cma
 
@@ -44,11 +51,17 @@ avr.cmi: avr.mli
 avr.cmo: avr.ml avr.cmi
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
 
-$(SCMIS): %.cmi: %.mli
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $^ -o $@
+$(PINSCMIS): %.cmi: %.ml
+	$(OCAMLC) -nopervasives -nostdlib -c $< -I $*
 
-$(SCMOS): %.cmo: %.ml
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $^ -o $@ $(foreach f,$(FOLDERS), -I $(f))
+$(PINSCMOS): %.cmo: %.ml
+	$(OCAMLC) -nopervasives -nostdlib -c $< -o $@ -I $*
+
+$(MCUCMIS): %/mcuPins.cmi: %/mcuPins.mli
+	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $^ -o $@ -I $*
+
+$(MCUCMOS): %/mcuPins.cmo: %/mcuPins.ml %/mcuPins.cmi
+	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@ -I $*
 
 $(LIB_FOLDERS):
 	mkdir -p $@
@@ -66,6 +79,6 @@ $(LIBAVR)/%.cmo: %.cmo
 	cp $< $@
 
 clean:
-	@rm -f $(CMOS) $(CMIS) $(SCMOS) $(SCMIS)
+	@rm -f **/*.cmo **/*.cmi
 
 .PHONY: avrs clean

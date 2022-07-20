@@ -7,11 +7,10 @@
 type level = HIGH | LOW
 type mode = INPUT | OUTPUT | INPUT_PULLUP
 
-type bit = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7
-
 module type AvrPins = sig
   type 'a pin
   type register
+  type bit
   val port_of_pin: 'a pin -> register
   val ddr_of_pin: 'a pin -> register
   val input_of_pin: 'a pin -> register

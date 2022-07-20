@@ -81,8 +81,12 @@ module AvrConfig(A : AVRCONFIG) : DEVICECONFIG = struct
             (Filename.concat "targets/avr"
                (Filename.concat A.folder
                   ((String.uncapitalize_ascii A.pins_module)^".cmo")));
+          Filename.concat libdir
+            (Filename.concat "targets/avr"
+               (Filename.concat A.folder "mcuPins.cmo"));
           "-open"; Printf.sprintf "Avr";
-          "-open"; Printf.sprintf "%s" A.pins_module ] in
+          "-open"; A.pins_module;
+          "-open"; "McuPins" ] in
     let cmd = cmd @ inputs @ [ "-o"; output ] in
     run ~vars ~verbose cmd
 
