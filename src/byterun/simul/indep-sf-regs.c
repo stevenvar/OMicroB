@@ -16,7 +16,7 @@
 #elif defined(__SIMUL_ARDUINO_MEGA__)
 #define NB_PORT 11
 #else
-#define NB_PORT 0
+#define NB_PORT 5
 #endif
 
 #define NB_REG 255
@@ -119,7 +119,7 @@ static void may_sleep(){
 static void send_write(char cmnd, int port, unsigned char val){
   char buf[5];
   buf[0] = cmnd;
-  buf[1] = port;
+  buf[1] = port + 1; // Avoid 0
   buf[2] = hexchar_of_int((val >> 4) & 0x0F);
   buf[3] = hexchar_of_int(val & 0x0F);
   buf[4] = '\n';
@@ -234,7 +234,7 @@ uint8_t read_register(uint8_t reg){
 }
 
 bool read_bit(uint8_t reg, uint8_t bit){
-  printf("read_bit(%d, %d)\n", (int) reg, (int) bit);
+  /* printf("read_bit(%d, %d)\n", (int) reg, (int) bit); */
   /* Dirty hack  */
   /* if (reg == SPSR){ */
   /*     return 1; */
@@ -252,7 +252,7 @@ bool read_bit(uint8_t reg, uint8_t bit){
 }
 
 void clear_bit(uint8_t reg, uint8_t bit){
-  printf("clear_bit(%d, %d)\n", (int) reg, (int) bit);
+  /* printf("clear_bit(%d, %d)\n", (int) reg, (int) bit); */
   init_simulator();
   P(sem_regs);
   {
@@ -287,7 +287,7 @@ void clear_bit(uint8_t reg, uint8_t bit){
 }
 
 void set_bit(uint8_t reg, uint8_t bit){
-  printf("set_bit(%d, %d)\n", (int) reg, (int) bit);
+  /* printf("set_bit(%d, %d)\n", (int) reg, (int) bit); */
   init_simulator();
   P(sem_regs);
   uint8_t old_val = regs[reg];
@@ -476,8 +476,8 @@ void exec_instr(char *instr, int size){
     out_set_analog(chan, val);
   }else{
     int port;
-    if(instr[1] <= HIGHER_PIN - LOWER_PORT){
-      port = instr[1];
+    if(instr[1] <= HIGHER_PIN - LOWER_PORT + 1){
+      port = instr[1] - 1;
     }else{
       invalid_instr(instr);
       return;

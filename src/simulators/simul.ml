@@ -17,58 +17,17 @@ let int_of_hex3 c2 c1 c0 =
 
 (***)
 
-type an =
-  | AN0  | AN1  | AN2  | AN3
-  | AN4  | AN5  | AN6  | AN7
-  | AN8  | AN9  | AN10 | AN11
-  | AN12
-
-let string_of_an an = match an with
-  | AN0  -> "AN0"  | AN1 -> "AN1" | AN2  -> "AN2"  | AN3  -> "AN3"
-  | AN4  -> "AN4"  | AN5 -> "AN5" | AN6  -> "AN6"  | AN7  -> "AN7"
-  | AN8  -> "AN8"  | AN9 -> "AN9" | AN10 -> "AN10" | AN11 -> "AN11"
-  | AN12 -> "AN12"
-
-let an_of_string str = match str with
-  | "AN0"  -> AN0  | "AN1" -> AN1 | "AN2"  -> AN2  | "AN3"  -> AN3
-  | "AN4"  -> AN4  | "AN5" -> AN5 | "AN6"  -> AN6  | "AN7"  -> AN7
-  | "AN8"  -> AN8  | "AN9" -> AN9 | "AN10" -> AN10 | "AN11" -> AN11
-  | "AN12" -> AN12 | _ -> invalid_arg "Simul.an_of_string"
-
-let char_of_an an = match an with
-  | AN0  -> '0' | AN1 -> '1' | AN2  -> '2' | AN3  -> '3'
-  | AN4  -> '4' | AN5 -> '5' | AN6  -> '6' | AN7  -> '7'
-  | AN8  -> '8' | AN9 -> '9' | AN10 -> 'A' | AN11 -> 'B'
-  | AN12 -> 'C'
-
-let an_of_char c = match c with
-  | '0' -> AN0  | '1' -> AN1 | '2' -> AN2  | '3' -> AN3
-  | '4' -> AN4  | '5' -> AN5 | '6' -> AN6  | '7' -> AN7
-  | '8' -> AN8  | '9' -> AN9 | 'A' -> AN10 | 'B' -> AN11
-  | 'C' -> AN12 | _ -> invalid_arg "Simul.an_of_char"
-
-let int_of_an an = match an with
-  | AN0  -> 0x0 | AN1 -> 0x1 | AN2  -> 0x2 | AN3  -> 0x3
-  | AN4  -> 0x4 | AN5 -> 0x5 | AN6  -> 0x6 | AN7  -> 0x7
-  | AN8  -> 0x8 | AN9 -> 0x9 | AN10 -> 0xA | AN11 -> 0xB
-  | AN12 -> 0xC
-
-let an_of_int n = match n with
-  | 0x0  -> AN0 | 0x1 -> AN1 | 0x2  -> AN2 | 0x3  -> AN3
-  | 0x4  -> AN4 | 0x5 -> AN5 | 0x6  -> AN6 | 0x7  -> AN7
-  | 0x8  -> AN8 | 0x9 -> AN9 | 0xA -> AN10 | 0xB -> AN11
-  | 0xC -> AN12 | _ -> invalid_arg "Simul.an_of_int"
-
-(***)
-
 module type MCUSimul = sig
   type 'a pin
   type register
   type bit
 
-  val pin_of_string : string -> [ `DWRITE ] pin
-  val name_of_pin : 'a pin -> string
+  val pin_of_string : string -> [ `SIMUL ] pin
+  val name_of_pin : [ `SIMUL ] pin -> string
   val nb_pins : int
+
+  val num_of_pin : [ `SIMUL ] pin -> int
+  val pin_of_num : int -> [ `SIMUL ] pin option
 
   val spdr : register
 
@@ -81,14 +40,58 @@ module type MCUSimul = sig
   val index_of_bit : bit -> int
   val bit_of_index : int -> bit
 
-  val register_of_pin : 'a pin -> register
-  val bit_of_pin : 'a pin -> bit
+  val register_of_pin : [ `SIMUL ] pin -> register
+  val bit_of_pin : [ `SIMUL ] pin -> bit
 
-  val pin_of_register_bit : register -> bit -> [ `DWRITE ] pin
+  val pin_of_register_bit : register -> bit -> [ `SIMUL ] pin
 end
 
 module Simul(M : MCUSimul) = struct
   open M
+
+  type an =
+    | AN0  | AN1  | AN2  | AN3
+    | AN4  | AN5  | AN6  | AN7
+    | AN8  | AN9  | AN10 | AN11
+    | AN12
+
+  let string_of_an an = match an with
+    | AN0  -> "AN0"  | AN1 -> "AN1" | AN2  -> "AN2"  | AN3  -> "AN3"
+    | AN4  -> "AN4"  | AN5 -> "AN5" | AN6  -> "AN6"  | AN7  -> "AN7"
+    | AN8  -> "AN8"  | AN9 -> "AN9" | AN10 -> "AN10" | AN11 -> "AN11"
+    | AN12 -> "AN12"
+
+  let an_of_string str = match str with
+    | "AN0"  -> AN0  | "AN1" -> AN1 | "AN2"  -> AN2  | "AN3"  -> AN3
+    | "AN4"  -> AN4  | "AN5" -> AN5 | "AN6"  -> AN6  | "AN7"  -> AN7
+    | "AN8"  -> AN8  | "AN9" -> AN9 | "AN10" -> AN10 | "AN11" -> AN11
+    | "AN12" -> AN12 | _ -> invalid_arg "Simul.an_of_string"
+
+  let char_of_an an = match an with
+    | AN0  -> '0' | AN1 -> '1' | AN2  -> '2' | AN3  -> '3'
+    | AN4  -> '4' | AN5 -> '5' | AN6  -> '6' | AN7  -> '7'
+    | AN8  -> '8' | AN9 -> '9' | AN10 -> 'A' | AN11 -> 'B'
+    | AN12 -> 'C'
+
+  let an_of_char c = match c with
+    | '0' -> AN0  | '1' -> AN1 | '2' -> AN2  | '3' -> AN3
+    | '4' -> AN4  | '5' -> AN5 | '6' -> AN6  | '7' -> AN7
+    | '8' -> AN8  | '9' -> AN9 | 'A' -> AN10 | 'B' -> AN11
+    | 'C' -> AN12 | _ -> invalid_arg "Simul.an_of_char"
+
+  let int_of_an an = match an with
+    | AN0  -> 0x0 | AN1 -> 0x1 | AN2  -> 0x2 | AN3  -> 0x3
+    | AN4  -> 0x4 | AN5 -> 0x5 | AN6  -> 0x6 | AN7  -> 0x7
+    | AN8  -> 0x8 | AN9 -> 0x9 | AN10 -> 0xA | AN11 -> 0xB
+    | AN12 -> 0xC
+
+  let an_of_int n = match n with
+    | 0x0  -> AN0 | 0x1 -> AN1 | 0x2  -> AN2 | 0x3  -> AN3
+    | 0x4  -> AN4 | 0x5 -> AN5 | 0x6  -> AN6 | 0x7  -> AN7
+    | 0x8  -> AN8 | 0x9 -> AN9 | 0xA -> AN10 | 0xB -> AN11
+    | 0xC -> AN12 | _ -> invalid_arg "Simul.an_of_int"
+
+  (***)
 
   type input =
     | IWrite of register * int
@@ -106,10 +109,10 @@ module Simul(M : MCUSimul) = struct
         match s.[0] with
         | 'W' ->
           assert (String.length s = 4);
-          IWrite  (register_of_index @@ int_of_char @@ s.[1], int_of_hex2 s.[2] s.[3])
+          IWrite  (register_of_index @@ (fun x -> int_of_char x - 1) @@ s.[1], int_of_hex2 s.[2] s.[3])
         | 'T' ->
           assert (String.length s = 4);
-          ITris   (register_of_index @@ int_of_char @@ s.[1], int_of_hex2 s.[2] s.[3])
+          ITris   (register_of_index @@ (fun x -> int_of_char x - 1) @@ s.[1], int_of_hex2 s.[2] s.[3])
         | 'Z' ->
           assert (String.length s = 5);
           IWriteAnalog (an_of_char s.[1], int_of_hex3 s.[2] s.[3] s.[4])
@@ -122,8 +125,8 @@ module Simul(M : MCUSimul) = struct
   (***)
 
   type output =
-    | OSet of [ `DWRITE ] pin
-    | OClear of [ `DWRITE ] pin
+    | OSet of [ `SIMUL ] pin
+    | OClear of [ `SIMUL ] pin
     | OWrite of register * int
     | OWriteAnalog of an * int
     | ODone
@@ -134,15 +137,15 @@ module Simul(M : MCUSimul) = struct
   let string_of_output output =
     match output with
     | OSet pin ->
-      Printf.sprintf "S%c%d" (char_of_int (index_of_register (register_of_pin pin)))
+      Printf.sprintf "S%c%d" (char_of_int (index_of_register (register_of_pin pin) + 1))
         (index_of_pin pin)
     | OClear pin ->
-      Printf.sprintf "C%c%d" (char_of_int (index_of_register (register_of_pin pin)))
+      Printf.sprintf "C%c%d" (char_of_int (index_of_register (register_of_pin pin) + 1))
         (index_of_pin pin)
     | OWrite (register, value) ->
       if value < 0 || value > 0xFF
       then failwith (Printf.sprintf "value %d of OWrite is out of range [ 0x0; 0xFF ]" value);
-      Printf.sprintf "W%c%02X" (char_of_int (index_of_register register)) value
+      Printf.sprintf "W%c%02X" (char_of_int (index_of_register register + 1)) value
     | OWriteAnalog (an, value) ->
       if value < 0 || value > 0x3FF
       then failwith (Printf.sprintf "value %d of OWriteAnalog is out of range [ 0x0; 0x3FF ]" value);
@@ -179,18 +182,18 @@ module Simul(M : MCUSimul) = struct
     | Write_register_handler of register * (int -> unit)
     | Tris_handler of (register -> int -> unit)
     | Tris_register_handler of register * (int -> unit)
-    | Set_handler of ([ `DWRITE ] pin -> unit)
-    | Clear_handler of ([ `DWRITE ] pin -> unit)
-    | Change_handler of ([ `DWRITE ] pin -> bool -> unit)
-    | Set_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Clear_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Change_pin_handler of [ `DWRITE ] pin * (bool -> unit)
-    | Setin_handler of ([ `DWRITE ] pin -> unit)
-    | Setout_handler of ([ `DWRITE ] pin -> unit)
-    | Setstate_handler of ([ `DWRITE ] pin -> bool -> unit)
-    | Setin_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Setout_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Setstate_pin_handler of [ `DWRITE ] pin * (bool -> unit)
+    | Set_handler of ([ `SIMUL ] pin -> unit)
+    | Clear_handler of ([ `SIMUL ] pin -> unit)
+    | Change_handler of ([ `SIMUL ] pin -> bool -> unit)
+    | Set_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Clear_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Change_pin_handler of [ `SIMUL ] pin * (bool -> unit)
+    | Setin_handler of ([ `SIMUL ] pin -> unit)
+    | Setout_handler of ([ `SIMUL ] pin -> unit)
+    | Setstate_handler of ([ `SIMUL ] pin -> bool -> unit)
+    | Setin_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Setout_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Setstate_pin_handler of [ `SIMUL ] pin * (bool -> unit)
     | Write_analog_handler of (an -> int -> unit)
     | Write_an_analog_handler of an * (int -> unit)
     | Config_analogs_handler of (int -> unit)

@@ -1,26 +1,6 @@
 val int_of_hex1 : char -> int
 val int_of_hex2 : char -> char -> int
 val int_of_hex3 : char -> char -> char -> int
-type an =
-    AN0
-  | AN1
-  | AN2
-  | AN3
-  | AN4
-  | AN5
-  | AN6
-  | AN7
-  | AN8
-  | AN9
-  | AN10
-  | AN11
-  | AN12
-val string_of_an : an -> string
-val an_of_string : string -> an
-val char_of_an : an -> char
-val an_of_char : char -> an
-val int_of_an : an -> int
-val an_of_int : int -> an
 
 
 module type MCUSimul = sig
@@ -28,9 +8,12 @@ module type MCUSimul = sig
   type register
   type bit
 
-  val pin_of_string : string -> [ `DWRITE ] pin
-  val name_of_pin : 'a pin -> string
+  val pin_of_string : string -> [ `SIMUL ] pin
+  val name_of_pin : [ `SIMUL ] pin -> string
   val nb_pins : int
+
+  val num_of_pin : [ `SIMUL ] pin -> int
+  val pin_of_num : int -> [ `SIMUL ] pin option
 
   val spdr : register
   val register_of_char : char -> register
@@ -42,15 +25,37 @@ module type MCUSimul = sig
   val index_of_bit : bit -> int
   val bit_of_index : int -> bit
 
-  val register_of_pin : 'a pin -> register
-  val bit_of_pin : 'a pin -> bit
+  val register_of_pin : [ `SIMUL ] pin -> register
+  val bit_of_pin : [ `SIMUL ] pin -> bit
 
-  val pin_of_register_bit : register -> bit -> [ `DWRITE ] pin
+  val pin_of_register_bit : register -> bit -> [ `SIMUL ] pin
 end
 
 
 module Simul(M : MCUSimul) : sig
   open M
+
+  type an =
+      AN0
+    | AN1
+    | AN2
+    | AN3
+    | AN4
+    | AN5
+    | AN6
+    | AN7
+    | AN8
+    | AN9
+    | AN10
+    | AN11
+    | AN12
+  val string_of_an : an -> string
+  val an_of_string : string -> an
+  val char_of_an : an -> char
+  val an_of_char : char -> an
+  val int_of_an : an -> int
+  val an_of_int : int -> an
+
   type input =
       IWrite of register * int
     | ITris of register * int
@@ -60,8 +65,8 @@ module Simul(M : MCUSimul) : sig
     | IStop
   val input_of_string : string -> input
   type output =
-    | OSet of [ `DWRITE ] pin
-    | OClear of [ `DWRITE ] pin
+    | OSet of [ `SIMUL ] pin
+    | OClear of [ `SIMUL ] pin
     | OWrite of register * int
     | OWriteAnalog of an * int
     | ODone
@@ -75,18 +80,18 @@ module Simul(M : MCUSimul) : sig
     | Write_register_handler of register * (int -> unit)
     | Tris_handler of (register -> int -> unit)
     | Tris_register_handler of register * (int -> unit)
-    | Set_handler of ([ `DWRITE ] pin -> unit)
-    | Clear_handler of ([ `DWRITE ] pin -> unit)
-    | Change_handler of ([ `DWRITE ] pin -> bool -> unit)
-    | Set_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Clear_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Change_pin_handler of [ `DWRITE ] pin * (bool -> unit)
-    | Setin_handler of ([ `DWRITE ] pin -> unit)
-    | Setout_handler of ([ `DWRITE ] pin -> unit)
-    | Setstate_handler of ([ `DWRITE ] pin -> bool -> unit)
-    | Setin_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Setout_pin_handler of [ `DWRITE ] pin * (unit -> unit)
-    | Setstate_pin_handler of [ `DWRITE ] pin * (bool -> unit)
+    | Set_handler of ([ `SIMUL ] pin -> unit)
+    | Clear_handler of ([ `SIMUL ] pin -> unit)
+    | Change_handler of ([ `SIMUL ] pin -> bool -> unit)
+    | Set_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Clear_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Change_pin_handler of [ `SIMUL ] pin * (bool -> unit)
+    | Setin_handler of ([ `SIMUL ] pin -> unit)
+    | Setout_handler of ([ `SIMUL ] pin -> unit)
+    | Setstate_handler of ([ `SIMUL ] pin -> bool -> unit)
+    | Setin_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Setout_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Setstate_pin_handler of [ `SIMUL ] pin * (bool -> unit)
     | Write_analog_handler of (an -> int -> unit)
     | Write_an_analog_handler of an * (int -> unit)
     | Config_analogs_handler of (int -> unit)
@@ -104,13 +109,13 @@ module Simul(M : MCUSimul) : sig
   val start : unit -> unit
   val join : unit -> unit
   val write_register : register -> int -> unit
-  val set_pin : [ `DWRITE ] pin -> unit
-  val clear_pin : [ `DWRITE ] pin -> unit
-  val change_pin : [ `DWRITE ] pin -> bool -> unit
+  val set_pin : [ `SIMUL ] pin -> unit
+  val clear_pin : [ `SIMUL ] pin -> unit
+  val change_pin : [ `SIMUL ] pin -> bool -> unit
   val write_analog : an -> int -> unit
   val read_register : register -> int
   val read_tris : register -> int
-  val test_pin : [ `DWRITE ] pin -> bool
-  val state_pin : [ `DWRITE ] pin -> bool
+  val test_pin : [ `SIMUL ] pin -> bool
+  val state_pin : [ `SIMUL ] pin -> bool
   val analog_input_count : unit -> int
 end

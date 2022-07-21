@@ -14,14 +14,15 @@ open Window;;
 
 module Component(M : Simul.MCUSimul) = struct
   open M
-  open Simul.Simul(M)
+  module Simul = Simul.Simul(M)
+  open Simul
 
   type led = {
     led_x      : int;
     led_y      : int;
     led_radius : int;
     led_color  : Color.t;
-    led_pin    : [ `DWRITE ] pin;
+    led_pin    : [ `SIMUL ] pin;
     led_inv    : bool;
   }
 
@@ -31,8 +32,8 @@ module Component(M : Simul.MCUSimul) = struct
     ledb_radius : int;
     ledb_color1 : Color.t;
     ledb_color2 : Color.t;
-    ledb_pin1   : [ `DWRITE ] pin;
-    ledb_pin2   : [ `DWRITE ] pin;
+    ledb_pin1   : [ `SIMUL ] pin;
+    ledb_pin2   : [ `SIMUL ] pin;
     ledb_inv    : bool;
   }
 
@@ -43,8 +44,8 @@ module Component(M : Simul.MCUSimul) = struct
     but_height  : int;
     but_color   : Color.t;
     but_label   : string;
-    but_pin     : [ `DWRITE ] pin;
-    but_pin_out : [ `DWRITE ] pin option;
+    but_pin     : [ `SIMUL ] pin;
+    but_pin_out : [ `SIMUL ] pin option;
     but_inv     : bool;
   }
 
@@ -55,7 +56,7 @@ module Component(M : Simul.MCUSimul) = struct
     swi_height : int;
     swi_color  : Color.t;
     swi_label  : string;
-    swi_pin    : [ `DWRITE ] pin;
+    swi_pin    : [ `SIMUL ] pin;
     swi_def    : bool;
     swi_orient : [ `Horizontal | `Vertical ];
   }
@@ -65,11 +66,11 @@ module Component(M : Simul.MCUSimul) = struct
     seg7_y       : int;
     seg7_width   : int;
     seg7_height  : int;
-    seg7_disp    : ([ `DWRITE ] pin * (int * int) array) array;
+    seg7_disp    : ([ `SIMUL ] pin * (int * int) array) array;
     seg7_color   : Color.t;
     seg7_bgcolor : Color.t;
-    seg7_point   : [ `DWRITE ] pin option;
-    seg7_common  : [ `DWRITE ] pin option;
+    seg7_point   : [ `SIMUL ] pin option;
+    seg7_common  : [ `SIMUL ] pin option;
     seg7_inv     : bool;
   }
 

@@ -12,9 +12,9 @@ module DisplayTypes(M : Simul.MCUSimul) = struct
   type display = {
     x : int;
     y : int;
-    cs : [ `DWRITE ] pin;
-    dc : [ `DWRITE ] pin;
-    rst : [ `DWRITE ] pin;
+    cs : [ `SIMUL ] pin;
+    dc : [ `SIMUL ] pin;
+    rst : [ `SIMUL ] pin;
     register : register;
     column_nb : int;
     line_nb : int;
@@ -52,13 +52,13 @@ module DisplayTypes(M : Simul.MCUSimul) = struct
   type display16x2 = {
     x16 : int;
     y16 : int;
-    e : [ `DWRITE ] pin;
-    rs : [ `DWRITE ] pin;
-    rw : [ `DWRITE ] pin;
-    d4 : [ `DWRITE ] pin;
-    d5 : [ `DWRITE ] pin;
-    d6 : [ `DWRITE ] pin;
-    d7 : [ `DWRITE ] pin;
+    e : [ `SIMUL ] pin;
+    rs : [ `SIMUL ] pin;
+    rw : [ `SIMUL ] pin;
+    d4 : [ `SIMUL ] pin;
+    d5 : [ `SIMUL ] pin;
+    d6 : [ `SIMUL ] pin;
+    d7 : [ `SIMUL ] pin;
     column_nb16 : int;
     line_nb16 : int;
     width16 : int;

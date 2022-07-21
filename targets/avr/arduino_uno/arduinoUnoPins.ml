@@ -9,32 +9,32 @@ let nb_registers = 6
 type bit = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7
 
 type 'a pin =
-  | PIN0  : [< `DREAD | `DWRITE ] pin
-  | PIN1  : [< `DREAD | `DWRITE ] pin
-  | PIN2  : [< `DREAD | `DWRITE ] pin
-  | PIN3  : [< `DREAD | `DWRITE | `PWM ] pin
-  | PIN4  : [< `DREAD | `DWRITE ] pin
-  | PIN5  : [< `DREAD | `DWRITE | `PWM ] pin
-  | PIN6  : [< `DREAD | `DWRITE | `PWM ] pin
-  | PIN7  : [< `DREAD | `DWRITE ] pin
-  | PIN8  : [< `DREAD | `DWRITE ] pin
-  | PIN9  : [< `DREAD | `DWRITE | `PWM ] pin
-  | PIN10 : [< `DREAD | `DWRITE | `PWM ] pin
-  | PIN11 : [< `DREAD | `DWRITE | `PWM ] pin
-  | PIN12 : [< `DREAD | `DWRITE ] pin
-  | PIN13 : [< `DREAD | `DWRITE ] pin
+  | PIN0  : [< `DREAD | `DWRITE | `SIMUL ] pin
+  | PIN1  : [< `DREAD | `DWRITE | `SIMUL ] pin
+  | PIN2  : [< `DREAD | `DWRITE | `SIMUL ] pin
+  | PIN3  : [< `DREAD | `DWRITE | `PWM | `SIMUL ] pin
+  | PIN4  : [< `DREAD | `DWRITE | `SIMUL ] pin
+  | PIN5  : [< `DREAD | `DWRITE | `PWM | `SIMUL ] pin
+  | PIN6  : [< `DREAD | `DWRITE | `PWM | `SIMUL ] pin
+  | PIN7  : [< `DREAD | `DWRITE | `SIMUL ] pin
+  | PIN8  : [< `DREAD | `DWRITE | `SIMUL ] pin
+  | PIN9  : [< `DREAD | `DWRITE | `PWM | `SIMUL ] pin
+  | PIN10 : [< `DREAD | `DWRITE | `PWM | `SIMUL ] pin
+  | PIN11 : [< `DREAD | `DWRITE | `PWM | `SIMUL ] pin
+  | PIN12 : [< `DREAD | `DWRITE | `SIMUL ] pin
+  | PIN13 : [< `DREAD | `DWRITE | `SIMUL ] pin
   | MISO  : [< `MISO ] pin
   | SCK   : [< `SCK ] pin
   | MOSI  : [< `MOSI ] pin
   | SS    : [< `SS ] pin
-  | PINA0 : [< `DREAD | `DWRITE | `AREAD ] pin
-  | PINA1 : [< `DREAD | `DWRITE | `AREAD ] pin
-  | PINA2 : [< `DREAD | `DWRITE | `AREAD ] pin
-  | PINA3 : [< `DREAD | `DWRITE | `AREAD ] pin
-  | PINA4 : [< `DREAD | `DWRITE | `AREAD ] pin
-  | PINA5 : [< `DREAD | `DWRITE | `AREAD ] pin
+  | PINA0 : [< `DREAD | `DWRITE | `AREAD | `SIMUL ] pin
+  | PINA1 : [< `DREAD | `DWRITE | `AREAD | `SIMUL ] pin
+  | PINA2 : [< `DREAD | `DWRITE | `AREAD | `SIMUL ] pin
+  | PINA3 : [< `DREAD | `DWRITE | `AREAD | `SIMUL ] pin
+  | PINA4 : [< `DREAD | `DWRITE | `AREAD | `SIMUL ] pin
+  | PINA5 : [< `DREAD | `DWRITE | `AREAD | `SIMUL ] pin
 
-let nb_pins = 24
+let nb_pins = 28
 
 let port_of_pin : type a. a pin -> register =
   function
@@ -160,7 +160,7 @@ external raise : exn -> 'a = "%raise"
 let invalid_arg s =
   raise (Invalid_argument s)
 
-let pin_of_string = function
+let pin_of_string : string -> [ `SIMUL ] pin = function
   | "PIN0" -> PIN0
   | "PIN1" -> PIN1
   | "PIN2" -> PIN2
@@ -183,9 +183,27 @@ let pin_of_string = function
   | "PINA5" -> PINA5
   | _ -> invalid_arg "pin_of_string"
 
-let name_of_pin : type a. a pin -> string = function
-  | _ -> ""
-
+let name_of_pin : [ `SIMUL ] pin -> string = function
+  | PIN0 -> "PIN0/RX0"
+  | PIN1 -> "PIN1/TX0"
+  | PIN2 -> "PIN2"
+  | PIN3 -> "PIN3/PWM"
+  | PIN4 -> "PIN4"
+  | PIN5 -> "PIN5"
+  | PIN6 -> "PIN6"
+  | PIN7 -> "PIN7"
+  | PIN8 -> "PIN8"
+  | PIN9 -> "PIN9/PWM"
+  | PIN10 -> "PIN10/PWM"
+  | PIN11 -> "PIN11/PWM"
+  | PIN12 -> "PIN12"
+  | PIN13 -> "PIN13"
+  | PINA0 -> "A0"
+  | PINA1 -> "A1"
+  | PINA2 -> "A2"
+  | PINA3 -> "A3"
+  | PINA4 -> "A4"
+  | PINA5 -> "A5"
 
 let register_of_char = function
   | 'B' -> PORTB
@@ -232,7 +250,9 @@ let bit_of_index = function
   | 7 -> BIT7
   | _ -> invalid_arg "bit_of_index"
 
-let pin_of_register_bit register bit : [ `DWRITE ] pin =
+exception Pin_of_register_bit of register * bit
+
+let pin_of_register_bit register bit : [ `SIMUL ] pin =
   match register, bit with
   | (PORTD, BIT0) -> PIN0
   | (PORTD, BIT1) -> PIN1
@@ -254,4 +274,51 @@ let pin_of_register_bit register bit : [ `DWRITE ] pin =
   | (PORTC, BIT3) -> PINA3
   | (PORTC, BIT4) -> PINA4
   | (PORTC, BIT5) -> PINA5
-  | _ -> invalid_arg "pin_of_register_bit"
+  | _ -> raise (Pin_of_register_bit (register, bit))
+
+(* Physical placement on the microcontroler *)
+
+let num_of_pin : [ `SIMUL ] pin -> int = function
+  | PIN0 -> 1
+  | PIN1 -> 2
+  | PIN2 -> 3
+  | PIN3 -> 4
+  | PIN4 -> 5
+  | PIN5 -> 10
+  | PIN6 -> 11
+  | PIN7 -> 12
+  | PIN8 -> 13
+  | PIN9 -> 14
+  | PIN10 -> 15
+  | PIN11 -> 16
+  | PIN12 -> 17
+  | PIN13 -> 18
+  | PINA0 -> 22
+  | PINA1 -> 23
+  | PINA2 -> 24
+  | PINA3 -> 25
+  | PINA4 -> 26
+  | PINA5 -> 27
+
+let pin_of_num : int -> [ `SIMUL ] pin option = function
+  | 1 -> Some PIN0
+  | 2 -> Some PIN1
+  | 3 -> Some PIN2
+  | 4 -> Some PIN3
+  | 5 -> Some PIN4
+  | 10 -> Some PIN5
+  | 11 -> Some PIN6
+  | 12 -> Some PIN7
+  | 13 -> Some PIN8
+  | 14 -> Some PIN9
+  | 15 -> Some PIN10
+  | 16 -> Some PIN11
+  | 17 -> Some PIN12
+  | 18 -> Some PIN13
+  | 22 -> Some PINA0
+  | 23 -> Some PINA1
+  | 24 -> Some PINA2
+  | 25 -> Some PINA3
+  | 26 -> Some PINA4
+  | 27 -> Some PINA5
+  | _ -> None

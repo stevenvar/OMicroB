@@ -49,7 +49,6 @@ let () =
     let open Lexer.Lexer(M) in
     let open Parser.Make(M) in
     let open Component.Component(M) in
-    let open Simul.Simul(M) in
 
     let file = get "file" file in
     let ic = open_in file in
@@ -76,7 +75,7 @@ let () =
       at_exit (fun () -> print_endline "STOP");
       Window.init_graphics ();
       List.iter register components;
-      start ();
+      Simul.start ();
       Window.main_loop ();
     with
     | Failure msg ->

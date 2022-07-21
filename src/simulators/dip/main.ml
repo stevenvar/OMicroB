@@ -1,9 +1,6 @@
 module Dip (M: Simul.MCUSimul) = struct
   exception Error
 
-  let num_of_pin : type a. a M.pin -> int = Obj.magic (* I know *)
-  let pin_of_num : int -> [ `DWRITE ] M.pin = Obj.magic
-
   let pins = Array.make (M.nb_pins) ((0,0),false)
   let tris = Array.make (M.nb_pins) true
   let mem_tris = Array.make (M.nb_pins) false
@@ -14,17 +11,19 @@ module Dip (M: Simul.MCUSimul) = struct
   let pin_height = 10
   let pin_space = 3
 
+  let width = 200
+
   let do_pin _p = ()
 
   let draw_pin i =
-    let y1 = (50 + (i*(pin_height+pin_space))) in
+    let y1 = M.nb_pins / 2 * (pin_height + pin_space) + 38 - (i*(pin_height+pin_space)) in
     let x1 = 50-pin_width in
     Graphics.set_color Graphics.yellow;
     Graphics.fill_rect x1 y1 pin_width pin_height;
     Graphics.set_color Graphics.black;
     Graphics.draw_rect x1 y1 pin_width pin_height;
     pins.(i) <- ((x1, y1), false);
-    let x2 = (50 + M.nb_pins / 4 * (pin_width + pin_space) ) in
+    let x2 = (50 + 200) in
     let y2 = y1 in
     Graphics.set_color Graphics.yellow;
     Graphics.fill_rect x2 y2 pin_width pin_height;
@@ -51,7 +50,7 @@ module Dip (M: Simul.MCUSimul) = struct
   let draw_name i p =
     let ((x,y),_) = p in
     let name = M.name_of_pin i in
-    if (num_of_pin i) < M.nb_pins / 2 then
+    if (M.num_of_pin i) < M.nb_pins / 2 then
       Graphics.moveto (x+pin_width + pin_space + 20) (y)
     else
       Graphics.moveto (x-(String.length name)*6-25) (y);
@@ -62,7 +61,7 @@ module Dip (M: Simul.MCUSimul) = struct
       let register = M.register_of_pin i and bit = M.bit_of_pin i in
       let c = M.char_of_register register in
       Graphics.set_color Graphics.white;
-      if (num_of_pin i) < M.nb_pins / 2 then
+      if (M.num_of_pin i) < M.nb_pins / 2 then
         Graphics.moveto (x+pin_width + pin_space) (y)
       else
         Graphics.moveto (x-15) (y);
@@ -96,7 +95,7 @@ module Dip (M: Simul.MCUSimul) = struct
   let change_arrows register value =
     for bit = 0 to 7 do
       try
-        let n = num_of_pin (M.pin_of_register_bit register (M.bit_of_index bit)) in
+        let n = M.num_of_pin (M.pin_of_register_bit register (M.bit_of_index bit)) in
         let ((x,y),_) = pins.(n) in
         pins.(n) <- ((x,y),value land (1 lsl bit) <> 0);
       with _ -> ()
@@ -113,7 +112,7 @@ module Dip (M: Simul.MCUSimul) = struct
    let draw_vals register value =
      for bit = 0 to 7 do
        try
-         let n = num_of_pin (M.pin_of_register_bit register (M.bit_of_index bit)) in
+         let n = M.num_of_pin (M.pin_of_register_bit register (M.bit_of_index bit)) in
          draw_val n (value land (1 lsl bit) <> 0);
        with _ -> ()
      done;
@@ -140,19 +139,18 @@ module Dip (M: Simul.MCUSimul) = struct
 
   let draw_micro () =
     Graphics.open_graph " ";
-    let p = pin_width + pin_space in
     let q = pin_height + pin_space in
-    Graphics.resize_window (M.nb_pins / 4 * p + 100)  (M.nb_pins / 2 * q + 100);
+    Graphics.resize_window (200 + 100)  (M.nb_pins / 2 * q + 100);
     let s = Printf.sprintf "Pin Simulator" in
     Graphics.set_window_title s;
     (* Graphics.display_mode false; *)
     let grew = Graphics.rgb 200 200 200 in
     Graphics.set_color grew;
-    Graphics.fill_rect 0 0 (M.nb_pins / 4 * p + 100) (M.nb_pins / 2 * q + 100);
+    Graphics.fill_rect 0 0 (200 + 100) (M.nb_pins / 2 * q + 100);
     Graphics.set_color Graphics.black;
-    Graphics.fill_rect 50 50 (M.nb_pins / 4 * p) (M.nb_pins / 2 * q);
+    Graphics.fill_rect 50 50 200 (M.nb_pins / 2 * q);
     for i = 0 to (M.nb_pins - 1) / 2 do draw_pin i done;
-    Array.iteri (fun i pin -> draw_name (pin_of_num i) pin) pins;
+    Array.iteri (fun i pin -> Option.iter (fun p -> draw_name p pin) (M.pin_of_num i)) pins;
     (* for i = 0 to M.nb_pins - 1 do do_pin pins.(i) done; *)
     draw_arrows ();
     Graphics.synchronize ()
