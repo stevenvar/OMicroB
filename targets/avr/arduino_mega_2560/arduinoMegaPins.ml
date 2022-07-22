@@ -432,6 +432,16 @@ let pin_of_string : string -> [ `SIMUL ] pin = function
   | "PINA3" -> PINA3
   | "PINA4" -> PINA4
   | "PINA5" -> PINA5
+  | "PINA6" -> PINA6
+  | "PINA7" -> PINA7
+  | "PINA8" -> PINA8
+  | "PINA9" -> PINA9
+  | "PINA10" -> PINA10
+  | "PINA11" -> PINA11
+  | "PINA12" -> PINA12
+  | "PINA13" -> PINA13
+  | "PINA14" -> PINA14
+  | "PINA15" -> PINA15
   | _ -> invalid_arg "TODO pin_of_string"
 
 let name_of_pin : [ `SIMUL ] pin -> string = function
@@ -807,3 +817,115 @@ let pin_of_num : int -> [ `SIMUL ] pin option = function
   | 82 -> Some PINA14
   | 81 -> Some PINA15
   | _ -> None
+
+(* Analog *)
+
+type analog_channel =
+  | AN0
+  | AN1
+  | AN2
+  | AN3
+  | AN4
+  | AN5
+  | AN6
+  | AN7
+  | AN8
+  | AN9
+  | AN10
+  | AN11
+  | AN12
+  | AN13
+  | AN14
+  | AN15
+
+let analog_of_pin : [> `AREAD ] pin -> analog_channel = function
+  | PINA0 -> AN0
+  | PINA1 -> AN1
+  | PINA2 -> AN2
+  | PINA3 -> AN3
+  | PINA4 -> AN4
+  | PINA5 -> AN5
+  | PINA6 -> AN6
+  | PINA7 -> AN7
+  | PINA8 -> AN8
+  | PINA9 -> AN9
+  | PINA10 -> AN10
+  | PINA11 -> AN11
+  | PINA12 -> AN12
+  | PINA13 -> AN13
+  | PINA14 -> AN14
+  | PINA15 -> AN15
+
+let pin_of_analog : analog_channel -> [< `AREAD | `SIMUL ] pin = function
+  | AN0 -> PINA0
+  | AN1 -> PINA1
+  | AN2 -> PINA2
+  | AN3 -> PINA3
+  | AN4 -> PINA4
+  | AN5 -> PINA5
+  | AN6 -> PINA6
+  | AN7 -> PINA7
+  | AN8 -> PINA8
+  | AN9 -> PINA9
+  | AN10 -> PINA10
+  | AN11 -> PINA11
+  | AN12 -> PINA12
+  | AN13 -> PINA13
+  | AN14 -> PINA14
+  | AN15 -> PINA15
+
+let int_of_analog = function
+  | AN0 -> 0
+  | AN1 -> 1
+  | AN2 -> 2
+  | AN3 -> 3
+  | AN4 -> 4
+  | AN5 -> 5
+  | AN6 -> 6
+  | AN7 -> 7
+  | AN8 -> 8
+  | AN9 -> 9
+  | AN10 -> 10
+  | AN11 -> 11
+  | AN12 -> 12
+  | AN13 -> 13
+  | AN14 -> 14
+  | AN15 -> 15
+
+let analog_of_int = function
+  | 0 -> AN0
+  | 1 -> AN1
+  | 2 -> AN2
+  | 3 -> AN3
+  | 4 -> AN4
+  | 5 -> AN5
+  | 6 -> AN6
+  | 7 -> AN7
+  | 8 -> AN8
+  | 9 -> AN9
+  | 10 -> AN10
+  | 11 -> AN11
+  | 12 -> AN12
+  | 13 -> AN13
+  | 14 -> AN14
+  | 15 -> AN15
+  | _ -> invalid_arg "analog_of_int"
+
+let analog_pin_of_string : string -> [ `AREAD | `SIMUL ] pin = function
+  | "PINA0" -> PINA0
+  | "PINA1" -> PINA1
+  | "PINA2" -> PINA2
+  | "PINA3" -> PINA3
+  | "PINA4" -> PINA4
+  | "PINA5" -> PINA5
+  | "PINA6" -> PINA6
+  | "PINA7" -> PINA7
+  | "PINA8" -> PINA8
+  | "PINA9" -> PINA9
+  | "PINA10" -> PINA10
+  | "PINA11" -> PINA11
+  | "PINA12" -> PINA12
+  | "PINA13" -> PINA13
+  | "PINA14" -> PINA14
+  | "PINA15" -> PINA15
+  | _ -> invalid_arg "analog_pin_of_string"

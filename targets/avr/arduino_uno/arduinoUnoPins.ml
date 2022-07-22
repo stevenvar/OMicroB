@@ -322,3 +322,55 @@ let pin_of_num : int -> [ `SIMUL ] pin option = function
   | 26 -> Some PINA4
   | 27 -> Some PINA5
   | _ -> None
+
+(* Analog *)
+
+type analog_channel =
+  | AN0
+  | AN1
+  | AN2
+  | AN3
+  | AN4
+  | AN5
+
+let analog_of_pin : [> `AREAD ] pin -> analog_channel = function
+  | PINA0 -> AN0
+  | PINA1 -> AN1
+  | PINA2 -> AN2
+  | PINA3 -> AN3
+  | PINA4 -> AN4
+  | PINA5 -> AN5
+
+let pin_of_analog : analog_channel -> [< `AREAD | `SIMUL ] pin = function
+  | AN0 -> PINA0
+  | AN1 -> PINA1
+  | AN2 -> PINA2
+  | AN3 -> PINA3
+  | AN4 -> PINA4
+  | AN5 -> PINA5
+
+let int_of_analog = function
+  | AN0 -> 0
+  | AN1 -> 1
+  | AN2 -> 2
+  | AN3 -> 3
+  | AN4 -> 4
+  | AN5 -> 5
+
+let analog_of_int = function
+  | 0 -> AN0
+  | 1 -> AN1
+  | 2 -> AN2
+  | 3 -> AN3
+  | 4 -> AN4
+  | 5 -> AN5
+  | _ -> invalid_arg "analog_of_int"
+
+let analog_pin_of_string : string -> [ `AREAD | `SIMUL ] pin = function
+  | "PINA0" -> PINA0
+  | "PINA1" -> PINA1
+  | "PINA2" -> PINA2
+  | "PINA3" -> PINA3
+  | "PINA4" -> PINA4
+  | "PINA5" -> PINA5
+  | _ -> invalid_arg "analog_pin_of_string"

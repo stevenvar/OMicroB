@@ -328,3 +328,19 @@ let pin_of_num = function
   | 39 -> Some PINA4
   | 40 -> Some PINA5
   | _ -> None
+
+(* No analog support yet :p *)
+
+type analog_channel = |
+
+let analog_of_pin : [> `AREAD ] pin -> analog_channel = function _ -> .
+
+let pin_of_analog : analog_channel -> [< `AREAD | `SIMUL ] pin = function _ -> .
+
+let int_of_analog : analog_channel -> int = function _ -> .
+
+let analog_of_int = function
+  | _ -> invalid_arg "analog_of_int"
+
+let analog_pin_of_string : string -> [ `AREAD | `SIMUL ] pin = function
+  | _ -> invalid_arg "analog_pin_of_string"

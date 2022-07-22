@@ -21,8 +21,10 @@ module type MCUSimul = sig
   type 'a pin
   type register
   type bit
+  type analog_channel
 
   val pin_of_string : string -> [ `SIMUL ] pin
+  val analog_pin_of_string : string -> [ `AREAD | `SIMUL ] pin
   val name_of_pin : [ `SIMUL ] pin -> string
   val nb_pins : int
 
@@ -44,59 +46,28 @@ module type MCUSimul = sig
   val bit_of_pin : [ `SIMUL ] pin -> bit
 
   val pin_of_register_bit : register -> bit -> [ `SIMUL ] pin
+
+  val analog_of_pin : [ `SIMUL | `AREAD ] pin -> analog_channel
+  val pin_of_analog : analog_channel -> [< `SIMUL | `AREAD ] pin
+  val int_of_analog : analog_channel -> int
+  val analog_of_int : int -> analog_channel
 end
 
 module Simul(M : MCUSimul) = struct
   open M
 
-  type an =
-    | AN0  | AN1  | AN2  | AN3
-    | AN4  | AN5  | AN6  | AN7
-    | AN8  | AN9  | AN10 | AN11
-    | AN12
+  let string_of_analog an =
+    name_of_pin (pin_of_analog an)
 
-  let string_of_an an = match an with
-    | AN0  -> "AN0"  | AN1 -> "AN1" | AN2  -> "AN2"  | AN3  -> "AN3"
-    | AN4  -> "AN4"  | AN5 -> "AN5" | AN6  -> "AN6"  | AN7  -> "AN7"
-    | AN8  -> "AN8"  | AN9 -> "AN9" | AN10 -> "AN10" | AN11 -> "AN11"
-    | AN12 -> "AN12"
-
-  let an_of_string str = match str with
-    | "AN0"  -> AN0  | "AN1" -> AN1 | "AN2"  -> AN2  | "AN3"  -> AN3
-    | "AN4"  -> AN4  | "AN5" -> AN5 | "AN6"  -> AN6  | "AN7"  -> AN7
-    | "AN8"  -> AN8  | "AN9" -> AN9 | "AN10" -> AN10 | "AN11" -> AN11
-    | "AN12" -> AN12 | _ -> invalid_arg "Simul.an_of_string"
-
-  let char_of_an an = match an with
-    | AN0  -> '0' | AN1 -> '1' | AN2  -> '2' | AN3  -> '3'
-    | AN4  -> '4' | AN5 -> '5' | AN6  -> '6' | AN7  -> '7'
-    | AN8  -> '8' | AN9 -> '9' | AN10 -> 'A' | AN11 -> 'B'
-    | AN12 -> 'C'
-
-  let an_of_char c = match c with
-    | '0' -> AN0  | '1' -> AN1 | '2' -> AN2  | '3' -> AN3
-    | '4' -> AN4  | '5' -> AN5 | '6' -> AN6  | '7' -> AN7
-    | '8' -> AN8  | '9' -> AN9 | 'A' -> AN10 | 'B' -> AN11
-    | 'C' -> AN12 | _ -> invalid_arg "Simul.an_of_char"
-
-  let int_of_an an = match an with
-    | AN0  -> 0x0 | AN1 -> 0x1 | AN2  -> 0x2 | AN3  -> 0x3
-    | AN4  -> 0x4 | AN5 -> 0x5 | AN6  -> 0x6 | AN7  -> 0x7
-    | AN8  -> 0x8 | AN9 -> 0x9 | AN10 -> 0xA | AN11 -> 0xB
-    | AN12 -> 0xC
-
-  let an_of_int n = match n with
-    | 0x0  -> AN0 | 0x1 -> AN1 | 0x2  -> AN2 | 0x3  -> AN3
-    | 0x4  -> AN4 | 0x5 -> AN5 | 0x6  -> AN6 | 0x7  -> AN7
-    | 0x8  -> AN8 | 0x9 -> AN9 | 0xA -> AN10 | 0xB -> AN11
-    | 0xC -> AN12 | _ -> invalid_arg "Simul.an_of_int"
+  let analog_of_string str =
+    analog_of_pin (analog_pin_of_string str)
 
   (***)
 
   type input =
     | IWrite of register * int
     | ITris of register * int
-    | IWriteAnalog of an * int
+    | IWriteAnalog of analog_channel * int
     | IConfigAnalog of int | ISync | IStop
 
   let input_of_string s =
@@ -115,7 +86,7 @@ module Simul(M : MCUSimul) = struct
           ITris   (register_of_index @@ (fun x -> int_of_char x - 1) @@ s.[1], int_of_hex2 s.[2] s.[3])
         | 'Z' ->
           assert (String.length s = 5);
-          IWriteAnalog (an_of_char s.[1], int_of_hex3 s.[2] s.[3] s.[4])
+          IWriteAnalog (analog_of_int @@ (fun x -> int_of_char x - 1) @@ s.[1], int_of_hex3 s.[2] s.[3] s.[4])
         | 'C' ->
           assert (String.length s = 2);
           IConfigAnalog (int_of_hex1 s.[1])
@@ -128,7 +99,7 @@ module Simul(M : MCUSimul) = struct
     | OSet of [ `SIMUL ] pin
     | OClear of [ `SIMUL ] pin
     | OWrite of register * int
-    | OWriteAnalog of an * int
+    | OWriteAnalog of analog_channel * int
     | ODone
     | OStop
 
@@ -149,7 +120,7 @@ module Simul(M : MCUSimul) = struct
     | OWriteAnalog (an, value) ->
       if value < 0 || value > 0x3FF
       then failwith (Printf.sprintf "value %d of OWriteAnalog is out of range [ 0x0; 0x3FF ]" value);
-      Printf.sprintf "Z%c%03X" (char_of_an an) value
+      Printf.sprintf "Z%c%03X" (char_of_int @@ (fun x -> int_of_analog x + 1) an) value
     | ODone -> "DONE"
     | OStop -> "STOP"
   ;;
@@ -194,8 +165,8 @@ module Simul(M : MCUSimul) = struct
     | Setin_pin_handler of [ `SIMUL ] pin * (unit -> unit)
     | Setout_pin_handler of [ `SIMUL ] pin * (unit -> unit)
     | Setstate_pin_handler of [ `SIMUL ] pin * (bool -> unit)
-    | Write_analog_handler of (an -> int -> unit)
-    | Write_an_analog_handler of an * (int -> unit)
+    | Write_analog_handler of (analog_channel -> int -> unit)
+    | Write_an_analog_handler of analog_channel * (int -> unit)
     | Config_analogs_handler of (int -> unit)
 
   let handlers_mutex = Mutex.create ();;
@@ -318,7 +289,7 @@ module Simul(M : MCUSimul) = struct
       true
     | IWriteAnalog (an, value) ->
       assert (value >= 0 && value <= 0x3FF);
-      analogs.(int_of_an an) <- value;
+      analogs.(int_of_analog an) <- value;
       List.iter (fun handler -> match handler with
           | Write_analog_handler f -> f an value
           | Write_an_analog_handler (an', f) when an' = an -> f value

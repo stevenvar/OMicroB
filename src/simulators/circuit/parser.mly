@@ -238,13 +238,13 @@ match String.lowercase_ascii name with
     let len = int_of_string (List.assoc "length" opts) in
     let o = orientation_of_string (List.assoc "orientation" opts) in
     let color = Color.of_string (List.assoc "color" opts) in
-    let an = Simul.an_of_string (List.assoc "pin" opts) in
+    let an = M.analog_of_pin (M.analog_pin_of_string (List.assoc "pin" opts)) in
     let init =  List.assoc "init" opts in
     let init = if init = "" then None else Some (float_of_string init) in
     if width < 3 then
     failwith ("too small width: " ^ string_of_int width);
     if len < width + 1 then
-    failwith ("incomptible length/width: " ^ string_of_int width ^ "/" ^ string_of_int len);
+    failwith ("incompatible length/width: " ^ string_of_int width ^ "/" ^ string_of_int len);
     (match init with
     | None -> ()
     | Some init ->

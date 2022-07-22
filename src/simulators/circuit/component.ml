@@ -81,7 +81,7 @@ module Component(M : Simul.MCUSimul) = struct
     ana_length : int;
     ana_orient : [ `Horizontal | `Vertical ];
     ana_color  : Color.t;
-    ana_an     : Simul.an;
+    ana_an     : analog_channel;
     ana_init   : float option;
   }
 
@@ -245,7 +245,8 @@ module Component(M : Simul.MCUSimul) = struct
           (match ana.ana_init with
            | None -> ()
            | Some init ->
-             if !has_init then failwith ("multiple definition of initial value for analog entry: " ^ Simul.string_of_an ana.ana_an);
+             if !has_init
+             then failwith ("multiple definition of initial value for analog entry: " ^ Simul.string_of_analog ana.ana_an);
              pos := init);
           Hashtbl.replace analogs ana.ana_an (ana :: others, pos, has_init);
           pos

@@ -7,7 +7,7 @@ external read_register : register -> int = "caml_read_register" [@@noalloc]
 external set_bit : register -> 'a -> unit = "caml_set_bit" [@@noalloc]
 external clear_bit : register -> 'a -> unit = "caml_clear_bit" [@@noalloc]
 external read_bit : register -> 'a -> bool = "caml_read_bit" [@@noalloc]
-external avr_analog_read : int -> int = "caml_avr_analog_read" [@@noalloc]
+external avr_analog_read : analog_channel -> int = "caml_avr_analog_read" [@@noalloc]
 
 let pin_mode p m =
   let port = port_of_pin p in
@@ -38,17 +38,8 @@ let digital_read p =
   | true -> HIGH
   | false -> LOW
 
-let channel_of_pin (p: [ `AREAD] pin) =
-  match p with
-  | PINA0 -> 0
-  | PINA1 -> 1
-  | PINA2 -> 2
-  | PINA3 -> 3
-  | PINA4 -> 4
-  | PINA5 -> 5
-
 let analog_read (p: [ `AREAD ] pin) =
-  avr_analog_read (channel_of_pin p)
+  avr_analog_read (analog_of_pin p)
 
 external do_pin_change_callback : register -> bit -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
 

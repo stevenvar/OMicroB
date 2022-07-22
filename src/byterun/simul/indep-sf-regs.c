@@ -154,10 +154,10 @@ static void send_write_ddr(int ddr, unsigned char val){
 /* } */
 
 static void send_set_analog(unsigned int chan, unsigned int val){
-  fprintf(stderr,"SET ANALOG %d to %d",chan,val);
+  fprintf(stderr,"SET ANALOG %d to %d\n",chan,val);
   char buf[6];
   buf[0] = 'Z';
-  buf[1] = hexchar_of_int(chan);
+  buf[1] = chan + 1;
   buf[2] = hexchar_of_int((val >> 8) & 0x0F);
   buf[3] = hexchar_of_int((val >> 4) & 0x0F);
   buf[4] = hexchar_of_int(val & 0x0F);
@@ -460,7 +460,7 @@ void exec_instr(char *instr, int size){
     V(sem_sync);
   }else if(size == 5 && instr[0] == 'Z'){
     int chan, h2, h1, h0, val;
-    chan = int_of_hexchar(instr[1]);
+    chan = instr[1] - 1;
     if(chan == -1 || chan > 14){
       invalid_instr(instr);
       return;

@@ -7,8 +7,10 @@ module type MCUSimul = sig
   type 'a pin
   type register
   type bit
+  type analog_channel
 
   val pin_of_string : string -> [ `SIMUL ] pin
+  val analog_pin_of_string : string -> [ `AREAD | `SIMUL ] pin
   val name_of_pin : [ `SIMUL ] pin -> string
   val nb_pins : int
 
@@ -29,37 +31,24 @@ module type MCUSimul = sig
   val bit_of_pin : [ `SIMUL ] pin -> bit
 
   val pin_of_register_bit : register -> bit -> [ `SIMUL ] pin
+
+  val analog_of_pin : [ `SIMUL | `AREAD ] pin -> analog_channel
+  val pin_of_analog : analog_channel -> [< `SIMUL | `AREAD ] pin
+  val int_of_analog : analog_channel -> int
+  val analog_of_int : int -> analog_channel
 end
 
 
 module Simul(M : MCUSimul) : sig
   open M
 
-  type an =
-      AN0
-    | AN1
-    | AN2
-    | AN3
-    | AN4
-    | AN5
-    | AN6
-    | AN7
-    | AN8
-    | AN9
-    | AN10
-    | AN11
-    | AN12
-  val string_of_an : an -> string
-  val an_of_string : string -> an
-  val char_of_an : an -> char
-  val an_of_char : char -> an
-  val int_of_an : an -> int
-  val an_of_int : int -> an
+  val string_of_analog : analog_channel -> string
+  val analog_of_string : string -> analog_channel
 
   type input =
       IWrite of register * int
     | ITris of register * int
-    | IWriteAnalog of an * int
+    | IWriteAnalog of analog_channel * int
     | IConfigAnalog of int
     | ISync
     | IStop
@@ -68,7 +57,7 @@ module Simul(M : MCUSimul) : sig
     | OSet of [ `SIMUL ] pin
     | OClear of [ `SIMUL ] pin
     | OWrite of register * int
-    | OWriteAnalog of an * int
+    | OWriteAnalog of analog_channel * int
     | ODone
     | OStop
   val string_of_output : output -> string
@@ -92,8 +81,8 @@ module Simul(M : MCUSimul) : sig
     | Setin_pin_handler of [ `SIMUL ] pin * (unit -> unit)
     | Setout_pin_handler of [ `SIMUL ] pin * (unit -> unit)
     | Setstate_pin_handler of [ `SIMUL ] pin * (bool -> unit)
-    | Write_analog_handler of (an -> int -> unit)
-    | Write_an_analog_handler of an * (int -> unit)
+    | Write_analog_handler of (analog_channel -> int -> unit)
+    | Write_an_analog_handler of analog_channel * (int -> unit)
     | Config_analogs_handler of (int -> unit)
   val handlers_mutex : Mutex.t
   val handlers : handler list ref
@@ -112,7 +101,7 @@ module Simul(M : MCUSimul) : sig
   val set_pin : [ `SIMUL ] pin -> unit
   val clear_pin : [ `SIMUL ] pin -> unit
   val change_pin : [ `SIMUL ] pin -> bool -> unit
-  val write_analog : an -> int -> unit
+  val write_analog : analog_channel -> int -> unit
   val read_register : register -> int
   val read_tris : register -> int
   val test_pin : [ `SIMUL ] pin -> bool
