@@ -10,8 +10,8 @@ module%comp LCD = Circuits.MakeLCD(struct
   end)
 
 (* déclaration des pins *)
-let plus = PIN7
-let minus = PIN6
+let plus = PIN6
+let minus = PIN7
 let resistor = PIN10
 let sensor = PINA0
 

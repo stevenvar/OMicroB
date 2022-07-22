@@ -25,9 +25,6 @@ try int_of_string s
 with Failure _ -> failwith (sprintf "%S should be an integer" s);
 ;;
 
-let pin_of_number i =
-pin_of_string (Printf.sprintf "PIN%s" i)
-
 let bool_of_string s =
 try bool_of_string s
 with Invalid_argument _ -> failwith (sprintf "%S should be a boolean" s);
@@ -217,9 +214,9 @@ match String.lowercase_ascii name with
     ] in
     let x = int_of_string (List.assoc "x" opts) in
     let y = int_of_string (List.assoc "y" opts) in
-    let cs = pin_of_number (List.assoc "cs" opts) in
-    let dc = pin_of_number (List.assoc "dc" opts) in
-    let rst = pin_of_number (List.assoc "rst" opts) in
+    let cs = pin_of_string (List.assoc "cs" opts) in
+    let dc = pin_of_string (List.assoc "dc" opts) in
+    let rst = pin_of_string (List.assoc "rst" opts) in
     let column_nb = int_of_string (List.assoc "column_nb" opts) in
     let line_nb = int_of_string (List.assoc "line_nb" opts) in
     Some (Lcd(Display.create_display x y cs dc rst column_nb line_nb))

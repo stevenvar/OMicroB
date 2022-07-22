@@ -111,11 +111,11 @@ let check() =
 ;;
 
 let _ =
-  set_bit DDRB DB7;
-  clear_bit PORTB PB7;
-  if solve 0 then set_bit PORTB PB7;
+  set_bit DDRB BIT7;
+  clear_bit PORTB BIT7;
+  if solve 0 then set_bit PORTB BIT7;
   let r = check () in
-  if r = 476 then set_bit PORTB PB7;
+  if r = 476 then set_bit PORTB BIT7;
 ;;
 
 (*

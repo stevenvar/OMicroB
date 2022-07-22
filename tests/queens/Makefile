@@ -4,7 +4,6 @@ DEVICE ?= arduino-mega
 
 SOURCES := queens.ml
 TARGETS := queens.byte queens.c queens.elf queens.avr queens.hex
-ATTY := /dev/tty.usbmodem1411
 
 all: $(TARGETS)
 
@@ -15,7 +14,9 @@ flash: queens.hex
 	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: queens.elf
-	./$< '../../bin/omicrob_pin_simulator' '../../bin/omicrob_circuit_simulator circuit.txt'
+	./$< \
+	'$(BIN)/omicrob_pin_simulator -device=$(DEVICE)' \
+	'$(BIN)/omicrob_circuit_simulator -device=$(DEVICE) circuit.txt'
 
 clean:
 	@rm -f *.cmo *.cmi

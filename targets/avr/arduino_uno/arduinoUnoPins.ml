@@ -160,6 +160,8 @@ external raise : exn -> 'a = "%raise"
 let invalid_arg s =
   raise (Invalid_argument s)
 
+exception Pin_of_string of string
+
 let pin_of_string : string -> [ `SIMUL ] pin = function
   | "PIN0" -> PIN0
   | "PIN1" -> PIN1
@@ -181,7 +183,7 @@ let pin_of_string : string -> [ `SIMUL ] pin = function
   | "PINA3" -> PINA3
   | "PINA4" -> PINA4
   | "PINA5" -> PINA5
-  | _ -> invalid_arg "pin_of_string"
+  | s -> raise (Pin_of_string s)
 
 let name_of_pin : [ `SIMUL ] pin -> string = function
   | PIN0 -> "PIN0/RX0"

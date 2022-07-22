@@ -4,7 +4,6 @@ DEVICE ?= arduino-uno
 
 SOURCES := light.ml
 TARGETS := light.byte light.c light.elf light.avr light.hex
-ATTY := /dev/ttyACM0
 
 all: $(TARGETS)
 
@@ -16,7 +15,9 @@ flash: light.hex
 
 
 simul: light.elf
-	./$< '../../bin/omicrob_pin_simulator circuit.txt'
+	./$< \
+	'$(BIN)/omicrob_pin_simulator -device=$(DEVICE)' \
+	'$(BIN)/omicrob_circuit_simulator -device=$(DEVICE) circuit.txt'
 
 clean:
 	@rm -f *.cmo *.cmi

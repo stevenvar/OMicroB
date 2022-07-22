@@ -4,7 +4,6 @@ DEVICE ?= arduboy
 
 SOURCES := buttons.ml
 TARGETS := buttons.byte buttons.c buttons.elf buttons.avr buttons.hex
-ATTY := /dev/tty.usbmodem1411
 
 all: $(TARGETS)
 
@@ -15,7 +14,9 @@ flash: buttons.hex
 	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: buttons.elf
-	./$< '../../bin/omicrob_circuit_simulator circuit.txt'
+	./$< \
+	'$(BIN)/omicrob_pin_simulator -device $(DEVICE)' \
+	'$(BIN)/omicrob_circuit_simulator -device $(DEVICE) circuit.txt'
 
 clean:
 	@rm -f *.cmo *.cmi

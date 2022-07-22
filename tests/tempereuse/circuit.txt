@@ -1,0 +1,9 @@
+window width=310 height=460 bgcolor=lightgray title="Tempereuse"
+
+led x=25 y=425 radius=10 pin=PIN10 color=red inverse=false
+
+analog x=150 y=50 width=40 length=200 pin=PINA0
+
+button x=210 y=170 width=40 height=40 label="+" pin=PIN6 color=red inverse=false
+button x=260 y=170 width=40 height=40 label="-" pin=PIN7 color=red inverse=false
+

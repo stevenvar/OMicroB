@@ -3,19 +3,23 @@ include ../../etc/Makefile.conf
 SOURCES := test.ml
 TARGETS := test.byte test.c test.elf test.hex
 
+DEVICE ?= arduino-uno
+
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -v $^ -mlopt -verbose -stack-size 200 -heap-size 200 -o test.elf
+	$(BIN)/omicrob -device $(DEVICE) -v $^ -mlopt -verbose -stack-size 200 -heap-size 200 -o test.elf
 
 clean:
 	@rm -f *.cmo *.cmi
 
 flash: test.hex
-	$(BIN)/omicrob -device arduino-uno -flash -sudo $<
+	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: test.elf
-	./$< '../../bin/omicrob_pin_simulator' '../../bin/omicrob_circuit_simulator circuit.txt'
+	./$< \
+	'$(BIN)/omicrob_pin_simulator -device=$(DEVICE)' \
+	'$(BIN)/omicrob_circuit_simulator -device=$(DEVICE) circuit.txt'
 
 clean:
 	@rm -f *.cmo *.cmi

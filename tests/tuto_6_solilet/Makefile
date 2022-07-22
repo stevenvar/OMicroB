@@ -14,7 +14,9 @@ flash: solilet.hex
 	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: solilet.elf
-	./$< '../../bin/omicrob_circuit_simulator circuit.txt'
+	./$< \
+	'$(BIN)/omicrob_pin_simulator -device=$(DEVICE)' \
+	'$(BIN)/omicrob_circuit_simulator -device=$(DEVICE) circuit.txt'
 
 clean:
 	@rm -f *.cmo *.cmi
