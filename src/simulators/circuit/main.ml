@@ -46,9 +46,10 @@ let () =
 
   try
     let (module M) = get_device () in
-    let open Lexer.Lexer(M) in
-    let open Parser.Make(M) in
-    let open Component.Component(M) in
+    let (module Simul) = (module Simul.Make(M) : Simul.Simul) in
+    let open Lexer.Lexer(Simul) in
+    let open Parser.Make(Simul) in
+    let open Component.Component(Simul) in
 
     let file = get "file" file in
     let ic = open_in file in

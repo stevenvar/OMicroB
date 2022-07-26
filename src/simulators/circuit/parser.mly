@@ -9,7 +9,7 @@
 /*                                                                       */
 /*************************************************************************/
 
-%parameter<M : Simul.MCUSimul>
+%parameter<M : Simul.Simul>
 
 %{
 
@@ -18,7 +18,8 @@ open Printf
 
 open M
 open Component.Component(M)
-module Display = Display.Display(M)
+module LCD = Lcd.LCD(M)
+module LCD16x2 = Lcd16x2.LCD(M)
 
 let int_of_string s =
 try int_of_string s
@@ -219,7 +220,23 @@ match String.lowercase_ascii name with
     let rst = pin_of_string (List.assoc "rst" opts) in
     let column_nb = int_of_string (List.assoc "column_nb" opts) in
     let line_nb = int_of_string (List.assoc "line_nb" opts) in
-    Some (Lcd(Display.create_display x y cs dc rst column_nb line_nb))
+    Some (Lcd(LCD.Display.create_display x y cs dc rst column_nb line_nb))
+| "lcd16x2" ->
+   let opts = parse_options options [
+                  ("x", None); ("y", None);
+                  ("e", None); ("rs", None); ("rw", None);
+                  ("d4", None); ("d5", None); ("d6", None); ("d7", None)
+                ] in
+    let x = int_of_string (List.assoc "x" opts) in
+    let y = int_of_string (List.assoc "y" opts) in
+    let e = pin_of_string (List.assoc "e" opts) in
+    let rs = pin_of_string (List.assoc "rs" opts) in
+    let rw = pin_of_string (List.assoc "rw" opts) in
+    let d4 = pin_of_string (List.assoc "d4" opts) in
+    let d5 = pin_of_string (List.assoc "d5" opts) in
+    let d6 = pin_of_string (List.assoc "d6" opts) in
+    let d7 = pin_of_string (List.assoc "d7" opts) in
+    Some (Lcd16x2(LCD16x2.Display.create_display x y e rs rw d4 d5 d6 d7 16 2))
 | "analog" ->
     let opts = parse_options options [
         ("x", None); ("y", None);

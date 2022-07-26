@@ -1,4 +1,4 @@
-module Dip (M: Simul.MCUSimul) = struct
+module Dip (M: Simul.Simul) = struct
   exception Error
 
   let pins = Array.make (M.nb_pins) ((0,0),false)
@@ -189,8 +189,9 @@ let _ =
 
   try
     let (module M) = get_device () in
-    let open Simul.Simul(M) in
-    let open Dip(M) in
+    let (module Simul) = (module Simul.Make(M) : Simul.Simul) in
+    let open Simul in
+    let open Dip(Simul) in
 
     draw_micro ();
     while true do

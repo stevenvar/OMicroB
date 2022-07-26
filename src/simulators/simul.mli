@@ -38,9 +38,8 @@ module type MCUSimul = sig
   val analog_of_int : int -> analog_channel
 end
 
-
-module Simul(M : MCUSimul) : sig
-  open M
+module type Simul = sig
+  include MCUSimul
 
   val string_of_analog : analog_channel -> string
   val analog_of_string : string -> analog_channel
@@ -108,3 +107,5 @@ module Simul(M : MCUSimul) : sig
   val state_pin : [ `SIMUL ] pin -> bool
   val analog_input_count : unit -> int
 end
+
+module Make(_ : MCUSimul) : Simul

@@ -1,0 +1,3 @@
+window width=500 height=460 bgcolor=lightgray title="Hello"
+
+lcd16x2 x=30 y=300 e=PIN12 rs=PIN11 rw=PIN0 d4=PIN2 d5=PIN3 d6=PIN4 d7=PIN5

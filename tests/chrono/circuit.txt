@@ -9,11 +9,12 @@
 ##                                                                       ##
 ###########################################################################
 
-window width=270 height=220 title="Timer"
+window width=500 height=460 title="Chronometer"
 
-button x=85 y=40 width=40 color=black label="START" pin=PIN6
-button x=135 y=55 width=20 height=20 label="+" pin=PIN7
-button x=135 y=25 width=20 height=20 label="-" pin=PIN8
+lcd16x2 x=30 y=300 e=PIN12 rs=PIN11 rw=PIN0 d4=PIN2 d5=PIN3 d6=PIN4 d7=PIN5
 
-led x=175 y=55 pin=PIN9 color=green
-led x=175 y=25 pin=PIN10
+button x=85 y=40 width=60 color=black label="START" pin=PIN6
+button x=405 y=55 width=20 height=20 label="+" pin=PIN7
+button x=405 y=25 width=20 height=20 label="-" pin=PIN8
+
+led x=145 y=40 pin=PIN9 color=green

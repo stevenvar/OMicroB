@@ -12,9 +12,7 @@
 open Printf;;
 open Window;;
 
-module Component(M : Simul.MCUSimul) = struct
-  open M
-  module Simul = Simul.Simul(M)
+module Component(Simul : Simul.Simul) = struct
   open Simul
 
   type led = {
@@ -85,12 +83,12 @@ module Component(M : Simul.MCUSimul) = struct
     ana_init   : float option;
   }
 
-  module Types = Types.DisplayTypes(M)
-  module Proto = Proto.Proto(M)
+  module LCD = Lcd.LCD(Simul)
+  module LCD16x2 = Lcd16x2.LCD(Simul)
 
-  type lcd = Types.display;;
+  type lcd = LCD.Types.display;;
 
-  type lcd16x2 = Types.display16x2;;
+  type lcd16x2 = LCD16x2.Types.display;;
 
   type t =
     | Led  of led
@@ -222,11 +220,11 @@ module Component(M : Simul.MCUSimul) = struct
     | Lcd lcd ->
       (* Display.display_border lcd; *)
       sync_display ();
-      Proto.register lcd;
-    | Lcd16x2 _lcd ->
-      (* Display.display_border lcd; *)
+      LCD.Proto.register lcd
+    | Lcd16x2 lcd ->
+      LCD16x2.Display.show lcd;
       sync_display ();
-      (* Proto.register lcd; *)
+      Simul.add_handler (LCD16x2.Proto.set_pin_handler lcd)
     | Ana ana ->
       let normalize ana p = min (ana.ana_length - ana.ana_width) (max 0 p) in
       let float_of_ofs ofs = float_of_int (normalize ana ofs) /. float_of_int (ana.ana_length - ana.ana_width) in

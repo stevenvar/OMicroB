@@ -53,8 +53,78 @@ module type MCUSimul = sig
   val analog_of_int : int -> analog_channel
 end
 
-module Simul(M : MCUSimul) = struct
-  open M
+module type Simul = sig
+  include MCUSimul
+
+  val string_of_analog : analog_channel -> string
+  val analog_of_string : string -> analog_channel
+
+  type input =
+      IWrite of register * int
+    | ITris of register * int
+    | IWriteAnalog of analog_channel * int
+    | IConfigAnalog of int
+    | ISync
+    | IStop
+  val input_of_string : string -> input
+  type output =
+    | OSet of [ `SIMUL ] pin
+    | OClear of [ `SIMUL ] pin
+    | OWrite of register * int
+    | OWriteAnalog of analog_channel * int
+    | ODone
+    | OStop
+  val string_of_output : output -> string
+  val channel : output Event.channel
+  val send : output -> unit
+  type handler =
+    | Exit_handler of (unit -> unit)
+    | Write_handler of (register -> int -> unit)
+    | Write_register_handler of register * (int -> unit)
+    | Tris_handler of (register -> int -> unit)
+    | Tris_register_handler of register * (int -> unit)
+    | Set_handler of ([ `SIMUL ] pin -> unit)
+    | Clear_handler of ([ `SIMUL ] pin -> unit)
+    | Change_handler of ([ `SIMUL ] pin -> bool -> unit)
+    | Set_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Clear_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Change_pin_handler of [ `SIMUL ] pin * (bool -> unit)
+    | Setin_handler of ([ `SIMUL ] pin -> unit)
+    | Setout_handler of ([ `SIMUL ] pin -> unit)
+    | Setstate_handler of ([ `SIMUL ] pin -> bool -> unit)
+    | Setin_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Setout_pin_handler of [ `SIMUL ] pin * (unit -> unit)
+    | Setstate_pin_handler of [ `SIMUL ] pin * (bool -> unit)
+    | Write_analog_handler of (analog_channel -> int -> unit)
+    | Write_an_analog_handler of analog_channel * (int -> unit)
+    | Config_analogs_handler of (int -> unit)
+  val handlers_mutex : Mutex.t
+  val handlers : handler list ref
+  val add_handler : handler -> unit
+  val remove_handler : handler -> unit
+  val registers : int array
+  val triss : int array
+  val analogs : int array
+  val analog_cnt : int ref
+  val scall1 : ('a -> unit) -> 'a -> unit
+  val scall2 : ('a -> 'b -> unit) -> 'a -> 'b -> unit
+  val exec : input -> bool
+  val start : unit -> unit
+  val join : unit -> unit
+  val write_register : register -> int -> unit
+  val set_pin : [ `SIMUL ] pin -> unit
+  val clear_pin : [ `SIMUL ] pin -> unit
+  val change_pin : [ `SIMUL ] pin -> bool -> unit
+  val write_analog : analog_channel -> int -> unit
+  val read_register : register -> int
+  val read_tris : register -> int
+  val test_pin : [ `SIMUL ] pin -> bool
+  val state_pin : [ `SIMUL ] pin -> bool
+  val analog_input_count : unit -> int
+end
+
+module Make(M : MCUSimul) : Simul = struct
+  include M
 
   let string_of_analog an =
     name_of_pin (pin_of_analog an)

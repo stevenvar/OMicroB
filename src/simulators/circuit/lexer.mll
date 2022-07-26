@@ -10,7 +10,7 @@
 (*************************************************************************)
 
 {
-module Lexer(M : Simul.MCUSimul) = struct
+module Lexer(M : Simul.Simul) = struct
   open Parser.Make(M);;
 
   exception Lexing_error of string

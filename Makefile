@@ -12,8 +12,6 @@ internals: config
 
 simulators: internals $(ARCHS)
 	$(call compile, src/simulators)
-	$(call compile, src/simulators/lcd)
-	$(call compile, src/simulators/lcd_16x2)
 	$(call compile, src/simulators/dip)
 	$(call compile, src/simulators/circuit)
 
@@ -113,8 +111,6 @@ clean:
 	$(call clean, src/byterun)
 	$(call clean, src/simulators)
 	$(call clean, src/simulators/dip)
-	$(call clean, src/simulators/lcd_16x2)
-	$(call clean, src/simulators/lcd)
 	$(call clean, src/simulators/circuit)
 	$(call clean, src/omicrob)
 	$(call clean, src/stdlib)

@@ -15,7 +15,7 @@ flash: lcdexample.hex
 
 simul: lcdexample.elf
 	./$< '$(BIN)/omicrob_pin_simulator -device=$(DEVICE)' \
-		 '$(BIN)/omicrob_lcd_16x2_simulator -device=$(DEVICE) -e=PIN12 -rs=PIN11 -rw=PIN0 -d4=PIN2 -d5=PIN3 -d6=PIN4 -d7=PIN5 16x2'
+	'$(BIN)/omicrob_circuit_simulator -device=$(DEVICE) circuit.txt' \
 
 clean:
 	@rm -f *.cmo *.cmi
