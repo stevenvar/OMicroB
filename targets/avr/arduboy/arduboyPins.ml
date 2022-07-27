@@ -4,7 +4,7 @@ type register =
   | PINB | PINC | PIND | PINE | PINF
   | SPCR | SPSR | SPDR
 
-let nb_registers = 8
+let nb_registers = 18
 
 type bit = BIT0 | BIT1 | BIT2 | BIT3 | BIT4 | BIT5 | BIT6 | BIT7
 
@@ -23,10 +23,10 @@ type 'a pin =
   | PIN12 : [< `OLED_CS | `DWRITE | `SIMUL ] pin
   | PIN11 : [< `LED_GREEN | `DWRITE | `SIMUL ] pin
   | PIN13 : [< `SPEAKER_MINUS | `SIMUL ] pin
-  | MISO  : [< `MISO ] pin
-  | SCK   : [< `SCK ] pin
-  | MOSI  : [< `MOSI ] pin
-  | SS    : [< `SS ] pin
+  | MISO  : [< `MISO | `SIMUL ] pin
+  | SCK   : [< `SCK | `SIMUL ] pin
+  | MOSI  : [< `MOSI | `SIMUL ] pin
+  | SS    : [< `SS | `SIMUL ] pin
   | PINA0 : [< `BUTTON_UP | `DREAD | `SIMUL ] pin
   | PINA1 : [< `BUTTON_RIGHT | `DREAD | `SIMUL ] pin
   | PINA2 : [< `BUTTON_LEFT | `DREAD | `SIMUL ] pin
@@ -206,6 +206,11 @@ let name_of_pin : [ `SIMUL ] pin -> string = function
   | PINA3 -> "A3"
   | PINA4 -> "A4"
   | PINA5 -> "A5"
+  | MISO -> "MISO"
+  | MOSI -> "MOSI"
+  | SCK -> "SCK"
+  | SS -> "SS"
+
 
 let register_of_char = function
   | 'B' -> PORTB
@@ -229,7 +234,12 @@ let index_of_register = function
   | PORTD -> 2
   | PORTE -> 3
   | PORTF -> 4
+  | SPCR -> 15
+  | SPSR -> 16
+  | SPDR -> 17
   | _ -> invalid_arg "index_of_register"
+
+exception Register_of_index of int
 
 let register_of_index = function
   | 0 -> PORTB
@@ -237,7 +247,8 @@ let register_of_index = function
   | 2 -> PORTD
   | 3 -> PORTE
   | 4 -> PORTF
-  | _ -> invalid_arg "register_of_index"
+  | 17 -> SPDR
+  | n -> raise (Register_of_index n)
 
 let index_of_bit = function
   | BIT0 -> 0
@@ -259,6 +270,8 @@ let bit_of_index = function
   | 6 -> BIT6
   | 7 -> BIT7
   | _ -> invalid_arg "bit_of_index"
+
+exception Pin_of_register_bit of register * bit
 
 let pin_of_register_bit register bit : [ `SIMUL ] pin =
   match register, bit with
@@ -282,7 +295,11 @@ let pin_of_register_bit register bit : [ `SIMUL ] pin =
   | (PORTF, BIT4) -> PINA3
   | (PORTF, BIT1) -> PINA4
   | (PORTF, BIT0) -> PINA5
-  | _ -> invalid_arg "pin_of_register_bit"
+  | (PORTB, BIT0) -> SS
+  | (PORTB, BIT1) -> SCK
+  | (PORTB, BIT2) -> MOSI
+  | (PORTB, BIT3) -> MISO
+  | _ -> raise (Pin_of_register_bit (register, bit))
 
 (* Physical placement on the microcontroler *)
 
@@ -307,6 +324,10 @@ let num_of_pin : [ `SIMUL ] pin -> int = function
   | PINA3 -> 38
   | PINA4 -> 39
   | PINA5 -> 40
+  | SS -> 7
+  | SCK -> 8
+  | MOSI -> 9
+  | MISO -> 10
 
 let pin_of_num = function
   | 19 -> Some PIN0
@@ -329,6 +350,10 @@ let pin_of_num = function
   | 38 -> Some PINA3
   | 39 -> Some PINA4
   | 40 -> Some PINA5
+  | 7 -> Some SS
+  | 8 -> Some SCK
+  | 9 -> Some MOSI
+  | 10 -> Some MISO
   | _ -> None
 
 (* No analog support yet :p *)

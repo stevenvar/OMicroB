@@ -27,8 +27,9 @@
 #define LOWER_PIN (HIGHER_DDR + 1)
 #define HIGHER_PIN (LOWER_PIN + NB_PORT - 1)
 
-/* #define SPSR 36 */
-/* #define SPDR 37 */
+// Only for arduboy, dirty hack
+#define SPSR 16
+#define SPDR 17
 
 static unsigned char *regs;
 static unsigned int *analogs;
@@ -203,10 +204,10 @@ static void write_register_gen(int reg, uint8_t new_val){
       regs[reg] = new_val;
     }
   }
-  /* else if(reg == SPDR){ */
-  /*   regs[reg] = new_val; */
-  /*   send_write_port('G'-'A',new_val); */
-  /* } */
+  else if(reg == SPDR){
+    regs[reg] = new_val;
+    send_write_port(reg, new_val);
+  }
   else{
     regs[reg] = new_val;
   }
@@ -234,11 +235,11 @@ uint8_t read_register(uint8_t reg){
 }
 
 bool read_bit(uint8_t reg, uint8_t bit){
-  /* printf("read_bit(%d, %d)\n", (int) reg, (int) bit); */
-  /* Dirty hack  */
-  /* if (reg == SPSR){ */
-  /*     return 1; */
-  /* } */
+  printf("read_bit(%d, %d)\n", (int) reg, (int) bit);
+  /* Dirty hack */
+  if (reg == SPSR){
+      return 1;
+  }
   uint8_t mask = 1 << bit;
   uint8_t val;
   init_simulator();

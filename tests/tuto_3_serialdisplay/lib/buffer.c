@@ -47,7 +47,7 @@ uint8_t buffer_get_byte(){
   uint8_t val = *ptr;
   ptr++;
   total++;
-  if(total >= WIDTH*HEIGHT){
+  if(total >= WIDTH*HEIGHT/8){
     ptr = sBuffer;
     total = 0;
   }

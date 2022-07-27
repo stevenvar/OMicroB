@@ -289,9 +289,13 @@ module Make(M : MCUSimul) : Simul = struct
           let mask = 1 lsl i in
           if lxor_values land mask <> 0 then
             if old_value land mask <> 0 then
-              clear_pins := pin_of_register_index register i :: !clear_pins
+              try
+                clear_pins := pin_of_register_index register i :: !clear_pins
+              with _ -> ()
             else
-              set_pins := pin_of_register_index register i :: !set_pins
+              try
+                set_pins := pin_of_register_index register i :: !set_pins
+              with _ -> ()
         done;
       in
       let set_pins = !set_pins in
@@ -329,9 +333,13 @@ module Make(M : MCUSimul) : Simul = struct
           let mask = 1 lsl i in
           if lxor_values land mask <> 0 then
             if old_value land mask <> 0 then
-              new_out_pins := pin_of_register_index register i :: !new_out_pins
+              try
+                new_out_pins := pin_of_register_index register i :: !new_out_pins
+              with _ -> ()
             else
-              new_in_pins := pin_of_register_index register i :: !new_in_pins
+              try
+                new_in_pins := pin_of_register_index register i :: !new_in_pins
+              with _ -> ()
         done;
       in
       let new_in_pins = !new_in_pins in

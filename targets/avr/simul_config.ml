@@ -1,11 +1,3 @@
-(* module ArduinoMegaSimul : *)
-(*   (MCUSimul *)
-(*    with type pin := [ `DWRITE ] ArduinoMegaPins.pin *)
-(*    with type port := ArduinoMegaPins.register *)
-(*    with type bit := ArduinoMegaPins.bit) = ArduinoMegaPins *)
-
-include ArduinoMegaPins
-
 let get_config name = match name with
   | "arduino-uno" -> (module ArduinoUnoPins : MCUSimul)
   | "arduino-mega" -> (module ArduinoMegaPins : MCUSimul)

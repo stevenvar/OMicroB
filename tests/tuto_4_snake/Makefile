@@ -14,7 +14,7 @@ flash: snake.hex
 	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: snake.elf
-	./$< '../../bin/omicrob_circuit_simulator circuit.txt'
+	./$< '../../bin/omicrob_circuit_simulator -device $(DEVICE) circuit.txt'
 
 clean:
 	@rm -f *.cmo *.cmi

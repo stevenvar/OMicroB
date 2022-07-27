@@ -218,7 +218,7 @@ module Component(Simul : Simul.Simul) = struct
           failwith (sprintf "invalid 7 segment (%d,%d) configuration" x y);
       end
     | Lcd lcd ->
-      (* Display.display_border lcd; *)
+      LCD.Display.show lcd;
       sync_display ();
       LCD.Proto.register lcd
     | Lcd16x2 lcd ->

@@ -1,8 +1,8 @@
 include ../../etc/Makefile.conf
 
-DEVICE ?= arduino-uno
+DEVICE ?= arduboy
 
-SOURCES := buffer.c spi.ml oled.ml arduboy.ml display.ml
+SOURCES := buffer.c spi.ml oled.ml display.ml
 TARGETS := display.byte display.c display.elf display.avr display.hex
 
 all: $(TARGETS)
@@ -14,7 +14,9 @@ flash: display.hex
 	$(BIN)/omicrob -device $(DEVICE) -flash -sudo $<
 
 simul: display.elf
-	./$< '../../bin/omicrob_circuit_simulator circuit.txt'
+	./$< \
+	'$(BIN)/omicrob_pin_simulator -device $(DEVICE)'  \
+	'$(BIN)/omicrob_circuit_simulator -device $(DEVICE) circuit.txt'
 
 clean:
 	@rm -f *.cmo *.cmi
