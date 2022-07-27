@@ -118,23 +118,24 @@ module Dip (M: Simul.Simul) = struct
      done;
      sync_display ()
 
-   let draw_analog _an _value = () (* TODO *)
-   (*   let open Graphics in *)
-   (*   let ((px, py),_) = pins.(num_of_pin (M.pin_of_an (int_of_an an))) in *)
-   (*   let red_sz = ((pin_height - 1) * (value - 1) + (0x3FF - 1)) / (0x3FF - 1) in *)
-   (*   set_color red; *)
-   (*   for i = 0 to red_sz - 1 do *)
-   (*     moveto (px) (py+i); *)
-   (*     rlineto pin_width 0; *)
-   (*   done; *)
-   (*   set_color yellow; *)
-   (*   for i = red_sz to 10 do *)
-   (*     moveto (px) (py+i); *)
-   (*     rlineto pin_width 0; *)
-   (*   done; *)
-   (*   set_color black; *)
-   (*   draw_rect px py pin_width pin_height; *)
-   (*   sync_display () *)
+   let draw_analog an value =
+     let open Graphics in
+     let n = M.num_of_pin (M.pin_of_analog an) in
+     let ((px, py),_) = pins.(n) in
+     let red_sz = ((pin_height - 1) * (value - 1) + (0x3FF - 1)) / (0x3FF - 1) in
+     set_color red;
+     for i = 0 to red_sz - 1 do
+       moveto (px) (py+i);
+       rlineto pin_width 0;
+     done;
+     set_color yellow;
+     for i = red_sz to 10 do
+       moveto (px) (py+i);
+       rlineto pin_width 0;
+     done;
+     set_color black;
+     draw_rect px py pin_width pin_height;
+     sync_display ()
 
 
   let draw_micro () =
