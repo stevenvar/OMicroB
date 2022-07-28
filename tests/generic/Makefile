@@ -8,7 +8,7 @@ DEVICE ?= arduino-uno
 all: $(TARGETS)
 
 $(TARGETS): $(SOURCES)
-	$(BIN)/omicrob -device $(DEVICE) -v $^ -mlopt -verbose -stack-size 200 -heap-size 200 -o test.elf
+	$(BIN)/omicrob -device $(DEVICE) -v $^ -mlopt -verbose -stack-size 200 -heap-size 200
 
 clean:
 	@rm -f *.cmo *.cmi

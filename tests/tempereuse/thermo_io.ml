@@ -17,7 +17,7 @@ let sensor = PINA0
 
 (* conversion de température *)
 let convert_temp t =
-  let f = (float_of_int (1033 - t) /. 11.67) in
+  let f = (float_of_int t /. 50.0) in
   int_of_float (f*.100.)
 
 (* lecture de la température *)

@@ -1,6 +1,6 @@
 include ../../../etc/Makefile.conf
 
-DEVICE ?= microbit
+DEVICE ?= arduino-uno
 
 all: rgb.hex
 

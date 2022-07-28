@@ -32,6 +32,7 @@ value caml_buffer_display(value x){
 #include "lib/buffer.c"
 
 #define SPSR 16
+#define SPDR 17
 #define SPIF 0
 
 value caml_buffer_write(value x, value y, value color) {
@@ -50,7 +51,7 @@ value caml_buffer_get_byte(value x) {
 value caml_buffer_display(value x){
   for(int i = 0; i < 1024; i++){
     int b = buffer_get_byte ();
-    avr_write_register(SPDR,b);
+    write_register(SPDR,b);
   }
   return Val_unit;
 }
