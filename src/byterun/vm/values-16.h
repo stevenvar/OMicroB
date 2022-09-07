@@ -95,7 +95,7 @@ typedef uint32_t code_t;
 #define Val_static_block(x)  (value)((value) ((char *) (x) - (char *) ocaml_ram_heap) << 1)
 #define Val_flash_block(x)   (value)((value) ((char *) (x) - (char *) ocaml_flash_heap + (ROUND_RAM_WOSIZE << 1)) << 1)
 
-#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + ((value) (x) >> 1)))
+#define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + ((uvalue) (x) >> 1)))
 #define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((uvalue) (x) >> 1) - (ROUND_RAM_WOSIZE << 1)))
 
 #define Val_int(x) ((value) (((uint16_t) (int16_t) (x) << 1) | 1))
