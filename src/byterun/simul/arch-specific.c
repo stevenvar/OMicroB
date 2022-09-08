@@ -25,14 +25,14 @@ void device_finish() {
 /********************************** Debug *************************************/
 /******************************************************************************/
 
-void uncaught_exception(value acc) {
+void uncaught_exception(value accu) {
   value str;
   int i;
   char c;
-  if (Is_block(acc) && Tag_val(acc) == Object_tag && Wosize_val(acc) > 0 && Is_block(Field(acc, 0)) && Tag_val(Field(acc, 0)) == String_tag) {
-    str = Field(acc, 0);
+  if (Is_block(accu) && Tag_val(accu) == Object_tag && Wosize_val(accu) > 0 && Is_block(Field(accu, 0)) && Tag_val(Field(accu, 0)) == String_tag) {
+    str = Field(accu, 0);
   } else {
-    str = Field(Field(acc, 0), 0);
+    str = Field(Field(accu, 0), 0);
   }
   printf("Error: uncaught exception: ");
   i = 0;
@@ -42,9 +42,9 @@ void uncaught_exception(value acc) {
     i ++;
     c = String_field(str, i);
   }
-  if (Is_block(acc) && Tag_val(acc) == 0 && Wosize_val(acc) > 1 && Is_block(Field(acc, 1)) && Tag_val(Field(acc, 1)) == String_tag) {
+  if (Is_block(accu) && Tag_val(accu) == 0 && Wosize_val(accu) > 1 && Is_block(Field(accu, 1)) && Tag_val(Field(accu, 1)) == String_tag) {
     printf(" \"");
-    str = Field(acc, 1);
+    str = Field(accu, 1);
     i = 0;
     c = String_field(str, 0);
     while (c != '\0') {
