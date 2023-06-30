@@ -47,8 +47,7 @@ void microbit_delay(int ms) {
 }
 
 int microbit_millis() {
-  printf("millis()\n");
-  return 0;
+    return millis();
 }
 
 /******************************************************************************/

@@ -9,6 +9,8 @@ extern const char **global_argv; // used by simulator
 
 void device_init(const char **argv) {
   global_argv = argv;
+  // Init time
+  gettimeofday(&start, NULL);
 }
 
 #if DEBUG >= 1

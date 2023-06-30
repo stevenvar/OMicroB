@@ -337,9 +337,14 @@ void delay(int ms) {
   usleep((useconds_t) ms * 1000);
 }
 
+#include <sys/time.h>
+
+struct timeval start, stop;
+
 int millis() {
-  printf("millis\n");
-  return 0;
+    gettimeofday(&stop, NULL);
+    uint64_t delta_us = (stop.tv_sec - start.tv_sec) * 1000000 + (stop.tv_usec - start.tv_usec);
+    return delta_us / 1000;
 }
 
 /******************************/
