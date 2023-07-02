@@ -46,7 +46,11 @@ int repeat (int a, int n) {
           
 
 int main() {
-int r  =  repeat(0,1000000) ;
- printf("%s %d\n","RES=", r);
-}
+    int start = millis();
 
+    int r  =  repeat(0,1000000) ;
+    printf("%s %d\n","RES=", r);
+    int end = millis();
+    printf("%d\n", end-start);
+    return 0;
+}

@@ -51,7 +51,9 @@ int repeat (int n){
 
 
 int main(){
-  int i;
-  printf("%d\n", repeat(2000000));
+    int start = millis();
+    printf("%d\n", repeat(2000000));
+    int end = millis();
+    printf("%d\n", end-start);
+    return 0;
 }
-
