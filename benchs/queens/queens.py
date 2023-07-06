@@ -78,9 +78,9 @@ def queens(n):
 
 def main():
     i = 0
-    while (i < 100):
+    while (i < 10000):
         j = 0
-        while (j <= 4):
+        while (j <= 6):
             queens(j)
             j = j + 1
         i = i + 1

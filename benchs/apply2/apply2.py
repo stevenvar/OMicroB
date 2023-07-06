@@ -1,5 +1,5 @@
 import time
-from microbit import *
+# from microbit import *
 
 double = lambda f : lambda x : f (f(x))
 quad = lambda n : double(double)(n)
@@ -14,7 +14,7 @@ def test_apply(n):
         i = i + 1
     print(r)
     return r
-    
-display.show(Image.CONFUSED)
-test_apply(100000)
-display.show(Image.HAPPY)
+
+# display.show(Image.CONFUSED)
+test_apply(1000000)
+# display.show(Image.HAPPY)

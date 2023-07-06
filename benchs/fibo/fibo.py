@@ -1,4 +1,4 @@
-from microbit import *
+# from microbit import *
 
 def fibo(n):
     if n < 2:
@@ -12,6 +12,6 @@ def test_fibo(n):
         fibo(5);
         i = i + 1
 
-display.show(Image.CONFUSED)
-test_fibo(100000)
-display.show(Image.HAPPY)
+# display.show(Image.CONFUSED)
+test_fibo(1000000)
+# display.show(Image.HAPPY)

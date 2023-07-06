@@ -78,11 +78,11 @@ def random_int(x):
     return random.randint(0,x)
 
 def main():
-    start = time.ticks_ms()
-    for i in range(0,10):
+    # start = time.ticks_ms()
+    for i in range(0,10000):
         l = init(100,random_int)
-    stop=time.ticks_ms()
-    print(time.ticks_diff(stop,start))
+    # stop=time.ticks_ms()
+    # print(time.ticks_diff(stop,start))
 
 if __name__ == "__main__":
     main()

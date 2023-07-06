@@ -1,5 +1,5 @@
 import time
-from microbit import *
+# from microbit import *
 
 def integrale(f, a, b, n):
     accu = 0.0
@@ -25,6 +25,6 @@ def test_integrales(n):
 
 
 
-display.show(Image.CONFUSED)
-test_integrales(40)
-display.show(Image.HAPPY)
+# display.show(Image.CONFUSED)
+test_integrales(4000)
+# display.show(Image.HAPPY)
