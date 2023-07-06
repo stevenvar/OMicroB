@@ -34,7 +34,7 @@ tree node(alpha d, tree l, tree r) {
     return t;
 }
 
-list init(int n, alpha (*f)(alpha)) {
+list init2(int n, alpha (*f)(alpha)) {
     list l = NULL;
     while(n > 0) {
         l = cons(f(n), l);
@@ -86,7 +86,7 @@ int main() {
     list l;
     int start = millis();
     for(int i = 0; i < 10000; i++) {
-        l = tree_sort(init(100, my_random));
+        l = tree_sort(init2(100, my_random));
     }
     int end = millis();
     printf("%d\n", end-start);
