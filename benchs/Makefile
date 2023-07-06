@@ -46,13 +46,14 @@ all: $(TARGETS)
 	$(BIN)/omicrob -device arduino-uno $^ -o $@
 
 %.o: %.c
-	gcc -c -o $@ $^
+	gcc -O1 -c -o $@ $^
 
 %-c.exe:%-c.c gccHarness.o
-	gcc -o $@ $^
+	gcc -g -O1 -o $@ $^
 
 %-c.arm_o:%-c.c
 	arm-none-eabi-gcc $(ARM_CXX_FLAGS) \
+		-Wno-array-bounds -Wno-incompatible-pointer-types \
 		-D__MICROBIT__ \
 		-I $(INCLUDEDIR)/microbit \
 		-o $@ -c $^ \

@@ -9,7 +9,7 @@ let rec repeat a n =
 
 let main () =
   let start = millis () in
-  ignore (repeat 0 100000);
+  ignore (repeat 0 1000000);
   let stop = millis () in
   Serial.write_string (string_of_int (stop-start));;
 

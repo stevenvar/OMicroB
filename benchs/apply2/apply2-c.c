@@ -36,10 +36,13 @@ alpha dcs(alpha(*f)(alpha), alpha x){
 int succ(int n) { return n + 1;}
           
  
-int repeat (int a, int n) {
-  if (n<=0) {return(a);}
-  else {return repeat(a+dcs(&succ,n),n-1);
-  }
+int repeat (int n) {
+    int a;
+    while(n > 0) {
+        a+=dcs(&succ,n);
+        n--;
+    }
+    return a;
 }
 
                 
@@ -48,8 +51,8 @@ int repeat (int a, int n) {
 int main() {
     int start = millis();
 
-    int r  =  repeat(0,1000000) ;
-    printf("%s %d\n","RES=", r);
+    int r  =  repeat(1000000) ;
+    printf("RES= %d\n", r);
     int end = millis();
     printf("%d\n", end-start);
     return 0;
