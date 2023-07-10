@@ -86,7 +86,7 @@ void debug_blink_pause(void) {
 #define assert(x)
 #endif
 
-void uncaught_exception(value acc) {
+void uncaught_exception(value) {
   debug_blink_error();
 }
 
