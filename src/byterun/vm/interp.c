@@ -175,6 +175,7 @@ static inline void interp_init(void) {
   init_global_data();
   init_static_heap();
   trapSp = Val_int(-1);
+  acc = init_ocaml_acc;
   env = Val_unit;
   extra_args = 0;
   pc = 0;

@@ -216,12 +216,6 @@ let () =
       Printer.print_opcodes oc opcodes;
       Printf.fprintf oc "\n";
 
-      (* Define initial flash *)
-      Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_heap" "OCAML_FLASH_HEAP_WOSIZE" flash_heap_data;
-      Printf.fprintf oc "\n";
-      Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_global_data" "OCAML_FLASH_GLOBDATA_NUMBER" flash_global_data;
-      Printf.fprintf oc "\n";
-
       (* Declare heap variables *)
       Printf.fprintf oc "struct {\n";
       Printf.fprintf oc "  value ocaml_ram_heap[OCAML_STATIC_HEAP_WOSIZE + OCAML_DYNAMIC_HEAP_WOSIZE];\n";
@@ -232,9 +226,11 @@ let () =
         assert (List.for_all ((=) (T.INT 0)) ram_global_data);
         Printf.fprintf oc "  value ocaml_ram_global_data[OCAML_RAM_GLOBDATA_NUMBER];\n";
       );
-      Printf.fprintf oc "  value acc = %s;\n" (Printer.string_of_dword accu_data);
-      Printf.fprintf oc "  value env = Val_unit;\n";
+      Printf.fprintf oc "  value acc;\n";
+      Printf.fprintf oc "  value env;\n";
       Printf.fprintf oc "} ocaml_ram;\n";
+      Printf.fprintf oc "\n";
+      Printf.fprintf oc "#define init_ocaml_acc (%s)\n" (Printer.string_of_dword accu_data);
       Printf.fprintf oc "\n";
       Printf.fprintf oc "#define ocaml_stack ocaml_ram.ocaml_stack\n";
       Printf.fprintf oc "#define ocaml_ram_heap ocaml_ram.ocaml_ram_heap\n";
@@ -243,6 +239,12 @@ let () =
       Printf.fprintf oc "#define env ocaml_ram.env\n";
       Printf.fprintf oc "\n";
       
+      (* Define initial flash *)
+      Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_heap" "OCAML_FLASH_HEAP_WOSIZE" flash_heap_data;
+      Printf.fprintf oc "\n";
+      Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_flash_global_data" "OCAML_FLASH_GLOBDATA_NUMBER" flash_global_data;
+      Printf.fprintf oc "\n";
+
       (* Define initial static heap and stack *)
       Printer.print_datagen_word_array oc "PROGMEM value const" "ocaml_initial_static_heap" "OCAML_STATIC_HEAP_WOSIZE" static_heap_data;
       Printf.fprintf oc "\n";
