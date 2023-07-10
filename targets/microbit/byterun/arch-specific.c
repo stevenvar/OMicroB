@@ -47,7 +47,7 @@ void debug_blink_pause(void) {
   delay_loop(1000);
 }
 
-void uncaught_exception(value acc) {
+void uncaught_exception(value) {
   debug_blink_error();
 }
 

@@ -1,10 +1,9 @@
 (******************************************************************************)
 
 let default_arm_cxx_options = [ "-mthumb";
-                                "-g"; "-fno-exceptions"; "-fno-unwind-tables";
-                                "-O2"; "-g"; "-Wall"; "-Wl,-Os";
+                                "-fno-exceptions"; "-fno-unwind-tables";
+                                "-Os"; "-Wall"; "-Wl,-Os";
                                 "-fdata-sections"; "-ffunction-sections";
-                                "-O"; "-g"; "-Wall"; "-Wl,-Os";
                                 "-Wl,--gc-sections" ]
 
 let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
