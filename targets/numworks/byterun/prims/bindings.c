@@ -12,7 +12,7 @@
 
 value caml_numworks_print_string(value s) {
   #ifdef __OCAML__
-  microbit_print_string(String_val(s));
+  printf("%s", String_val(s));
   #else
   int n = caml_string_length(s); int i;
   char buf[n+1];
