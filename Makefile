@@ -21,6 +21,9 @@ avr: internals
 microbit: internals
 	$(call compile, targets/microbit)
 
+numworks: internals
+	$(call compile, targets/numworks)
+
 pic32: internals
 	$(call compile, targets/pic32)
 

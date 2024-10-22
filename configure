@@ -25,7 +25,7 @@ function usage () {
  -prefix <dir>       Set bindir, libdir, libexecdir includedir and mandir to <dir>/bin, <dir>/lib/omicrob,
                      <dir>/libexec/omicrob, <dir>/include/omicrob and <dir>/man respectively
  -target <opt>       Select one target for which OMicroB will be installed
-                     (e.g. -target avr|pic32|microbit)"
+                     (e.g. -target avr|pic32|microbit|numworks)"
 }
 
 function check_command () {
@@ -220,6 +220,7 @@ function reset_targets() {
     rm -rf "src/byterun/avr/"
     rm -rf "src/byterun/pic32"
     rm -rf "src/byterun/microbit"
+    rm -rf "src/byterun/numworks"
 }
 
 reset_targets
@@ -295,6 +296,24 @@ function target_microbit () {
     echo "ARCHS := microbit \$(ARCHS)" >> "etc/Makefile.conf"
 }
 
+function target_numworks () {
+    check_command "arm-none-eabi-gcc"
+    check_command "npx"
+
+    cat "targets/numworks/device_config.ml" >> "src/omicrob/device_config.ml"
+
+    cat "targets/numworks/byterun/prims/prims.h" >> "src/byterun/prims/prims.h"
+    cat "targets/numworks/byterun/prims/bindings.c" >> "src/byterun/prims/bindings.c"
+    cat "targets/numworks/byterun/prims/prims.h" >> "src/byterun/simul/sf-regs.h"
+    cat "targets/numworks/byterun/simul/sf-regs.c" >> "src/byterun/simul/sf-regs.c"
+
+    cp -rf "targets/numworks/byterun" "src/byterun/numworks"
+
+    echo "ARCHS := numworks \$(ARCHS)" >> "etc/Makefile.conf"
+
+    echo "let eadk_cflags = \"$(npx --yes -- nwlink@0.0.16 eadk-cflags)\"" >> "etc/config.ml"
+}
+
 
 ################################################################################
 ## Choose targets
@@ -305,6 +324,7 @@ do
         avr) target_avr;;
         pic32) target_pic32;;
         microbit) target_microbit;;
+        numworks) target_numworks;;
     *) echo "Unsupported target \"$target\""
     esac
 done

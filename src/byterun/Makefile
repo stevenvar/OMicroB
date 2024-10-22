@@ -41,4 +41,7 @@ clean:
 microbit: microbit/accel.c microbit/adc.c microbit/lib.c microbit/radio.c microbit/serial.c microbit/timer.c microbit/lib.c microbit/microbian.c microbit/startup.c
 	$(MAKE) -C microbit
 
+numworks: numworks/startup.c
+	$(MAKE) -C numworks
+
 .PHONY: byterun clean $(ARCHS)
