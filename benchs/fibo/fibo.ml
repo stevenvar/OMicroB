@@ -9,5 +9,5 @@ let rec repeat n =
 let _ =
   let start = millis () in
   repeat 1000000;
-  let stop = millis () in
-  Serial.write_string (string_of_int (stop-start))
+  let stop = millis () in () (* in *)
+  (* Serial.write_string (string_of_int (stop-start)) *)

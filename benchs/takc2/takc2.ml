@@ -15,7 +15,7 @@ let repeat n =
 let main () =
   let start = millis () in
   ignore (repeat 200000);
-  let stop = millis () in
-  Serial.write_string (string_of_int (stop-start));;
+  let stop = millis () in ();;
+  (* Serial.write_string (string_of_int (stop-start));; *)
 
 main();;

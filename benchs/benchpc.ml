@@ -46,7 +46,7 @@ let main outchan bench =
   Printf.printf "Running benchs for %s\n%!" bench;
   output_string outchan bench;
 
-  let omicrob_cmd = Printf.sprintf "./%s.omicrob.byte" bench in
+  let omicrob_cmd = Printf.sprintf "./%s.elf" bench in
   Printf.printf "Running omicrob bench: %s\n%!" omicrob_cmd;
   run_for_time outchan omicrob_cmd;
 

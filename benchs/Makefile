@@ -6,18 +6,20 @@ BENCHS := \
 	takc2/takc2 \
 	abrsort/abrsort \
 	queens/queens \
-	integrales_tr/integrales_tr
+	integrales_tr/integrales_tr \
+	object/object
 
 ARM_CXX_FLAGS := \
 	-mcpu=cortex-m0 -mthumb \
-	-g -fno-exceptions -fno-unwind-tables \
-	-O2 -g -Wall -Wl,-Os \
+	-fno-exceptions -fno-unwind-tables \
+	-Os -Wall -Wl,-Os \
 	-fdata-sections -ffunction-sections \
 	-Wl,--gc-sections
 
 
 OMICROB_BYTE := $(BENCHS:=.omicrob.byte)
 OCAMLRUN_BYTE := $(BENCHS:=.ocamlrun.byte)
+OMICROB_ELF := $(BENCHS:=.elf)
 OMICROB_ARM_HEX := $(BENCHS:=.arm.hex)
 OMICROB_AVR_HEX := $(BENCHS:=.avr.hex)
 C_EXE := $(BENCHS:=-c.exe)
@@ -25,13 +27,16 @@ C_ARM_ELF := $(BENCHS:=-c.arm_elf)
 C_ARM_HEX := $(BENCHS:=-c.arm.hex)
 
 TARGETS := $(OCAMLRUN_BYTE) \
-	$(OMICROB_BYTE) $(OMICROB_ARM_HEX) $(OMICROB_AVR_HEX) \
+	$(OMICROB_ELF) $(OMICROB_ARM_HEX) $(OMICROB_AVR_HEX) \
 	$(C_EXE) $(C_ARM_ELF) $(C_ARM_HEX)
 
 all: $(TARGETS)
 
 %.omicrob.byte: %.ml
 	$(BIN)/omicrob -device microbit $^ -o $@
+
+%.elf: %.ml
+	$(BIN)/omicrob -no-shortcut-initialization -device microbit $^ -o $@
 
 %.cmo: %.ml
 	ocamlc -c -o $@ unix.cma $^
@@ -40,16 +45,16 @@ all: $(TARGETS)
 	ocamlc -o $@ unix.cma ocamlrunHarness.cmo -open OcamlrunHarness $<
 
 %.arm.hex: %.ml
-	$(BIN)/omicrob -device microbit $^ -o $@
+	$(BIN)/omicrob -device microbit $^ -o $@ -no-shortcut-initialization -stack-size 200 -heap-size 1000
 
 %.avr.hex: %.ml
 	$(BIN)/omicrob -device arduino-uno $^ -o $@
 
 %.o: %.c
-	gcc -O1 -c -o $@ $^
+	gcc -Os -c -o $@ $^
 
 %-c.exe:%-c.c gccHarness.o
-	gcc -g -O1 -o $@ $^
+	gcc -Os -o $@ $^
 
 %-c.arm_o:%-c.c
 	arm-none-eabi-gcc $(ARM_CXX_FLAGS) \

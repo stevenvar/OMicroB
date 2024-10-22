@@ -28,8 +28,8 @@ exception K of string * float *   bool
 let main () =
   let start = millis () in
   repeat 4000;
-  let stop = millis () in
-  Serial.write_string (string_of_int (stop-start));;
+  let stop = millis () in ();;
+  (* Serial.write_string (string_of_int (stop-start));; *)
 
 main ()
 ;;
