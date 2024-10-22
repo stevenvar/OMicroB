@@ -1,7 +1,7 @@
 let get_config name = match name with
-  | "arduino-uno" -> (module ArduinoUnoPins : MCUSimul)
-  | "arduino-mega" -> (module ArduinoMegaPins : MCUSimul)
-  | "arduboy" -> (module ArduboyPins : MCUSimul)
+  | "arduino-uno" -> (module ArduinoUnoPins : Simul.MCUSimul)
+  | "arduino-mega" -> (module ArduinoMegaPins : Simul.MCUSimul)
+  | "arduboy" -> (module ArduboyPins : Simul.MCUSimul)
   | _ -> get_config name
 
 let all_config_names () = [
