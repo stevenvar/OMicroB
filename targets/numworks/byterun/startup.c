@@ -1,5 +1,9 @@
-// TODO
+#include <stddef.h>
+
+extern int main(int, char**);
+
 void default_start() {
+  main(0, NULL); // Run the VM
   /* printf("External data : '%s'\n", eadk_external_data); */
   /* eadk_timing_msleep(3000); */
   /* draw_random_colorful_rectangles(); */

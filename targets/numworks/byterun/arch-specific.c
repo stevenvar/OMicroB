@@ -1,3 +1,4 @@
+#include <eadk.h>
 #include "arch-specific.h"
 
 /******************************************************************************/
@@ -19,27 +20,23 @@ void device_finish() {
 
 void debug_blink_error(void) {
   while(1) {
-    char s[] = "E";
-    // TODO
+    printf("Error!");
   }
 }
 
 void debug_blink_uncatched_exception(void) {
   while(1) {
-    char s[] = "U";
-    // TODO
+    printf("Uncatched exception!");
   }
 }
 
 void debug_blink_message(int n) {
-  char buf[50];
-  sprintf(buf, "%d", n);
-  // TODO
+  printf("Error: %d\n", n);
 }
 
 void debug_blink_pause(void) {
-  char s[] = "P";
-  // TODO
+  printf("pause");
+  eadk_timing_msleep(1000);
 }
 
 void uncaught_exception(value) {
