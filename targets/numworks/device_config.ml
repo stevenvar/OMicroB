@@ -47,7 +47,7 @@ let compile_c_to_hex ~local ~trace:_ ~verbose input output =
   let cmd = cmd @ [ "-nostartfiles" ] in
   let cmd = cmd @ [ "--specs=nosys.specs" ] in
   let cmd = cmd @ [ "-fdata-sections"; "-ffunction-sections" ] in
-  let cmd = cmd @ [ "-Wl,-e,main"; "-Wl,-u,eadk_app_name"; "-Wl,-u,eadk_app_icon"; "-Wl,-u,eadk_api_level" ] in
+  let cmd = cmd @ [ "-Wl,-e,__start"; "-Wl,-u,eadk_app_name"; "-Wl,-u,eadk_app_icon"; "-Wl,-u,eadk_api_level" ] in
   let cmd = cmd @ [ "-Wl,--gc-sections" ] in
   let cmd = cmd @ [ "-D__NUMWORKS__" ] in
   let cmd = cmd @ [ arm_o_file;
