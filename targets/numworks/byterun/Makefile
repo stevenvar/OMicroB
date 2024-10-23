@@ -1,4 +1,4 @@
-all: startup.o
+all: startup.o icon.o
 
 CC = arm-none-eabi-gcc
 NWLINK = npx --yes -- nwlink@0.0.16
@@ -15,6 +15,10 @@ AR = arm-none-eabi-ar
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
+icon.o: icon.png
+	@echo "ICON    $<"
+	$(Q) $(NWLINK) png-icon-o $< $@
 
 clean: force
 	rm -f *.hex *.elf *.map *.o

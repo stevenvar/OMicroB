@@ -138,3 +138,34 @@ void format_long(char *buf, int bufsize, value v) {
 }
 #endif
 
+/******************************************************************************/
+/******************************** Hardware ************************************/
+/******************************************************************************/
+
+bool read_bit(uint8_t reg, uint8_t bit) {
+  return 0; // TODO
+}
+
+void set_bit(uint8_t reg, uint8_t bit) {
+  return; // TODO
+}
+
+void clear_bit(uint8_t reg, uint8_t bit) {
+  return; // TODO
+}
+
+void write_register(uint8_t reg, uint8_t val) {
+  return; // TODO
+}
+
+uint8_t read_register(uint8_t reg) {
+  return 0; // TODO
+}
+
+void delay(int ms) {
+  eadk_timing_msleep(ms);
+}
+
+int millis() {
+  return 0; // TODO
+}

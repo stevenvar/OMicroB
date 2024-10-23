@@ -45,10 +45,15 @@ let compile_c_to_hex ~local ~trace:_ ~verbose input output =
   let cmd = [ Config.arm_cxx ] @ default_arm_cxx_options in
   let cmd = cmd @ [ "-Wl,--relocatable" ] in
   let cmd = cmd @ [ "-nostartfiles" ] in
-  let cmd = cmd @ [ "--specs=nano.specs" ] in
+  let cmd = cmd @ [ "--specs=nosys.specs" ] in
+  let cmd = cmd @ [ "-fdata-sections"; "-ffunction-sections" ] in
+  let cmd = cmd @ [ "-Wl,-e,main"; "-Wl,-u,eadk_app_name"; "-Wl,-u,eadk_app_icon"; "-Wl,-u,eadk_api_level" ] in
+  let cmd = cmd @ [ "-Wl,--gc-sections" ] in
   let cmd = cmd @ [ "-D__NUMWORKS__" ] in
   let cmd = cmd @ [ arm_o_file;
-                    conc_numworks "startup.o" ] in
+                    conc_numworks "startup.o";
+                    conc_numworks "icon.o" ] in
+  let cmd = cmd @ [ "-lm" ] in
   let cmd = cmd @ [ "-o" ; arm_elf_file ] in
   List.iter (Printf.printf "%s ") cmd;
   run ~verbose cmd;
